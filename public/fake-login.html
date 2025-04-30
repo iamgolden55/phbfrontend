@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHB Login Hack</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        button {
+            background-color: #005eb8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #003f7e;
+        }
+    </style>
+</head>
+<body>
+    <h1>PHB Login Helper</h1>
+    <p>This page will help you log in to test the system.</p>
+    <p>Click the button below to simulate login and go to appointments:</p>
+    <button id="loginBtn">Login & Go to Appointments</button>
+
+    <script>
+        document.getElementById('loginBtn').addEventListener('click', function() {
+            // Create a fake user object with the correct structure
+            const user = {
+                id: '1',
+                full_name: 'John Smith',
+                email: 'john@example.com',
+                hpn: '123 456 7890',
+                gender: 'male',
+                date_of_birth: '1980-05-15',
+                phoneNumber: '+44 7700 900123',
+                country: 'GB',
+                state: 'London',
+                city: 'London',
+                has_completed_onboarding: true,
+                is_verified: true,
+                role: 'patient',
+                address: '123 Oxford Street, London',
+                phone: '+44 7700 900123'
+            };
+
+            // Add auth token
+            localStorage.setItem('phb_auth_token', 'fake-auth-token');
+            
+            // Store in localStorage as the app expects
+            localStorage.setItem('phb_user', JSON.stringify(user));
+
+            // Redirect to appointments page
+            window.location.href = '/account/appointments';
+        });
+    </script>
+</body>
+</html>

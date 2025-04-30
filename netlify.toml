@@ -1,0 +1,95 @@
+[images]
+  remote_images = ["https://source.unsplash.com/.*", "https://images.unsplash.com/.*", "https://ext.same-assets.com/.*", "https://ugc.same-assets.com/.*"]
+  compress = true
+
+[build]
+  publish = "dist"
+  command = "bun run build"
+
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  pretty_urls = true
+
+[build.processing.images]
+  compress = true
+
+# Direct access to static HTML pages
+[[redirects]]
+  from = "/simple.html"
+  to = "/simple.html"
+  status = 200
+
+[[redirects]]
+  from = "/test.html"
+  to = "/test.html"
+  status = 200
+
+# Specific SPA routes
+[[redirects]]
+  from = "/professional/login"
+  to = "/index.html"
+  status = 200
+  force = true
+
+# Add redirect for the misspelled URL (professionals with 's')
+[[redirects]]
+  from = "/professionals/login"
+  to = "/professional/login"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/professional/register"
+  to = "/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/professional/dashboard"
+  to = "/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/professional/calculators"
+  to = "/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/professional/research"
+  to = "/index.html"
+  status = 200
+  force = true
+
+# Generic catch-all for SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = true
+
+[functions]
+  node_bundler = "esbuild"
+  directory = "netlify/functions"
+
+[context.production]
+  environment = { NODE_VERSION = "18", BUN_VERSION = "1.2.5" }
+
+[dev]
+  command = "bun run dev"
+  framework = "#custom"
+  targetPort = 5173
+  port = 8888
+  publish = "dist"
+  autoLaunch = true

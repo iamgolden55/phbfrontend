@@ -1,0 +1,163 @@
+import React, { useState, useEffect } from 'react';
+import { getConditionsByLetter } from '../features/health/healthConditionsData';
+import { HealthCondition } from '../features/health/healthConditionsData';
+
+type HealthConditionsType = Record<string, { name: string; href: string; id: string }[]>;
+
+const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+const HealthAZPage: React.FC = () => {
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [healthConditions, setHealthConditions] = useState<HealthConditionsType>({});
+
+  // Load and prepare health conditions data when component mounts
+  useEffect(() => {
+    const conditionsByLetter = getConditionsByLetter();
+    const formattedConditions: HealthConditionsType = {};
+
+    // Format data for our component structure
+    Object.keys(conditionsByLetter).forEach(letter => {
+      formattedConditions[letter] = conditionsByLetter[letter].map(condition => ({
+        name: condition.name,
+        href: `/health-a-z/${condition.id}`,
+        id: condition.id
+      }));
+    });
+
+    setHealthConditions(formattedConditions);
+  }, []);
+
+  const handleAlphabetClick = (letter: string) => {
+    setActiveFilter(letter === activeFilter ? null : letter);
+    setSearchTerm('');
+  };
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setActiveFilter(null);
+  };
+
+  // Filter conditions based on search or active filter
+  const filteredConditions = () => {
+    const result: { letter: string; conditions: { name: string; href: string; id: string }[] }[] = [];
+
+    if (searchTerm) {
+      // Search through all conditions
+      Object.entries(healthConditions).forEach(([letter, conditions]) => {
+        const matchingConditions = conditions.filter(condition =>
+          condition.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+        if (matchingConditions.length > 0) {
+          result.push({ letter, conditions: matchingConditions });
+        }
+      });
+    } else if (activeFilter && healthConditions[activeFilter]) {
+      // Show only the active filter letter
+      result.push({
+        letter: activeFilter,
+        conditions: healthConditions[activeFilter]
+      });
+    } else {
+      // Show all conditions organized by letter
+      Object.entries(healthConditions).forEach(([letter, conditions]) => {
+        result.push({ letter, conditions });
+      });
+    }
+
+    return result;
+  };
+
+  return (
+    <div className="bg-white">
+      <div className="bg-[#005eb8] text-white py-8">
+        <div className="phb-container">
+          <h1 className="text-3xl font-bold mb-4">Health A to Z</h1>
+          <p className="text-xl font-medium">Find conditions and treatments information by selecting a letter</p>
+        </div>
+      </div>
+
+      <div className="phb-container py-8">
+        {/* Search */}
+        <div className="mb-8">
+          <label htmlFor="health-search" className="block font-bold mb-2">Search health conditions</label>
+          <div className="flex max-w-xl">
+            <input
+              type="search"
+              id="health-search"
+              placeholder="Search by condition or symptom"
+              className="px-4 py-2 border border-gray-300 rounded-l-md w-full focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+              value={searchTerm}
+              onChange={handleSearch}
+            />
+            <button
+              type="submit"
+              className="bg-[#005eb8] hover:bg-[#003f7e] text-white px-4 py-2 rounded-r-md"
+            >
+              Search
+            </button>
+          </div>
+        </div>
+
+        {/* Alphabet navigation */}
+        <div className="mb-8">
+          <h2 className="text-xl font-bold mb-4">Browse by letter</h2>
+          <div className="flex flex-wrap gap-2">
+            {alphabet.map(letter => (
+              <button
+                key={letter}
+                onClick={() => handleAlphabetClick(letter)}
+                className={`w-10 h-10 flex items-center justify-center rounded-md font-bold text-lg
+                  ${activeFilter === letter
+                    ? 'bg-[#005eb8] text-white'
+                    : healthConditions[letter] && healthConditions[letter].length > 0
+                      ? 'bg-gray-100 hover:bg-gray-200 text-[#005eb8]'
+                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  }`}
+                disabled={!healthConditions[letter] || healthConditions[letter].length === 0}
+              >
+                {letter}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Conditions list */}
+        <div>
+          {filteredConditions().map(({ letter, conditions }) => (
+            <div key={letter} className="mb-8">
+              <h2 id={`letter-${letter}`} className="text-2xl font-bold mb-4 text-[#005eb8] border-b border-gray-200 pb-2">
+                {letter}
+              </h2>
+              <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {conditions.map((condition) => (
+                  <li key={condition.id}>
+                    <a
+                      href={condition.href}
+                      className="text-[#005eb8] hover:underline font-medium flex items-center"
+                    >
+                      <svg className="h-5 w-5 mr-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                      {condition.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+
+          {filteredConditions().length === 0 && (
+            <div className="bg-gray-100 p-6 rounded-md">
+              <h3 className="text-lg font-bold mb-2">No conditions found</h3>
+              <p>Try searching with a different term or browse by letter.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default HealthAZPage;

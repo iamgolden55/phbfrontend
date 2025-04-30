@@ -1,0 +1,166 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Frutiger';
+  src: url('https://ext.same-assets.com/2399685259/709842854.bin') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Frutiger';
+  src: url('https://ext.same-assets.com/2399685259/1734805319.bin') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+}
+
+body {
+  font-family: 'Frutiger', Arial, Helvetica, sans-serif;
+}
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 3.9%;
+
+  /* PHB Blue - main color (similar to NHS blue but modified for PHB) */
+  --phb-blue: 210 70% 35%;
+  --phb-light-blue: 210 60% 95%;
+
+  --primary: var(--phb-blue);
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: var(--phb-blue);
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 0 0% 98%;
+  --primary-foreground: 240 5.9% 10%;
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --ring: 240 4.9% 83.9%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .phb-container {
+    @apply container max-w-[1020px] mx-auto px-4;
+  }
+
+  .phb-link {
+    @apply text-[#005eb8] hover:underline font-medium;
+  }
+
+  .phb-button {
+    @apply bg-[#005eb8] text-white px-5 py-2 rounded-md hover:bg-[#003f7e] transition-colors font-bold;
+  }
+
+  .phb-card {
+    @apply bg-white border border-gray-200 rounded-md p-5;
+  }
+}
+
+/* 3D transformation utility classes */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* Body model styling */
+.human-body-outline {
+  stroke: #d1d5db;
+  stroke-width: 2;
+  fill: transparent;
+}
+
+.body-part {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  fill: rgba(147, 197, 253, 0.1);
+  stroke: #d1d5db;
+  stroke-width: 2;
+}
+
+.body-part:hover, .body-part.highlight {
+  fill: rgba(96, 165, 250, 0.6);
+  stroke: #2563eb;
+  stroke-width: 2.5;
+}
+
+/* Animation for pulse effect */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Custom animation for paste feedback effect */
+@keyframes paste-feedback {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.paste-feedback {
+  animation: paste-feedback 0.5s ease-in-out;
+}
