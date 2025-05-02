@@ -67,11 +67,6 @@ interface RegisterData {
   consent_terms?: boolean;
   consent_hipaa?: boolean;
   consent_data_processing?: boolean;
-  consents?: {
-    terms: boolean;
-    hipaa: boolean;
-    dataProcessing: boolean;
-  };
 }
 
 interface UserProfileUpdateData {

@@ -14,6 +14,7 @@ import TestPage from './pages/TestPage';
 import OnboardingTestPage from './pages/OnboardingTestPage'; // Add this import
 import BookAppointment from './features/health/BookAppointment';
 import ViewAppointments from './features/health/ViewAppointments';
+import AppointmentConfirmation from './features/health/AppointmentConfirmation';
 
 // Organization Pages
 import OrganizationDashboardPage from './pages/organization/OrganizationDashboardPage';
@@ -492,6 +493,11 @@ function App() {
                 <Route path="account/appointments/view" element={
                   <ProtectedRoute>
                     <ViewAppointments />
+                  </ProtectedRoute>
+                } />
+                <Route path="account/appointments/confirmation" element={
+                  <ProtectedRoute>
+                    <AppointmentConfirmation />
                   </ProtectedRoute>
                 } />
                 <Route path="account/medical-records" element={

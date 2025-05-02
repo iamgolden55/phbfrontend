@@ -307,13 +307,7 @@ const RegisterForm: React.FC = () => {
         // Include individual consent fields
         consent_terms: consentTerms,
         consent_hipaa: consentHipaa,
-        consent_data_processing: consentDataProcessing,
-        // Also include nested consents object as an alternative
-        consents: {
-          terms: consentTerms,
-          hipaa: consentHipaa,
-          dataProcessing: consentDataProcessing
-        }
+        consent_data_processing: consentDataProcessing
       };
 
       // Call the register function with the complete user data
