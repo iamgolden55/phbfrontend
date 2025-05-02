@@ -99,7 +99,7 @@ const MOCK_DOCTOR = {
 };
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/'; // Fallback if .env is missing
-const AUTH_TOKEN_KEY = 'phb_auth_token'; // Key for localStorage - same as in authContext
+const AUTH_TOKEN_KEY = 'phb_auth_token';
 
 // Helper function for making API calls (reusing pattern from authContext)
 async function apiRequest<T>(
@@ -192,23 +192,56 @@ const BookAppointment: React.FC = () => {
       setIsLoading(true);
       try {
         // Fetch appointment types and departments from the actual API endpoints
-        const [appointmentTypesResponse, departmentsResponse] = await Promise.all([
-          apiRequest<AppointmentType[]>('/api/appointment-types/'),
-          apiRequest<Department[]>('/api/departments/')
-        ]);
+        const appointmentTypesResponse = await apiRequest<AppointmentType[]>('/api/appointment-types/');
         
+        // Handle the new departments response format
+        const departmentsResponse = await fetch(`${API_BASE_URL}/api/departments/`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem(AUTH_TOKEN_KEY)}`,
+            'Accept': 'application/json',
+          }
+        });
+
+        // Parse the departments response
+        const departmentsData = await departmentsResponse.json();
+
+        // Handle different response status codes
+        if (!departmentsResponse.ok) {
+          switch (departmentsResponse.status) {
+            case 403:
+              throw new Error('You are not registered with this hospital. Please contact support.');
+            case 404:
+              throw new Error('No primary hospital found. Please register with a hospital first.');
+            default:
+              throw new Error(`Failed to fetch departments: ${departmentsData.message || 'Unknown error'}`);
+          }
+        }
+
+        // Validate the success response format
+        if (departmentsData.status !== 'success' || !Array.isArray(departmentsData.departments)) {
+          throw new Error('Invalid department data received from server');
+        }
+
         console.log('API Response - Appointment Types:', appointmentTypesResponse);
-        console.log('API Response - Departments:', departmentsResponse);
+        console.log('API Response - Departments:', departmentsData.departments);
         
         setAppointmentTypes(appointmentTypesResponse);
-        setDepartments(departmentsResponse);
+        setDepartments(departmentsData.departments);
         setUsesMockData(false);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching initial data:', error);
-        // Fallback to mock data if API fails
-        setAppointmentTypes(MOCK_APPOINTMENT_TYPES);
-        setDepartments(MOCK_DEPARTMENTS);
-        setUsesMockData(true);
+        
+        // Show specific error messages for department-related errors
+        if (error.message.includes('hospital')) {
+          setSubmissionError(error.message);
+          // Don't fall back to mock data for hospital registration issues
+          setDepartments([]);
+        } else {
+          // Fall back to mock data for other types of errors
+          setAppointmentTypes(MOCK_APPOINTMENT_TYPES);
+          setDepartments(MOCK_DEPARTMENTS);
+          setUsesMockData(true);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -318,7 +351,7 @@ const BookAppointment: React.FC = () => {
       
       console.log('Created doctor info:', doctorInfo);
       setMatchedDoctor(doctorInfo);
-      
+
       // Process available time slots
       console.log('Checking for available_slots in the response');
       if (jsonData.available_slots && Array.isArray(jsonData.available_slots)) {
@@ -390,27 +423,24 @@ const BookAppointment: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!matchedDoctor) {
+      setSubmissionError('No doctor matched. Please try again.');
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmissionError(null);
 
     try {
-      if (!matchedDoctor) {
-        throw new Error('No doctor has been matched for this appointment');
-      }
+      const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
       
-      // Find appointment type ID
-      const selectedAppointmentType = appointmentTypes.find(t => t.name === formData.appointmentType);
-      if (!selectedAppointmentType) {
-        throw new Error('Appointment type not found');
-      }
-      
-      // Parse time slot
-      const startTime = formData.preferredTimeSlot.split(' - ')[0].trim();
-      
-      // Format date and time for API
-      const appointmentDateTime = `${formData.preferredDate}T${startTime}`;
-      
-      // Map urgency to API priority values
+      // Format the appointment date and time
+      const [hours, minutes] = formData.preferredTimeSlot.split(':');
+      const appointmentDate = new Date(formData.preferredDate);
+      appointmentDate.setHours(parseInt(hours), parseInt(minutes), 0);
+      const appointmentDateTime = appointmentDate.toISOString();
+
+      // Map urgency levels to API values
       const priorityMapping: { [key: string]: string } = {
         "routine": "normal",
         "soon": "priority",
@@ -418,41 +448,48 @@ const BookAppointment: React.FC = () => {
       };
       
       // Submit appointment to API
-      const response = await apiRequest<any>(
-        '/api/appointments/', 
-        'POST', 
-        {
+      const response = await fetch(`${API_BASE_URL}api/appointments/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': authToken ? `Bearer ${authToken}` : '',
+        },
+        body: JSON.stringify({
           doctor_id: matchedDoctor.doctor_id,
-          hospital: 1, // Default hospital ID
-          department: matchedDoctor.department_id,
+          department_id: matchedDoctor.department_id,
           appointment_date: appointmentDateTime,
-          appointment_type: selectedAppointmentType.id,
+          appointment_type: formData.appointmentType,
           priority: priorityMapping[formData.urgency],
           chief_complaint: formData.symptoms || 'General checkup',
           additional_notes: formData.additionalNotes || '',
-          fee: 0, // Add default fee as required by backend
-          patient_language_preference: formData.preferredLanguage // Add language preference for future appointments
-        }
-      );
+          preferred_language: formData.preferredLanguage
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create appointment. Please try again.');
+      }
+
+      const appointmentData = await response.json();
       
       // Navigate to confirmation page with details
       navigate('/account/appointments/confirmation', {
         state: {
           appointmentDetails: {
             ...formData,
-            appointmentId: response.appointment_id || response.id,
+            appointmentId: appointmentData.id,
             doctorName: matchedDoctor.doctor_name,
             doctorSpecialty: formData.specialtyNeeded,
-            location: response.hospital_name || 'PHB Virtual Care',
+            location: appointmentData.location || 'PHB Virtual Care',
             dateConfirmed: formData.preferredDate,
-            timeConfirmed: formData.preferredTimeSlot,
-            apiResponse: response
+            timeConfirmed: formData.preferredTimeSlot
           }
         }
       });
     } catch (error: any) {
       console.error('Error submitting appointment:', error);
-      setSubmissionError(getErrorMessage(error));
+      setSubmissionError(error.message || 'Failed to create appointment. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
