@@ -55,49 +55,6 @@ const LANGUAGES = [
   'Japanese'
 ];
 
-// Temporary mock data until API is ready
-const MOCK_APPOINTMENT_TYPES = [
-  { id: "first_visit", name: 'First Visit' },
-  { id: "follow_up", name: 'Follow Up' },
-  { id: "consultation", name: 'Consultation' },
-  { id: "procedure", name: 'Procedure' },
-  { id: "test", name: 'Medical Test' },
-  { id: "vaccination", name: 'Vaccination' },
-  { id: "therapy", name: 'Therapy' }
-];
-
-const MOCK_DEPARTMENTS = [
-  { id: 1, name: 'General Practice', code: 'GP' },
-  { id: 2, name: 'Cardiology', code: 'CARD' },
-  { id: 3, name: 'Dermatology', code: 'DERM' },
-  { id: 4, name: 'Gastroenterology', code: 'GAST' },
-  { id: 5, name: 'Neurology', code: 'NEUR' },
-  { id: 6, name: 'Obstetrics & Gynecology', code: 'OBGYN' },
-  { id: 7, name: 'Orthopedics', code: 'ORTH' },
-  { id: 8, name: 'Pediatrics', code: 'PEDI' },
-  { id: 9, name: 'Psychiatry', code: 'PSYC' },
-  { id: 10, name: 'Urology', code: 'URO' }
-];
-
-const MOCK_TIME_SLOTS = [
-  { start: "09:00:00", end: "09:30:00" },
-  { start: "09:45:00", end: "10:15:00" },
-  { start: "10:30:00", end: "11:00:00" },
-  { start: "11:15:00", end: "11:45:00" },
-  { start: "13:30:00", end: "14:00:00" },
-  { start: "14:15:00", end: "14:45:00" },
-  { start: "15:00:00", end: "15:30:00" }
-];
-
-const MOCK_DOCTOR = {
-  doctor_id: 123,
-  doctor_name: 'Dr. Sarah Johnson',
-  department_id: 1,
-  available_dates: ["2023-07-01", "2023-07-02", "2023-07-03"],
-  specialty: 'General Practice',
-  languages: ['English', 'Spanish']
-};
-
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/'; // Fallback if .env is missing
 const AUTH_TOKEN_KEY = 'phb_auth_token';
 
@@ -178,7 +135,6 @@ const BookAppointment: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [usesMockData, setUsesMockData] = useState(false);
 
   // Fetch appointment types and departments on component mount
   useEffect(() => {
@@ -222,26 +178,11 @@ const BookAppointment: React.FC = () => {
           throw new Error('Invalid department data received from server');
         }
 
-        console.log('API Response - Appointment Types:', appointmentTypesResponse);
-        console.log('API Response - Departments:', departmentsData.departments);
-        
         setAppointmentTypes(appointmentTypesResponse);
         setDepartments(departmentsData.departments);
-        setUsesMockData(false);
       } catch (error: any) {
-        console.error('Error fetching initial data:', error);
-        
-        // Show specific error messages for department-related errors
-        if (error.message.includes('hospital')) {
-          setSubmissionError(error.message);
-          // Don't fall back to mock data for hospital registration issues
-          setDepartments([]);
-        } else {
-          // Fall back to mock data for other types of errors
-          setAppointmentTypes(MOCK_APPOINTMENT_TYPES);
-          setDepartments(MOCK_DEPARTMENTS);
-          setUsesMockData(true);
-        }
+        setSubmissionError(error.message);
+        setDepartments([]);
       } finally {
         setIsLoading(false);
       }
@@ -297,13 +238,6 @@ const BookAppointment: React.FC = () => {
     setSubmissionError(null);
     
     try {
-      if (usesMockData) {
-        // Mock for testing
-        setMatchedDoctor(MOCK_DOCTOR);
-        setAvailableTimeSlots(MOCK_TIME_SLOTS);
-        return;
-      }
-      
       // Find department ID from selection
       const selectedDepartment = departments.find(d => d.name === formData.specialtyNeeded);
       if (!selectedDepartment) {
@@ -441,12 +375,6 @@ const BookAppointment: React.FC = () => {
       console.error('Error matching with doctor:', error);
       setSubmissionError(error.message || 'Error matching with a doctor');
       setAvailableTimeSlots([]);
-      
-      // Fallback to mock for testing
-      if (usesMockData) {
-        setMatchedDoctor(MOCK_DOCTOR);
-        setAvailableTimeSlots(MOCK_TIME_SLOTS);
-      }
     } finally {
       setIsLoading(false);
     }
@@ -641,15 +569,6 @@ const BookAppointment: React.FC = () => {
     <AccountHealthLayout title="Book an Appointment">
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <h2 className="text-2xl font-bold mb-6">Book an Appointment</h2>
-
-        {usesMockData && (
-          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <h3 className="font-bold text-yellow-800 mb-2">Development Mode</h3>
-            <p className="text-sm text-yellow-700">
-              Using mock data for testing purposes. In production, real data would be fetched from the API.
-            </p>
-          </div>
-        )}
 
         <div className="mb-8">
           <div className="relative">
