@@ -151,7 +151,7 @@ const BookAppointment: React.FC = () => {
         const appointmentTypesResponse = await apiRequest<AppointmentType[]>('/api/appointment-types/');
         
         // Handle the new departments response format
-        const departmentsResponse = await fetch(`${API_BASE_URL}/api/departments/`, {
+        const departmentsResponse = await fetch(`${API_BASE_URL.replace(/\/$/, '')}/api/departments/`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem(AUTH_TOKEN_KEY)}`,
             'Accept': 'application/json',
