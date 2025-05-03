@@ -436,7 +436,7 @@ const BookAppointment: React.FC = () => {
       };
       
       // Submit appointment to API
-      const response = await fetch(`${API_BASE_URL}api/appointments/`, {
+      const response = await fetch(`${API_BASE_URL.replace(/\/$/, '')}/api/appointments/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
