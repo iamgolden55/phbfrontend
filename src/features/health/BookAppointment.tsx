@@ -250,6 +250,24 @@ const BookAppointment: React.FC = () => {
     fetchInitialData();
   }, [isAuthenticated, navigate]);
 
+  // Dynamically fetch available slots when date changes on step 3
+  useEffect(() => {
+    // Only run when on step 3 and a date is selected
+    if (currentStep === 3 && formData.preferredDate) {
+      // Debounce to avoid spamming API if user changes date quickly
+      const debounceTimeout = setTimeout(() => {
+        // Reset selected time slot when date changes
+        setFormData(prev => ({
+          ...prev,
+          preferredTimeSlot: ''
+        }));
+        matchWithDoctor();
+      }, 400); // 400ms debounce
+      return () => clearTimeout(debounceTimeout);
+    }
+    // eslint-disable-next-line
+  }, [formData.preferredDate, currentStep]);
+
   // When form data changes, we might want to update the form
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
