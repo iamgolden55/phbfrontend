@@ -102,7 +102,7 @@ const AppointmentDetail: React.FC = () => {
 
         try {
           // Attempt to get data from actual API
-          const response = await fetch(`${API_BASE_URL}api/appointments/${id}/`, {
+          const response = await fetch(`${API_BASE_URL.replace(/\/$/, '')}/api/appointments/${id}/`, {
             headers: {
               'Authorization': `Bearer ${authToken}`,
               'Accept': 'application/json',
@@ -138,7 +138,7 @@ const AppointmentDetail: React.FC = () => {
     setSummaryError(null);
     
     // Open the summary in a new tab/window
-    window.open(`${API_BASE_URL}api/appointments/${appointment.id}/summary/`, '_blank');
+    window.open(`${API_BASE_URL.replace(/\/$/, '')}/api/appointments/${appointment.id}/summary/`, '_blank');
     
     setSummaryLoading(false);
   };
@@ -147,7 +147,7 @@ const AppointmentDetail: React.FC = () => {
     if (!appointment) return;
     
     // Open the calendar endpoint in a new tab/window
-    window.open(`${API_BASE_URL}api/appointments/${appointment.id}/calendar/`, '_blank');
+    window.open(`${API_BASE_URL.replace(/\/$/, '')}/api/appointments/${appointment.id}/calendar/`, '_blank');
   };
 
   const formatDate = (dateString: string) => {

@@ -67,7 +67,7 @@ const ViewAppointments: React.FC = () => {
           queryParams = '?past=true';
         }
         
-        const response = await fetch(`${API_BASE_URL}api/appointments/${queryParams}`, {
+        const response = await fetch(`${API_BASE_URL.replace(/\/$/, '')}/api/appointments/${queryParams}`, {
           headers: {
             'Authorization': `Bearer ${authToken}`,
             'Accept': 'application/json',
@@ -214,7 +214,7 @@ const ViewAppointments: React.FC = () => {
     try {
       const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
       
-      const response = await fetch(`${API_BASE_URL}api/appointments/${selectedAppointment.id}/cancel/`, {
+      const response = await fetch(`${API_BASE_URL.replace(/\/$/, '')}/api/appointments/${selectedAppointment.id}/cancel/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -268,11 +268,11 @@ const ViewAppointments: React.FC = () => {
 
   // API function handlers
   const handleViewSummary = (appointmentId: string) => {
-    window.open(`${API_BASE_URL}api/appointments/${appointmentId}/summary/`, '_blank');
+    window.open(`${API_BASE_URL.replace(/\/$/, '')}/api/appointments/${appointmentId}/summary/`, '_blank');
   };
 
   const handleAddToCalendar = (appointmentId: string) => {
-    window.open(`${API_BASE_URL}api/appointments/${appointmentId}/calendar/`, '_blank');
+    window.open(`${API_BASE_URL.replace(/\/$/, '')}/api/appointments/${appointmentId}/calendar/`, '_blank');
   };
 
   return (
