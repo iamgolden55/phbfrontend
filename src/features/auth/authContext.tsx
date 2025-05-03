@@ -136,7 +136,8 @@ async function apiRequest<T>(
   body?: any,
   token?: string | null
 ): Promise<T> {
-  const url = `${API_BASE_URL.replace(/\/$/, '')}${endpoint}`; // Ensure no double slashes
+  // Ensure exactly one slash between base URL and endpoint
+  const url = `${API_BASE_URL.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
