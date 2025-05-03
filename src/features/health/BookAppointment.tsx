@@ -253,11 +253,24 @@ const BookAppointment: React.FC = () => {
   // When form data changes, we might want to update the form
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // Format appointment type to match backend expectations (if needed)
+    if (name === 'appointmentType') {
+      // Capitalize first letter of each word for appointment type
+      const formattedValue = value.split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+      
+      setFormData(prev => ({
+        ...prev,
+        [name]: formattedValue
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   // Match with a doctor after the Preferences step and get available time slots
@@ -435,10 +448,39 @@ const BookAppointment: React.FC = () => {
       const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
       
       // Format the appointment date and time
-      const [hours, minutes] = formData.preferredTimeSlot.split(':');
+      // Parse the selected time slot (e.g., "9:00 AM - 9:30 AM") to extract the start time
+      let hours = 0;
+      let minutes = 0;
+      
+      if (formData.preferredTimeSlot) {
+        // Extract just the start time portion (e.g., "9:00 AM")
+        const startTimeStr = formData.preferredTimeSlot.split(' - ')[0];
+        
+        // Parse hours and minutes, handling AM/PM
+        const timeMatch = startTimeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+        if (timeMatch) {
+          let parsedHours = parseInt(timeMatch[1]);
+          const parsedMinutes = parseInt(timeMatch[2]);
+          const period = timeMatch[3].toUpperCase();
+          
+          // Convert 12-hour format to 24-hour format
+          if (period === 'PM' && parsedHours < 12) {
+            parsedHours += 12;
+          } else if (period === 'AM' && parsedHours === 12) {
+            parsedHours = 0;
+          }
+          
+          hours = parsedHours;
+          minutes = parsedMinutes;
+        }
+      }
+      
+      // Set the time on the appointment date
       const appointmentDate = new Date(formData.preferredDate);
-      appointmentDate.setHours(parseInt(hours), parseInt(minutes), 0);
+      appointmentDate.setHours(hours, minutes, 0);
       const appointmentDateTime = appointmentDate.toISOString();
+      
+      console.log('Sending appointment with datetime:', appointmentDateTime);
 
       // Map urgency levels to API values
       const priorityMapping: { [key: string]: string } = {
@@ -456,14 +498,12 @@ const BookAppointment: React.FC = () => {
           'Authorization': authToken ? `Bearer ${authToken}` : '',
         },
         body: JSON.stringify({
-          doctor_id: matchedDoctor.doctor_id,
           department_id: matchedDoctor.department_id,
           appointment_date: appointmentDateTime,
           appointment_type: formData.appointmentType,
           priority: priorityMapping[formData.urgency],
-          chief_complaint: formData.symptoms || 'General checkup',
-          additional_notes: formData.additionalNotes || '',
-          preferred_language: formData.preferredLanguage
+          chief_complaint: formData.symptoms || 'General checkup'
+          // Removed doctor_id, additional_notes, and preferred_language as per backend expectations
         })
       });
 

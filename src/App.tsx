@@ -186,6 +186,9 @@ import EatingDisordersPage from './pages/mental-health/EatingDisordersPage';
 // New import for Research Publications Page
 import ResearchPublicationsPage from './pages/ResearchPublicationsPage';
 
+// Add the new import
+import AppointmentDetail from './features/health/AppointmentDetail';
+
 // Professional route guard component
 const ProfessionalRouteGuard = ({ children, allowedRoles = [] }: { children: React.ReactNode, allowedRoles?: string[] }) => {
   const { isAuthenticated, professionalInfo } = useProfessionalAuth();
@@ -498,6 +501,11 @@ function App() {
                 <Route path="account/appointments/confirmation" element={
                   <ProtectedRoute>
                     <AppointmentConfirmation />
+                  </ProtectedRoute>
+                } />
+                <Route path="account/appointments/:id" element={
+                  <ProtectedRoute>
+                    <AppointmentDetail />
                   </ProtectedRoute>
                 } />
                 <Route path="account/medical-records" element={

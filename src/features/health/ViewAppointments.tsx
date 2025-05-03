@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AccountHealthLayout from '../../layouts/AccountHealthLayout';
+import { useAuth } from '../auth/authContext';
 
 interface AppointmentType {
   id: string;
@@ -13,97 +14,22 @@ interface AppointmentType {
   location: string;
   status: 'scheduled' | 'cancelled' | 'completed' | 'missed' | 'rescheduled';
   reason?: string;
+  formatted_date_time?: string; // For API response
+  doctor_full_name?: string; // For API response
 }
 
-// Sample appointments for demonstration
-const mockAppointments: AppointmentType[] = [
-  {
-    id: 'APP-123456',
-    date: '2025-04-15',
-    time: '09:30',
-    duration: '20 min',
-    type: 'in-person',
-    provider: 'Dr. Sarah Johnson',
-    speciality: 'General Practice',
-    location: 'PHB Medical Center - North Wing',
-    status: 'scheduled',
-    reason: 'Annual check-up'
-  },
-  {
-    id: 'APP-123457',
-    date: '2025-04-22',
-    time: '14:00',
-    duration: '30 min',
-    type: 'video',
-    provider: 'Dr. Michael Chen',
-    speciality: 'Dermatology',
-    location: 'PHB Virtual Care',
-    status: 'scheduled',
-    reason: 'Skin condition follow-up'
-  },
-  {
-    id: 'APP-123458',
-    date: '2025-03-10',
-    time: '11:15',
-    duration: '15 min',
-    type: 'phone',
-    provider: 'Dr. Emily Rodriguez',
-    speciality: 'Psychiatry',
-    location: 'PHB Telehealth Services',
-    status: 'completed',
-    reason: 'Medication review'
-  },
-  {
-    id: 'APP-123459',
-    date: '2025-03-05',
-    time: '16:30',
-    duration: '45 min',
-    type: 'in-person',
-    provider: 'Dr. James Wilson',
-    speciality: 'Cardiology',
-    location: 'PHB Heart Center',
-    status: 'completed',
-    reason: 'Echocardiogram and consultation'
-  },
-  {
-    id: 'APP-123460',
-    date: '2025-02-28',
-    time: '09:00',
-    duration: '20 min',
-    type: 'video',
-    provider: 'Dr. Sarah Johnson',
-    speciality: 'General Practice',
-    location: 'PHB Virtual Care',
-    status: 'cancelled',
-    reason: 'Cold and flu symptoms'
-  },
-  {
-    id: 'APP-123461',
-    date: '2025-02-15',
-    time: '13:45',
-    duration: '30 min',
-    type: 'in-person',
-    provider: 'Dr. Robert Thompson',
-    speciality: 'Orthopedics',
-    location: 'PHB Medical Center - East Wing',
-    status: 'missed',
-    reason: 'Knee pain assessment'
-  },
-  {
-    id: 'APP-123462',
-    date: '2025-04-30',
-    time: '10:15',
-    duration: '20 min',
-    type: 'phone',
-    provider: 'Dr. Lisa Anderson',
-    speciality: 'Neurology',
-    location: 'PHB Telehealth Services',
-    status: 'scheduled',
-    reason: 'Headache consultation'
-  }
-];
+// API URL constants
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/';
+const AUTH_TOKEN_KEY = 'phb_auth_token';
+
+// Helper function to get authorization headers
+const getAuthHeaders = () => {
+  const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
+  return authToken ? { 'Authorization': `Bearer ${authToken}` } : {};
+};
 
 const ViewAppointments: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const [view, setView] = useState<'upcoming' | 'past' | 'all'>('upcoming');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAppointment, setSelectedAppointment] = useState<AppointmentType | null>(null);
@@ -111,23 +37,80 @@ const ViewAppointments: React.FC = () => {
   const [cancelReason, setCancelReason] = useState('');
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
   const [cancelSuccess, setCancelSuccess] = useState(false);
+  
+  // API data state
+  const [appointments, setAppointments] = useState<AppointmentType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Filter appointments based on current view and search term
-  const filteredAppointments = mockAppointments
-    .filter(appointment => {
-      // Filter by view type
-      const appointmentDate = new Date(appointment.date);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0); // Set to beginning of day for comparison
+  // Fetch appointments from API
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      if (!isAuthenticated) {
+        return;
+      }
+      
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
+        if (!authToken) {
+          throw new Error('No authentication token found');
+        }
+        
+        // Determine API query parameters based on selected view
+        let queryParams = '';
+        if (view === 'upcoming') {
+          queryParams = '?upcoming=true';
+        } else if (view === 'past') {
+          queryParams = '?past=true';
+        }
+        
+        const response = await fetch(`${API_BASE_URL}api/appointments/${queryParams}`, {
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Accept': 'application/json',
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch appointments: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Appointments data from API:', data);
+        
+        // Transform API data to match our component's expected format
+        const formattedAppointments = Array.isArray(data) ? data.map((apt: any) => ({
+          id: apt.id || apt.appointment_id || '',
+          date: apt.date || (apt.appointment_date ? apt.appointment_date.split('T')[0] : ''),
+          time: apt.time || (apt.appointment_date ? new Date(apt.appointment_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''),
+          duration: apt.duration || '30 min',
+          type: apt.appointment_type?.includes('video') ? 'video' : 
+                apt.appointment_type?.includes('phone') ? 'phone' : 'in-person',
+          provider: apt.doctor_full_name || apt.doctor_name || 'Doctor',
+          speciality: apt.department_name || apt.specialty || 'General',
+          location: apt.location || apt.hospital_name || 'PHB Medical Center',
+          status: apt.status || 'scheduled',
+          reason: apt.chief_complaint || apt.reason || '',
+        })) : [];
+        
+        setAppointments(formattedAppointments);
+      } catch (err) {
+        console.error('Error fetching appointments:', err);
+        setError('Failed to load appointments. Please try again later.');
+        setAppointments([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchAppointments();
+  }, [view, isAuthenticated]);
 
-      if (view === 'upcoming') {
-        return appointmentDate >= today && appointment.status === 'scheduled';
-      }
-      if (view === 'past') {
-        return appointmentDate < today || appointment.status !== 'scheduled';
-      }
-      return true; // 'all' view
-    })
+  // Filter appointments based on search term
+  const filteredAppointments = appointments
     .filter(appointment => {
       // Filter by search term
       if (!searchTerm) return true;
@@ -213,7 +196,7 @@ const ViewAppointments: React.FC = () => {
     }
   };
 
-  const handleCancelAppointment = (appointment: AppointmentType) => {
+  const handleCancelAppointment = async (appointment: AppointmentType) => {
     setSelectedAppointment(appointment);
     setShowCancelModal(true);
   };
@@ -223,20 +206,50 @@ const ViewAppointments: React.FC = () => {
     setShowRescheduleModal(true);
   };
 
-  const submitCancellation = () => {
-    console.log('Cancellation submitted for:', selectedAppointment?.id, 'Reason:', cancelReason);
+  const submitCancellation = async () => {
+    if (!selectedAppointment) return;
+    
+    console.log('Cancellation submitted for:', selectedAppointment.id, 'Reason:', cancelReason);
 
-    // In a real app, this would be an API call
-    // For now we'll just close the modal and show success message
-    setShowCancelModal(false);
-    setCancelSuccess(true);
+    try {
+      const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
+      
+      const response = await fetch(`${API_BASE_URL}api/appointments/${selectedAppointment.id}/cancel/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({ reason: cancelReason || 'User cancelled' }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to cancel appointment');
+      }
+      
+      // Close the modal and show success message
+      setShowCancelModal(false);
+      setCancelSuccess(true);
 
-    // Hide success message after 3 seconds
-    setTimeout(() => setCancelSuccess(false), 3000);
+      // Hide success message after 3 seconds
+      setTimeout(() => setCancelSuccess(false), 3000);
 
-    // Reset
-    setCancelReason('');
-    setSelectedAppointment(null);
+      // Reset and update appointments
+      setCancelReason('');
+      setSelectedAppointment(null);
+      
+      // Update the appointments list after cancellation
+      setAppointments(prevAppointments => 
+        prevAppointments.map(apt => 
+          apt.id === selectedAppointment.id 
+            ? { ...apt, status: 'cancelled' } 
+            : apt
+        )
+      );
+    } catch (error) {
+      console.error('Error cancelling appointment:', error);
+      alert('Failed to cancel appointment. Please try again.');
+    }
   };
 
   const canCancelAppointment = (appointment: AppointmentType) => {
@@ -251,6 +264,15 @@ const ViewAppointments: React.FC = () => {
 
     // Can't cancel if less than 24 hours before appointment
     return hoursDifference > 24;
+  };
+
+  // API function handlers
+  const handleViewSummary = (appointmentId: string) => {
+    window.open(`${API_BASE_URL}api/appointments/${appointmentId}/summary/`, '_blank');
+  };
+
+  const handleAddToCalendar = (appointmentId: string) => {
+    window.open(`${API_BASE_URL}api/appointments/${appointmentId}/calendar/`, '_blank');
   };
 
   return (
@@ -330,7 +352,16 @@ const ViewAppointments: React.FC = () => {
           </Link>
         </div>
 
-        {filteredAppointments.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#005eb8]"></div>
+            <span className="ml-3 text-gray-700">Loading appointments...</span>
+          </div>
+        ) : error ? (
+          <div className="bg-red-50 p-4 rounded-md mb-4">
+            <p className="text-red-700">{error}</p>
+          </div>
+        ) : filteredAppointments.length === 0 ? (
           <div className="bg-gray-50 rounded-lg p-8 text-center">
             <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -397,6 +428,13 @@ const ViewAppointments: React.FC = () => {
                             Cancel
                           </button>
 
+                          <button
+                            onClick={() => handleAddToCalendar(appointment.id)}
+                            className="px-3 py-1 text-sm bg-teal-50 text-teal-700 rounded border border-teal-200 hover:bg-teal-100 transition-colors"
+                          >
+                            Add to Calendar
+                          </button>
+
                           {!canCancelAppointment(appointment) && appointment.status === 'scheduled' && (
                             <span className="text-xs text-gray-500 ml-2 self-center">
                               Cannot cancel within 24 hours
@@ -414,14 +452,12 @@ const ViewAppointments: React.FC = () => {
                         </a>
                       )}
 
-                      {appointment.status === 'completed' && (
-                        <Link
-                          to={`/account/appointments/${appointment.id}/summary`}
-                          className="px-3 py-1 text-sm bg-purple-50 text-purple-700 rounded border border-purple-200 hover:bg-purple-100 transition-colors"
-                        >
-                          View Summary
-                        </Link>
-                      )}
+                      <button
+                        onClick={() => handleViewSummary(appointment.id)}
+                        className="px-3 py-1 text-sm bg-purple-50 text-purple-700 rounded border border-purple-200 hover:bg-purple-100 transition-colors"
+                      >
+                        View Summary
+                      </button>
 
                       <Link
                         to={`/account/appointments/${appointment.id}`}
