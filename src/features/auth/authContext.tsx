@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode, useCallback, useRef } from 'react';
+import { API_BASE_URL } from '../../utils/config';
 
 // Define types for our user and auth context
 interface User {
@@ -126,7 +127,6 @@ interface AuthContextType {
 // Create the context with a default value
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/'; // Fallback if .env is missing
 const AUTH_TOKEN_KEY = 'phb_auth_token'; // Key for storing token in localStorage
 
 // Helper function for making API calls
