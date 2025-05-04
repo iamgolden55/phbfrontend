@@ -2,6 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../auth/authContext';
 import { Link } from 'react-router-dom';
 import AccountHealthLayout from '../../layouts/AccountHealthLayout';
+import { 
+  fetchMedicalRecords, 
+  isMedAccessTokenValid, 
+  clearMedAccessToken, 
+  ERROR_CODES 
+} from './medicalRecordsAuthService';
+import MedicalRecordsOTP from './MedicalRecordsOTP';
 
 interface RecordType {
   id: string;
@@ -63,11 +70,16 @@ const mockHealthRecords: RecordType[] = [
 ];
 
 const GPHealthRecord: React.FC = () => {
-  const { user, isLoading, error, hasPrimaryHospital, primaryHospital, checkPrimaryHospital } = useAuth();
+  const { user, isLoading, error: authError, hasPrimaryHospital, primaryHospital, checkPrimaryHospital } = useAuth();
   const [selectedRecord, setSelectedRecord] = useState<RecordType | null>(null);
   const [filterType, setFilterType] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [isCheckingHospital, setIsCheckingHospital] = useState(false);
+  
+  // Add new state for medical record access
+  const [accessState, setAccessState] = useState<'checking' | 'need_auth' | 'loading' | 'authorized' | 'error'>('checking');
+  const [medicalAccessError, setMedicalAccessError] = useState<string>('');
+  const [accessExpiry, setAccessExpiry] = useState<Date | null>(null);
 
   // Check primary hospital on component mount
   useEffect(() => {
@@ -90,9 +102,47 @@ const GPHealthRecord: React.FC = () => {
       verifyHospital();
     }
     
-    // Remove dependencies that cause re-renders and infinite API calls
+    // Check if we have medical records access
+    checkMedicalRecordsAccess();
+    
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Add a function to check medical records access
+  const checkMedicalRecordsAccess = () => {
+    setAccessState('checking');
+    console.log('Checking medical records access for GP Health Record...');
+    
+    // Check if we have a valid med access token
+    if (isMedAccessTokenValid()) {
+      // We have a valid token, we can show the records
+      console.log('Valid medical access token found, setting authorized state');
+      setAccessState('authorized');
+      
+      // Set expiry time for UI display
+      const expiryTime = new Date();
+      expiryTime.setMinutes(expiryTime.getMinutes() + 30); // Assuming 30 min expiry
+      setAccessExpiry(expiryTime);
+    } else {
+      // We need to request authentication
+      console.log('No valid medical access token found, authentication required');
+      setAccessState('need_auth');
+    }
+  };
+
+  const handleVerificationSuccess = () => {
+    console.log('OTP verification successful for GP Health Record');
+    setAccessState('authorized');
+    // Set expiry time for UI display
+    const expiryTime = new Date();
+    expiryTime.setMinutes(expiryTime.getMinutes() + 30);
+    setAccessExpiry(expiryTime);
+  };
+
+  const handleCancelVerification = () => {
+    // Just show a message instead of the verification form
+    setAccessState('need_auth');
+  };
 
   // Filter records based on type and search term
   const filteredRecords = mockHealthRecords.filter(record => {
@@ -181,26 +231,111 @@ const GPHealthRecord: React.FC = () => {
     }
   };
 
+  // Render different content based on access state
+  if (accessState === 'checking') {
+    return (
+      <AccountHealthLayout>
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin h-8 w-8 border-4 border-[#005eb8] border-t-transparent rounded-full"></div>
+          <span className="ml-3 text-gray-600">Checking access...</span>
+        </div>
+      </AccountHealthLayout>
+    );
+  }
+
+  if (accessState === 'need_auth') {
+    return (
+      <AccountHealthLayout>
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h2 className="text-2xl font-bold mb-4">GP Health Record</h2>
+          
+          <div className="p-4 bg-blue-50 rounded-md mb-6">
+            <p className="text-blue-700">
+              Your HPN number: {user?.hpn || 'Not available'}
+            </p>
+            {hasPrimaryHospital && primaryHospital && (
+              <p className="text-blue-700 mt-2">
+                Primary Hospital: {primaryHospital.name}
+              </p>
+            )}
+          </div>
+          
+          <p className="mb-6">
+            Medical records contain sensitive information and require secure verification.
+            Click the button below to request access.
+          </p>
+          
+          <button
+            onClick={() => setAccessState('loading')}
+            className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e]"
+          >
+            Request Secure Access
+          </button>
+        </div>
+      </AccountHealthLayout>
+    );
+  }
+
+  if (accessState === 'loading') {
+    return (
+      <AccountHealthLayout>
+        <MedicalRecordsOTP 
+          onVerificationSuccess={handleVerificationSuccess} 
+          onCancel={handleCancelVerification} 
+        />
+      </AccountHealthLayout>
+    );
+  }
+
+  if (accessState === 'error') {
+    return (
+      <AccountHealthLayout>
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h2 className="text-2xl font-bold mb-4">GP Health Record</h2>
+          
+          <div className="p-4 bg-red-50 rounded-md mb-6 text-red-700">
+            {medicalAccessError || 'An error occurred while accessing your medical records.'}
+          </div>
+          
+          <button
+            onClick={checkMedicalRecordsAccess}
+            className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e]"
+          >
+            Try Again
+          </button>
+        </div>
+      </AccountHealthLayout>
+    );
+  }
+
+  // Render original content if authorized
   const recordsContent = (
     <div className="bg-white p-6 rounded-lg shadow-sm">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">GP Health Record</h2>
-        <div className="text-sm text-gray-500">
-          {isCheckingHospital ? (
-            <div className="flex items-center">
-              <div className="animate-spin h-4 w-4 border-2 border-[#005eb8] border-t-transparent rounded-full mr-2"></div>
-              <span>Checking hospital registration...</span>
-            </div>
-          ) : hasPrimaryHospital && primaryHospital ? (
-            <div className="text-green-700">
-              <div>HPN Number: <span className="font-medium">{user?.hpn || "Not available"}</span></div>
-              <div>Primary Hospital: <span className="font-medium">{primaryHospital.name}</span></div>
-            </div>
-          ) : (
-            <div className="text-yellow-600">
-              HPN Number not linked with a primary hospital. <Link to="/account/link-phb" className="text-[#005eb8] hover:underline">Link your HPN number to a hospital</Link>
+        <div className="flex items-center">
+          {accessExpiry && (
+            <div className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm mr-4">
+              Access expires: {accessExpiry.toLocaleTimeString()}
             </div>
           )}
+          <div className="text-sm text-gray-500">
+            {isCheckingHospital ? (
+              <div className="flex items-center">
+                <div className="animate-spin h-4 w-4 border-2 border-[#005eb8] border-t-transparent rounded-full mr-2"></div>
+                <span>Checking hospital registration...</span>
+              </div>
+            ) : hasPrimaryHospital && primaryHospital ? (
+              <div className="text-green-700">
+                <div>HPN Number: <span className="font-medium">{user?.hpn || "Not available"}</span></div>
+                <div>Primary Hospital: <span className="font-medium">{primaryHospital.name}</span></div>
+              </div>
+            ) : (
+              <div className="text-yellow-600">
+                HPN Number not linked with a primary hospital. <Link to="/account/link-phb" className="text-[#005eb8] hover:underline">Link your HPN number to a hospital</Link>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

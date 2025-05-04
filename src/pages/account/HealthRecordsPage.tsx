@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../features/auth/authContext';
 import { Navigate } from 'react-router-dom';
+import MedicalRecordsOTP from '../../features/health/MedicalRecordsOTP';
+import { 
+  isMedAccessTokenValid, 
+  clearMedAccessToken 
+} from '../../features/health/medicalRecordsAuthService';
 
 interface HealthDocument {
   id: string;
@@ -55,9 +60,161 @@ const HealthRecordsPage: React.FC = () => {
     date: '',
     source: '',
   });
+  
+  // Add new state for medical record access
+  const [accessState, setAccessState] = useState<'checking' | 'need_auth' | 'loading' | 'authorized' | 'error'>('checking');
+  const [accessError, setAccessError] = useState<string>('');
+  const [accessExpiry, setAccessExpiry] = useState<Date | null>(null);
+
+  useEffect(() => {
+    checkAccess();
+  }, []);
+
+  const checkAccess = () => {
+    setAccessState('checking');
+    
+    // Check if we have a valid med access token
+    if (isMedAccessTokenValid()) {
+      // We have a valid token, we can show the health records
+      setAccessState('authorized');
+      
+      // Set expiry time for UI display
+      const expiryTime = new Date();
+      expiryTime.setMinutes(expiryTime.getMinutes() + 30); // Assuming 30 min expiry
+      setAccessExpiry(expiryTime);
+    } else {
+      // We need to request authentication
+      setAccessState('need_auth');
+    }
+  };
+
+  const handleVerificationSuccess = () => {
+    setAccessState('authorized');
+    // Set expiry time for UI display
+    const expiryTime = new Date();
+    expiryTime.setMinutes(expiryTime.getMinutes() + 30);
+    setAccessExpiry(expiryTime);
+  };
+
+  const handleCancelVerification = () => {
+    // Just show a message instead of the verification form
+    setAccessState('need_auth');
+  };
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  // Render different content based on access state
+  if (accessState === 'checking') {
+    return (
+      <div className="bg-white">
+        <div className="bg-[#005eb8] text-white py-8">
+          <div className="phb-container">
+            <h1 className="text-3xl font-bold mb-4">Health Records</h1>
+            <p className="text-xl font-medium">
+              Manage and access your health documents
+            </p>
+          </div>
+        </div>
+        <div className="phb-container py-8">
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin h-8 w-8 border-4 border-[#005eb8] border-t-transparent rounded-full"></div>
+            <span className="ml-3 text-gray-600">Checking access...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (accessState === 'need_auth') {
+    return (
+      <div className="bg-white">
+        <div className="bg-[#005eb8] text-white py-8">
+          <div className="phb-container">
+            <h1 className="text-3xl font-bold mb-4">Health Records</h1>
+            <p className="text-xl font-medium">
+              Manage and access your health documents
+            </p>
+          </div>
+        </div>
+        <div className="phb-container py-8">
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+            <h2 className="text-2xl font-bold mb-4">Secure Access Required</h2>
+            
+            <div className="p-4 bg-blue-50 rounded-md mb-6">
+              <p className="text-blue-800">
+                Health records contain sensitive information and require additional verification.
+              </p>
+            </div>
+            
+            <p className="mb-6">
+              To protect your privacy, we need to verify your identity before showing your health records.
+              Click the button below to proceed with verification.
+            </p>
+            
+            <button
+              onClick={() => setAccessState('loading')}
+              className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e]"
+            >
+              Request Secure Access
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (accessState === 'loading') {
+    return (
+      <div className="bg-white">
+        <div className="bg-[#005eb8] text-white py-8">
+          <div className="phb-container">
+            <h1 className="text-3xl font-bold mb-4">Health Records</h1>
+            <p className="text-xl font-medium">
+              Manage and access your health documents
+            </p>
+          </div>
+        </div>
+        <div className="phb-container py-8">
+          <MedicalRecordsOTP 
+            onVerificationSuccess={handleVerificationSuccess} 
+            onCancel={handleCancelVerification} 
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (accessState === 'error') {
+    return (
+      <div className="bg-white">
+        <div className="bg-[#005eb8] text-white py-8">
+          <div className="phb-container">
+            <h1 className="text-3xl font-bold mb-4">Health Records</h1>
+            <p className="text-xl font-medium">
+              Manage and access your health documents
+            </p>
+          </div>
+        </div>
+        <div className="phb-container py-8">
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+            <h2 className="text-2xl font-bold mb-4">Access Error</h2>
+            
+            <div className="p-4 bg-red-50 rounded-md mb-6 text-red-700">
+              {accessError || 'An error occurred while accessing your health records.'}
+            </div>
+            
+            <button
+              onClick={checkAccess}
+              className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e]"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -207,12 +364,19 @@ const HealthRecordsPage: React.FC = () => {
             <h2 className="text-2xl font-bold">Your Documents</h2>
             <p className="text-gray-600">Upload and manage your health-related documents</p>
           </div>
-          <button
-            onClick={() => setShowUploadForm(!showUploadForm)}
-            className="bg-[#005eb8] hover:bg-[#003f7e] text-white px-4 py-2 rounded-md transition-colors"
-          >
-            {showUploadForm ? 'Cancel' : '+ Upload Document'}
-          </button>
+          <div className="flex items-center">
+            {accessExpiry && (
+              <div className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm mr-4">
+                Access expires: {accessExpiry.toLocaleTimeString()}
+              </div>
+            )}
+            <button
+              onClick={() => setShowUploadForm(!showUploadForm)}
+              className="bg-[#005eb8] hover:bg-[#003f7e] text-white px-4 py-2 rounded-md transition-colors"
+            >
+              {showUploadForm ? 'Cancel' : '+ Upload Document'}
+            </button>
+          </div>
         </div>
 
         {showUploadForm && (
