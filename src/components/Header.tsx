@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import PHBLogo from './PHBLogo';
 import { useAuth } from '../features/auth/authContext';
+import { useProfessionalAuth } from '../features/professional/professionalAuthContext';
 import SearchResults from './SearchResults';
 import { searchContent, getSearchSuggestions } from '../utils/searchService';
 import { useClickOutside } from '../hooks/useClickOutside';
+import ViewToggle from './ViewToggle';
 import {
   getSearchHistory,
   addToSearchHistory,
@@ -48,13 +50,18 @@ const Header: React.FC = () => {
   const [searchHistory, setSearchHistory] = useState([]);
   const [activeFilter, setActiveFilter] = useState('all');
   const [pasteAnimation, setPasteAnimation] = useState(false);
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, isDoctor } = useAuth();
+  const { professionalUser } = useProfessionalAuth();
   const { isDarkMode } = useDarkMode();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mobileSearchResultsRef = useRef<HTMLDivElement>(null);
+
+  // Check if we're in professional view
+  const isProfessionalView = location.pathname.includes('/professional');
 
   // Close search results when clicking outside
   useClickOutside(searchRef, (event) => {
@@ -288,8 +295,8 @@ const Header: React.FC = () => {
     setShowCookieBanner(false);
   };
 
-  // Navigation items
-  const navItems = [
+  // Navigation items - Regular view
+  const regularNavItems = [
     { name: 'Health A-Z', path: '/health-a-z' },
     { name: 'Live Well', path: '/live-well' },
     { name: 'Mental health', path: '/mental-health' },
@@ -297,6 +304,18 @@ const Header: React.FC = () => {
     { name: 'Pregnancy', path: '/pregnancy' },
     { name: 'Programs', path: '/programs' },
   ];
+
+  // Navigation items - Professional view
+  const professionalNavItems = [
+    { name: 'Dashboard', path: '/professional/dashboard' },
+    { name: 'Appointments', path: '/professional/appointments' },
+    { name: 'Patients', path: '/professional/patients' },
+    { name: 'Calculators', path: '/professional/calculators' },
+    { name: 'Resources', path: '/professional/resources' },
+  ];
+
+  // Use the appropriate nav items based on current view
+  const navItems = isProfessionalView ? professionalNavItems : regularNavItems;
 
   return (
     <header className={`sticky top-0 z-40 w-full transition-colors duration-300 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
@@ -335,13 +354,16 @@ const Header: React.FC = () => {
       )}
 
       {/* Main header */}
-      <div className={`border-b ${isDarkMode ? 'border-gray-800' : 'border-gray-200'} shadow-sm`}>
+      <div className={`border-b ${isDarkMode ? 'border-gray-800' : 'border-gray-200'} shadow-sm ${isProfessionalView ? 'bg-blue-900' : ''}`}>
         <div className="phb-container">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center">
-              <Link to="/" className="flex items-center">
-                <PHBLogo />
+              <Link to={isProfessionalView ? "/professional/dashboard" : "/"} className="flex items-center">
+                <PHBLogo className={isProfessionalView ? "text-white" : ""} />
+                {isProfessionalView && (
+                  <span className="ml-2 font-bold text-white text-lg">Professional</span>
+                )}
               </Link>
             </div>
 
@@ -446,43 +468,26 @@ const Header: React.FC = () => {
                 <Link
                   key={index}
                   to={item.path}
-                  className={`text-sm font-medium hover:text-blue-600 transition-colors ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                  className={`text-sm font-medium hover:text-blue-300 transition-colors ${
+                    isProfessionalView 
+                      ? 'text-white'
+                      : (isDarkMode ? 'text-gray-300' : 'text-gray-700')
+                  }`}
                 >
                   {item.name}
                 </Link>
               ))}
-
-              {/* Account Links */}
-              {isAuthenticated && (
-                <div className="relative">
-                  <button className={`text-sm font-medium hover:text-blue-600 transition-colors ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Account
-                  </button>
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
-                    <div className="py-1">
-                      <Link
-                        to="/account/request-prescription"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Request Prescription
-                      </Link>
-                      <Link
-                        to="/account/nominated-pharmacy"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Nominated Pharmacy
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              )}
             </nav>
 
             {/* Right side buttons */}
             <div className="flex items-center space-x-4">
               {/* Search button - mobile only */}
               <button
-                className="md:hidden text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                className={`md:hidden ${
+                  isProfessionalView 
+                    ? 'text-white hover:text-blue-200' 
+                    : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
+                } transition-colors`}
                 onClick={handleSearchClick}
                 aria-label="Search"
               >
@@ -491,18 +496,29 @@ const Header: React.FC = () => {
                 </svg>
               </button>
 
+              {/* View Toggle for Doctors */}
+              {isAuthenticated && <ViewToggle />}
+
               {/* Login/Account button */}
               {isAuthenticated ? (
                 <Link
-                  to="/account"
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors text-sm font-medium"
+                  to={isProfessionalView ? "/professional/profile" : "/account"}
+                  className={`${
+                    isProfessionalView 
+                      ? 'bg-white text-blue-900 hover:bg-blue-100' 
+                      : 'bg-green-600 hover:bg-green-700 text-white'
+                  } px-4 py-2 rounded-md transition-colors text-sm font-medium`}
                 >
-                  Account
+                  {isProfessionalView ? 'Profile' : 'Account'}
                 </Link>
               ) : (
                 <Link
-                  to="/login"
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors text-sm font-medium"
+                  to={isProfessionalView ? "/professional/login" : "/login"}
+                  className={`${
+                    isProfessionalView 
+                      ? 'bg-white text-blue-900 hover:bg-blue-100' 
+                      : 'bg-green-600 hover:bg-green-700 text-white'
+                  } px-4 py-2 rounded-md transition-colors text-sm font-medium`}
                 >
                   Login
                 </Link>
@@ -510,7 +526,11 @@ const Header: React.FC = () => {
 
               {/* Mobile menu button - tablet/mobile only */}
               <button
-                className="lg:hidden text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                className={`lg:hidden ${
+                  isProfessionalView 
+                    ? 'text-white hover:text-blue-200'
+                    : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
+                } transition-colors`}
                 onClick={() => setShowMobileMenu(!showMobileMenu)}
                 aria-label={showMobileMenu ? 'Close menu' : 'Open menu'}
               >
@@ -623,7 +643,11 @@ const Header: React.FC = () => {
 
       {/* Mobile menu */}
       {showMobileMenu && (
-        <div className="lg:hidden border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+        <div className={`lg:hidden border-b ${
+          isProfessionalView 
+            ? 'border-blue-800 bg-blue-900 text-white'
+            : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900'
+        }`}>
           <div className="phb-container py-4">
             <nav>
               <ul className="space-y-4">
@@ -631,7 +655,11 @@ const Header: React.FC = () => {
                   <li key={index}>
                     <Link
                       to={item.path}
-                      className={`block py-2 text-base font-medium hover:text-blue-600 transition-colors ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                      className={`block py-2 text-base font-medium hover:text-blue-300 transition-colors ${
+                        isProfessionalView 
+                          ? 'text-white'
+                          : (isDarkMode ? 'text-gray-300' : 'text-gray-700')
+                      }`}
                       onClick={() => setShowMobileMenu(false)}
                     >
                       {item.name}

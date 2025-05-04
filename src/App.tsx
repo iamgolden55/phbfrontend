@@ -119,6 +119,12 @@ import ClinicalGuidelinesPage from './pages/professional/ClinicalGuidelinesPage'
 import DoctorResourcesPage from './pages/professional/DoctorResourcesPage';
 import ProfessionalForumPage from './pages/professional/ProfessionalForumPage';
 import PatientManagementPage from './pages/professional/PatientManagementPage';
+import ProfessionalAppointmentsPage from './pages/professional/ProfessionalAppointmentsPage';
+import ProfessionalAppointmentDetailPage from './pages/professional/ProfessionalAppointmentDetailPage';
+import ProfessionalPatientsPage from './pages/professional/ProfessionalPatientsPage';
+import ProfessionalResearchPage from './pages/professional/ProfessionalResearchPage';
+import ProfessionalProfilePage from './pages/professional/ProfessionalProfilePage';
+import ProfessionalResourcesPage from './pages/professional/ProfessionalResourcesPage';
 
 // Features
 import { AuthProvider, useAuth } from './features/auth/authContext';
@@ -544,53 +550,22 @@ function App() {
 
               {/* Professional layout routes */}
               <Route path="/professional" element={<ProfessionalLayout />}>
+                <Route index element={<Navigate to="/professional/dashboard" replace />} />
                 <Route path="dashboard" element={
                   <ProfessionalRouteGuard>
                     <ProfessionalDashboardPage />
                   </ProfessionalRouteGuard>
                 } />
-
-                {/* Patient Management */}
-                <Route path="patients" element={
-                  <ProfessionalRouteGuard>
-                    <PatientManagementPage />
-                  </ProfessionalRouteGuard>
-                } />
-
-                {/* Clinical Guidelines */}
-                <Route path="guidelines" element={
-                  <ProfessionalRouteGuard>
-                    <ClinicalGuidelinesPage />
-                  </ProfessionalRouteGuard>
-                } />
-
-                {/* Doctor Resources */}
-                <Route path="resources" element={
-                  <ProfessionalRouteGuard>
-                    <DoctorResourcesPage />
-                  </ProfessionalRouteGuard>
-                } />
-
-                {/* Professional Forum */}
-                <Route path="forum" element={
-                  <ProfessionalRouteGuard>
-                    <ProfessionalForumPage />
-                  </ProfessionalRouteGuard>
-                } />
-
-                {/* Clinical Calculators */}
-                <Route path="calculators" element={
-                  <ProfessionalRouteGuard>
-                    <ProfessionalCalculatorsPage />
-                  </ProfessionalRouteGuard>
-                } />
-
-                {/* Research Portal */}
-                <Route path="research" element={
-                  <ProfessionalRouteGuard allowedRoles={['researcher', 'doctor']}>
-                    <ResearchPage />
-                  </ProfessionalRouteGuard>
-                } />
+                <Route path="appointments" element={<ProfessionalAppointmentsPage />} />
+                <Route path="appointments/:appointmentId" element={<ProfessionalAppointmentDetailPage />} />
+                <Route path="calculators" element={<ProfessionalCalculatorsPage />} />
+                <Route path="guidelines" element={<ClinicalGuidelinesPage />} />
+                <Route path="doctor-resources" element={<DoctorResourcesPage />} />
+                <Route path="resources" element={<ProfessionalResourcesPage />} />
+                <Route path="patients" element={<ProfessionalPatientsPage />} />
+                <Route path="research" element={<ProfessionalResearchPage />} />
+                <Route path="forum" element={<ProfessionalForumPage />} />
+                <Route path="profile" element={<ProfessionalProfilePage />} />
               </Route>
 
               {/* Catch all for 404 - can be replaced with a NotFoundPage component */}

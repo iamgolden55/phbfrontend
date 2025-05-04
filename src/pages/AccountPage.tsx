@@ -1,9 +1,49 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../features/auth/authContext';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 
 const AccountPage: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
+  const [isProfessionalView, setIsProfessionalView] = useState(false);
+  const navigate = useNavigate();
+
+  // Check if the user is a doctor and what view they're in
+  useEffect(() => {
+    const checkViewPreference = () => {
+      const viewPreference = localStorage.getItem('phb_view_preference');
+      const newIsProfessionalView = viewPreference === 'doctor';
+      
+      if (user?.role === 'doctor' || user?.hpn) {
+        setIsProfessionalView(newIsProfessionalView);
+        
+        // If in professional view, redirect to professional dashboard
+        if (newIsProfessionalView) {
+          navigate('/professional/dashboard');
+        }
+      }
+    };
+    
+    // Check initially
+    checkViewPreference();
+    
+    // Set up event listener for storage changes (when toggle is clicked elsewhere)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'phb_view_preference') {
+        checkViewPreference();
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Custom event for immediate updates within the same window
+    const handleCustomViewChange = () => checkViewPreference();
+    window.addEventListener('phb_view_changed', handleCustomViewChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('phb_view_changed', handleCustomViewChange);
+    };
+  }, [user, navigate]);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -12,6 +52,9 @@ const AccountPage: React.FC = () => {
   const handleLogout = () => {
     logout();
   };
+
+  // Show appointments in the patient view unless doctor is in professional view
+  const showAppointmentsLink = !(isProfessionalView && (user?.role === 'doctor' || user?.hpn));
 
   return (
     <div className="bg-white">
@@ -121,20 +164,22 @@ const AccountPage: React.FC = () => {
                   </div>
                 </Link>
 
-                <Link
-                  to="/account/appointments"
-                  className="bg-[#f0f4f5] p-4 rounded-md flex items-center hover:bg-[#e8edee] transition-colors"
-                >
-                  <div className="rounded-full bg-purple-100 p-3 mr-3">
-                    <svg className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-bold">Appointments</h3>
-                    <p className="text-sm text-gray-600">Book and manage appointments</p>
-                  </div>
-                </Link>
+                {showAppointmentsLink && (
+                  <Link
+                    to="/account/appointments"
+                    className="bg-[#f0f4f5] p-4 rounded-md flex items-center hover:bg-[#e8edee] transition-colors"
+                  >
+                    <div className="rounded-full bg-purple-100 p-3 mr-3">
+                      <svg className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-bold">Appointments</h3>
+                      <p className="text-sm text-gray-600">Book and manage appointments</p>
+                    </div>
+                  </Link>
+                )}
 
                 <Link
                   to="/account/test-results"

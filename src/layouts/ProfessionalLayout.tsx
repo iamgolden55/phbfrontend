@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, Link } from 'react-router-dom';
 import { useProfessionalAuth } from '../features/professional/professionalAuthContext';
 import PHBLogo from '../components/PHBLogo';
@@ -8,6 +8,38 @@ const ProfessionalLayout: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { professionalUser, logout } = useProfessionalAuth();
   const navigate = useNavigate();
+
+  // Check if view is switched to patient view
+  useEffect(() => {
+    const checkViewPreference = () => {
+      const viewPreference = localStorage.getItem('phb_view_preference');
+      if (viewPreference !== 'doctor') {
+        // If user switched to patient view, redirect to regular account page
+        navigate('/account');
+      }
+    };
+    
+    // Check initially
+    checkViewPreference();
+    
+    // Set up event listener for storage changes (when toggle is clicked elsewhere)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'phb_view_preference') {
+        checkViewPreference();
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Custom event for immediate updates within the same window
+    const handleCustomViewChange = () => checkViewPreference();
+    window.addEventListener('phb_view_changed', handleCustomViewChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('phb_view_changed', handleCustomViewChange);
+    };
+  }, [navigate]);
 
   const handleLogout = () => {
     logout();

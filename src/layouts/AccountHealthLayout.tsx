@@ -1,43 +1,52 @@
-import React from 'react';
-import { Link, useLocation, Navigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../features/auth/authContext';
-
-interface NavLinkProps {
-  to: string;
-  icon: React.ReactNode;
-  label: string;
-  active: boolean;
-}
-
-const NavLink: React.FC<NavLinkProps> = ({ to, icon, label, active }) => (
-  <Link
-    to={to}
-    className={`flex items-center px-4 py-3 ${
-      active
-        ? 'bg-blue-50 text-[#005eb8] border-l-4 border-[#005eb8]'
-        : 'text-gray-700 hover:bg-gray-100'
-    }`}
-  >
-    <div className="mr-3">{icon}</div>
-    <span className="font-medium">{label}</span>
-  </Link>
-);
 
 interface AccountHealthLayoutProps {
   children: React.ReactNode;
   title?: string;
 }
 
+// Custom NavLink component for consistent styling
+const NavLink = ({ to, active, icon, label }: { to: string; active: boolean; icon: React.ReactNode; label: string }) => (
+  <Link
+    to={to}
+    className={`flex items-center px-4 py-3 hover:bg-gray-50 ${active ? 'bg-gray-50 border-l-4 border-[#005eb8]' : ''}`}
+  >
+    <div className={`mr-3 ${active ? 'text-[#005eb8]' : 'text-gray-500'}`}>
+      {icon}
+    </div>
+    <span className={active ? 'font-medium text-[#005eb8]' : 'text-gray-700'}>
+      {label}
+    </span>
+  </Link>
+);
+
 const AccountHealthLayout: React.FC<AccountHealthLayoutProps> = ({
   children,
   title = "Your Health Dashboard"
 }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const location = useLocation();
   const currentPath = location.pathname;
+  const [isProfessionalView, setIsProfessionalView] = useState(false);
+  
+  // Check if the user is a doctor and in professional view
+  useEffect(() => {
+    const viewPreference = localStorage.getItem('phb_view_preference');
+    if (user?.role === 'doctor' || user?.hpn) {
+      setIsProfessionalView(viewPreference === 'doctor');
+    }
+  }, [user]);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+  
+  // Redirect doctors in professional view to the professional dashboard
+  // We only redirect if they're in professional view, otherwise they can access their patient appointments
+  if (isProfessionalView && (user?.role === 'doctor' || user?.hpn)) {
+    return <Navigate to="/professional/dashboard" replace />;
   }
 
   return (

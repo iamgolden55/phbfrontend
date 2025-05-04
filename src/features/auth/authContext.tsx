@@ -122,6 +122,8 @@ interface AuthContextType {
   registerWithHospital: (hospitalId: number, isPrimary?: boolean) => Promise<{ message: string; data: any }>;
   primaryHospital: Hospital | null;
   hasPrimaryHospital: boolean;
+  // Doctor role check - check both role and hpn for reliability
+  isDoctor: boolean;
 }
 
 // Create the context with a default value
@@ -520,20 +522,31 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Logout function
   const logout = async () => {
-    setError(null);
-    setOtpError(null);
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
-
-    // Clear local state immediately
-    setUser(null);
+    // Clear auth token
     localStorage.removeItem(AUTH_TOKEN_KEY);
-    setOtpVerificationRequired(false);
-    setPendingEmail(null);
+    
+    // Also clear professional auth if present
+    localStorage.removeItem('phb_professional_user');
+    
+    // Clear user data and related state
+    setUser(null);
     setPrimaryHospital(null);
     setHasPrimaryHospital(false);
-
-    // No API call needed for standard JWT logout on client-side
-    // Backend token invalidation (if any) happens via expiry or refresh mechanisms
+    
+    // Add additional logout logic if needed
+    // Clear any other stored tokens or user data
+    localStorage.removeItem('phb_view_preference');
+    
+    try {
+      // Make a logout request to the API if needed
+      await apiRequest('/api/logout/', 'POST');
+    } catch (err) {
+      console.error('Error during logout:', err);
+      // We still want to clear the local state even if the API call fails
+    }
+    
+    // Resolve the promise
+    return Promise.resolve();
   };
 
   const clearError = () => {
@@ -926,6 +939,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     registerWithHospital,
     primaryHospital,
     hasPrimaryHospital,
+    // Doctor role check - check both role and hpn for reliability
+    isDoctor: user?.role === 'doctor' || !!user?.hpn,
   };
 
   return (
