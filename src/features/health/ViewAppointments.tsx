@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AccountHealthLayout from '../../layouts/AccountHealthLayout';
 import { useAuth } from '../auth/authContext';
+import { useAppointments } from './useAppointments';
 
 interface AppointmentType {
   id: string;
@@ -32,101 +33,14 @@ const ViewAppointments: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const [view, setView] = useState<'upcoming' | 'past' | 'all'>('upcoming');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedAppointment, setSelectedAppointment] = useState<AppointmentType | null>(null);
+  const [selectedAppointment, setSelectedAppointment] = useState<any | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
   const [cancelSuccess, setCancelSuccess] = useState(false);
   
-  // API data state
-  const [appointments, setAppointments] = useState<AppointmentType[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Fetch appointments from API
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      if (!isAuthenticated) {
-        return;
-      }
-      
-      setLoading(true);
-      setError(null);
-      
-      try {
-        const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
-        if (!authToken) {
-          throw new Error('No authentication token found');
-        }
-        
-        // Determine API query parameters based on selected view
-        let queryParams = '';
-        if (view === 'upcoming') {
-          queryParams = '?upcoming=true';
-        } else if (view === 'past') {
-          queryParams = '?past=true';
-        }
-        
-        const response = await fetch(`${API_BASE_URL.replace(/\/$/, '')}/api/appointments/${queryParams}`, {
-          headers: {
-            'Authorization': `Bearer ${authToken}`,
-            'Accept': 'application/json',
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch appointments: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('Appointments data from API:', data);
-        
-        // Transform API data to match our component's expected format
-        const formattedAppointments = Array.isArray(data) ? data.map((apt: any) => ({
-          id: apt.id || apt.appointment_id || '',
-          date: apt.date || (apt.appointment_date ? apt.appointment_date.split('T')[0] : ''),
-          time: apt.time || (apt.appointment_date ? new Date(apt.appointment_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''),
-          duration: apt.duration || '30 min',
-          type: apt.appointment_type?.includes('video') ? 'video' : 
-                apt.appointment_type?.includes('phone') ? 'phone' : 'in-person',
-          provider: apt.doctor_full_name || apt.doctor_name || 'Doctor',
-          speciality: apt.department_name || apt.specialty || 'General',
-          location: apt.location || apt.hospital_name || 'PHB Medical Center',
-          status: apt.status || 'scheduled',
-          reason: apt.chief_complaint || apt.reason || '',
-        })) : [];
-        
-        setAppointments(formattedAppointments);
-      } catch (err) {
-        console.error('Error fetching appointments:', err);
-        setError('Failed to load appointments. Please try again later.');
-        setAppointments([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchAppointments();
-  }, [view, isAuthenticated]);
-
-  // Filter appointments based on search term
-  const filteredAppointments = appointments
-    .filter(appointment => {
-      // Filter by search term
-      if (!searchTerm) return true;
-      const searchTermLower = searchTerm.toLowerCase();
-      return (
-        appointment.provider.toLowerCase().includes(searchTermLower) ||
-        appointment.speciality.toLowerCase().includes(searchTermLower) ||
-        appointment.location.toLowerCase().includes(searchTermLower) ||
-        appointment.reason?.toLowerCase().includes(searchTermLower) ||
-        appointment.id.toLowerCase().includes(searchTermLower)
-      );
-    })
-    .sort((a, b) => {
-      // Sort by date, newest first
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
-    });
+  // Use the shared hook
+  const { appointments, loading, error } = useAppointments(view);
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -237,15 +151,6 @@ const ViewAppointments: React.FC = () => {
       // Reset and update appointments
       setCancelReason('');
       setSelectedAppointment(null);
-      
-      // Update the appointments list after cancellation
-      setAppointments(prevAppointments => 
-        prevAppointments.map(apt => 
-          apt.id === selectedAppointment.id 
-            ? { ...apt, status: 'cancelled' } 
-            : apt
-        )
-      );
     } catch (error) {
       console.error('Error cancelling appointment:', error);
       alert('Failed to cancel appointment. Please try again.');
@@ -274,6 +179,21 @@ const ViewAppointments: React.FC = () => {
   const handleAddToCalendar = (appointmentId: string) => {
     window.open(`${API_BASE_URL.replace(/\/$/, '')}/api/appointments/${appointmentId}/calendar/`, '_blank');
   };
+
+  // Filter appointments based on search term
+  const filteredAppointments = appointments
+    .filter(appointment => {
+      if (!searchTerm) return true;
+      const searchTermLower = searchTerm.toLowerCase();
+      return (
+        appointment.provider.toLowerCase().includes(searchTermLower) ||
+        appointment.speciality.toLowerCase().includes(searchTermLower) ||
+        appointment.location.toLowerCase().includes(searchTermLower) ||
+        appointment.reason?.toLowerCase().includes(searchTermLower) ||
+        appointment.id.toLowerCase().includes(searchTermLower)
+      );
+    })
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return (
     <AccountHealthLayout title="View Appointments">
