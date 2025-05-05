@@ -17,8 +17,9 @@ import {
 // Create a custom hook for dark mode
 const useDarkMode = () => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Only use saved theme preference, default to light, ignore system preference
     const savedTheme = localStorage.getItem('theme');
-    return savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    return savedTheme === 'dark';
   });
 
   useEffect(() => {
