@@ -334,7 +334,7 @@ class MedicalRecordsService {
           }
           
           // Save to localStorage with expiry
-          const expiresIn = data.expires_in || 1800; // Default to 30 minutes
+          const expiresIn = data.expires_in || 900; // Default to 15 minutes (900 seconds)
           const expiresAt = new Date().getTime() + (expiresIn * 1000);
           localStorage.setItem('med_access_token', this.medAccessToken);
           localStorage.setItem('med_access_expires_at', expiresAt.toString());

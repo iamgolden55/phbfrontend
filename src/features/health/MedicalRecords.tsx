@@ -46,10 +46,63 @@ const MedicalRecords: React.FC = () => {
   const [patientData, setPatientData] = useState<PatientData | null>(null);
   const [error, setError] = useState<string>('');
   const [accessExpiry, setAccessExpiry] = useState<Date | null>(null);
+  
+  // Add state for countdown timer
+  const [remainingTime, setRemainingTime] = useState<string>('');
 
   useEffect(() => {
     checkAccess();
   }, []);
+  
+  // Add effect for countdown timer
+  useEffect(() => {
+    let intervalId: number | undefined;
+    
+    if (accessExpiry) {
+      // Update immediately
+      updateRemainingTime();
+      
+      // Set up interval to update every second
+      intervalId = window.setInterval(updateRemainingTime, 1000);
+    }
+    
+    // Clean up interval on unmount or when expiry changes
+    return () => {
+      if (intervalId !== undefined) {
+        clearInterval(intervalId);
+      }
+    };
+    
+    function updateRemainingTime() {
+      if (!accessExpiry) return;
+      
+      const now = new Date();
+      const timeDiff = accessExpiry.getTime() - now.getTime();
+      
+      if (timeDiff <= 0) {
+        // Time expired, clear interval and reload to show OTP screen
+        if (intervalId !== undefined) {
+          clearInterval(intervalId);
+        }
+        setRemainingTime('Expired');
+        // Force reload after a brief delay
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+        return;
+      }
+      
+      // Calculate minutes and seconds
+      const minutes = Math.floor(timeDiff / (1000 * 60));
+      const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+      
+      // Format with leading zeros
+      const formattedMinutes = String(minutes).padStart(2, '0');
+      const formattedSeconds = String(seconds).padStart(2, '0');
+      
+      setRemainingTime(`${formattedMinutes}:${formattedSeconds}`);
+    }
+  }, [accessExpiry]);
 
   const checkAccess = async () => {
     setAccessState('checking');
@@ -81,9 +134,9 @@ const MedicalRecords: React.FC = () => {
             if (expiresAt) {
               setAccessExpiry(new Date(parseInt(expiresAt)));
             } else {
-              // No expiry stored, set default 30 min
+              // No expiry stored, set default 15 min
               const expiryTime = new Date();
-              expiryTime.setMinutes(expiryTime.getMinutes() + 30);
+              expiryTime.setMinutes(expiryTime.getMinutes() + 15);
               setAccessExpiry(expiryTime);
             }
             return;
@@ -104,9 +157,9 @@ const MedicalRecords: React.FC = () => {
             if (expiresAt) {
               setAccessExpiry(new Date(parseInt(expiresAt)));
             } else {
-              // No expiry stored, set default 30 min
+              // No expiry stored, set default 15 min
               const expiryTime = new Date();
-              expiryTime.setMinutes(expiryTime.getMinutes() + 30);
+              expiryTime.setMinutes(expiryTime.getMinutes() + 15);
               setAccessExpiry(expiryTime);
             }
             return;
@@ -168,9 +221,9 @@ const MedicalRecords: React.FC = () => {
             if (expiresAt) {
               setAccessExpiry(new Date(parseInt(expiresAt)));
             } else {
-              // No expiry stored, set default 30 min
+              // No expiry stored, set default 15 min
               const expiryTime = new Date();
-              expiryTime.setMinutes(expiryTime.getMinutes() + 30);
+              expiryTime.setMinutes(expiryTime.getMinutes() + 15);
               setAccessExpiry(expiryTime);
             }
             return;
@@ -191,9 +244,9 @@ const MedicalRecords: React.FC = () => {
             if (expiresAt) {
               setAccessExpiry(new Date(parseInt(expiresAt)));
             } else {
-              // No expiry stored, set default 30 min
+              // No expiry stored, set default 15 min
               const expiryTime = new Date();
-              expiryTime.setMinutes(expiryTime.getMinutes() + 30);
+              expiryTime.setMinutes(expiryTime.getMinutes() + 15);
               setAccessExpiry(expiryTime);
             }
             return;
@@ -287,76 +340,88 @@ const MedicalRecords: React.FC = () => {
       case 'authorized':
         // Check if we have patient profile data instead of medical records
         if (patientData) {
-          return <PatientProfile data={patientData} expiryTime={accessExpiry} />;
+          return (
+            <>
+              {remainingTime && (
+                <div className="mb-4 px-3 py-2 bg-green-100 text-green-800 rounded-md text-sm flex justify-between items-center">
+                  <span className="font-medium">Session expires in:</span>
+                  <span className="font-bold">{remainingTime}</span>
+                </div>
+              )}
+              <PatientProfile data={patientData} expiryTime={null} />
+            </>
+          );
         }
         
         // Otherwise show medical records list (legacy format)
         return (
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <div className="flex justify-between items-start mb-6">
-              <h2 className="text-2xl font-bold">Medical Records</h2>
+          <>
+            {remainingTime && (
+              <div className="mb-4 px-3 py-2 bg-green-100 text-green-800 rounded-md text-sm flex justify-between items-center">
+                <span className="font-medium">Session expires in:</span>
+                <span className="font-bold">{remainingTime}</span>
+              </div>
+            )}
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <div className="flex justify-between items-start mb-6">
+                <h2 className="text-2xl font-bold">Medical Records</h2>
+              </div>
               
-              {accessExpiry && (
-                <div className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-                  Access expires: {accessExpiry.toLocaleTimeString()}
+              <div className="p-4 bg-blue-50 rounded-md mb-6">
+                <p className="text-blue-700">
+                  Your HPN number: {user?.hpn || patientData?.hpn || 'Not available'}
+                </p>
+              </div>
+              
+              {records.length === 0 ? (
+                <div className="text-center p-8 bg-gray-50 rounded-md">
+                  <p className="text-gray-600 mb-2">No medical records found.</p>
+                  <p className="text-sm text-gray-500">
+                    If you believe this is an error, please contact your healthcare provider.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {records.map((record, index) => (
+                    <div key={record.id || index} className="border rounded-md p-4 hover:bg-gray-50">
+                      <div className="flex justify-between">
+                        <h3 className="font-bold text-lg">{record.title || 'Unknown Title'}</h3>
+                        <span className="text-sm text-gray-500">
+                          {record.date ? formatDate(record.date) : 'Unknown Date'}
+                        </span>
+                      </div>
+                      <p className="text-gray-500 text-sm mb-2">
+                        {record.provider || 'Unknown Provider'} • {record.type || 'Unknown Type'}
+                      </p>
+                      <p className="mb-3">{record.description || 'No description available'}</p>
+                      
+                      {record.attachments && record.attachments.length > 0 && (
+                        <div className="mt-3">
+                          <h4 className="text-sm font-medium mb-2">Attachments:</h4>
+                          <div className="space-y-2">
+                            {record.attachments.map((attachment, attachIndex) => (
+                              <a 
+                                key={attachment.id || attachIndex}
+                                href={attachment.url}
+                                className="flex items-center text-[#005eb8] hover:underline"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                </svg>
+                                {attachment.name}
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
-            
-            <div className="p-4 bg-blue-50 rounded-md mb-6">
-              <p className="text-blue-700">
-                Your HPN number: {user?.hpn || patientData?.hpn || 'Not available'}
-              </p>
-            </div>
-            
-            {records.length === 0 ? (
-              <div className="text-center p-8 bg-gray-50 rounded-md">
-                <p className="text-gray-600 mb-2">No medical records found.</p>
-                <p className="text-sm text-gray-500">
-                  If you believe this is an error, please contact your healthcare provider.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {records.map((record, index) => (
-                  <div key={record.id || index} className="border rounded-md p-4 hover:bg-gray-50">
-                    <div className="flex justify-between">
-                      <h3 className="font-bold text-lg">{record.title || 'Unknown Title'}</h3>
-                      <span className="text-sm text-gray-500">
-                        {record.date ? formatDate(record.date) : 'Unknown Date'}
-                      </span>
-                    </div>
-                    <p className="text-gray-500 text-sm mb-2">
-                      {record.provider || 'Unknown Provider'} • {record.type || 'Unknown Type'}
-                    </p>
-                    <p className="mb-3">{record.description || 'No description available'}</p>
-                    
-                    {record.attachments && record.attachments.length > 0 && (
-                      <div className="mt-3">
-                        <h4 className="text-sm font-medium mb-2">Attachments:</h4>
-                        <div className="space-y-2">
-                          {record.attachments.map((attachment, attachIndex) => (
-                            <a 
-                              key={attachment.id || attachIndex}
-                              href={attachment.url}
-                              className="flex items-center text-[#005eb8] hover:underline"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                              </svg>
-                              {attachment.name}
-                            </a>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          </>
         );
         
       default:
