@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 
 // Define types for professional user and auth context
-export type ProfessionalRole = 'doctor' | 'researcher' | 'nurse' | 'pharmacist';
+export type ProfessionalRole = 'doctor' | 'nurse' | 'researcher' | 'pharmacist';
 
 interface ProfessionalUser {
   id: string;
@@ -18,7 +18,7 @@ interface ProfessionalAuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: (preserveView?: boolean) => void;
   register: (name: string, email: string, password: string, role: ProfessionalRole, licenseNumber: string, specialty?: string) => Promise<void>;
   error: string | null;
   clearError: () => void;
@@ -68,6 +68,11 @@ const sampleProfessionalUsers: ProfessionalUser[] = [
   },
 ];
 
+// Keys for localStorage
+const PROFESSIONAL_USER_KEY = 'phb_professional_user';
+const PROFESSIONAL_AUTH_STATE_KEY = 'phb_professional_auth_state';
+const VIEW_PREFERENCE_KEY = 'phb_view_preference';
+
 // Create a provider component
 export const ProfessionalAuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [professionalUser, setProfessionalUser] = useState<ProfessionalUser | null>(null);
@@ -76,13 +81,15 @@ export const ProfessionalAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
 
   // Check if professional user is already logged in
   useEffect(() => {
-    const storedUser = localStorage.getItem('phb_professional_user');
+    const storedUser = localStorage.getItem(PROFESSIONAL_USER_KEY);
     if (storedUser) {
       try {
         setProfessionalUser(JSON.parse(storedUser));
+        localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
       } catch (err) {
         console.error('Error parsing stored professional user:', err);
-        localStorage.removeItem('phb_professional_user');
+        localStorage.removeItem(PROFESSIONAL_USER_KEY);
+        localStorage.removeItem(PROFESSIONAL_AUTH_STATE_KEY);
       }
     }
     setIsLoading(false);
@@ -114,7 +121,15 @@ export const ProfessionalAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
 
       // Store professional user in state and localStorage
       setProfessionalUser(foundUser);
-      localStorage.setItem('phb_professional_user', JSON.stringify(foundUser));
+      localStorage.setItem(PROFESSIONAL_USER_KEY, JSON.stringify(foundUser));
+      
+      // Set view preference to doctor if this is a doctor login
+      if (foundUser.role === 'doctor') {
+        localStorage.setItem(VIEW_PREFERENCE_KEY, 'doctor');
+      }
+      
+      // Set authentication state
+      localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
 
     } catch (err) {
       if (err instanceof Error) {
@@ -128,9 +143,15 @@ export const ProfessionalAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
   };
 
   // Logout function
-  const logout = () => {
+  const logout = (preserveView: boolean = false) => {
     setProfessionalUser(null);
-    localStorage.removeItem('phb_professional_user');
+    localStorage.removeItem(PROFESSIONAL_USER_KEY);
+    localStorage.removeItem(PROFESSIONAL_AUTH_STATE_KEY);
+    
+    // Only reset view preference if we're not preserving it
+    if (!preserveView) {
+      localStorage.setItem(VIEW_PREFERENCE_KEY, 'patient');
+    }
   };
 
   // Register function (mock)
@@ -177,7 +198,15 @@ export const ProfessionalAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
 
       // "Log in" the new professional user
       setProfessionalUser(newUser);
-      localStorage.setItem('phb_professional_user', JSON.stringify(newUser));
+      localStorage.setItem(PROFESSIONAL_USER_KEY, JSON.stringify(newUser));
+      
+      // Set view preference to doctor if this is a doctor registration
+      if (role === 'doctor') {
+        localStorage.setItem(VIEW_PREFERENCE_KEY, 'doctor');
+      }
+      
+      // Set authentication state
+      localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
 
     } catch (err) {
       if (err instanceof Error) {

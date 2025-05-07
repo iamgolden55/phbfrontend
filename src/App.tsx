@@ -121,6 +121,7 @@ import ProfessionalForumPage from './pages/professional/ProfessionalForumPage';
 import PatientManagementPage from './pages/professional/PatientManagementPage';
 import ProfessionalAppointmentsPage from './pages/professional/ProfessionalAppointmentsPage';
 import ProfessionalAppointmentDetailPage from './pages/professional/ProfessionalAppointmentDetailPage';
+import ProfessionalAppointmentReschedulePage from './pages/professional/ProfessionalAppointmentReschedulePage';
 import ProfessionalPatientsPage from './pages/professional/ProfessionalPatientsPage';
 import ProfessionalResearchPage from './pages/professional/ProfessionalResearchPage';
 import ProfessionalProfilePage from './pages/professional/ProfessionalProfilePage';
@@ -195,21 +196,8 @@ import ResearchPublicationsPage from './pages/ResearchPublicationsPage';
 // Add the new import
 import AppointmentDetail from './features/health/AppointmentDetail';
 
-// Professional route guard component
-const ProfessionalRouteGuard = ({ children, allowedRoles = [] }: { children: React.ReactNode, allowedRoles?: string[] }) => {
-  const { isAuthenticated, professionalInfo } = useProfessionalAuth();
-
-  if (!isAuthenticated) {
-    return <Navigate to="/professional/login" replace />;
-  }
-
-  // If roles are specified and the user's role is not in the allowed roles
-  if (allowedRoles.length > 0 && !allowedRoles.includes(professionalInfo?.role || '')) {
-    return <Navigate to="/professional/dashboard" replace />;
-  }
-
-  return <>{children}</>;
-};
+// Import the Professional Route Guard for proper authentication
+import ProfessionalRouteGuard from './features/professional/ProfessionalRouteGuard';
 
 // Organization route guard component
 const OrganizationRouteGuard = ({ children }: { children: React.ReactNode }) => {
@@ -557,6 +545,7 @@ function App() {
                   </ProfessionalRouteGuard>
                 } />
                 <Route path="appointments" element={<ProfessionalAppointmentsPage />} />
+                <Route path="appointments/reschedule/:appointmentId" element={<ProfessionalAppointmentReschedulePage />} />
                 <Route path="appointments/:appointmentId" element={<ProfessionalAppointmentDetailPage />} />
                 <Route path="calculators" element={<ProfessionalCalculatorsPage />} />
                 <Route path="guidelines" element={<ClinicalGuidelinesPage />} />

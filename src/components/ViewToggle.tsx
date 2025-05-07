@@ -5,6 +5,7 @@ import { useProfessionalAuth } from '../features/professional/professionalAuthCo
 
 // Create a localStorage key for storing the view preference
 const VIEW_PREFERENCE_KEY = 'phb_view_preference';
+const PROFESSIONAL_AUTH_STATE_KEY = 'phb_professional_auth_state';
 
 const ViewToggle: React.FC = () => {
   const { user, isDoctor } = useAuth();
@@ -31,7 +32,7 @@ const ViewToggle: React.FC = () => {
   const [showTooltip, setShowTooltip] = useState(false);
   
   // Check if we should show the toggle - either user is a doctor or professional user is logged in
-  const showToggle = isDoctor || (user?.role === 'doctor') || professionalUser?.role === 'doctor';
+  const showToggle = isDoctor || (user?.role === 'doctor') || (user?.hpn) || professionalUser?.role === 'doctor';
   
   // If the doctor HPN exists, it confirms this user is a doctor
   const hasHPN = !!user?.hpn;
@@ -45,8 +46,49 @@ const ViewToggle: React.FC = () => {
       setIsProfessionalView(isCurrentlyInProfessionalView);
       // Update stored preference to match current location
       localStorage.setItem(VIEW_PREFERENCE_KEY, isCurrentlyInProfessionalView ? 'doctor' : 'patient');
+      
+      // If switching to professional view, set auth state
+      if (isCurrentlyInProfessionalView && (isDoctor || user?.role === 'doctor' || user?.hpn || professionalUser)) {
+        localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
+      }
     }
-  }, [location.pathname, isProfessionalView]);
+  }, [location.pathname, isProfessionalView, isDoctor, user, professionalUser]);
+
+  // Create a custom event that will keep the view state consistent
+  useEffect(() => {
+    // Broadcast the initial view state on component mount
+    const initialViewState = isProfessionalView ? 'doctor' : 'patient';
+    localStorage.setItem(VIEW_PREFERENCE_KEY, initialViewState);
+    
+    // If doctor and in professional view, set auth state
+    if (isProfessionalView && (isDoctor || user?.role === 'doctor' || user?.hpn || professionalUser)) {
+      localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
+    }
+    
+    // Function to handle popstate (browser back/forward buttons)
+    const handlePopState = () => {
+      const currentPreference = localStorage.getItem(VIEW_PREFERENCE_KEY);
+      const isInProfessionalPath = location.pathname.includes('/professional');
+      
+      // If there's a mismatch between path and preference, fix it
+      if ((isInProfessionalPath && currentPreference !== 'doctor') || 
+          (!isInProfessionalPath && currentPreference === 'doctor')) {
+        localStorage.setItem(VIEW_PREFERENCE_KEY, isInProfessionalPath ? 'doctor' : 'patient');
+        setIsProfessionalView(isInProfessionalPath);
+      }
+      
+      // Ensure auth state is set when navigating to professional pages
+      if (isInProfessionalPath && (isDoctor || user?.role === 'doctor' || user?.hpn || professionalUser)) {
+        localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
+      }
+    };
+    
+    // Listen for browser navigation events
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [isProfessionalView, isDoctor, user, professionalUser, location.pathname]);
   
   // Handle toggle switch
   const handleToggleView = () => {
@@ -59,6 +101,11 @@ const ViewToggle: React.FC = () => {
     
     // Save preference
     localStorage.setItem(VIEW_PREFERENCE_KEY, newValue ? 'doctor' : 'patient');
+    
+    // Set auth state if switching to professional view and user is a doctor
+    if (newValue && (isDoctor || user?.role === 'doctor' || user?.hpn || professionalUser)) {
+      localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
+    }
     
     // Dispatch a custom event to notify other components
     window.dispatchEvent(new CustomEvent('phb_view_changed'));
