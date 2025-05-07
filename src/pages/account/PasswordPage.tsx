@@ -3,7 +3,7 @@ import { useAuth } from '../../features/auth/authContext';
 import { Navigate } from 'react-router-dom';
 
 const PasswordPage: React.FC = () => {
-  const { isAuthenticated, changePassword } = useAuth();
+  const { isAuthenticated, changePassword, isLoading } = useAuth();
 
   const [formData, setFormData] = useState({
     currentPassword: '',
@@ -14,6 +14,7 @@ const PasswordPage: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -59,38 +60,47 @@ const PasswordPage: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
+    if (!validateForm() || isSubmitting) {
       return;
     }
 
+    setIsSubmitting(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+
     try {
-      // This is a mock implementation. In a real app, this would call an API
-      // and the changePassword function would be implemented in the auth context
-      if (typeof changePassword === 'function') {
-        changePassword(formData.currentPassword, formData.newPassword);
+      const result = await changePassword(
+        formData.currentPassword,
+        formData.newPassword,
+        formData.confirmPassword
+      );
+
+      if (result.success) {
+        setSuccessMessage(result.message);
+        setFormData({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+        });
+      } else {
+        setErrorMessage(result.message);
+        
+        // Set field-specific errors if the API response indicates them
+        if (result.message.toLowerCase().includes('current password')) {
+          setErrors(prev => ({ ...prev, currentPassword: result.message }));
+        } else if (result.message.toLowerCase().includes('new password')) {
+          setErrors(prev => ({ ...prev, newPassword: result.message }));
+        } else if (result.message.toLowerCase().includes('passwords don\'t match')) {
+          setErrors(prev => ({ ...prev, confirmPassword: result.message }));
+        }
       }
-
-      setSuccessMessage('Password changed successfully');
-      setFormData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
-      });
-
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 3000);
-    } catch (error) {
-      setErrorMessage('Failed to change password. Please check your current password and try again.');
-
-      // Clear error message after 3 seconds
-      setTimeout(() => {
-        setErrorMessage('');
-      }, 3000);
+    } catch (error: any) {
+      setErrorMessage(error.message || 'An unexpected error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -185,9 +195,24 @@ const PasswordPage: React.FC = () => {
               <div className="pt-4">
                 <button
                   type="submit"
-                  className="bg-[#005eb8] hover:bg-[#003f7e] text-white py-2 px-6 rounded-md transition-colors"
+                  disabled={isSubmitting || isLoading}
+                  className={`${
+                    isSubmitting || isLoading
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-[#005eb8] hover:bg-[#003f7e]'
+                  } text-white py-2 px-6 rounded-md transition-colors flex items-center`}
                 >
-                  Change Password
+                  {isSubmitting || isLoading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Processing...
+                    </>
+                  ) : (
+                    'Change Password'
+                  )}
                 </button>
               </div>
             </div>

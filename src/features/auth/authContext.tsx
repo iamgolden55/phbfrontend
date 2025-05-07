@@ -115,7 +115,7 @@ interface AuthContextType {
   // New functions for account management
   updateUserProfile: (data: UserProfileUpdateData) => Promise<void>;
   updateContactPreferences: (preferences: ContactPreferencesData) => Promise<void>;
-  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  changePassword: (currentPassword: string, newPassword: string, confirmPassword: string) => Promise<{ success: boolean; message: string }>;
   // Password reset functions
   requestPasswordReset: (email: string) => Promise<{ success: boolean; message: string }>;
   confirmPasswordReset: (token: string, newPassword: string, confirmPassword: string) => Promise<{ success: boolean; message: string }>;
@@ -762,22 +762,43 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   // Function to change password
-  const changePassword = async (currentPassword: string, newPassword: string) => {
+  const changePassword = async (currentPassword: string, newPassword: string, confirmPassword: string) => {
        if (!user) throw new Error("User not authenticated");
        setIsLoading(true);
        setError(null);
        const token = localStorage.getItem(AUTH_TOKEN_KEY);
        try {
-           // Assuming endpoint like '/api/auth/change-password' - COMMENTED OUT
-           console.warn("Change Password functionality requires a confirmed backend endpoint."); // Added warning
-           // await apiRequest('/api/auth/change-password', 'POST', { currentPassword, newPassword }, token);
-           // Optionally show success message
-           setError("Change Password endpoint not configured in frontend."); // Feedback
-
+           const response = await apiRequest<{ message: string }>(
+               '/api/password/change/',
+               'POST', 
+               { 
+                   current_password: currentPassword,
+                   new_password: newPassword,
+                   confirm_password: confirmPassword
+               }, 
+               token
+           );
+           
+           return { success: true, message: response.message || "Password changed successfully! 🎉" };
        } catch (err: any) {
            console.error("Change password failed:", err);
-           setError(err.message || "Failed to change password.");
-           throw err; // Re-throw
+           let errorMessage = "Failed to change password.";
+           
+           // Handle specific error cases based on the API response
+           if (err.data) {
+               if (err.data.error) {
+                   errorMessage = err.data.error;
+               } else if (err.data.confirm_password) {
+                   errorMessage = err.data.confirm_password[0];
+               } else if (err.data.new_password) {
+                   errorMessage = err.data.new_password[0];
+               } else if (err.data.current_password) {
+                   errorMessage = err.data.current_password[0];
+               }
+           }
+           
+           setError(errorMessage);
+           return { success: false, message: errorMessage };
        } finally {
            setIsLoading(false);
        }
