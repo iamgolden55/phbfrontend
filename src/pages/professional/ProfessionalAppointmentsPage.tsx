@@ -8,6 +8,7 @@ interface Appointment {
   id: number;
   appointment_id: string;
   doctor_full_name: string;
+  patient_name: string;
   hospital_name: string;
   department_name: string;
   appointment_date: string;
@@ -47,6 +48,7 @@ const ProfessionalAppointmentsPage: React.FC = () => {
       
       try {
         const data = await fetchDoctorAppointments();
+        console.log('Appointments data:', data);
         setAppointments(data);
       } catch (err: any) {
         console.error('Failed to load doctor appointments:', err);
@@ -202,7 +204,7 @@ const ProfessionalAppointmentsPage: React.FC = () => {
                   <tr key={appointment.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
-                        {appointment.patient?.name || "Patient Name"}
+                        {appointment.patient_name || appointment.patient?.name || "Patient Name"}
                       </div>
                       <div className="text-sm text-gray-500">
                         ID: {appointment.appointment_id}
