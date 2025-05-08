@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { fetchDoctorAppointments, updateAppointmentStatus, fetchDoctorAppointmentDetails } from '../../features/professional/appointmentsService';
 import { useAuth } from '../../features/auth/authContext';
 
-// Define appointment type based on the API response
 interface Appointment {
   id: number;
   appointment_id: string;
   doctor_full_name: string;
+  patient_name: string;
   hospital_name: string;
   department_name: string;
   appointment_date: string;
@@ -24,18 +24,15 @@ interface Appointment {
   status_display: string;
   chief_complaint: string;
   created_at: string;
-  // Patient information can come in different formats
   patient?: {
     id: number;
     name: string;
     age?: number;
     gender?: string;
   };
-  // Alternative format fields for patient data
   patient_name?: string;
   patient_full_name?: string;
   patient_id?: string;
-  // Notification info
   notification_status?: string;
   notification_message?: string;
   notification_details?: {
@@ -58,6 +55,22 @@ interface Appointment {
   };
 }
 
+interface NotificationStatus {
+  id: string;
+  status: string;
+  message?: string;
+  recipient?: string;
+  sentAt?: string;
+  calendarAttached?: boolean;
+  details?: Array<{
+    id: number;
+    type: string;
+    status: string;
+    created_at: string;
+    sent_at: string;
+  }>;
+}
+
 const ProfessionalAppointmentsPage: React.FC = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -65,22 +78,7 @@ const ProfessionalAppointmentsPage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<string>('upcoming');
   const [statusUpdateLoading, setStatusUpdateLoading] = useState<string | null>(null);
   const [statusUpdateSuccess, setStatusUpdateSuccess] = useState<string | null>(null);
-  const [notificationStatus, setNotificationStatus] = useState<{
-    id: string;
-    status: string;
-    message?: string;
-    recipient?: string;
-    sentAt?: string;
-    calendarAttached?: boolean;
-    details?: Array<{
-      id: number;
-      type: string;
-      status: string;
-      created_at: string;
-      sent_at: string;
-    }>;
-  } | null>(null);
-  // Add states for the completion modal
+  const [notificationStatus, setNotificationStatus] = useState<NotificationStatus | null>(null);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [completionAppointmentId, setCompletionAppointmentId] = useState<string | null>(null);
   const [medicalSummary, setMedicalSummary] = useState('');
@@ -88,23 +86,19 @@ const ProfessionalAppointmentsPage: React.FC = () => {
   const [meetingEndTime, setMeetingEndTime] = useState('');
   const { user } = useAuth();
   const navigate = useNavigate();
-  
-  // Fetch appointments on component mount
+
   useEffect(() => {
     const loadAppointments = async () => {
       setIsLoading(true);
       setError(null);
       
       try {
-        // Fetch appointments from API
         const data = await fetchDoctorAppointments();
         
         // Process the data to properly handle patient information
         const processedData = data.map((appointment: any) => {
-          // Make a copy to avoid mutating the original
           const processed = { ...appointment };
           
-          // Extract patient name based on multiple possible data structures
           let patientName = processed.patient_name || 
                           processed.patient_full_name || 
                           (processed.patient && (processed.patient.name || processed.patient.full_name)) ||
@@ -114,64 +108,43 @@ const ProfessionalAppointmentsPage: React.FC = () => {
                           processed.user_name ||
                           processed.client_name;
           
-          // Extract patient ID if available
           let patientId = processed.patient_id ||
                           (processed.patient && processed.patient.id) ||
                           processed.user_id ||
                           processed.customer_id ||
                           processed.client_id;
                           
-          // Add the extracted patient name and ID to the processed appointment
-          if (patientName) {
-            processed.patient_name = patientName;
-          }
-          
-          if (patientId) {
-            processed.patient_id = patientId;
-          }
+          if (patientName) processed.patient_name = patientName;
+          if (patientId) processed.patient_id = patientId;
           
           return processed;
         });
         
         // For appointments without patient names, try to fetch patient details
-        const appointmentsWithMissingNames = processedData.filter(
-          (app: any) => !app.patient_name || app.patient_name === 'No Patient Name Available'
+        const appointmentsWithDetailsFetched = await Promise.all(
+          processedData.map(async (appointment: any) => {
+            if (!appointment.patient_name || appointment.patient_name === 'No Patient Name Available') {
+              try {
+                const details = await fetchDoctorAppointmentDetails(appointment.appointment_id);
+                let patientName = details.patient_name || 
+                                 details.patient_full_name || 
+                                 (details.patient && (details.patient.name || details.patient.full_name)) ||
+                                 details.name ||
+                                 details.full_name ||
+                                 details.customer_name || 
+                                 details.user_name;
+                if (patientName) {
+                  return { ...appointment, patient_name: patientName };
+                }
+              } catch (err) {
+                console.error(`Failed to fetch details for appointment ${appointment.appointment_id}:`, err);
+              }
+            }
+            return appointment;
+          })
         );
         
-        if (appointmentsWithMissingNames.length > 0) {
-          // Only get patient details for appointments without names
-          const appointmentsWithDetailsFetched = await Promise.all(
-            processedData.map(async (appointment: any) => {
-              if (!appointment.patient_name || appointment.patient_name === 'No Patient Name Available') {
-                try {
-                  // Fetch detailed info for this appointment
-                  const details = await fetchDoctorAppointmentDetails(appointment.appointment_id);
-                  
-                  // Extract patient name from details if available
-                  let patientName = details.patient_name || 
-                                   details.patient_full_name || 
-                                   (details.patient && (details.patient.name || details.patient.full_name)) ||
-                                   details.name ||
-                                   details.full_name ||
-                                   details.customer_name || 
-                                   details.user_name;
-                                   
-                  if (patientName) {
-                    return { ...appointment, patient_name: patientName };
-                  }
-                } catch (err) {
-                  console.error(`Failed to fetch details for appointment ${appointment.appointment_id}:`, err);
-                }
-              }
-              return appointment;
-            })
-          );
-          
-          setAppointments(appointmentsWithDetailsFetched);
-        } else {
-          // No missing names, use processed data directly
-          setAppointments(processedData);
-        }
+        setAppointments(appointmentsWithDetailsFetched);
       } catch (err: any) {
         console.error('Failed to load doctor appointments:', err);
         setError(err.message || 'Failed to load doctor appointments');
@@ -183,44 +156,35 @@ const ProfessionalAppointmentsPage: React.FC = () => {
     loadAppointments();
   }, []);
 
-  // Handle back to dashboard
   const handleBackToDashboard = () => {
     navigate('/professional/dashboard');
   };
 
-  // Navigate to appointment details
   const handleViewAppointment = (appointmentId: string) => {
     navigate(`/professional/appointments/${appointmentId}`);
   };
 
-  // Filter appointments based on active filter
   const filteredAppointments = appointments.filter(appointment => {
     const appointmentDate = new Date(appointment.appointment_date);
     const now = new Date();
     
     if (activeFilter === 'upcoming') {
-      // Show only confirmed appointments with future dates
       return appointmentDate >= now && appointment.status === 'confirmed';
     } else if (activeFilter === 'past') {
-      // Show only completed appointments
       return appointment.status === 'completed';
     } else if (activeFilter === 'cancelled') {
       return appointment.status === 'cancelled';
     } else if (activeFilter === 'all') {
       return true;
     }
-    
     return false;
   });
 
-  // Handle the click on Complete button
   const handleCompleteClick = (appointmentId: string) => {
     setCompletionAppointmentId(appointmentId);
-    
-    // Find the appointment to pre-fill the meeting start time with scheduled time
     const appointment = appointments.find(a => a.appointment_id === appointmentId);
+    
     if (appointment) {
-      // Set default start time to the scheduled appointment time if available
       const appointmentDate = appointment.appointment_date?.split('T')[0] || new Date().toISOString().split('T')[0];
       const appointmentTime = appointment.formatted_time ? 
         convertTimeFormat(appointment.formatted_time) : 
@@ -228,19 +192,16 @@ const ProfessionalAppointmentsPage: React.FC = () => {
       
       setMeetingStartTime(`${appointmentDate}T${appointmentTime}`);
       
-      // Set default end time to current time or appointment time + duration
       const now = new Date();
       const endDate = now.toISOString().split('T')[0];
       const endTime = now.toTimeString().slice(0, 5);
       setMeetingEndTime(`${endDate}T${endTime}`);
     } else {
-      // Default to current date/time if appointment not found
       const now = new Date();
       const dateStr = now.toISOString().split('T')[0];
       const timeStr = now.toTimeString().slice(0, 5);
       setMeetingStartTime(`${dateStr}T${timeStr}`);
       
-      // Set end time 30 minutes later as default
       const endTime = new Date(now.getTime() + 30 * 60000);
       const endDateStr = endTime.toISOString().split('T')[0];
       const endTimeStr = endTime.toTimeString().slice(0, 5);
@@ -250,7 +211,6 @@ const ProfessionalAppointmentsPage: React.FC = () => {
     setShowCompletionModal(true);
   };
   
-  // Helper to convert time format from "2:30 PM" to "14:30"
   const convertTimeFormat = (time12h: string): string => {
     const [time, modifier] = time12h.split(' ');
     let [hours, minutes] = time.split(':');
@@ -264,7 +224,6 @@ const ProfessionalAppointmentsPage: React.FC = () => {
     return `${hours.padStart(2, '0')}:${minutes}`;
   };
 
-  // Handle the submission of medical summary
   const handleSubmitCompletion = async () => {
     if (!completionAppointmentId || !medicalSummary.trim()) {
       setError('Medical summary is required');
@@ -277,17 +236,12 @@ const ProfessionalAppointmentsPage: React.FC = () => {
     }
 
     try {
-      // Format the meeting times for sending to the API
       const startTimeFormatted = new Date(meetingStartTime).toISOString();
       const endTimeFormatted = new Date(meetingEndTime).toISOString();
-      
-      // Create an enhanced summary with the meeting times included
       const enhancedSummary = `Meeting Time: ${startTimeFormatted} to ${endTimeFormatted}\n\n${medicalSummary}`;
       
-      // Call the existing status change function with the additional parameter
       await handleStatusChange(completionAppointmentId, 'completed', enhancedSummary);
       
-      // Reset the modal state
       setShowCompletionModal(false);
       setCompletionAppointmentId(null);
       setMedicalSummary('');
@@ -299,7 +253,6 @@ const ProfessionalAppointmentsPage: React.FC = () => {
     }
   };
 
-  // Helper function to process notification response
   const processNotificationResponse = (notification: any, appointmentId?: string) => {
     if (!notification) return null;
     
@@ -308,18 +261,13 @@ const ProfessionalAppointmentsPage: React.FC = () => {
       message: null
     };
     
-    // Add appointment ID if provided
-    if (appointmentId) {
-      notificationData.id = appointmentId;
-    }
+    if (appointmentId) notificationData.id = appointmentId;
     
-    // Handle legacy notification format
     if (typeof notification === 'string' || notification.status) {
       notificationData.status = notification.status || 'unknown';
       notificationData.message = notification.message;
     }
     
-    // Handle enhanced notification format
     if (notification.email_sent) {
       notificationData.status = notification.email_sent.notification_status;
       notificationData.recipient = notification.email_sent.recipient;
@@ -327,7 +275,6 @@ const ProfessionalAppointmentsPage: React.FC = () => {
       notificationData.calendarAttached = notification.email_sent.calendar_attached;
     }
     
-    // Add notification details if available
     if (notification.details && Array.isArray(notification.details)) {
       notificationData.details = notification.details;
     }
@@ -335,13 +282,10 @@ const ProfessionalAppointmentsPage: React.FC = () => {
     return notificationData;
   };
 
-  // Modified handle status change to include medical summary
   const handleStatusChange = async (appointmentId: string, newStatus: string, summary?: string) => {
-    // Show loading for this specific appointment
     setStatusUpdateLoading(appointmentId);
     
     try {
-      // Call the API to update the status
       const result = await updateAppointmentStatus(
         appointmentId, 
         newStatus as 'confirmed' | 'cancelled' | 'completed' | 'rescheduled' | 'no_show',
@@ -349,12 +293,10 @@ const ProfessionalAppointmentsPage: React.FC = () => {
         summary
       );
       
-      // Check for enhanced notification status in the response
       if (result.notification) {
         setNotificationStatus(processNotificationResponse(result.notification, appointmentId));
       }
       
-      // Update the local state
       setAppointments(appointments.map(appointment => {
         if (appointment.appointment_id === appointmentId) {
           const updatedAppointment = {
@@ -363,15 +305,12 @@ const ProfessionalAppointmentsPage: React.FC = () => {
             status_display: newStatus.charAt(0).toUpperCase() + newStatus.slice(1),
           };
           
-          // Add notification data to appointment
           if (result.notification) {
-            // Legacy format
             if (result.notification.status) {
               updatedAppointment.notification_status = result.notification.status;
               updatedAppointment.notification_message = result.notification.message;
             }
             
-            // Enhanced format
             if (result.notification.email_sent || result.notification.details) {
               updatedAppointment.notification_details = {
                 email_sent: result.notification.email_sent,
@@ -385,7 +324,6 @@ const ProfessionalAppointmentsPage: React.FC = () => {
         return appointment;
       }));
       
-      // Show success message
       setStatusUpdateSuccess(`Appointment ${newStatus} successfully` + 
         (result.notification ? ` | Notification: ${
           result.notification.email_sent?.notification_status || 
@@ -393,35 +331,25 @@ const ProfessionalAppointmentsPage: React.FC = () => {
           'processed'
         }` : ''));
       
-      // Clear success message after 5 seconds
-      setTimeout(() => {
-        setStatusUpdateSuccess(null);
-      }, 5000);
+      setTimeout(() => setStatusUpdateSuccess(null), 5000);
     } catch (err: any) {
       console.error(`Failed to update appointment status to ${newStatus}:`, err);
       setError(err.message || `Failed to update appointment status to ${newStatus}`);
-      
-      // Clear error message after 5 seconds
-      setTimeout(() => {
-        setError(null);
-      }, 5000);
+      setTimeout(() => setError(null), 5000);
     } finally {
-      // Clear loading state
       setStatusUpdateLoading(null);
     }
   };
   
-  // Format patient ID for display
   const formatPatientId = (appointment: Appointment) => {
     const patientId = appointment.patient_id || 
                      (appointment.patient && appointment.patient.id) || 
                      appointment.appointment_id;
-                     
     return `ID: ${patientId || appointment.appointment_id}`;
   };
 
   return (
-    <div>
+    <div className="container mx-auto px-4 py-8">
       <Helmet>
         <title>My Appointments | Doctor Dashboard</title>
       </Helmet>
@@ -501,13 +429,12 @@ const ProfessionalAppointmentsPage: React.FC = () => {
           notificationStatus.status === 'sent' ? 'bg-green-100 border border-green-400 text-green-700' :
           notificationStatus.status === 'pending' ? 'bg-yellow-100 border border-yellow-400 text-yellow-700' :
           'bg-red-100 border border-red-400 text-red-700'
-        }`} role="alert">
+        }`}>
           <span className="font-medium">Notification status for Appointment {notificationStatus.id}: {notificationStatus.status}</span>
           {notificationStatus.message && (
             <p className="block sm:inline mt-1">{notificationStatus.message}</p>
           )}
           
-          {/* Enhanced notification details */}
           {notificationStatus.recipient && (
             <div className="mt-2 text-sm">
               <p><strong>Recipient:</strong> {notificationStatus.recipient}</p>
@@ -520,7 +447,6 @@ const ProfessionalAppointmentsPage: React.FC = () => {
             </div>
           )}
           
-          {/* Notification details list */}
           {notificationStatus.details && notificationStatus.details.length > 0 && (
             <div className="mt-2">
               <p className="font-medium">Notification details:</p>
@@ -533,18 +459,6 @@ const ProfessionalAppointmentsPage: React.FC = () => {
                 ))}
               </ul>
             </div>
-          )}
-          
-          {notificationStatus.status === 'failed' && (
-            <button 
-              onClick={() => {
-                const appointment = appointments.find(a => a.appointment_id === notificationStatus.id);
-                if (appointment) handleStatusChange(notificationStatus.id, appointment.status);
-              }} 
-              className="mt-3 px-3 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded-md transition-colors"
-            >
-              Retry sending notification
-            </button>
           )}
         </div>
       )}
@@ -751,4 +665,4 @@ const ProfessionalAppointmentsPage: React.FC = () => {
   );
 };
 
-export default ProfessionalAppointmentsPage; 
+export default ProfessionalAppointmentsPage;

@@ -71,11 +71,15 @@ interface RegisterData {
 }
 
 interface UserProfileUpdateData {
-  name?: string;
-  email?: string;
-  dateOfBirth?: string;
-  address?: string;
   phone?: string;
+  country?: string;
+  state?: string;
+  city?: string;
+  date_of_birth?: string;
+  gender?: string;
+  preferred_language?: string;
+  secondary_languages?: string[];
+  custom_language?: string;
 }
 
 interface ContactPreferencesData {
@@ -111,7 +115,7 @@ interface AuthContextType {
   // New functions for account management
   updateUserProfile: (data: UserProfileUpdateData) => Promise<void>;
   updateContactPreferences: (preferences: ContactPreferencesData) => Promise<void>;
-  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  changePassword: (currentPassword: string, newPassword: string, confirmPassword: string) => Promise<{ success: boolean; message: string }>;
   // Password reset functions
   requestPasswordReset: (email: string) => Promise<{ success: boolean; message: string }>;
   confirmPasswordReset: (token: string, newPassword: string, confirmPassword: string) => Promise<{ success: boolean; message: string }>;
@@ -134,7 +138,7 @@ const AUTH_TOKEN_KEY = 'phb_auth_token'; // Key for storing token in localStorag
 // Helper function for making API calls
 async function apiRequest<T>(
   endpoint: string,
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET',
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' = 'GET',
   body?: any,
   token?: string | null
 ): Promise<T> {
@@ -607,14 +611,126 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setIsLoading(true);
       setError(null);
       const token = localStorage.getItem(AUTH_TOKEN_KEY);
+      
+      // Create a copy of data for safe manipulation
+      const updateData: Record<string, any> = { ...data };
+      
+      // Check if we're sending secondary_languages
+      if ('secondary_languages' in updateData) {
+          // Completely rewritten secondary_languages handling
+          const rawValue = updateData.secondary_languages;
+          let secondaryLanguages: string[] = [];
+          
+          // Case 1: Already a proper array
+          if (Array.isArray(rawValue)) {
+              // Filter out any non-string values and ensure each is a proper string
+              secondaryLanguages = rawValue
+                  .filter(item => item !== null && item !== undefined)
+                  .map(item => String(item).trim());
+              
+              console.log("Case 1: Array input - processed to:", secondaryLanguages);
+          }
+          // Case 2: String that looks like a JSON array
+          else if (typeof rawValue === 'string' && rawValue.trim().startsWith('[') && rawValue.trim().endsWith(']')) {
+              try {
+                  const parsed = JSON.parse(rawValue);
+                  if (Array.isArray(parsed)) {
+                      secondaryLanguages = parsed
+                          .filter(item => item !== null && item !== undefined)
+                          .map(item => String(item).trim());
+                  } else {
+                      // If parsed successfully but not an array, treat as comma-separated values
+                      secondaryLanguages = rawValue
+                          .slice(1, -1) // Remove brackets
+                          .split(',')
+                          .map(lang => lang.trim().replace(/['"]/g, '')); // Remove quotes
+                  }
+              } catch (e) {
+                  // If JSON parsing fails, manually extract values
+                  secondaryLanguages = rawValue
+                      .slice(1, -1) // Remove brackets
+                      .split(',')
+                      .map(lang => lang.trim().replace(/['"]/g, '')); // Remove quotes
+              }
+              console.log("Case 2: JSON string input - processed to:", secondaryLanguages);
+          }
+          // Case 3: Regular string (treat as comma-separated)
+          else if (typeof rawValue === 'string') {
+              secondaryLanguages = rawValue
+                  .split(',')
+                  .map(lang => lang.trim())
+                  .filter(lang => lang.length > 0); // Filter out empty strings
+                  
+              console.log("Case 3: String input - processed to:", secondaryLanguages);
+          }
+          // Case 4: Object that can be converted to string and split
+          else if (rawValue && typeof rawValue === 'object') {
+              try {
+                  const asString = String(rawValue);
+                  secondaryLanguages = asString
+                      .split(',')
+                      .map(lang => lang.trim())
+                      .filter(lang => lang.length > 0);
+                      
+                  console.log("Case 4: Object input - processed to:", secondaryLanguages);
+              } catch (e) {
+                  console.error("Failed to process object as string:", e);
+                  secondaryLanguages = [];
+              }
+          }
+          
+          // Ensure we have an array even if all processing failed
+          if (!Array.isArray(secondaryLanguages)) {
+              console.error("Secondary languages processing resulted in non-array:", secondaryLanguages);
+              secondaryLanguages = [];
+          }
+          
+          // Update the data with properly formatted array
+          updateData.secondary_languages = secondaryLanguages;
+          
+          console.log("Final secondary_languages array type:", typeof updateData.secondary_languages);
+          console.log("Is array:", Array.isArray(updateData.secondary_languages));
+          console.log("Final value:", updateData.secondary_languages);
+      }
+      
+      // Make sure custom_language is an empty string rather than null or undefined
+      if ('custom_language' in updateData && (updateData.custom_language === null || updateData.custom_language === undefined)) {
+          updateData.custom_language = '';
+      }
+      
+      // Replace all null/undefined values with empty strings
+      Object.keys(updateData).forEach(key => {
+          if (updateData[key] === null || updateData[key] === undefined) {
+              updateData[key] = '';
+          }
+      });
+      
+      console.log("Final formatted data being sent to API:", updateData);
+      console.log("Fields being updated:", Object.keys(updateData).join(', '));
+      console.log("Using PATCH method for partial update");
+      
+      if ('secondary_languages' in updateData) {
+          console.log("Type of secondary_languages:", 
+              Array.isArray(updateData.secondary_languages) ? 'Array' : typeof updateData.secondary_languages);
+          console.log("Secondary languages value:", updateData.secondary_languages);
+      }
+      
       try {
-          // Assuming endpoint like '/api/profile/'
-          const updatedUserData = await apiRequest<User>('/api/profile/', 'PUT', data, token);
-          setUser(updatedUserData);
+          // Use PATCH instead of PUT for partial updates
+          const updatedUserData = await apiRequest<User>('/api/profile/', 'PATCH', updateData, token);
+          
+          // Update local user state with the new data
+          setUser(prevUser => {
+              if (!prevUser) return updatedUserData;
+              return { ...prevUser, ...updatedUserData };
+          });
+          
+          console.log("Profile updated successfully with fields:", Object.keys(updateData).join(', '));
       } catch (err: any) {
           console.error("Update profile failed:", err);
-          setError(err.message || "Failed to update profile.");
-          throw err; // Re-throw for the calling component to handle
+          const errorMessage = err.data?.detail || err.message || "Failed to update profile.";
+          setError(errorMessage);
+          throw new Error(errorMessage); // Re-throw with better error message
       } finally {
           setIsLoading(false);
       }
@@ -646,22 +762,43 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   // Function to change password
-  const changePassword = async (currentPassword: string, newPassword: string) => {
+  const changePassword = async (currentPassword: string, newPassword: string, confirmPassword: string) => {
        if (!user) throw new Error("User not authenticated");
        setIsLoading(true);
        setError(null);
        const token = localStorage.getItem(AUTH_TOKEN_KEY);
        try {
-           // Assuming endpoint like '/api/auth/change-password' - COMMENTED OUT
-           console.warn("Change Password functionality requires a confirmed backend endpoint."); // Added warning
-           // await apiRequest('/api/auth/change-password', 'POST', { currentPassword, newPassword }, token);
-           // Optionally show success message
-           setError("Change Password endpoint not configured in frontend."); // Feedback
-
+           const response = await apiRequest<{ message: string }>(
+               '/api/password/change/',
+               'POST', 
+               { 
+                   current_password: currentPassword,
+                   new_password: newPassword,
+                   confirm_password: confirmPassword
+               }, 
+               token
+           );
+           
+           return { success: true, message: response.message || "Password changed successfully! 🎉" };
        } catch (err: any) {
            console.error("Change password failed:", err);
-           setError(err.message || "Failed to change password.");
-           throw err; // Re-throw
+           let errorMessage = "Failed to change password.";
+           
+           // Handle specific error cases based on the API response
+           if (err.data) {
+               if (err.data.error) {
+                   errorMessage = err.data.error;
+               } else if (err.data.confirm_password) {
+                   errorMessage = err.data.confirm_password[0];
+               } else if (err.data.new_password) {
+                   errorMessage = err.data.new_password[0];
+               } else if (err.data.current_password) {
+                   errorMessage = err.data.current_password[0];
+               }
+           }
+           
+           setError(errorMessage);
+           return { success: false, message: errorMessage };
        } finally {
            setIsLoading(false);
        }

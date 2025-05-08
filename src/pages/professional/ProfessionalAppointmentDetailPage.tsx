@@ -3,33 +3,67 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { fetchDoctorAppointmentDetails, updateAppointmentStatus } from '../../features/professional/appointmentsService';
 
+interface AppointmentDetails {
+  id: string;
+  status: string;
+  status_display: string;
+  patient_name: string;
+  patient_email?: string;
+  patient_id?: string;
+  appointment_date?: string;
+  formatted_date?: string;
+  formatted_time?: string;
+  formatted_date_time?: string;
+  hospital_name?: string;
+  department_name?: string;
+  formatted_appointment_type?: string;
+  formatted_priority?: string;
+  duration?: string | number;
+  appointment_duration_display?: string;
+  created_at?: string;
+  chief_complaint?: string;
+  symptoms?: string;
+  medical_history?: string;
+  allergies?: string;
+  current_medications?: string;
+  is_insurance_based?: boolean;
+  insurance_details?: any;
+  payment_status?: string;
+  important_notes?: string[];
+  can_be_cancelled?: boolean;
+  email_verified?: boolean;
+}
+
+interface NotificationStatus {
+  status: string;
+  message?: string;
+  recipient?: string;
+  sentAt?: string;
+  calendarAttached?: boolean;
+  details?: Array<{
+    id: number;
+    type: string;
+    status: string;
+    created_at: string;
+    sent_at: string;
+  }>;
+}
+
 const ProfessionalAppointmentDetailPage: React.FC = () => {
   const { appointmentId } = useParams<{ appointmentId: string }>();
-  const [appointmentDetails, setAppointmentDetails] = useState<any>(null);
+  const navigate = useNavigate();
+  const [appointmentDetails, setAppointmentDetails] = useState<AppointmentDetails | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [showAddNotesModal, setShowAddNotesModal] = useState<boolean>(false);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [notes, setNotes] = useState<string>('');
+  const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
   const [statusUpdateSuccess, setStatusUpdateSuccess] = useState<string | null>(null);
-  const [notificationStatus, setNotificationStatus] = useState<{
-    status: string;
-    message?: string;
-    recipient?: string;
-    sentAt?: string;
-    calendarAttached?: boolean;
-    details?: Array<{
-      id: number;
-      type: string;
-      status: string;
-      created_at: string;
-      sent_at: string;
-    }>;
-  } | null>(null);
+  const [notificationStatus, setNotificationStatus] = useState<NotificationStatus | null>(null);
   const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [medicalSummary, setMedicalSummary] = useState('');
   const [meetingStartTime, setMeetingStartTime] = useState('');
   const [meetingEndTime, setMeetingEndTime] = useState('');
-  const navigate = useNavigate();
 
   useEffect(() => {
     const loadAppointmentDetails = async () => {
@@ -40,36 +74,23 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
       
       try {
         const data = await fetchDoctorAppointmentDetails(appointmentId);
-        console.log("Appointment details:", data); // For debugging
+        console.log('Appointment details:', data);
         
-        // Process the data to extract patient information correctly
-        // Try all possible locations where patient info might be stored
-        const processedData = { ...data };
-        
-        // Try to extract patient name from various possible locations
-        let patientName = processedData.patient_name || 
-                          processedData.patient_full_name || 
-                          (processedData.patient && (processedData.patient.name || processedData.patient.full_name)) ||
-                          processedData.name ||
-                          processedData.full_name ||
-                          processedData.customer_name || 
-                          processedData.user_name;
-                          
-        // If we found a name, ensure it's stored in the patient_name field
-        if (patientName) {
-          processedData.patient_name = patientName;
-        }
-        
-        // Similarly handle patient email
-        let patientEmail = processedData.patient_email || 
-                           (processedData.patient && processedData.patient.email) ||
-                           processedData.email;
-                           
-        if (patientEmail) {
-          processedData.patient_email = patientEmail;
-        }
-        
-        console.log("Processed appointment details:", processedData);
+        // Process patient information
+        const processedData: AppointmentDetails = {
+          ...data,
+          patient_name: data.patient_name || 
+                       data.patient?.name || 
+                       data.patient?.full_name ||
+                       data.name ||
+                       data.full_name ||
+                       data.customer_name || 
+                       data.user_name ||
+                       `Patient #${data.appointment_id?.slice(-6)}`,
+          patient_email: data.patient_email || data.patient?.email || data.email,
+          patient_id: data.patient_id || data.patient?.id || data.appointment_id
+        };
+
         setAppointmentDetails(processedData);
       } catch (err: any) {
         console.error('Failed to load appointment details:', err);
@@ -82,61 +103,18 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
     loadAppointmentDetails();
   }, [appointmentId]);
 
-  // Handle back button click
-  const handleBack = () => {
-    navigate('/professional/appointments');
-  };
-
-  // Handle add notes modal
-  const handleAddNotesClick = () => {
-    setShowAddNotesModal(true);
-  };
-
-  // Handle close modal
-  const handleCloseModal = () => {
-    setShowAddNotesModal(false);
-  };
-
-  // Handle save notes
-  const handleSaveNotes = () => {
-    // Add notes to the important notes array
-    if (notes.trim() !== "") {
-      // In a real app, you would call an API endpoint to save the notes
-      // For now, we'll just update the local state
-      const updatedImportantNotes = [...(appointmentDetails.important_notes || []), notes];
-      setAppointmentDetails({
-        ...appointmentDetails,
-        important_notes: updatedImportantNotes
-      });
-      setNotes('');
-      setShowAddNotesModal(false);
-      
-      // Show success message
-      setStatusUpdateSuccess('Note added successfully');
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setStatusUpdateSuccess(null);
-      }, 3000);
-    }
-  };
-
-  // Helper function to process notification response
-  const processNotificationResponse = (notification: any) => {
+  const processNotificationResponse = (notification: any): NotificationStatus | null => {
     if (!notification) return null;
     
-    const notificationData: any = {
+    const notificationData: NotificationStatus = {
       status: 'unknown',
-      message: null
     };
     
-    // Handle legacy notification format
     if (typeof notification === 'string' || notification.status) {
       notificationData.status = notification.status || 'unknown';
       notificationData.message = notification.message;
     }
     
-    // Handle enhanced notification format
     if (notification.email_sent) {
       notificationData.status = notification.email_sent.notification_status;
       notificationData.recipient = notification.email_sent.recipient;
@@ -144,7 +122,6 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
       notificationData.calendarAttached = notification.email_sent.calendar_attached;
     }
     
-    // Add notification details if available
     if (notification.details && Array.isArray(notification.details)) {
       notificationData.details = notification.details;
     }
@@ -152,117 +129,92 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
     return notificationData;
   };
 
-  // Handle confirm appointment
   const handleConfirmAppointment = async () => {
-    if (!appointmentId) return;
+    if (!appointmentId || !appointmentDetails) return;
     
+    setActionLoading('confirm');
     try {
       const result = await updateAppointmentStatus(appointmentId, 'confirmed');
       setStatusUpdateSuccess('Appointment confirmed successfully');
       
-      // Process enhanced notification response
       if (result.notification) {
         setNotificationStatus(processNotificationResponse(result.notification));
       }
       
-      // Update local state
-      if (appointmentDetails) {
-        setAppointmentDetails({
-          ...appointmentDetails,
-          status: 'confirmed',
-          status_display: 'Confirmed'
-        });
-      }
+      setAppointmentDetails({
+        ...appointmentDetails,
+        status: 'confirmed',
+        status_display: 'Confirmed'
+      });
       
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setStatusUpdateSuccess(null);
-      }, 3000);
+      setTimeout(() => setStatusUpdateSuccess(null), 3000);
     } catch (err: any) {
       setError(err.message || 'Failed to confirm appointment');
-      
-      // Clear error message after 3 seconds
-      setTimeout(() => {
-        setError(null);
-      }, 3000);
+      setTimeout(() => setError(null), 3000);
+    } finally {
+      setActionLoading(null);
     }
   };
 
-  // Handle cancel appointment
   const handleCancelAppointment = async () => {
-    if (!appointmentId) return;
+    if (!appointmentId || !appointmentDetails) return;
     
+    const reason = prompt('Please provide a reason for cancellation:');
+    if (reason === null) return;
+    
+    setActionLoading('cancel');
     try {
-      const result = await updateAppointmentStatus(appointmentId, 'cancelled');
+      const result = await updateAppointmentStatus(appointmentId, 'cancelled', reason);
       setStatusUpdateSuccess('Appointment cancelled successfully');
       
-      // Process enhanced notification response
       if (result.notification) {
         setNotificationStatus(processNotificationResponse(result.notification));
       }
       
-      // Update local state
-      if (appointmentDetails) {
-        setAppointmentDetails({
-          ...appointmentDetails,
-          status: 'cancelled',
-          status_display: 'Cancelled',
-          can_be_cancelled: false
-        });
-      }
+      setAppointmentDetails({
+        ...appointmentDetails,
+        status: 'cancelled',
+        status_display: 'Cancelled',
+        can_be_cancelled: false
+      });
       
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setStatusUpdateSuccess(null);
-      }, 3000);
+      setTimeout(() => setStatusUpdateSuccess(null), 3000);
     } catch (err: any) {
       setError(err.message || 'Failed to cancel appointment');
-      
-      // Clear error message after 3 seconds
-      setTimeout(() => {
-        setError(null);
-      }, 3000);
+      setTimeout(() => setError(null), 3000);
+    } finally {
+      setActionLoading(null);
     }
   };
 
-  // Handle no-show appointment
   const handleNoShowAppointment = async () => {
-    if (!appointmentId) return;
+    if (!appointmentId || !appointmentDetails) return;
     
+    setActionLoading('no_show');
     try {
       const result = await updateAppointmentStatus(appointmentId, 'no_show');
       setStatusUpdateSuccess('Appointment marked as no-show');
       
-      // Process enhanced notification response
       if (result.notification) {
         setNotificationStatus(processNotificationResponse(result.notification));
       }
       
-      // Update local state
-      if (appointmentDetails) {
-        setAppointmentDetails({
-          ...appointmentDetails,
-          status: 'no_show',
-          status_display: 'No Show',
-          can_be_cancelled: false
-        });
-      }
+      setAppointmentDetails({
+        ...appointmentDetails,
+        status: 'no_show',
+        status_display: 'No Show',
+        can_be_cancelled: false
+      });
       
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setStatusUpdateSuccess(null);
-      }, 3000);
+      setTimeout(() => setStatusUpdateSuccess(null), 3000);
     } catch (err: any) {
       setError(err.message || 'Failed to mark appointment as no-show');
-      
-      // Clear error message after 3 seconds
-      setTimeout(() => {
-        setError(null);
-      }, 3000);
+      setTimeout(() => setError(null), 3000);
+    } finally {
+      setActionLoading(null);
     }
   };
 
-  // Helper to convert time format from "2:30 PM" to "14:30"
   const convertTimeFormat = (time12h: string): string => {
     if (!time12h || !time12h.includes(' ')) return '00:00';
     
@@ -278,9 +230,7 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
     return `${hours.padStart(2, '0')}:${minutes || '00'}`;
   };
 
-  // Modified function to show the completion modal and set default times
   const handleShowCompletionModal = () => {
-    // Set default start time to the scheduled appointment time if available
     if (appointmentDetails) {
       const appointmentDate = appointmentDetails.appointment_date?.split('T')[0] || new Date().toISOString().split('T')[0];
       const appointmentTime = appointmentDetails.formatted_time ? 
@@ -289,19 +239,16 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
       
       setMeetingStartTime(`${appointmentDate}T${appointmentTime}`);
       
-      // Set default end time to current time
       const now = new Date();
       const endDate = now.toISOString().split('T')[0];
       const endTime = now.toTimeString().slice(0, 5);
       setMeetingEndTime(`${endDate}T${endTime}`);
     } else {
-      // Default to current date/time if appointment details not available
       const now = new Date();
       const dateStr = now.toISOString().split('T')[0];
       const timeStr = now.toTimeString().slice(0, 5);
       setMeetingStartTime(`${dateStr}T${timeStr}`);
       
-      // Set end time 30 minutes later as default
       const endTime = new Date(now.getTime() + 30 * 60000);
       const endDateStr = endTime.toISOString().split('T')[0];
       const endTimeStr = endTime.toTimeString().slice(0, 5);
@@ -311,38 +258,36 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
     setShowSummaryModal(true);
   };
 
-  // Modified handleCompleteAppointment to accept summary and meeting times
-  const handleCompleteAppointment = async (summary?: string) => {
-    if (!appointmentId) return;
-    // Validate summary is provided
-    if (!summary || summary.trim() === '') {
+  const handleCompleteAppointment = async () => {
+    if (!appointmentId || !appointmentDetails) return;
+    
+    if (!medicalSummary || medicalSummary.trim() === '') {
       setError('Medical summary is required when completing an appointment');
-      setTimeout(() => {
-        setError(null);
-      }, 3000);
+      setTimeout(() => setError(null), 3000);
       return;
     }
     
     if (!meetingStartTime || !meetingEndTime) {
       setError('Meeting start and end times are required');
-      setTimeout(() => {
-        setError(null);
-      }, 3000);
+      setTimeout(() => setError(null), 3000);
       return;
     }
     
+    const startDate = new Date(meetingStartTime);
+    const endDate = new Date(meetingEndTime);
+    
+    if (endDate <= startDate) {
+      setError('End time must be after start time');
+      setTimeout(() => setError(null), 3000);
+      return;
+    }
+    
+    setActionLoading('complete');
     try {
-      // Format the start and end times
-      const startDate = new Date(meetingStartTime);
-      const endDate = new Date(meetingEndTime);
-      
       const startTimeFormatted = startDate.toLocaleString();
       const endTimeFormatted = endDate.toLocaleString();
+      const enhancedSummary = `Meeting Time: ${startTimeFormatted} to ${endTimeFormatted}\n\n${medicalSummary}`;
       
-      // Create an enhanced summary with the meeting times included
-      const enhancedSummary = `Meeting Time: ${startTimeFormatted} to ${endTimeFormatted}\n\n${summary}`;
-      
-      // Call the API to update the status and include the summary
       const result = await updateAppointmentStatus(
         appointmentId, 
         'completed',
@@ -350,72 +295,65 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
         enhancedSummary
       );
       
-      // Process enhanced notification response
       if (result.notification) {
         setNotificationStatus(processNotificationResponse(result.notification));
       }
       
-      // Update local state
-      if (appointmentDetails) {
-        setAppointmentDetails({
-          ...appointmentDetails,
-          status: 'completed',
-          status_display: 'Completed',
-          can_be_cancelled: false,
-          medical_summary: enhancedSummary
-        });
-      }
+      setAppointmentDetails({
+        ...appointmentDetails,
+        status: 'completed',
+        status_display: 'Completed',
+        can_be_cancelled: false,
+        medical_summary: enhancedSummary
+      });
       
-      // Close the modal
       setShowSummaryModal(false);
-      
-      // Reset form
       setMedicalSummary('');
       setMeetingStartTime('');
       setMeetingEndTime('');
       
-      // Set success message
       setStatusUpdateSuccess('Appointment completed successfully');
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setStatusUpdateSuccess(null);
-      }, 3000);
+      setTimeout(() => setStatusUpdateSuccess(null), 3000);
     } catch (err: any) {
       setError(err.message || 'Failed to complete appointment');
-      
-      // Clear error message after 3 seconds
-      setTimeout(() => {
-        setError(null);
-      }, 3000);
+      setTimeout(() => setError(null), 3000);
+    } finally {
+      setActionLoading(null);
     }
   };
 
-  // Helper function to handle status changes and resend notifications
-  const handleStatusChange = async (currentStatus: string) => {
-    if (!appointmentId) return;
-    
-    try {
-      const result = await updateAppointmentStatus(appointmentId, currentStatus as any);
-      setStatusUpdateSuccess(`Notification resent for ${currentStatus} status`);
-      
-      // Update notification status using the helper function
-      if (result.notification) {
-        setNotificationStatus(processNotificationResponse(result.notification));
-      }
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setStatusUpdateSuccess(null);
-      }, 3000);
-    } catch (err: any) {
-      setError(err.message || 'Failed to resend notification');
-      
-      // Clear error message after 3 seconds
-      setTimeout(() => {
-        setError(null);
-      }, 3000);
+  const handleAddNotes = () => {
+    setShowNotesModal(true);
+  };
+
+  const handleSaveNotes = async () => {
+    if (!appointmentId || !notes.trim()) {
+      setShowNotesModal(false);
+      return;
     }
+    
+    setActionLoading('notes');
+    try {
+      const updatedAppointment = await updateAppointmentStatus(
+        appointmentId, 
+        appointmentDetails?.status || '', 
+        notes
+      );
+      setAppointmentDetails(updatedAppointment);
+      setShowNotesModal(false);
+      setNotes('');
+      setStatusUpdateSuccess('Notes added successfully');
+      setTimeout(() => setStatusUpdateSuccess(null), 3000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to add notes');
+      setTimeout(() => setError(null), 3000);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleBack = () => {
+    navigate('/professional/appointments');
   };
 
   if (isLoading) {
@@ -445,18 +383,18 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
     return (
       <div className="p-8 text-center text-red-600">
         <p>Appointment not found</p>
-        <a 
-          href="/professional/appointments" 
+        <button 
+          onClick={handleBack}
           className="mt-2 text-blue-600 hover:underline"
         >
           Back to appointments
-        </a>
+        </button>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="container mx-auto px-4 py-8">
       <Helmet>
         <title>Appointment {appointmentId} | Doctor Dashboard</title>
       </Helmet>
@@ -490,13 +428,12 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
           notificationStatus.status === 'sent' ? 'bg-green-100 border border-green-400 text-green-700' :
           notificationStatus.status === 'pending' ? 'bg-yellow-100 border border-yellow-400 text-yellow-700' :
           'bg-red-100 border border-red-400 text-red-700'
-        }`} role="alert">
+        }`}>
           <span className="font-medium">Notification status: {notificationStatus.status}</span>
           {notificationStatus.message && (
             <p className="block sm:inline mt-1">{notificationStatus.message}</p>
           )}
           
-          {/* Enhanced notification details */}
           {notificationStatus.recipient && (
             <div className="mt-2 text-sm">
               <p><strong>Recipient:</strong> {notificationStatus.recipient}</p>
@@ -509,7 +446,6 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
             </div>
           )}
           
-          {/* Notification details list */}
           {notificationStatus.details && notificationStatus.details.length > 0 && (
             <div className="mt-2">
               <p className="font-medium">Notification details:</p>
@@ -522,17 +458,6 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
                 ))}
               </ul>
             </div>
-          )}
-          
-          {notificationStatus.status === 'failed' && (
-            <button 
-              onClick={() => {
-                if (appointmentDetails) handleStatusChange(appointmentDetails.status);
-              }} 
-              className="mt-3 px-3 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded-md transition-colors"
-            >
-              Resend notification
-            </button>
           )}
         </div>
       )}
@@ -569,39 +494,32 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
           <div>
             <p className="text-sm text-gray-500">Hospital</p>
             <p className="text-base font-medium">
-              {appointmentDetails.hospital?.name || 
-              appointmentDetails.hospital_name || 
-              'Not specified'}
+              {appointmentDetails.hospital_name || 'Not specified'}
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Department</p>
             <p className="text-base font-medium">
-              {appointmentDetails.department?.name || 
-              appointmentDetails.department_name || 
-              'Not specified'}
+              {appointmentDetails.department_name || 'Not specified'}
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Type</p>
             <p className="text-base font-medium">
-              {appointmentDetails.formatted_appointment_type || 
-              appointmentDetails.appointment_type || 
-              'Consultation'}
+              {appointmentDetails.formatted_appointment_type || 'Consultation'}
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Priority</p>
             <p className="text-base font-medium">
-              {appointmentDetails.formatted_priority || 
-              appointmentDetails.priority || 
-              'Normal Priority'}
+              {appointmentDetails.formatted_priority || 'Normal Priority'}
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Duration</p>
             <p className="text-base font-medium">
-              {appointmentDetails.duration || '30'} minutes
+              {appointmentDetails.appointment_duration_display || 
+               (appointmentDetails.duration ? `${appointmentDetails.duration} minutes` : 'Not specified')}
             </p>
           </div>
           <div>
@@ -622,25 +540,19 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
           <div>
             <p className="text-sm text-gray-500">Patient Name</p>
             <p className="text-base font-medium">
-              {appointmentDetails.patient_name || 
-              (appointmentDetails.patient && appointmentDetails.patient.name) || 
-              `Patient #${appointmentDetails.appointment_id?.slice(-6)}`}
+              {appointmentDetails.patient_name}
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Patient ID</p>
             <p className="text-base font-medium">
-              {appointmentDetails.patient_id || 
-              (appointmentDetails.patient && appointmentDetails.patient.id) || 
-              appointmentDetails.appointment_id || 'Not Available'}
+              {appointmentDetails.patient_id || 'Not Available'}
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Patient Email</p>
             <p className="text-base font-medium">
-              {appointmentDetails.patient_email || 
-              (appointmentDetails.patient && appointmentDetails.patient.email) || 
-              'Not Available'}
+              {appointmentDetails.patient_email || 'Not Available'}
               {appointmentDetails.email_verified === false && (
                 <span className="ml-2 px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
                   Not Verified
@@ -687,35 +599,37 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
       </div>
       
       {/* Payment Information */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <h2 className="text-xl font-bold text-blue-800 mb-4">Payment Information</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm text-gray-500">Payment Status</p>
-            <p className="text-base font-medium capitalize">
-              {appointmentDetails.payment_status || 'Not specified'}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Payment Required</p>
-            <p className="text-base font-medium">
-              {appointmentDetails.payment_required ? 'Yes' : 'No'}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Insurance Based</p>
-            <p className="text-base font-medium">
-              {appointmentDetails.is_insurance_based ? 'Yes' : 'No'}
-            </p>
-          </div>
-          {appointmentDetails.insurance_details && (
+      {(appointmentDetails.payment_status || appointmentDetails.is_insurance_based) && (
+        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+          <h2 className="text-xl font-bold text-blue-800 mb-4">Payment Information</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {appointmentDetails.payment_status && (
+              <div>
+                <p className="text-sm text-gray-500">Payment Status</p>
+                <p className="text-base font-medium capitalize">
+                  {appointmentDetails.payment_status}
+                </p>
+              </div>
+            )}
             <div>
-              <p className="text-sm text-gray-500">Insurance Details</p>
-              <p className="text-base font-medium">{appointmentDetails.insurance_details}</p>
+              <p className="text-sm text-gray-500">Insurance Based</p>
+              <p className="text-base font-medium">
+                {appointmentDetails.is_insurance_based ? 'Yes' : 'No'}
+              </p>
             </div>
-          )}
+            {appointmentDetails.insurance_details && (
+              <div>
+                <p className="text-sm text-gray-500">Insurance Details</p>
+                <p className="text-base font-medium">
+                  {typeof appointmentDetails.insurance_details === 'string' 
+                    ? appointmentDetails.insurance_details
+                    : JSON.stringify(appointmentDetails.insurance_details)}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
       
       {/* Action Buttons */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">
@@ -726,19 +640,28 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
             <>
               <button 
                 onClick={handleConfirmAppointment}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
+                disabled={actionLoading !== null}
+                className={`px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors ${
+                  actionLoading === 'confirm' ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               >
-                Confirm Appointment
+                {actionLoading === 'confirm' ? 'Confirming...' : 'Confirm Appointment'}
               </button>
               <button 
                 onClick={handleCancelAppointment}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
+                disabled={actionLoading !== null}
+                className={`px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors ${
+                  actionLoading === 'cancel' ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               >
-                Cancel Appointment
+                {actionLoading === 'cancel' ? 'Cancelling...' : 'Cancel Appointment'}
               </button>
               <button 
-                onClick={handleAddNotesClick}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors"
+                onClick={handleAddNotes}
+                disabled={actionLoading !== null}
+                className={`px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors ${
+                  actionLoading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               >
                 Add Notes
               </button>
@@ -750,27 +673,39 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
             <>
               <button 
                 onClick={handleShowCompletionModal}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
+                disabled={actionLoading !== null}
+                className={`px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors ${
+                  actionLoading === 'complete' ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               >
-                Mark as Completed
+                {actionLoading === 'complete' ? 'Completing...' : 'Mark as Completed'}
               </button>
-              {appointmentDetails.can_be_cancelled && (
+              {(appointmentDetails.can_be_cancelled ?? true) && (
                 <button 
                   onClick={handleCancelAppointment}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
+                  disabled={actionLoading !== null}
+                  className={`px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors ${
+                    actionLoading === 'cancel' ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 >
-                  Cancel Appointment
+                  {actionLoading === 'cancel' ? 'Cancelling...' : 'Cancel Appointment'}
                 </button>
               )}
               <button 
                 onClick={handleNoShowAppointment}
-                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md transition-colors"
+                disabled={actionLoading !== null}
+                className={`px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md transition-colors ${
+                  actionLoading === 'no_show' ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               >
-                Mark as No-Show
+                {actionLoading === 'no_show' ? 'Processing...' : 'Mark as No-Show'}
               </button>
               <button 
-                onClick={handleAddNotesClick}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors"
+                onClick={handleAddNotes}
+                disabled={actionLoading !== null}
+                className={`px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors ${
+                  actionLoading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               >
                 Add Notes
               </button>
@@ -780,8 +715,11 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
           {/* Other statuses */}
           {appointmentDetails.status !== 'pending' && appointmentDetails.status !== 'confirmed' && (
             <button 
-              onClick={handleAddNotesClick}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors"
+              onClick={handleAddNotes}
+              disabled={actionLoading !== null}
+              className={`px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors ${
+                actionLoading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
               Add Notes
             </button>
@@ -804,7 +742,7 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
       </div>
       
       {/* Add Notes Modal */}
-      {showAddNotesModal && (
+      {showNotesModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 className="text-xl font-bold text-blue-800 mb-4">Add Notes</h3>
@@ -816,22 +754,26 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
             ></textarea>
             <div className="flex justify-end gap-2">
               <button
-                onClick={handleCloseModal}
+                onClick={() => setShowNotesModal(false)}
                 className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveNotes}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+                disabled={!notes.trim() || actionLoading === 'notes'}
+                className={`px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors ${
+                  !notes.trim() || actionLoading === 'notes' ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               >
-                Save Notes
+                {actionLoading === 'notes' ? 'Saving...' : 'Save Notes'}
               </button>
             </div>
           </div>
         </div>
       )}
 
+      {/* Completion Modal */}
       {showSummaryModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
@@ -889,11 +831,15 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
                 Cancel
               </button>
               <button
-                onClick={() => handleCompleteAppointment(medicalSummary)}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
-                disabled={!medicalSummary.trim() || !meetingStartTime || !meetingEndTime}
+                onClick={handleCompleteAppointment}
+                disabled={!medicalSummary.trim() || !meetingStartTime || !meetingEndTime || actionLoading === 'complete'}
+                className={`px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors ${
+                  !medicalSummary.trim() || !meetingStartTime || !meetingEndTime || actionLoading === 'complete' 
+                    ? 'opacity-50 cursor-not-allowed' 
+                    : ''
+                }`}
               >
-                Submit & Complete
+                {actionLoading === 'complete' ? 'Processing...' : 'Submit & Complete'}
               </button>
             </div>
           </div>
@@ -903,4 +849,4 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
   );
 };
 
-export default ProfessionalAppointmentDetailPage; 
+export default ProfessionalAppointmentDetailPage;
