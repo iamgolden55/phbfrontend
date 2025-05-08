@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Connection Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .container {
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 5px;
+    }
+    h1 {
+      color: #333;
+    }
+    .log-container {
+      background-color: #f5f5f5;
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 5px;
+      font-family: monospace;
+      height: 300px;
+      overflow-y: auto;
+      margin-top: 20px;
+    }
+    .success {
+      color: green;
+      font-weight: bold;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>PHB API Connection Test</h1>
+    <p>This tool helps verify that your frontend can connect to the backend API and retrieve appointment data.</p>
+    
+    <div>
+      <label for="api-url">API Base URL:</label>
+      <input type="text" id="api-url" value="http://127.0.0.1:8000" />
+    </div>
+    
+    <div>
+      <label for="auth-token">Authentication Token (leave empty to use localStorage):</label>
+      <input type="text" id="auth-token" placeholder="Bearer token..." />
+    </div>
+    
+    <button id="test-button">Test Connection</button>
+    
+    <div id="log-container" class="log-container"></div>
+  </div>
+  
+  <script>
+    // Function to log messages to the UI
+    function log(message, isError = false) {
+      const logContainer = document.getElementById('log-container');
+      const logEntry = document.createElement('div');
+      logEntry.textContent = message;
+      if (isError) {
+        logEntry.classList.add('error');
+      }
+      logContainer.appendChild(logEntry);
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }
+    
+    // Function to log success messages
+    function logSuccess(message) {
+      const logContainer = document.getElementById('log-container');
+      const logEntry = document.createElement('div');
+      logEntry.textContent = message;
+      logEntry.classList.add('success');
+      logContainer.appendChild(logEntry);
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }
+    
+    // Test API connection
+    async function testDoctorAppointmentsAPI() {
+      const logContainer = document.getElementById('log-container');
+      logContainer.innerHTML = ''; // Clear previous logs
+      
+      const apiUrl = document.getElementById('api-url').value;
+      const customToken = document.getElementById('auth-token').value;
+      const AUTH_TOKEN_KEY = 'phb_auth_token';
+      
+      log('Testing connection to the doctor-appointments API endpoint...');
+      log(`API URL: ${apiUrl}/api/doctor-appointments/`);
+      
+      try {
+        // Get token from input or localStorage
+        const token = customToken || localStorage.getItem(AUTH_TOKEN_KEY);
+        
+        if (!token) {
+          log('No authentication token provided or found in localStorage.', true);
+          log('You may need to log in first or provide a test token.');
+          return null;
+        }
+        
+        log(`Using token: ${token.substring(0, 10)}...`);
+        
+        const response = await fetch(`${apiUrl}/api/doctor-appointments/`, {
+          method: 'GET',
+          headers: {
+            'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Error fetching appointments: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        log('API Response received');
+        
+        // Check if response has the expected structure
+        if (Array.isArray(data)) {
+          log(`Response is an array with ${data.length} appointments`);
+          
+          if (data.length > 0) {
+            log('First appointment fields:');
+            const appointment = data[0];
+            
+            // Check for required fields
+            const fields = [
+              'appointment_id', 
+              'patient_name',
+              'appointment_date',
+              'formatted_date',
+              'status',
+              'priority'
+            ];
+            
+            fields.forEach(field => {
+              const available = appointment[field] !== undefined;
+              log(`- ${field}: ${available ? 'AVAILABLE' : 'MISSING'} ${available ? `(${appointment[field]})` : ''}`, !available);
+            });
+            
+            // Log full data structure of first appointment
+            log('First appointment data structure:');
+            log(JSON.stringify(appointment, null, 2));
+          } else {
+            log('No appointments found in the response');
+          }
+        } else {
+          log('Response is not an array. Structure:', true);
+          log(JSON.stringify(data, null, 2));
+        }
+        
+        logSuccess('✅ API connection successful!');
+        return data;
+      } catch (error) {
+        log(`Error connecting to the API: ${error.message}`, true);
+        return null;
+      }
+    }
+    
+    // Add event listener to the test button
+    document.getElementById('test-button').addEventListener('click', () => {
+      testDoctorAppointmentsAPI();
+    });
+  </script>
+</body>
+</html> 
