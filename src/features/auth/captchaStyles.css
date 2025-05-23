@@ -1,0 +1,22 @@
+.captcha-container {
+  margin: 15px 0;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+
+.captcha-challenge {
+  margin-bottom: 10px;
+}
+
+.captcha-challenge h4 {
+  margin: 0 0 8px 0;
+  color: #444;
+}
+
+.captcha-challenge p {
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+}

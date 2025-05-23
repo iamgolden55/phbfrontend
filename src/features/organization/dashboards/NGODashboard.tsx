@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { OrganizationInfo } from '../organizationAuthContext';
+import { UserData } from '../organizationAuthContext';
 
 // --- Reusable Components (Mirroring HospitalDashboard, consider moving to shared utils) ---
 const DashboardCard: React.FC<{ title: string; children: React.ReactNode; className?: string }> = ({ title, children, className }) => (
@@ -72,10 +72,10 @@ const VolunteerActivity: React.FC = () => (
 
 // --- NGO Dashboard Main Component ---
 interface NGODashboardProps {
-  organizationInfo: OrganizationInfo;
+  userData: UserData;
 }
 
-const NGODashboard: React.FC<NGODashboardProps> = ({ organizationInfo }) => {
+const NGODashboard: React.FC<{ userData: UserData }> = ({ userData }) => {
   return (
     <div>
       {/* Stats Grid */}

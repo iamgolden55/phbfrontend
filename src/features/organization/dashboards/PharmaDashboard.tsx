@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { OrganizationInfo } from '../organizationAuthContext';
+import { UserData } from '../organizationAuthContext';
 
 // --- Reusable Components (Mirroring others, consider moving to shared utils) ---
 const DashboardCard: React.FC<{ title: string; children: React.ReactNode; className?: string }> = ({ title, children, className }) => (
@@ -74,10 +74,10 @@ const PipelineOverview: React.FC = () => (
 
 // --- Pharma Dashboard Main Component ---
 interface PharmaDashboardProps {
-  organizationInfo: OrganizationInfo;
+  userData: UserData;
 }
 
-const PharmaDashboard: React.FC<PharmaDashboardProps> = ({ organizationInfo }) => {
+const PharmaDashboard: React.FC<PharmaDashboardProps> = ({ userData }) => {
   return (
     <div>
       {/* Stats Grid */}

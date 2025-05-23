@@ -98,7 +98,7 @@ interface AuthContextType {
   isNewUser: boolean;
   needsOnboarding: boolean;
   completeOnboarding: () => Promise<{ success: boolean; message: string }>;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, captchaToken?: string, captchaAnswer?: string) => Promise<void>;
   logout: () => Promise<void>;
   register: (
     data: RegisterData
@@ -128,6 +128,10 @@ interface AuthContextType {
   hasPrimaryHospital: boolean;
   // Doctor role check - check both role and hpn for reliability
   isDoctor: boolean;
+  // CAPTCHA-related properties
+  captchaRequired: boolean;
+  captchaChallenge: string;
+  captchaToken: string;
 }
 
 // Create the context with a default value
@@ -202,6 +206,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // New state variables for hospital functionality
   const [primaryHospital, setPrimaryHospital] = useState<Hospital | null>(null);
   const [hasPrimaryHospital, setHasPrimaryHospital] = useState<boolean>(false);
+  // CAPTCHA-related state
+  const [captchaRequired, setCaptchaRequired] = useState(false);
+  const [captchaChallenge, setCaptchaChallenge] = useState('');
+  const [captchaToken, setCaptchaToken] = useState('');
 
   // Add a reference to track the last API call time and parameters
   const lastApiCall = useRef<{
@@ -316,72 +324,134 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   // Login function
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, captchaToken?: string, captchaAnswer?: string) => {
     setError(null);
     setOtpError(null);
     setIsLoading(true);
     setOtpVerificationRequired(false); // Reset OTP state
     setPendingEmail(null);
+    
+    // Reset CAPTCHA state if not being used in this request
+    if (!captchaToken) {
+      setCaptchaRequired(false);
+      setCaptchaChallenge('');
+      setCaptchaToken('');
+    }
 
     try {
-      // Assuming '/api/login/' endpoint
-      const response = await apiRequest<{ user?: User; token?: string; otpRequired?: boolean; message?: string }>('/api/login/', 'POST', { email, password });
+      // Prepare login payload
+      // Using 'email' field as required by the backend
+      const loginPayload: any = { email, password };
+      
+      // Add CAPTCHA data if provided
+      if (captchaToken && captchaAnswer) {
+        loginPayload.captcha_token = captchaToken;
+        loginPayload.captcha_answer = captchaAnswer;
+      }
+      
+      // Make API request to the login endpoint
+      // IMPORTANT: We're using /api/login/ for the main auth flow, which triggers OTP
+      // The CAPTCHA challenge is implemented on this endpoint as well
+      const response = await apiRequest<{ 
+        user?: User; 
+        token?: string; 
+        otpRequired?: boolean; 
+        require_otp?: boolean; // Backend uses this field name
+        status?: string; // Backend may return 'pending' for OTP flow
+        message?: string;
+        detail?: string;
+        captcha_required?: boolean;
+        captcha_challenge?: string;
+        captcha_token?: string;
+        access?: string;
+        refresh?: string;
+      }>('/api/login/', 'POST', loginPayload);
 
-       // Check 1: Explicit OTP required flag from backend
-       if (response.otpRequired) {
-           setOtpVerificationRequired(true);
-           setPendingEmail(email);
-           setUser(null);
-           localStorage.removeItem(AUTH_TOKEN_KEY);
-           setError(response.message || "OTP verification required."); // Show message if available
-       }
-       // Check 2: Direct login success with user and token
-       else if (response.user && response.token) {
-           handleAuthSuccess(response.user, response.token);
-           
-           // Check if user has a primary hospital after successful login
-           // Only if we haven't already loaded this information
-           if (!hasPrimaryHospital && !primaryHospital) {
-             try {
-               const token = response.token;
-               const hospitalData = await apiRequest<PrimaryHospitalResponse>(
-                 '/api/user/has-primary-hospital/', 
-                 'GET', 
-                 undefined, 
-                 token
-               );
-               
-               // Only update if values have changed
-               const hasPrimaryChanged = hospitalData.has_primary !== hasPrimaryHospital;
-               const hospitalChanged = JSON.stringify(hospitalData.primary_hospital) !== JSON.stringify(primaryHospital);
-               
-               if (hasPrimaryChanged || hospitalChanged) {
-                 setHasPrimaryHospital(hospitalData.has_primary);
-                 setPrimaryHospital(hospitalData.primary_hospital || null);
-               }
-             } catch (hospitalErr) {
-               console.error('Error checking primary hospital after login:', hospitalErr);
-               // Don't fail the login if hospital check fails
-             }
-           }
-       }
-       // Check 3: Successful response but no token -> Assume OTP required (common pattern)
-       else if (!response.token) { // If response is OK (implied by being here) but no token
-           console.log("Login successful, but no token received. Assuming OTP is required.");
-           setOtpVerificationRequired(true);
-           setPendingEmail(email);
-           setUser(null);
-           localStorage.removeItem(AUTH_TOKEN_KEY);
-           setError(response.message || "OTP verification required."); // Show message if available
-       }
-       // Check 4: Unexpected response structure
-       else {
-           console.error("Unexpected response structure during login:", response);
-           throw new Error("Invalid response from server during login.");
-       }
+      // Handle CAPTCHA challenge response
+      if (response.captcha_required) {
+        setCaptchaRequired(true);
+        setCaptchaChallenge(response.captcha_challenge || '');
+        setCaptchaToken(response.captcha_token || '');
+        setError(response.message || 'CAPTCHA verification required due to multiple failed attempts.');
+        return;
+      }
+
+      // Check 1: Explicit OTP required flag from backend (using either field name)
+      if (response.otpRequired || response.require_otp || (response.status === 'pending')) {
+        setOtpVerificationRequired(true);
+        setPendingEmail(email);
+        setUser(null);
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+        setError(response.message || "OTP verification required."); // Show message if available
+      }
+      // Check 2: Direct login success with user and token
+      else if (response.user && response.token) {
+        handleAuthSuccess(response.user, response.token);
+        
+        // Check if user has a primary hospital after successful login
+        // Only if we haven't already loaded this information
+        if (!hasPrimaryHospital && !primaryHospital) {
+          try {
+            const token = response.token;
+            const hospitalData = await apiRequest<PrimaryHospitalResponse>(
+              '/api/user/has-primary-hospital/', 
+              'GET', 
+              undefined, 
+              token
+            );
+            
+            // Only update if values have changed
+            const hasPrimaryChanged = hospitalData.has_primary !== hasPrimaryHospital;
+            const hospitalChanged = JSON.stringify(hospitalData.primary_hospital) !== JSON.stringify(primaryHospital);
+            
+            if (hasPrimaryChanged || hospitalChanged) {
+              setHasPrimaryHospital(hospitalData.has_primary);
+              setPrimaryHospital(hospitalData.primary_hospital || null);
+            }
+          } catch (hospitalErr) {
+            console.error('Error checking primary hospital after login:', hospitalErr);
+            // Don't fail the login if hospital check fails
+          }
+        }
+      }
+      // Check 3: Successful response but no token -> Assume OTP required (common pattern)
+      else if (!response.token) { // If response is OK (implied by being here) but no token
+        console.log("Login successful, but no token received. Assuming OTP is required.");
+        setOtpVerificationRequired(true);
+        setPendingEmail(email);
+        setUser(null);
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+        setError(response.message || "OTP verification required."); // Show message if available
+      }
+      // Check 4: Unexpected response structure
+      else {
+        console.error("Unexpected response structure during login:", response);
+        throw new Error("Invalid response from server during login.");
+      }
 
     } catch (err: any) {
       console.error("Login failed:", err);
+      
+      // Handle CAPTCHA challenge (403 Forbidden)
+      if (err.status === 403 && err.data) {
+        const data = err.data;
+        if (data.captcha_required) {
+          setCaptchaRequired(true);
+          setCaptchaChallenge(data.captcha_challenge || '');
+          setCaptchaToken(data.captcha_token || '');
+          setError(data.detail || 'CAPTCHA verification required due to multiple failed attempts.');
+          return;
+        }
+      }
+      
+      // Handle rate limiting (429 Too Many Requests)
+      if (err.status === 429) {
+        // Show user-friendly rate limit message
+        setError('Too many login attempts. Please wait a moment before trying again.');
+        return;
+      }
+      
+      // Handle other errors
       setError(err.message || 'Login failed. Please check your credentials.');
       setUser(null);
       localStorage.removeItem(AUTH_TOKEN_KEY);
@@ -1078,6 +1148,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     hasPrimaryHospital,
     // Doctor role check - check both role and hpn for reliability
     isDoctor: user?.role === 'doctor' || !!user?.hpn,
+    // CAPTCHA-related properties
+    captchaRequired,
+    captchaChallenge,
+    captchaToken,
   };
 
   return (

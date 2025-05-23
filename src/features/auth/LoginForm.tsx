@@ -1,15 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from './authContext';
 import { Link } from 'react-router-dom';
+import './captchaStyles.css';
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, isLoading, error, clearError } = useAuth();
+  const [captchaAnswer, setCaptchaAnswer] = useState('');
+  const { 
+    login, 
+    isLoading, 
+    error, 
+    clearError, 
+    captchaRequired, 
+    captchaChallenge, 
+    captchaToken 
+  } = useAuth();
+  
+  // Reset captcha answer when captchaRequired changes to false
+  useEffect(() => {
+    if (!captchaRequired) {
+      setCaptchaAnswer('');
+    }
+  }, [captchaRequired]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(email, password);
+    if (captchaRequired) {
+      await login(email, password, captchaToken, captchaAnswer);
+    } else {
+      await login(email, password);
+    }
   };
 
   return (
@@ -66,13 +87,37 @@ const LoginForm: React.FC = () => {
             required
           />
         </div>
+        
+        {/* CAPTCHA challenge section */}
+        {captchaRequired && (
+          <div className="captcha-container mb-6">
+            <div className="captcha-challenge">
+              <h4 className="text-lg font-medium mb-2">Security Check</h4>
+              <p className="text-gray-800 text-lg font-medium">{captchaChallenge}</p>
+            </div>
+            <div className="mt-3">
+              <label htmlFor="captcha-answer" className="block font-medium mb-1">
+                Answer
+              </label>
+              <input
+                type="text"
+                id="captcha-answer"
+                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+                value={captchaAnswer}
+                onChange={(e) => { setCaptchaAnswer(e.target.value); clearError(); }}
+                placeholder="Enter your answer"
+                required
+              />
+            </div>
+          </div>
+        )}
 
         <button
           type="submit"
           className="w-full bg-[#005eb8] text-white py-2 px-4 rounded hover:bg-[#003f7e] transition-colors"
           disabled={isLoading}
         >
-          {isLoading ? 'Signing in...' : 'Sign in'}
+          {isLoading ? 'Signing in...' : captchaRequired ? 'Verify & Sign in' : 'Sign in'}
         </button>
       </form>
 

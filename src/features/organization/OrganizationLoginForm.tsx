@@ -1,27 +1,44 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useOrganizationAuth } from './organizationAuthContext';
+import OrganizationVerificationForm from './OrganizationVerificationForm';
 
 interface OrganizationLoginFormProps {
   redirectPath?: string;
 }
 
-const OrganizationLoginForm: React.FC<OrganizationLoginFormProps> = ({ redirectPath = '/organization/dashboard' }) => {
+const OrganizationLoginForm: React.FC<OrganizationLoginFormProps> = ({ redirectPath }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, error, isLoading, clearError } = useOrganizationAuth();
+  const [hospitalCode, setHospitalCode] = useState('');
+  const { login, error, isLoading, clearError, needsVerification, getDashboardPath } = useOrganizationAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login(email, password);
-      // Navigate to the dashboard after successful login
-      navigate(redirectPath);
+      console.log('Submitting login form...');
+      await login(email, password, hospitalCode);
+      
+      // Force the verification form to show by directly setting session state
+      sessionStorage.setItem('org_auth_email', email);
+      sessionStorage.setItem('org_auth_needs_verification', 'true');
+      
+      // Force a component re-render to show the verification form
+      window.location.reload();
     } catch (err) {
+      console.error('Login error:', err);
       // Error is handled in the auth context
     }
   };
+
+  // Check if we need to show verification form (either from context or session storage)
+  // This ensures verification state persists even if components remount
+  const showVerification = needsVerification || sessionStorage.getItem('org_auth_needs_verification') === 'true';
+  
+  if (showVerification) {
+    return <OrganizationVerificationForm redirectPath={redirectPath} />;
+  }
 
   return (
     <div className="bg-white py-8 px-6 shadow rounded-lg sm:px-10">
@@ -58,14 +75,29 @@ const OrganizationLoginForm: React.FC<OrganizationLoginFormProps> = ({ redirectP
           />
         </div>
 
+        <div className="mb-4">
+          <label htmlFor="hospital-code" className="block text-gray-700 font-medium mb-2">
+            Hospital Code
+          </label>
+          <input
+            type="text"
+            id="hospital-code"
+            value={hospitalCode}
+            onChange={(e) => { setHospitalCode(e.target.value); clearError(); }}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="e.g. NGH-001"
+            required
+          />
+        </div>
+
         <div className="mb-6">
           <div className="flex justify-between">
             <label htmlFor="organization-password" className="block text-gray-700 font-medium mb-2">
               Password
             </label>
-            <a href="#" className="text-sm text-blue-600 hover:underline">
+            <Link to="/hospital-admin/reset-password/request" className="text-sm text-blue-600 hover:underline">
               Forgot password?
-            </a>
+            </Link>
           </div>
           <input
             type="password"

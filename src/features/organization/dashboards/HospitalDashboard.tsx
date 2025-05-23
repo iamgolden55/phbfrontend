@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { OrganizationInfo } from '../organizationAuthContext'; // Assuming OrganizationInfo is needed
+import { UserData } from '../organizationAuthContext';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 // --- MOCK DATA (Replace below with API calls via authContext in real app) ---
@@ -372,10 +372,10 @@ const SurgeryOverview: React.FC<{ overview: typeof MOCK_SURGERY_OVERVIEW }> = ({
 
 // --- Hospital Dashboard Main Component ---
 interface HospitalDashboardProps {
-  organizationInfo: OrganizationInfo; // Pass necessary info if needed
+  userData: UserData; // Pass user data including hospital info
 }
 
-const HospitalDashboard: React.FC<HospitalDashboardProps> = ({ organizationInfo }) => {
+const HospitalDashboard: React.FC<HospitalDashboardProps> = ({ userData }) => {
   // In real app, fetch data here using authContext/api calls
   return (
     <div className="px-2 sm:px-0">

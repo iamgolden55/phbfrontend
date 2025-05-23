@@ -23,6 +23,9 @@ import OrganizationRegisterPage from './pages/organization/OrganizationRegisterP
 import PatientAdmissionsPage from './pages/organization/PatientAdmissionsPage';
 import PatientRegistrationApprovalPage from './pages/organization/PatientRegistrationApprovalPage';
 import SurgerySchedulePage from './pages/organization/SurgerySchedulePage';
+import HospitalAdminForgotPasswordPage from './pages/organization/HospitalAdminForgotPasswordPage';
+import HospitalAdminPasswordResetVerifyPage from './pages/organization/HospitalAdminPasswordResetVerifyPage';
+import HospitalAdminPasswordResetCompletePage from './pages/organization/HospitalAdminPasswordResetCompletePage';
 import WardManagementPage from './pages/organization/WardManagementPage';
 import StaffRosterPage from './pages/organization/StaffRosterPage';
 import InventoryCheckPage from './pages/organization/InventoryCheckPage';
@@ -211,6 +214,10 @@ const ProfessionalRouteGuard = ({ children, allowedRoles = [] }: { children: Rea
   return <>{children}</>;
 };
 
+// Import CAPTCHA test pages
+import CaptchaTestPage from './features/auth/CaptchaTestPage';
+import CaptchaTestScript from './features/auth/CaptchaTestScript';
+
 // Organization route guard component
 const OrganizationRouteGuard = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useOrganizationAuth();
@@ -254,6 +261,11 @@ function App() {
               <Route path="professional/register" element={<ProfessionalRegisterPage />} />
               <Route path="organization/login" element={<OrganizationLoginPage />} />
               <Route path="organization/register" element={<OrganizationRegisterPage />} />
+              
+              {/* Hospital Admin Password Reset Routes */}
+              <Route path="hospital-admin/reset-password/request" element={<HospitalAdminForgotPasswordPage />} />
+              <Route path="hospital-admin/reset-password/verify" element={<HospitalAdminPasswordResetVerifyPage />} />
+              <Route path="hospital-admin/reset-password/complete" element={<HospitalAdminPasswordResetCompletePage />} />
 
               {/* Organization layout routes */}
               <Route path="/organization" element={<OrganizationLayout />}>
@@ -546,6 +558,10 @@ function App() {
                 <Route path="phb-services" element={<PHBServicesPage />} />
                 <Route path="link-validator" element={<LinkValidatorPage />} />
                 <Route path="site-map" element={<SiteMapPage />} />
+                
+                {/* Test Pages */}
+                <Route path="captcha-test" element={<CaptchaTestPage />} />
+                <Route path="captcha-script" element={<CaptchaTestScript />} />
               </Route>
 
               {/* Professional layout routes */}

@@ -6,7 +6,7 @@ import FeedbackButton from '../components/FeedbackButton';
 
 const OrganizationLayout: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { organizationInfo, logout } = useOrganizationAuth();
+  const { userData, logout } = useOrganizationAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -14,14 +14,14 @@ const OrganizationLayout: React.FC = () => {
     navigate('/organization/login');
   };
 
-  // Define menu items based on organization type
+  // Define menu items based on user role
   const getMenuItems = () => {
     const baseItems = [
       { label: 'Dashboard', path: '/organization/dashboard', icon: 'dashboard' },
     ];
 
-    if (organizationInfo) {
-      if (organizationInfo.type === 'hospital') {
+    if (userData) {
+      if (userData.role === 'hospital_admin') {
         return [
           ...baseItems,
           { label: 'Patient Admissions', path: '/organization/admissions', icon: 'person_add' },
@@ -30,7 +30,7 @@ const OrganizationLayout: React.FC = () => {
           { label: 'Staff Roster', path: '/organization/staffing', icon: 'badge' },
           { label: 'Inventory Check', path: '/organization/inventory', icon: 'inventory_2' },
         ];
-      } else if (organizationInfo.type === 'ngo') {
+      } else if (userData.role === 'ngo_admin') {
         return [
           ...baseItems,
           { label: 'Programs', path: '/organization/programs', icon: 'article' },
@@ -38,7 +38,7 @@ const OrganizationLayout: React.FC = () => {
           { label: 'Donations', path: '/organization/donations', icon: 'volunteer_activism' },
           { label: 'Reports', path: '/organization/reports', icon: 'bar_chart' },
         ];
-      } else if (organizationInfo.type === 'pharmaceutical') {
+      } else if (userData.role === 'pharmacy_admin') {
         return [
           ...baseItems,
           { label: 'Inventory', path: '/organization/inventory', icon: 'inventory_2' },
@@ -54,10 +54,16 @@ const OrganizationLayout: React.FC = () => {
 
   const menuItems = getMenuItems();
 
-  // Format organization type with capitalization if it exists
-  const formattedType = organizationInfo?.type
-    ? organizationInfo.type.charAt(0).toUpperCase() + organizationInfo.type.slice(1)
-    : 'Organization';
+  // Determine organization type from user role
+  const getOrganizationType = () => {
+    if (!userData) return 'Organization';
+    if (userData.role === 'hospital_admin') return 'Hospital';
+    if (userData.role === 'ngo_admin') return 'NGO';
+    if (userData.role === 'pharmacy_admin') return 'Pharmacy';
+    return 'Organization';
+  };
+  
+  const formattedType = getOrganizationType();
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -90,9 +96,9 @@ const OrganizationLayout: React.FC = () => {
 
             {/* User Menu */}
             <div className="hidden md:ml-4 md:flex md:items-center">
-              {organizationInfo && (
+              {userData && (
                 <div className="ml-3 relative flex items-center">
-                  <span className="mr-4 text-sm">{organizationInfo.name}</span>
+                  <span className="mr-4 text-sm">{userData?.full_name || 'User'} | {userData?.hospital?.name || userData?.ngo?.name || userData?.pharmacy?.name || ''}</span>
                   <span className="mr-4 px-2 py-1 rounded-full bg-blue-700 text-xs">
                     {formattedType}
                   </span>
@@ -137,18 +143,19 @@ const OrganizationLayout: React.FC = () => {
               </Link>
             ))}
           </div>
-          {organizationInfo && (
+          {userData && (
             <div className="pt-4 pb-3 border-t border-blue-700">
               <div className="flex items-center px-5">
                 <div className="flex-shrink-0">
                   <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
                     <span className="text-lg font-bold">
-                      {organizationInfo.name.charAt(0)}
+                      {userData?.full_name?.charAt(0) || 'U'}
                     </span>
                   </div>
                 </div>
                 <div className="ml-3">
-                  <div className="text-base font-medium text-white">{organizationInfo.name}</div>
+                  <div className="text-base font-medium text-white">{userData?.full_name || 'User'}</div>
+                  <div className="text-sm font-medium text-blue-200">{userData?.hospital?.name || userData?.ngo?.name || userData?.pharmacy?.name || ''}</div>
                   <div className="text-sm font-medium text-blue-200">{formattedType}</div>
                 </div>
               </div>

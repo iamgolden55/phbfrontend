@@ -63,12 +63,18 @@ const EventsSection: React.FC = () => {
 
 // --- Main Dashboard Page Container Component ---
 const OrganizationDashboardPage: React.FC = () => {
-  const { organizationInfo, logout } = useOrganizationAuth();
+  const { userData, logout } = useOrganizationAuth();
 
-  // Capitalize the first letter of the organization type
-  const formattedType = organizationInfo?.type
-    ? organizationInfo.type.charAt(0).toUpperCase() + organizationInfo.type.slice(1)
-    : 'Organization';
+  // Determine organization type from user role
+  const getOrganizationType = () => {
+    if (!userData) return 'Organization';
+    if (userData.role === 'hospital_admin') return 'Hospital';
+    if (userData.role === 'ngo_admin') return 'NGO';
+    if (userData.role === 'pharmacy_admin') return 'Pharmacy';
+    return 'Organization';
+  };
+  
+  const formattedType = getOrganizationType();
 
   const handleLogout = () => {
     logout();
@@ -76,17 +82,17 @@ const OrganizationDashboardPage: React.FC = () => {
     // navigate('/organization/login');
   };
 
-  // Render the specific dashboard based on type
+  // Render the specific dashboard based on user role
   const renderSpecificDashboard = () => {
-    if (!organizationInfo) return null; // Or a loading/error state
+    if (!userData) return null; // Or a loading/error state
 
-    switch (organizationInfo.type) {
-      case 'hospital':
-        return <HospitalDashboard organizationInfo={organizationInfo} />;
-      case 'ngo':
-        return <NGODashboard organizationInfo={organizationInfo} />;
-      case 'pharmaceutical':
-        return <PharmaDashboard organizationInfo={organizationInfo} />;
+    switch (userData.role) {
+      case 'hospital_admin':
+        return <HospitalDashboard userData={userData} />;
+      case 'ngo_admin':
+        return <NGODashboard userData={userData} />;
+      case 'pharmacy_admin':
+        return <PharmaDashboard userData={userData} />;
       default:
         return <p>Unknown organization type.</p>; // Fallback
     }
@@ -100,14 +106,14 @@ const OrganizationDashboardPage: React.FC = () => {
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
       </Helmet>
 
-      {organizationInfo ? (
+      {userData ? (
         <>
           {/* Header Section - Common for all org dashboards */}
           <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center">
             <div>
               <h1 className="text-3xl font-bold text-blue-800">{formattedType} Dashboard</h1>
               <p className="mt-1 text-gray-600">
-                Welcome, {organizationInfo.name}
+                Welcome, {userData.full_name} | {userData.hospital?.name || userData.ngo?.name || userData.pharmacy?.name || 'Organization'}
               </p>
             </div>
             <button 
