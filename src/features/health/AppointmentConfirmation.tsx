@@ -2,18 +2,20 @@ import React from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import AccountHealthLayout from '../../layouts/AccountHealthLayout';
 
+interface SelectedSymptom {
+  bodyPartId: string;
+  bodyPartName: string;
+  symptomName: string;
+  description: string;
+}
+
 interface AppointmentDetails {
   appointmentId: string;
-  appointmentType: string;
-  specialtyNeeded: string;
   preferredLanguage: string;
   urgency: string;
-  preferredDate: string;
-  preferredTimeSlot: string;
-  symptoms: string;
+  selectedSymptoms: SelectedSymptom[];
   additionalNotes: string;
-  doctorName: string;
-  doctorSpecialty: string;
+  departmentName: string;
   location: string;
   dateConfirmed: string;
   timeConfirmed: string;
@@ -82,10 +84,6 @@ const AppointmentConfirmation: React.FC = () => {
                   <p className="font-medium">{appointmentDetails.appointmentId}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Appointment Type</p>
-                  <p className="font-medium">{appointmentDetails.appointmentType}</p>
-                </div>
-                <div>
                   <p className="text-sm text-gray-500">Date & Time</p>
                   <p className="font-medium">
                     {formatDate(appointmentDetails.dateConfirmed)} at {appointmentDetails.timeConfirmed}
@@ -95,19 +93,23 @@ const AppointmentConfirmation: React.FC = () => {
                   <p className="text-sm text-gray-500">Location</p>
                   <p className="font-medium">{appointmentDetails.location}</p>
                 </div>
+                <div>
+                  <p className="text-sm text-gray-500">Urgency Level</p>
+                  <p className="font-medium capitalize">{appointmentDetails.urgency}</p>
+                </div>
               </div>
             </div>
             
             <div>
-              <h3 className="text-lg font-bold mb-4">Healthcare Provider</h3>
+              <h3 className="text-lg font-bold mb-4">Department Information</h3>
               <div className="space-y-3">
                 <div>
-                  <p className="text-sm text-gray-500">Provider Name</p>
-                  <p className="font-medium">{appointmentDetails.doctorName}</p>
+                  <p className="text-sm text-gray-500">Department</p>
+                  <p className="font-medium">{appointmentDetails.departmentName}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Specialty</p>
-                  <p className="font-medium">{appointmentDetails.doctorSpecialty}</p>
+                  <p className="text-sm text-gray-500">Assignment</p>
+                  <p className="font-medium">First available healthcare provider</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Language</p>
@@ -117,10 +119,17 @@ const AppointmentConfirmation: React.FC = () => {
             </div>
           </div>
           
-          {appointmentDetails.symptoms && (
+          {appointmentDetails.selectedSymptoms && appointmentDetails.selectedSymptoms.length > 0 && (
             <div className="mt-6 pt-6 border-t border-gray-200">
-              <p className="text-sm text-gray-500 mb-1">Reason for Visit</p>
-              <p>{appointmentDetails.symptoms}</p>
+              <p className="text-sm text-gray-500 mb-3">Reported Symptoms</p>
+              <div className="space-y-3">
+                {appointmentDetails.selectedSymptoms.map((symptom, index) => (
+                  <div key={index} className="p-3 bg-white border border-gray-200 rounded-md">
+                    <p className="font-medium">{symptom.bodyPartName} - {symptom.symptomName}</p>
+                    <p className="text-gray-600 mt-1">{symptom.description}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
           
@@ -157,6 +166,7 @@ const AppointmentConfirmation: React.FC = () => {
             <li>You'll receive a confirmation email with these appointment details.</li>
             <li>We'll send you a reminder 24 hours before your appointment.</li>
             <li>For video appointments, you'll receive a link to join the call 15 minutes before the scheduled time.</li>
+            <li>The healthcare provider from the department will be assigned to your appointment.</li>
             <li>If you need to reschedule or cancel, please do so at least 24 hours in advance.</li>
           </ul>
         </div>

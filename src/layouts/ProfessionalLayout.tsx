@@ -1,18 +1,57 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, useNavigate, Link } from 'react-router-dom';
+import { Outlet, useNavigate, Link, useLocation } from 'react-router-dom';
 import { useProfessionalAuth } from '../features/professional/professionalAuthContext';
+import { useAuth } from '../features/auth/authContext';
 import PHBLogo from '../components/PHBLogo';
 import FeedbackButton from '../components/FeedbackButton';
+import ViewToggle from '../components/ViewToggle';
+
+// Key for storing authentication state in localStorage
+const PROFESSIONAL_AUTH_STATE_KEY = 'phb_professional_auth_state';
+const VIEW_PREFERENCE_KEY = 'phb_view_preference';
 
 const ProfessionalLayout: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { professionalUser, logout } = useProfessionalAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check if the current user is a doctor (either from user or professional context)
+  const userIsDoctor = user?.role === 'doctor' || user?.hpn || professionalUser?.role === 'doctor';
+
+  // Handle browser navigation events (back/forward buttons)
+  useEffect(() => {
+    // Set authentication state if user is a doctor
+    if (userIsDoctor) {
+      localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
+    }
+
+    // Function to handle browser back/forward navigation
+    const handlePopState = () => {
+      const viewPreference = localStorage.getItem(VIEW_PREFERENCE_KEY);
+      
+      // If in professional section but view preference doesn't match, align them
+      if (location.pathname.includes('/professional') && viewPreference !== 'doctor') {
+        localStorage.setItem(VIEW_PREFERENCE_KEY, 'doctor');
+      }
+      
+      // If user is a doctor, ensure authentication state is set
+      if (userIsDoctor) {
+        localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
+      }
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [location.pathname, userIsDoctor]);
 
   // Check if view is switched to patient view
   useEffect(() => {
     const checkViewPreference = () => {
-      const viewPreference = localStorage.getItem('phb_view_preference');
+      const viewPreference = localStorage.getItem(VIEW_PREFERENCE_KEY);
       if (viewPreference !== 'doctor') {
         // If user switched to patient view, redirect to regular account page
         navigate('/account');
@@ -24,7 +63,7 @@ const ProfessionalLayout: React.FC = () => {
     
     // Set up event listener for storage changes (when toggle is clicked elsewhere)
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'phb_view_preference') {
+      if (e.key === VIEW_PREFERENCE_KEY) {
         checkViewPreference();
       }
     };
@@ -50,26 +89,32 @@ const ProfessionalLayout: React.FC = () => {
   const getMenuItems = () => {
     const baseItems = [
       { label: 'Dashboard', path: '/professional/dashboard' },
+      { label: 'Appointments', path: '/professional/appointments' },
       { label: 'Patient Management', path: '/professional/patients' },
       { label: 'Clinical Guidelines', path: '/professional/guidelines' },
       { label: 'Professional Forum', path: '/professional/forum' },
       { label: 'Clinical Calculators', path: '/professional/calculators' },
     ];
 
-    if (professionalUser) {
-      if (professionalUser.role === 'doctor') {
+    // Check both professional context and regular user context
+    const effectiveUser = professionalUser || (user?.role === 'doctor' ? user : null);
+
+    if (effectiveUser) {
+      const role = professionalUser?.role || user?.role;
+      
+      if (role === 'doctor') {
         baseItems.push({ label: 'Doctor Resources', path: '/professional/resources' });
       }
 
-      if (professionalUser.role === 'researcher') {
+      if (role === 'researcher') {
         baseItems.push({ label: 'Research Dashboard', path: '/professional/research' });
       }
 
-      if (professionalUser.role === 'nurse') {
+      if (role === 'nurse') {
         baseItems.push({ label: 'Nursing Resources', path: '/professional/nursing-resources' });
       }
 
-      if (professionalUser.role === 'pharmacist') {
+      if (role === 'pharmacist') {
         baseItems.push({ label: 'Pharmacy Resources', path: '/professional/pharmacy-resources' });
       }
     }
@@ -80,9 +125,11 @@ const ProfessionalLayout: React.FC = () => {
   const menuItems = getMenuItems();
 
   // Format role with capitalization if it exists
-  const formattedRole = professionalUser?.role
-    ? professionalUser.role.charAt(0).toUpperCase() + professionalUser.role.slice(1)
+  const effectiveUser = professionalUser || (user?.role === 'doctor' ? user : null);
+  const formattedRole = effectiveUser?.role
+    ? effectiveUser.role.charAt(0).toUpperCase() + effectiveUser.role.slice(1)
     : '';
+  const userName = effectiveUser?.name || '';
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -112,11 +159,14 @@ const ProfessionalLayout: React.FC = () => {
               ))}
             </div>
 
-            {/* User Menu */}
+            {/* User Menu with ViewToggle */}
             <div className="hidden md:ml-4 md:flex md:items-center">
-              {professionalUser && (
+              {/* Always display the ViewToggle */}
+              <ViewToggle />
+              
+              {effectiveUser && (
                 <div className="ml-3 relative flex items-center">
-                  <span className="mr-4 text-sm">{professionalUser.name}</span>
+                  <span className="mr-4 text-sm">{userName}</span>
                   <span className="mr-4 px-2 py-1 rounded-full bg-blue-700 text-xs">
                     {formattedRole}
                   </span>
@@ -132,10 +182,13 @@ const ProfessionalLayout: React.FC = () => {
 
             {/* Mobile Menu Button */}
             <div className="flex items-center md:hidden">
+              {/* ViewToggle for mobile */}
+              <ViewToggle />
+              
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-blue-700 focus:outline-none"
+                className="inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-blue-700 focus:outline-none ml-2"
                 aria-expanded="false"
               >
                 <span className="sr-only">Open main menu</span>
@@ -180,25 +233,25 @@ const ProfessionalLayout: React.FC = () => {
               </Link>
             ))}
           </div>
-          {professionalUser && (
+          {effectiveUser && (
             <div className="pt-4 pb-3 border-t border-blue-700">
               <div className="flex items-center px-5">
                 <div className="flex-shrink-0">
                   <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
                     <span className="text-lg font-bold">
-                      {professionalUser.name.charAt(0)}
+                      {userName.charAt(0)}
                     </span>
                   </div>
                 </div>
                 <div className="ml-3">
-                  <div className="text-base font-medium text-white">{professionalUser.name}</div>
+                  <div className="text-base font-medium text-white">{userName}</div>
                   <div className="text-sm font-medium text-blue-200">{formattedRole}</div>
                 </div>
               </div>
               <div className="mt-3 px-2 space-y-1">
                 <button
                   onClick={handleLogout}
-                  className="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-blue-700 w-full text-left"
+                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white hover:bg-blue-700"
                 >
                   Logout
                 </button>
@@ -208,36 +261,13 @@ const ProfessionalLayout: React.FC = () => {
         </div>
       </header>
 
-      {/* Page Content */}
-      <main className="flex-1">
-        <div className="py-6">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <Outlet />
-          </div>
-        </div>
+      {/* Main Content */}
+      <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <Outlet />
       </main>
 
-      {/* Footer */}
-      <footer className="bg-blue-900 text-white">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <div className="md:flex md:items-center md:justify-between">
-            <div className="text-center md:text-left">
-              <p className="text-sm">
-                &copy; {new Date().getFullYear()} Public Health Board - Professional Portal
-              </p>
-              <p className="text-xs mt-1 text-blue-200">
-                This platform is intended for healthcare professionals only. All information is confidential.
-              </p>
-            </div>
-            <div className="mt-4 flex justify-center md:mt-0">
-              <a href="#" className="text-blue-200 hover:text-white mx-2">Terms of Service</a>
-              <a href="#" className="text-blue-200 hover:text-white mx-2">Privacy Policy</a>
-              <a href="#" className="text-blue-200 hover:text-white mx-2">Contact</a>
-            </div>
-          </div>
-        </div>
-        <FeedbackButton />
-      </footer>
+      {/* Feedback Button */}
+      <FeedbackButton />
     </div>
   );
 };

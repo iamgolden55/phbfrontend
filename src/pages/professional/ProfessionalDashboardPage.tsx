@@ -1,183 +1,281 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import { useNavigate } from 'react-router-dom';
+import { fetchDoctorAppointments, acceptAppointment, AppointmentResponse, Appointment, DoctorInfo, AppointmentSummary } from '../../features/professional/appointmentsService';
 import { useProfessionalAuth } from '../../features/professional/professionalAuthContext';
+import { useAuth } from '../../features/auth/authContext';
+import { useNavigate } from 'react-router-dom';
+
+// Mock data for a doctor dashboard
+const mockDoctorData = {
+  welcomeMessage: 'Welcome to your doctor dashboard',
+  stats: [
+    { label: 'Clinical Guidelines Updates', value: '12 new' },
+    { label: 'CME Opportunities', value: '8 available' },
+    { label: 'Professional Forum Threads', value: '24 unread' },
+    { label: 'Research Collaborations', value: '5 open' },
+  ],
+  quickLinks: [
+    { label: 'Appointments', path: '/professional/appointments' },
+    { label: 'Clinical Guidelines', path: '/professional/guidelines' },
+    { label: 'Doctor Resources', path: '/professional/doctor-resources' },
+    { label: 'Clinical Calculators', path: '/professional/calculators' },
+    { label: 'Professional Forum', path: '/professional/forum' },
+  ],
+};
+
+// Latest announcements - common for all roles
+const announcements = [
+  {
+    id: 1,
+    title: 'New Clinical Guidelines for Hypertension',
+    date: 'May 15, 2023',
+    summary: 'Updated clinical guidelines for the management of hypertension have been published.',
+  },
+  {
+    id: 2,
+    title: 'Professional Forum Update',
+    date: 'May 10, 2023',
+    summary: 'The professional forum has been updated with new features including direct messaging and topic subscriptions.',
+  },
+  {
+    id: 3,
+    title: 'COVID-19 Protocol Updates',
+    date: 'May 5, 2023',
+    summary: 'The COVID-19 treatment and prevention protocols have been updated based on the latest research findings.',
+  },
+];
+
+// Upcoming events - common for all roles
+const events = [
+  {
+    id: 1,
+    title: 'Virtual Grand Rounds: Advanced Diabetes Management',
+    date: 'June 15, 2023',
+    time: '1:00 PM - 2:30 PM',
+  },
+  {
+    id: 2,
+    title: 'Research Methodology Workshop',
+    date: 'June 22, 2023',
+    time: '10:00 AM - 4:00 PM',
+  },
+  {
+    id: 3,
+    title: 'Professional Ethics Seminar',
+    date: 'July 5, 2023',
+    time: '2:00 PM - 4:00 PM',
+  },
+];
 
 const ProfessionalDashboardPage: React.FC = () => {
-  const { professionalUser } = useProfessionalAuth();
+  // Get data from both auth contexts
+  const { user, isAuthenticated: mainIsAuthenticated, isLoading: mainIsLoading, isDoctor } = useAuth();
+  const { professionalUser, isAuthenticated: profIsAuthenticated, isLoading: profIsLoading } = useProfessionalAuth();
   const navigate = useNavigate();
+  
+  // State for appointments
+  const [appointmentData, setAppointmentData] = useState<AppointmentResponse | null>(null);
+  const [isLoadingAppointments, setIsLoadingAppointments] = useState<boolean>(true);
+  const [appointmentsError, setAppointmentsError] = useState<string | null>(null);
+  const [processingAppointment, setProcessingAppointment] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [doctorInfo, setDoctorInfo] = useState<DoctorInfo | null>(null);
+  const [appointmentSummary, setAppointmentSummary] = useState<AppointmentSummary | null>(null);
 
-  // Check if view is switched to patient view
+  // Check if the user is authenticated and is a doctor
+  const isAuthLoading = mainIsLoading || profIsLoading;
+  const isAuthenticated = mainIsAuthenticated && isDoctor;
+
+  // Redirect if not authenticated or not a doctor
   useEffect(() => {
-    const checkViewPreference = () => {
-      const viewPreference = localStorage.getItem('phb_view_preference');
-      if (viewPreference !== 'doctor') {
-        // If user switched to patient view, redirect to regular account page
-        navigate('/account');
+    if (!isAuthLoading && !isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthLoading, isAuthenticated, navigate]);
+
+  // Fetch appointments on component mount
+  useEffect(() => {
+    const loadAppointments = async () => {
+      if (!isAuthenticated) return;
+      
+      setIsLoadingAppointments(true);
+      setAppointmentsError(null);
+      
+      try {
+        // Fetch appointments from API
+        const data = await fetchDoctorAppointments();
+        
+        // Save the appointment data
+        setAppointmentData(data);
+        setDoctorInfo(data.doctor_info);
+        setAppointmentSummary(data.summary);
+      } catch (err: any) {
+        console.error('Failed to load doctor appointments:', err);
+        setAppointmentsError(err.message || 'Failed to load appointments. Please try again later.');
+        
+        // Create mock data structure for the new format
+        setAppointmentData({
+          pending_department_appointments: [],
+          my_appointments: {
+            confirmed: [],
+            in_progress: [],
+            completed: [],
+            cancelled: [],
+            no_show: [],
+            all: []
+          },
+          doctor_info: {
+            id: 0,
+            name: user?.full_name || 'Doctor',
+            email: user?.email || '',
+            specialization: '',
+            department: { id: 0, name: '' },
+            hospital: { id: 0, name: '' }
+          },
+          summary: {
+            pending_department_count: 0,
+            my_appointments_count: {
+              confirmed: 0,
+              in_progress: 0,
+              completed: 0,
+              cancelled: 0,
+              no_show: 0,
+              total: 0
+            },
+            today_appointments: 0,
+            upcoming_appointments: 0
+          }
+        });
+      } finally {
+        setIsLoadingAppointments(false);
       }
     };
     
-    // Check initially
-    checkViewPreference();
-    
-    // Set up event listener for storage changes (when toggle is clicked elsewhere)
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'phb_view_preference') {
-        checkViewPreference();
+    loadAppointments();
+  }, [isAuthenticated, user]);
+
+  // Handle accepting an appointment
+  const handleAcceptAppointment = async (appointmentId: string) => {
+    setProcessingAppointment(appointmentId);
+    try {
+      const result = await acceptAppointment(appointmentId);
+      
+      // Update the appointment data by moving the appointment from pending to confirmed
+      if (appointmentData) {
+        const acceptedAppointment = appointmentData.pending_department_appointments.find(
+          app => app.appointment_id === appointmentId
+        );
+        
+        if (acceptedAppointment) {
+          // Create a copy of the appointment with updated status
+          const updatedAppointment = {
+            ...acceptedAppointment,
+            status: 'confirmed',
+            status_display: 'Confirmed'
+          };
+          
+          // Remove from pending and add to confirmed
+          setAppointmentData({
+            ...appointmentData,
+            pending_department_appointments: appointmentData.pending_department_appointments.filter(
+              app => app.appointment_id !== appointmentId
+            ),
+            my_appointments: {
+              ...appointmentData.my_appointments,
+              confirmed: [...appointmentData.my_appointments.confirmed, updatedAppointment],
+              all: [...appointmentData.my_appointments.all, updatedAppointment]
+            },
+            summary: {
+              ...appointmentData.summary,
+              pending_department_count: appointmentData.summary.pending_department_count - 1,
+              my_appointments_count: {
+                ...appointmentData.summary.my_appointments_count,
+                confirmed: appointmentData.summary.my_appointments_count.confirmed + 1,
+                total: appointmentData.summary.my_appointments_count.total + 1
+              }
+            }
+          });
+        }
       }
-    };
-    
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Custom event for immediate updates within the same window
-    const handleCustomViewChange = () => checkViewPreference();
-    window.addEventListener('phb_view_changed', handleCustomViewChange);
-    
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('phb_view_changed', handleCustomViewChange);
-    };
-  }, [navigate]);
-
-  // Format role with capitalization if it exists
-  const formattedRole = professionalUser?.role
-    ? professionalUser.role.charAt(0).toUpperCase() + professionalUser.role.slice(1)
-    : '';
-
-  // Get welcome message and stats based on role
-  const getRoleSpecificContent = () => {
-    if (!professionalUser) return null;
-
-    switch (professionalUser.role) {
-      case 'doctor':
-        return {
-          welcomeMessage: 'Welcome to your doctor dashboard',
-          stats: [
-            { label: 'Clinical Guidelines Updates', value: '12 new' },
-            { label: 'CME Opportunities', value: '8 available' },
-            { label: 'Professional Forum Threads', value: '24 unread' },
-            { label: 'Research Collaborations', value: '5 open' },
-          ],
-          quickLinks: [
-            { label: 'Appointments', path: '/professional/appointments' },
-            { label: 'Clinical Guidelines', path: '/professional/guidelines' },
-            { label: 'Doctor Resources', path: '/professional/doctor-resources' },
-            { label: 'Clinical Calculators', path: '/professional/calculators' },
-            { label: 'Professional Forum', path: '/professional/forum' },
-          ],
-        };
-      case 'researcher':
-        return {
-          welcomeMessage: 'Welcome to your research dashboard',
-          stats: [
-            { label: 'Data Sets Available', value: '36' },
-            { label: 'Research Collaborations', value: '11 active' },
-            { label: 'Publication Opportunities', value: '7 open' },
-            { label: 'Grant Applications', value: '4 closing soon' },
-          ],
-          quickLinks: [
-            { label: 'Research Dashboard', path: '/professional/research' },
-            { label: 'Data Visualization', path: '/professional/research/visualization' },
-            { label: 'Clinical Calculators', path: '/professional/calculators' },
-            { label: 'Professional Forum', path: '/professional/forum' },
-          ],
-        };
-      case 'nurse':
-        return {
-          welcomeMessage: 'Welcome to your nursing dashboard',
-          stats: [
-            { label: 'Care Protocols Updates', value: '8 new' },
-            { label: 'Training Opportunities', value: '12 available' },
-            { label: 'Professional Forum Threads', value: '18 unread' },
-            { label: 'Resource Guides', value: '15 available' },
-          ],
-          quickLinks: [
-            { label: 'Care Protocols', path: '/professional/guidelines' },
-            { label: 'Nursing Resources', path: '/professional/nursing-resources' },
-            { label: 'Clinical Calculators', path: '/professional/calculators' },
-            { label: 'Professional Forum', path: '/professional/forum' },
-          ],
-        };
-      case 'pharmacist':
-        return {
-          welcomeMessage: 'Welcome to your pharmacy dashboard',
-          stats: [
-            { label: 'Medication Updates', value: '23 new' },
-            { label: 'Drug Interaction Alerts', value: '5 updated' },
-            { label: 'Professional Forum Threads', value: '14 unread' },
-            { label: 'Continuing Education', value: '9 courses' },
-          ],
-          quickLinks: [
-            { label: 'Medication Database', path: '/professional/pharmacy-resources' },
-            { label: 'Clinical Guidelines', path: '/professional/guidelines' },
-            { label: 'Clinical Calculators', path: '/professional/calculators' },
-            { label: 'Professional Forum', path: '/professional/forum' },
-          ],
-        };
-      default:
-        return {
-          welcomeMessage: 'Welcome to your professional dashboard',
-          stats: [
-            { label: 'Professional Updates', value: '15 new' },
-            { label: 'Forum Activity', value: '20 unread' },
-            { label: 'Resource Updates', value: '8 new' },
-            { label: 'Educational Opportunities', value: '10 available' },
-          ],
-          quickLinks: [
-            { label: 'Clinical Guidelines', path: '/professional/guidelines' },
-            { label: 'Clinical Calculators', path: '/professional/calculators' },
-            { label: 'Professional Forum', path: '/professional/forum' },
-            { label: 'Educational Resources', path: '/professional/resources' },
-          ],
-        };
+      
+      setSuccessMessage(`Appointment #${appointmentId} has been accepted successfully`);
+      // Clear success message after 5 seconds
+      setTimeout(() => setSuccessMessage(null), 5000);
+    } catch (error: any) {
+      setAppointmentsError(error.message || 'Failed to accept appointment');
+      // Clear error message after 5 seconds
+      setTimeout(() => setAppointmentsError(null), 5000);
+    } finally {
+      setProcessingAppointment(null);
     }
   };
 
-  const roleContent = getRoleSpecificContent();
+  // Status tag styling based on appointment priority/status
+  const getStatusTagClassName = (appointment: Appointment) => {
+    if (appointment.status === 'cancelled') {
+      return 'bg-red-100 text-red-800';
+    }
+    
+    switch (appointment.priority) {
+      case 'urgent':
+        return 'bg-red-100 text-red-800';
+      case 'high':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'normal':
+      default:
+        return 'bg-green-100 text-green-800';
+    }
+  };
 
-  // Latest announcements - common for all roles
-  const announcements = [
-    {
-      id: 1,
-      title: 'New Clinical Guidelines for Hypertension',
-      date: 'May 15, 2023',
-      summary: 'Updated clinical guidelines for the management of hypertension have been published.',
-    },
-    {
-      id: 2,
-      title: 'Professional Forum Update',
-      date: 'May 10, 2023',
-      summary: 'The professional forum has been updated with new features including direct messaging and topic subscriptions.',
-    },
-    {
-      id: 3,
-      title: 'COVID-19 Protocol Updates',
-      date: 'May 5, 2023',
-      summary: 'The COVID-19 treatment and prevention protocols have been updated based on the latest research findings.',
-    },
-  ];
+  // Format the status display text
+  const getStatusDisplay = (appointment: Appointment) => {
+    if (appointment.status === 'cancelled') {
+      return 'Cancelled';
+    }
+    
+    switch (appointment.priority) {
+      case 'urgent':
+        return 'Urgent';
+      case 'high':
+        return 'Follow-up';
+      case 'normal':
+      default:
+        return 'Stable';
+    }
+  };
 
-  // Upcoming events - common for all roles
-  const events = [
-    {
-      id: 1,
-      title: 'Virtual Grand Rounds: Advanced Diabetes Management',
-      date: 'June 15, 2023',
-      time: '1:00 PM - 2:30 PM',
-    },
-    {
-      id: 2,
-      title: 'Research Methodology Workshop',
-      date: 'June 22, 2023',
-      time: '10:00 AM - 4:00 PM',
-    },
-    {
-      id: 3,
-      title: 'Professional Ethics Seminar',
-      date: 'July 5, 2023',
-      time: '2:00 PM - 4:00 PM',
-    },
-  ];
+  // Format date from ISO to readable format
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString();
+    } catch {
+      return dateString;
+    }
+  };
+
+  // Show loading state while authentication is being checked
+  if (isAuthLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  // If not authenticated or not a doctor, this will redirect (see useEffect above)
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  // Get the doctor's name from various sources
+  const doctorName = doctorInfo?.name || professionalUser?.name || user?.full_name || 'Doctor';
+  const doctorRole = professionalUser?.role || 'Doctor';
+  const doctorSpecialty = doctorInfo?.specialization || professionalUser?.specialty || '';
+  
+  // Get department and hospital info
+  const departmentName = doctorInfo?.department?.name || '';
+  const hospitalName = doctorInfo?.hospital?.name || '';
 
   return (
     <div>
@@ -185,144 +283,290 @@ const ProfessionalDashboardPage: React.FC = () => {
         <title>Professional Dashboard | PHB</title>
       </Helmet>
 
-      {roleContent && professionalUser && (
-        <>
-          {/* Header Section */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-blue-800">{roleContent.welcomeMessage}</h1>
-            <p className="mt-2 text-gray-600">
-              {professionalUser.name} | {formattedRole}
-              {professionalUser.specialty ? ` | ${professionalUser.specialty}` : ''}
-            </p>
-          </div>
+      {/* Header Section */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-blue-800">{mockDoctorData.welcomeMessage}</h1>
+        <p className="mt-2 text-gray-600">
+          {doctorName} | {doctorRole}
+          {doctorSpecialty ? ` | ${doctorSpecialty}` : ''}
+        </p>
+        {departmentName && hospitalName && (
+          <p className="text-gray-500">
+            {departmentName}, {hospitalName}
+          </p>
+        )}
+      </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {roleContent.stats.map((stat, index) => (
-              <div key={index} className="bg-white p-4 rounded-lg shadow-md">
-                <p className="text-lg font-bold text-blue-600">{stat.value}</p>
-                <p className="text-sm text-gray-600">{stat.label}</p>
+      {/* Success message */}
+      {successMessage && (
+        <div className="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
+          <span className="block sm:inline">{successMessage}</span>
+        </div>
+      )}
+
+      {/* Appointment Summary Stats */}
+      {appointmentSummary && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+          <div className="bg-blue-50 p-4 rounded-lg shadow-md">
+            <p className="text-lg font-bold text-blue-600">{appointmentSummary.pending_department_count}</p>
+            <p className="text-sm text-blue-700">Pending in Department</p>
+          </div>
+          <div className="bg-green-50 p-4 rounded-lg shadow-md">
+            <p className="text-lg font-bold text-green-600">{appointmentSummary.my_appointments_count.confirmed}</p>
+            <p className="text-sm text-green-700">Confirmed Appointments</p>
+          </div>
+          <div className="bg-yellow-50 p-4 rounded-lg shadow-md">
+            <p className="text-lg font-bold text-yellow-600">{appointmentSummary.my_appointments_count.in_progress}</p>
+            <p className="text-sm text-yellow-700">In Progress</p>
+          </div>
+          <div className="bg-indigo-50 p-4 rounded-lg shadow-md">
+            <p className="text-lg font-bold text-indigo-600">{appointmentSummary.today_appointments}</p>
+            <p className="text-sm text-indigo-700">Today's Appointments</p>
+          </div>
+          <div className="bg-purple-50 p-4 rounded-lg shadow-md">
+            <p className="text-lg font-bold text-purple-600">{appointmentSummary.upcoming_appointments}</p>
+            <p className="text-sm text-purple-700">Upcoming Appointments</p>
+          </div>
+        </div>
+      )}
+
+      {/* Static Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {mockDoctorData.stats.map((stat, index) => (
+          <div key={index} className="bg-white p-4 rounded-lg shadow-md">
+            <p className="text-lg font-bold text-blue-600">{stat.value}</p>
+            <p className="text-sm text-gray-600">{stat.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Pending Department Appointments Section */}
+      <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold text-blue-800">Pending Department Appointments</h2>
+          <a href="/professional/appointments?filter=pending" className="text-blue-600 hover:underline text-sm">View all pending</a>
+        </div>
+        
+        {isLoadingAppointments ? (
+          <div className="flex justify-center py-6">
+            <div className="animate-spin h-6 w-6 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+          </div>
+        ) : appointmentsError && (!appointmentData || appointmentData.pending_department_appointments.length === 0) ? (
+          <div className="bg-red-50 text-red-700 p-4 rounded-md">
+            <p>{appointmentsError}</p>
+          </div>
+        ) : !appointmentData || appointmentData.pending_department_appointments.length === 0 ? (
+          <div className="bg-gray-50 p-4 rounded-md text-gray-600">
+            No pending appointments found in your department.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {appointmentData.pending_department_appointments.slice(0, 5).map((appointment: Appointment) => (
+                  <tr key={appointment.appointment_id}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {appointment.patient?.full_name || 
+                       appointment.patient_name || 
+                       appointment.patient_full_name || 
+                       `Patient #${appointment.appointment_id.slice(-6)}`}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {appointment.formatted_date || formatDate(appointment.appointment_date)}
+                      {appointment.formatted_time && ` at ${appointment.formatted_time}`}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">{appointment.chief_complaint}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        appointment.priority === 'urgent' ? 'bg-red-100 text-red-800' :
+                        appointment.priority === 'high' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-green-100 text-green-800'
+                      }`}>
+                        {appointment.formatted_priority || appointment.priority}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <button
+                        onClick={() => handleAcceptAppointment(appointment.appointment_id)}
+                        disabled={processingAppointment === appointment.appointment_id}
+                        className={`bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm ${processingAppointment === appointment.appointment_id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      >
+                        {processingAppointment === appointment.appointment_id ? 'Processing...' : 'Accept'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* My Confirmed Appointments Section */}
+      <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold text-blue-800">My Confirmed Appointments</h2>
+          <a href="/professional/appointments?filter=confirmed" className="text-blue-600 hover:underline text-sm">View all confirmed</a>
+        </div>
+        
+        {isLoadingAppointments ? (
+          <div className="flex justify-center py-6">
+            <div className="animate-spin h-6 w-6 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+          </div>
+        ) : appointmentData && appointmentData.my_appointments.confirmed.length === 0 ? (
+          <div className="bg-gray-50 p-4 rounded-md text-gray-600">
+            No confirmed appointments found.
+          </div>
+        ) : appointmentData && (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {appointmentData.my_appointments.confirmed.slice(0, 5).map((appointment: Appointment) => (
+                  <tr key={appointment.appointment_id}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {appointment.patient?.full_name || 
+                       appointment.patient_name || 
+                       appointment.patient_full_name || 
+                       `Patient #${appointment.appointment_id.slice(-6)}`}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {appointment.formatted_date || formatDate(appointment.appointment_date)}
+                      {appointment.formatted_time && ` at ${appointment.formatted_time}`}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {appointment.formatted_appointment_type || appointment.appointment_type}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600 hover:text-blue-900">
+                      <a href={`/professional/appointments/${appointment.appointment_id}`}>View Details</a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* In Progress Appointments Section */}
+      {appointmentData && appointmentData.my_appointments.in_progress.length > 0 && (
+        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold text-yellow-800">Active Consultations</h2>
+            <a href="/professional/appointments?filter=in_progress" className="text-blue-600 hover:underline text-sm">View all active</a>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {appointmentData.my_appointments.in_progress.slice(0, 3).map((appointment: Appointment) => (
+                  <tr key={appointment.appointment_id} className="bg-yellow-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {appointment.patient?.full_name || 
+                       appointment.patient_name || 
+                       appointment.patient_full_name || 
+                       `Patient #${appointment.appointment_id.slice(-6)}`}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {appointment.formatted_date || formatDate(appointment.appointment_date)}
+                      {appointment.formatted_time && ` at ${appointment.formatted_time}`}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {appointment.formatted_appointment_type || appointment.appointment_type}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <a 
+                        href={`/professional/appointments/${appointment.appointment_id}`}
+                        className="bg-yellow-600 hover:bg-yellow-700 text-white py-1 px-3 rounded text-sm"
+                      >
+                        Complete Consultation
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Links and Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        {/* Quick Links */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-bold text-blue-800 mb-4">Quick Links</h2>
+          <div className="grid grid-cols-1 gap-2">
+            {mockDoctorData.quickLinks.map((link, index) => (
+              <a
+                key={index}
+                href={link.path}
+                className="bg-blue-50 hover:bg-blue-100 p-3 rounded-md flex items-center text-blue-700 transition"
+              >
+                <span className="mr-2">→</span>
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </div>
+
+        {/* Announcements */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-bold text-blue-800 mb-4">Latest Announcements</h2>
+          <div className="space-y-4">
+            {announcements.map((announcement) => (
+              <div key={announcement.id} className="border-b pb-3 last:border-0">
+                <h3 className="text-md font-semibold">{announcement.title}</h3>
+                <p className="text-xs text-gray-500 mb-1">{announcement.date}</p>
+                <p className="text-sm text-gray-700">{announcement.summary}</p>
               </div>
             ))}
           </div>
-
-          {/* Quick Links and Activity */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            {/* Quick Links */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-bold text-blue-800 mb-4">Quick Links</h2>
-              <div className="grid grid-cols-1 gap-2">
-                {roleContent.quickLinks.map((link, index) => (
-                  <a
-                    key={index}
-                    href={link.path}
-                    className="bg-blue-50 hover:bg-blue-100 p-3 rounded-md flex items-center text-blue-700 transition"
-                  >
-                    <span className="material-icons mr-2">arrow_forward</span>
-                    {link.label}
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            {/* Announcements */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-bold text-blue-800 mb-4">Latest Announcements</h2>
-              <div className="space-y-4">
-                {announcements.map((announcement) => (
-                  <div key={announcement.id} className="border-b pb-3 last:border-0">
-                    <h3 className="text-md font-semibold">{announcement.title}</h3>
-                    <p className="text-xs text-gray-500 mb-1">{announcement.date}</p>
-                    <p className="text-sm text-gray-700">{announcement.summary}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4">
-                <a href="#" className="text-blue-600 hover:underline text-sm">View all announcements</a>
-              </div>
-            </div>
-
-            {/* Upcoming Events */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-bold text-blue-800 mb-4">Upcoming Events</h2>
-              <div className="space-y-4">
-                {events.map((event) => (
-                  <div key={event.id} className="border-b pb-3 last:border-0">
-                    <h3 className="text-md font-semibold">{event.title}</h3>
-                    <p className="text-xs text-gray-500">{event.date}</p>
-                    <p className="text-xs text-gray-500">{event.time}</p>
-                    <button className="mt-2 text-xs bg-blue-600 text-white px-2 py-1 rounded">
-                      Add to calendar
-                    </button>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4">
-                <a href="#" className="text-blue-600 hover:underline text-sm">View all events</a>
-              </div>
-            </div>
+          <div className="mt-4">
+            <a href="#" className="text-blue-600 hover:underline text-sm">View all announcements</a>
           </div>
-
-          {/* Recent Activity */}
-          <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-            <h2 className="text-xl font-bold text-blue-800 mb-4">Recent Activity</h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-full table-auto">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Activity</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Section</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  <tr>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Accessed Clinical Guidelines</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Guidelines</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">May 18, 2023</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                        Completed
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Commented on forum thread</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Professional Forum</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">May 17, 2023</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                        Completed
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Downloaded research data</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Research Resources</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">May 15, 2023</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                        Completed
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div className="mt-4">
-              <a href="#" className="text-blue-600 hover:underline text-sm">View all activity</a>
-            </div>
-          </div>
-        </>
-      )}
-
-      {!professionalUser && (
-        <div className="text-center py-12">
-          <h2 className="text-2xl font-bold text-blue-800 mb-4">Not Authenticated</h2>
-          <p className="text-gray-600">Please <a href="/professional/login" className="text-blue-600 hover:underline">log in</a> to access the professional dashboard.</p>
         </div>
-      )}
+
+        {/* Upcoming Events */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-bold text-blue-800 mb-4">Upcoming Events</h2>
+          <div className="space-y-4">
+            {events.map((event) => (
+              <div key={event.id} className="border-b pb-3 last:border-0">
+                <h3 className="text-md font-semibold">{event.title}</h3>
+                <p className="text-xs text-gray-500 mb-1">{event.date}</p>
+                <p className="text-sm text-gray-700">{event.time}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4">
+            <a href="#" className="text-blue-600 hover:underline text-sm">View all events</a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

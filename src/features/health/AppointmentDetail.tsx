@@ -14,6 +14,17 @@ interface AppointmentDetail {
   location: string;
   status: 'scheduled' | 'cancelled' | 'completed' | 'missed' | 'rescheduled';
   reason?: string;
+  chief_complaint?: string;
+  department_name?: string;
+  hospital_name?: string;
+  doctor_full_name?: string;
+  appointment_type?: string;
+  symptoms_data?: Array<{
+    body_part_id: string;
+    body_part_name: string;
+    symptom_name: string;
+    description?: string;
+  }>;
   summaryDetails?: {
     diagnosis?: string;
     treatment?: string;
@@ -114,7 +125,57 @@ const AppointmentDetail: React.FC = () => {
           }
 
           const data = await response.json();
-          setAppointment(data);
+          console.log("API response data:", data);
+          
+          // Log symptoms data if available for debugging
+          if (data.symptoms_data) {
+            console.log("Symptoms data found:", data.symptoms_data);
+          } else {
+            console.log("No symptoms data found in response");
+          }
+          
+          // Process the API response data to match our interface
+          const processedAppointment: AppointmentDetail = {
+            id: data.id || data.appointment_id || id || '',
+            date: data.date || (data.appointment_date ? data.appointment_date.split('T')[0] : ''),
+            time: data.time || (data.appointment_date ? new Date(data.appointment_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''),
+            duration: data.duration ? `${data.duration} min` : '30 min',
+            type: data.appointment_type?.includes('video') ? 'video' : 
+                  data.appointment_type?.includes('phone') ? 'phone' : 'in-person',
+            provider: data.doctor_full_name || data.doctor_name || 'Doctor',
+            specialty: data.department_name || data.specialty || 'General',
+            location: data.location || data.hospital_name || 'PHB Medical Center',
+            status: data.status || 'scheduled',
+            reason: data.chief_complaint || data.reason || '',
+            // Store additional API fields
+            chief_complaint: data.chief_complaint || '',
+            department_name: data.department_name || '',
+            hospital_name: data.hospital_name || '',
+            doctor_full_name: data.doctor_full_name || '',
+            appointment_type: data.appointment_type || '',
+            // Store symptoms data if available - handle different possible formats
+            symptoms_data: data.symptoms_data || 
+                           (data.appointment_data?.symptoms_data) || 
+                           (data.symptoms && Array.isArray(data.symptoms) ? data.symptoms.map((s: any) => ({
+                             body_part_id: s.body_part_id || s.bodyPartId || '',
+                             body_part_name: s.body_part_name || s.bodyPartName || '',
+                             symptom_name: s.symptom_name || s.symptomName || '',
+                             description: s.description || ''
+                           })) : []),
+            // Process summary details if available
+            summaryDetails: data.medical_summary ? {
+              diagnosis: data.medical_summary.diagnosis || '',
+              treatment: data.medical_summary.treatment || '',
+              followUp: data.medical_summary.follow_up || '',
+              notes: data.medical_summary.notes || '',
+              prescriptions: data.medical_summary.prescriptions || [],
+              vitalSigns: data.medical_summary.vital_signs || {}
+            } : undefined
+          };
+          
+          console.log("Processed appointment with symptoms:", processedAppointment);
+          
+          setAppointment(processedAppointment);
         } catch (apiError) {
           console.error('API error, falling back to mock data:', apiError);
           // Fallback to mock data for development/testing
@@ -240,12 +301,25 @@ const AppointmentDetail: React.FC = () => {
                   </div>
                   <div>
                     <h4 className="text-sm font-medium text-gray-500">Location</h4>
-                    <p className="text-gray-900">{appointment.location}</p>
+                    <p className="text-gray-900">{appointment.location || appointment.hospital_name}</p>
                   </div>
-                  {appointment.reason && (
+                  {/* Display symptoms based on availability */}
+                  {appointment.symptoms_data && appointment.symptoms_data.length > 0 ? (
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">Symptoms</h4>
+                      <ul className="list-disc list-inside text-gray-900 ml-2">
+                        {appointment.symptoms_data.map((symptom, index) => (
+                          <li key={index}>
+                            {symptom.body_part_name} - {symptom.symptom_name}
+                            {symptom.description && <span className="text-gray-600 ml-1">({symptom.description})</span>}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : (appointment.reason || appointment.chief_complaint) && (
                     <div>
                       <h4 className="text-sm font-medium text-gray-500">Reason for Visit</h4>
-                      <p className="text-gray-900">{appointment.reason}</p>
+                      <p className="text-gray-900">{appointment.chief_complaint || appointment.reason}</p>
                     </div>
                   )}
                 </div>
@@ -256,11 +330,11 @@ const AppointmentDetail: React.FC = () => {
                 <div className="space-y-3">
                   <div>
                     <h4 className="text-sm font-medium text-gray-500">Healthcare Provider</h4>
-                    <p className="text-gray-900">{appointment.provider}</p>
+                    <p className="text-gray-900">{appointment.provider || appointment.doctor_full_name}</p>
                   </div>
                   <div>
                     <h4 className="text-sm font-medium text-gray-500">Specialty</h4>
-                    <p className="text-gray-900">{appointment.specialty}</p>
+                    <p className="text-gray-900">{appointment.specialty || appointment.department_name}</p>
                   </div>
                 </div>
               </div>
@@ -364,22 +438,7 @@ const AppointmentDetail: React.FC = () => {
                   )}
                 </>
               )}
-              
-              <button
-                onClick={handleViewSummary}
-                disabled={summaryLoading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"
-              >
-                {summaryLoading ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Loading...
-                  </>
-                ) : "View Complete Summary"}
-              </button>
+             
             </div>
             
             {summaryError && (
