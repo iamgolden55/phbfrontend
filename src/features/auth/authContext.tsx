@@ -263,7 +263,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             // Only update if values have changed to prevent re-renders
             const hasPrimaryChanged = hospitalData.has_primary !== hasPrimaryHospital;
             const hospitalChanged = JSON.stringify(hospitalData.primary_hospital) !== JSON.stringify(primaryHospital);
-            
+            console.log("hasPrimaryChanged:", hasPrimaryChanged);
+            console.log("hospitalChanged:", hospitalData.primary_hospital);
             if (hasPrimaryChanged || hospitalChanged) {
               setHasPrimaryHospital(hospitalData.has_primary);
               setPrimaryHospital(hospitalData.primary_hospital || null);
@@ -1077,8 +1078,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     primaryHospital,
     hasPrimaryHospital,
     // Doctor role check - check both role and hpn for reliability
-    isDoctor: user?.role === 'doctor' || !!user?.hpn,
+    isDoctor: user?.role === 'doctor',
   };
+  
+  
 
   return (
     <AuthContext.Provider value={contextValue}>

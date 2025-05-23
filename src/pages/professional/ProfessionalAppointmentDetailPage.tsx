@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { fetchDoctorAppointmentDetails, updateAppointmentStatus } from '../../features/professional/appointmentsService';
+import { 
+  fetchDoctorAppointmentDetails, 
+  updateAppointmentStatus, 
+  addDoctorNotes,
+  cancelAppointment,
+  markAppointmentNoShow,
+  addAppointmentPrescriptions,
+  getAppointmentPrescriptions,
+  PrescriptionMedication,
+  PrescriptionResponse
+} from '../../features/professional/appointmentsService';
 
 interface AppointmentDetails {
   id: string;
@@ -32,6 +42,8 @@ interface AppointmentDetails {
   important_notes?: string[];
   can_be_cancelled?: boolean;
   email_verified?: boolean;
+  medical_summary?: string;
+  prescriptions?: PrescriptionResponse[];
 }
 
 interface NotificationStatus {
@@ -49,6 +61,19 @@ interface NotificationStatus {
   }>;
 }
 
+interface MedicationForm {
+  medication_name: string;
+  strength: string;
+  form: string;
+  route: string;
+  dosage: string;
+  frequency: string;
+  duration: string;
+  patient_instructions: string;
+  indication: string;
+  generic_name?: string;
+}
+
 const ProfessionalAppointmentDetailPage: React.FC = () => {
   const { appointmentId } = useParams<{ appointmentId: string }>();
   const navigate = useNavigate();
@@ -64,6 +89,22 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
   const [medicalSummary, setMedicalSummary] = useState('');
   const [meetingStartTime, setMeetingStartTime] = useState('');
   const [meetingEndTime, setMeetingEndTime] = useState('');
+  
+  // Prescription state variables
+  const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
+  const [prescriptions, setPrescriptions] = useState<PrescriptionResponse[]>([]);
+  const [isLoadingPrescriptions, setIsLoadingPrescriptions] = useState(false);
+  const [medications, setMedications] = useState<MedicationForm[]>([{
+    medication_name: '',
+    strength: '',
+    form: '',
+    route: '',
+    dosage: '',
+    frequency: '',
+    duration: '',
+    patient_instructions: '',
+    indication: ''
+  }]);
 
   useEffect(() => {
     const loadAppointmentDetails = async () => {
@@ -92,6 +133,11 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
         };
 
         setAppointmentDetails(processedData);
+        
+        // If the appointment is in progress or completed, fetch prescriptions
+        if (processedData.status === 'in_progress' || processedData.status === 'completed') {
+          loadPrescriptions();
+        }
       } catch (err: any) {
         console.error('Failed to load appointment details:', err);
         setError(err.message || 'Failed to load appointment details');
@@ -102,6 +148,34 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
     
     loadAppointmentDetails();
   }, [appointmentId]);
+
+  // Function to load prescriptions
+  const loadPrescriptions = async () => {
+    if (!appointmentId) return;
+    
+    setIsLoadingPrescriptions(true);
+    
+    try {
+      const data = await getAppointmentPrescriptions(appointmentId);
+      console.log('Loaded prescriptions for appointment:', data);
+      
+      // Just store the prescription response as is
+      setPrescriptions([data]);
+      
+      // If we got prescriptions back, also update the appointment details
+      if (appointmentDetails) {
+        setAppointmentDetails({
+          ...appointmentDetails,
+          prescriptions: [data]
+        });
+      }
+    } catch (err: any) {
+      console.error('Failed to load prescriptions:', err);
+      // We don't set the main error here to avoid disrupting the UI if only prescriptions fail
+    } finally {
+      setIsLoadingPrescriptions(false);
+    }
+  };
 
   const processNotificationResponse = (notification: any): NotificationStatus | null => {
     if (!notification) return null;
@@ -159,12 +233,24 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
   const handleCancelAppointment = async () => {
     if (!appointmentId || !appointmentDetails) return;
     
-    const reason = prompt('Please provide a reason for cancellation:');
-    if (reason === null) return;
-    
     setActionLoading('cancel');
     try {
-      const result = await updateAppointmentStatus(appointmentId, 'cancelled', reason);
+      const reason = prompt('Please provide a reason for cancellation (required):');
+      if (reason === null) {
+        // User cancelled the prompt
+        setActionLoading(null);
+        return;
+      }
+      
+      if (!reason.trim()) {
+        // Empty reason provided
+        setError('A cancellation reason is required');
+        setTimeout(() => setError(null), 3000);
+        setActionLoading(null);
+        return;
+      }
+      
+      const result = await cancelAppointment(appointmentId, reason);
       setStatusUpdateSuccess('Appointment cancelled successfully');
       
       if (result.notification) {
@@ -192,7 +278,7 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
     
     setActionLoading('no_show');
     try {
-      const result = await updateAppointmentStatus(appointmentId, 'no_show');
+      const result = await markAppointmentNoShow(appointmentId);
       setStatusUpdateSuccess('Appointment marked as no-show');
       
       if (result.notification) {
@@ -334,12 +420,20 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
     
     setActionLoading('notes');
     try {
-      const updatedAppointment = await updateAppointmentStatus(
+      const result = await addDoctorNotes(
         appointmentId, 
-        appointmentDetails?.status || '', 
         notes
       );
-      setAppointmentDetails(updatedAppointment);
+      
+      // Update the appointment details with the result from the API
+      if (appointmentDetails && result) {
+        setAppointmentDetails({
+          ...appointmentDetails,
+          // Update relevant fields from the API response
+          important_notes: result.important_notes || appointmentDetails.important_notes
+        });
+      }
+      
       setShowNotesModal(false);
       setNotes('');
       setStatusUpdateSuccess('Notes added successfully');
@@ -354,6 +448,108 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
 
   const handleBack = () => {
     navigate('/professional/appointments');
+  };
+
+  // Add a new blank medication form
+  const handleAddMedication = () => {
+    setMedications([...medications, {
+      medication_name: '',
+      strength: '',
+      form: '',
+      route: '',
+      dosage: '',
+      frequency: '',
+      duration: '',
+      patient_instructions: '',
+      indication: ''
+    }]);
+  };
+  
+  // Remove a medication form
+  const handleRemoveMedication = (index: number) => {
+    const updatedMedications = [...medications];
+    updatedMedications.splice(index, 1);
+    setMedications(updatedMedications);
+  };
+  
+  // Update a specific field in a medication form
+  const handleMedicationChange = (index: number, field: keyof MedicationForm, value: string) => {
+    const updatedMedications = [...medications];
+    updatedMedications[index] = {
+      ...updatedMedications[index],
+      [field]: value
+    };
+    setMedications(updatedMedications);
+  };
+  
+  // Open the prescription modal
+  const handleShowPrescriptionModal = () => {
+    setShowPrescriptionModal(true);
+  };
+  
+  // Submit prescriptions
+  const handleSubmitPrescriptions = async () => {
+    if (!appointmentId) return;
+    
+    // Validate medications
+    const invalidMedications = medications.filter(med => 
+      !med.medication_name || !med.strength || !med.form || 
+      !med.route || !med.dosage || !med.frequency || 
+      !med.patient_instructions || !med.indication
+    );
+    
+    if (invalidMedications.length > 0) {
+      setError('Please fill out all required fields for all medications');
+      setTimeout(() => setError(null), 3000);
+      return;
+    }
+    
+    setActionLoading('prescriptions');
+    
+    try {
+      // Map to the expected format
+      const medicationsToSubmit = medications.map(med => ({
+        // Using 0 as a temporary ID since the server will assign the real one
+        id: 0,
+        medication_name: med.medication_name,
+        strength: med.strength,
+        form: med.form,
+        route: med.route,
+        dosage: med.dosage,
+        frequency: med.frequency,
+        duration: med.duration || undefined, // Don't send empty strings
+        patient_instructions: med.patient_instructions,
+        indication: med.indication
+      }));
+      console.log('Medications to submit:', medicationsToSubmit);
+      const result = await addAppointmentPrescriptions(appointmentId, medicationsToSubmit);
+      
+      // Reset the form
+      setMedications([{
+        medication_name: '',
+        strength: '',
+        form: '',
+        route: '',
+        dosage: '',
+        frequency: '',
+        duration: '',
+        patient_instructions: '',
+        indication: ''
+      }]);
+      
+      setShowPrescriptionModal(false);
+      
+      // Reload prescriptions
+      loadPrescriptions();
+      
+      setStatusUpdateSuccess('Prescriptions added successfully');
+      setTimeout(() => setStatusUpdateSuccess(null), 3000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to add prescriptions');
+      setTimeout(() => setError(null), 3000);
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   if (isLoading) {
@@ -712,8 +908,68 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
             </>
           )}
           
+          {/* In Progress Status Actions */}
+          {appointmentDetails.status === 'in_progress' && (
+            <>
+              <button 
+                onClick={handleShowCompletionModal}
+                disabled={actionLoading !== null}
+                className={`px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors ${
+                  actionLoading === 'complete' ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {actionLoading === 'complete' ? 'Completing...' : 'Mark as Completed'}
+              </button>
+              <button 
+                onClick={handleAddNotes}
+                disabled={actionLoading !== null}
+                className={`px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors ${
+                  actionLoading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                Add Notes
+              </button>
+              <button 
+                onClick={handleShowPrescriptionModal}
+                disabled={actionLoading !== null}
+                className={`px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors ${
+                  actionLoading === 'prescriptions' ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {actionLoading === 'prescriptions' ? 'Processing...' : 'Add Prescriptions'}
+              </button>
+            </>
+          )}
+          
+          {/* Completed Status Actions */}
+          {appointmentDetails.status === 'completed' && (
+            <>
+              <button 
+                onClick={handleAddNotes}
+                disabled={actionLoading !== null}
+                className={`px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors ${
+                  actionLoading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                Add Notes
+              </button>
+              <button 
+                onClick={handleShowPrescriptionModal}
+                disabled={actionLoading !== null}
+                className={`px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors ${
+                  actionLoading === 'prescriptions' ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {actionLoading === 'prescriptions' ? 'Processing...' : 'Add Prescriptions'}
+              </button>
+            </>
+          )}
+          
           {/* Other statuses */}
-          {appointmentDetails.status !== 'pending' && appointmentDetails.status !== 'confirmed' && (
+          {appointmentDetails.status !== 'pending' && 
+            appointmentDetails.status !== 'confirmed' && 
+            appointmentDetails.status !== 'in_progress' && 
+            appointmentDetails.status !== 'completed' && (
             <button 
               onClick={handleAddNotes}
               disabled={actionLoading !== null}
@@ -740,6 +996,95 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
           <p className="text-gray-500">No notes recorded</p>
         )}
       </div>
+      
+      {/* Prescriptions */}
+      {(appointmentDetails.status === 'in_progress' || appointmentDetails.status === 'completed') && (
+        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold text-blue-800">Prescriptions</h2>
+            <button
+              onClick={handleShowPrescriptionModal}
+              disabled={actionLoading === 'prescriptions'}
+              className={`px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors text-sm ${
+                actionLoading === 'prescriptions' ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              {actionLoading === 'prescriptions' ? 'Processing...' : 'Add New Prescription'}
+            </button>
+          </div>
+          
+          {isLoadingPrescriptions ? (
+            <div className="text-center py-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-800 mx-auto"></div>
+              <p className="mt-2 text-gray-500">Loading prescriptions...</p>
+            </div>
+          ) : prescriptions && prescriptions.length > 0 ? (
+            <div className="space-y-4">
+              {prescriptions.map((prescription, index) => (
+                <div key={index} className="border rounded-md p-4 bg-purple-50">
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="font-semibold">Prescription for {prescription.patient_name}</h3>
+                    <span className="text-sm text-gray-500">
+                      Prescribed on: {new Date(prescription.appointment_date).toLocaleDateString()}
+                    </span>
+                  </div>
+                  
+                  <div className="mt-2">
+                    <h4 className="font-medium text-gray-700 mb-2">Medications ({prescription.medication_count}):</h4>
+                    {prescription.medications && prescription.medications.map((medication, medIndex) => (
+                      <div key={medIndex} className="bg-white p-3 rounded-md mb-2 shadow-sm">
+                        <div className="flex justify-between">
+                          <h5 className="font-medium">{medication.medication_name}</h5>
+                          <span className="text-sm bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                            {medication.form}
+                          </span>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2 text-sm">
+                          <div>
+                            <span className="font-medium">Strength:</span> {medication.strength}
+                          </div>
+                          <div>
+                            <span className="font-medium">Route:</span> {medication.route}
+                          </div>
+                          <div>
+                            <span className="font-medium">Dosage:</span> {medication.dosage}
+                          </div>
+                          <div>
+                            <span className="font-medium">Frequency:</span> {medication.frequency}
+                          </div>
+                          {medication.duration && (
+                            <div>
+                              <span className="font-medium">Duration:</span> {medication.duration}
+                            </div>
+                          )}
+                          <div className="md:col-span-2">
+                            <span className="font-medium">Indication:</span> {medication.indication}
+                          </div>
+                          <div className="md:col-span-2">
+                            <span className="font-medium">Instructions:</span> {medication.patient_instructions}
+                          </div>
+                          {medication.status && (
+                            <div>
+                              <span className="font-medium">Status:</span> {medication.status_display || medication.status}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="mt-2 text-sm text-gray-500">
+                    Prescribed by: {prescription.doctor_name || 'Doctor'}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500">No prescriptions have been added yet.</p>
+          )}
+        </div>
+      )}
       
       {/* Add Notes Modal */}
       {showNotesModal && (
@@ -840,6 +1185,232 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
                 }`}
               >
                 {actionLoading === 'complete' ? 'Processing...' : 'Submit & Complete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Prescription Modal */}
+      {showPrescriptionModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-bold text-blue-800 mb-4">Add Prescriptions</h3>
+            
+            <div className="mb-4 p-3 bg-blue-50 rounded-md text-sm text-blue-700">
+              <p>
+                <strong>Note:</strong> Please fill out all required information for each medication. The medications will be added to the patient's medical record.
+              </p>
+            </div>
+            
+            <div className="space-y-6">
+              {medications.map((medication, index) => (
+                <div key={index} className="p-4 border rounded-md bg-gray-50">
+                  <div className="flex justify-between items-center mb-3">
+                    <h4 className="font-bold text-gray-700">Medication #{index + 1}</h4>
+                    {medications.length > 1 && (
+                      <button
+                        onClick={() => handleRemoveMedication(index)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Medication Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full border border-gray-300 rounded-md px-3 py-2"
+                        value={medication.medication_name}
+                        onChange={(e) => handleMedicationChange(index, 'medication_name', e.target.value)}
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Strength <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full border border-gray-300 rounded-md px-3 py-2"
+                        placeholder="e.g., 500mg, 10mg/mL"
+                        value={medication.strength}
+                        onChange={(e) => handleMedicationChange(index, 'strength', e.target.value)}
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Form <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        className="w-full border border-gray-300 rounded-md px-3 py-2"
+                        value={medication.form}
+                        onChange={(e) => handleMedicationChange(index, 'form', e.target.value)}
+                        required
+                      >
+                        <option value="">Select form</option>
+                        <option value="tablet">Tablet</option>
+                        <option value="capsule">Capsule</option>
+                        <option value="liquid">Liquid</option>
+                        <option value="injection">Injection</option>
+                        <option value="cream">Cream</option>
+                        <option value="ointment">Ointment</option>
+                        <option value="patch">Patch</option>
+                        <option value="inhaler">Inhaler</option>
+                        <option value="drops">Drops</option>
+                        <option value="spray">Spray</option>
+                        <option value="suppository">Suppository</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Route <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        className="w-full border border-gray-300 rounded-md px-3 py-2"
+                        value={medication.route}
+                        onChange={(e) => handleMedicationChange(index, 'route', e.target.value)}
+                        required
+                      >
+                        <option value="">Select route</option>
+                        <option value="oral">Oral</option>
+                        <option value="topical">Topical</option>
+                        <option value="intravenous">Intravenous (IV)</option>
+                        <option value="intramuscular">Intramuscular (IM)</option>
+                        <option value="subcutaneous">Subcutaneous</option>
+                        <option value="inhalation">Inhalation</option>
+                        <option value="nasal">Nasal</option>
+                        <option value="ophthalmic">Ophthalmic (Eye)</option>
+                        <option value="otic">Otic (Ear)</option>
+                        <option value="rectal">Rectal</option>
+                        <option value="vaginal">Vaginal</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Dosage <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full border border-gray-300 rounded-md px-3 py-2"
+                        placeholder="e.g., 1 tablet, 2 teaspoons"
+                        value={medication.dosage}
+                        onChange={(e) => handleMedicationChange(index, 'dosage', e.target.value)}
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Frequency <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full border border-gray-300 rounded-md px-3 py-2"
+                        placeholder="e.g., twice daily, every 8 hours"
+                        value={medication.frequency}
+                        onChange={(e) => handleMedicationChange(index, 'frequency', e.target.value)}
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Duration
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full border border-gray-300 rounded-md px-3 py-2"
+                        placeholder="e.g., 7 days, 2 weeks"
+                        value={medication.duration}
+                        onChange={(e) => handleMedicationChange(index, 'duration', e.target.value)}
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Indication <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full border border-gray-300 rounded-md px-3 py-2"
+                        placeholder="Reason for prescription"
+                        value={medication.indication}
+                        onChange={(e) => handleMedicationChange(index, 'indication', e.target.value)}
+                        required
+                      />
+                    </div>
+                    
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Patient Instructions <span className="text-red-500">*</span>
+                      </label>
+                      <textarea
+                        className="w-full border border-gray-300 rounded-md px-3 py-2"
+                        rows={2}
+                        placeholder="Instructions for the patient"
+                        value={medication.patient_instructions}
+                        onChange={(e) => handleMedicationChange(index, 'patient_instructions', e.target.value)}
+                        required
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-4">
+              <button
+                onClick={handleAddMedication}
+                className="flex items-center text-blue-600 hover:text-blue-800"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+                </svg>
+                Add Another Medication
+              </button>
+            </div>
+            
+            <div className="flex justify-end gap-2 mt-6">
+              <button
+                onClick={() => {
+                  setShowPrescriptionModal(false);
+                  setMedications([{
+                    medication_name: '',
+                    strength: '',
+                    form: '',
+                    route: '',
+                    dosage: '',
+                    frequency: '',
+                    duration: '',
+                    patient_instructions: '',
+                    indication: ''
+                  }]);
+                }}
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmitPrescriptions}
+                disabled={actionLoading === 'prescriptions'}
+                className={`px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors ${
+                  actionLoading === 'prescriptions' ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {actionLoading === 'prescriptions' ? 'Processing...' : 'Add Prescriptions'}
               </button>
             </div>
           </div>

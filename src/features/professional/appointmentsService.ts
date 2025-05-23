@@ -2,11 +2,71 @@ import { API_BASE_URL } from '../../utils/config';
 
 const AUTH_TOKEN_KEY = 'phb_auth_token';
 
+// Define types for appointment data
+export interface AppointmentSummary {
+  pending_department_count: number;
+  my_appointments_count: {
+    confirmed: number;
+    in_progress: number;
+    completed: number;
+    cancelled: number;
+    no_show: number;
+    total: number;
+  };
+  today_appointments: number;
+  upcoming_appointments: number;
+}
+
+export interface DoctorInfo {
+  id: number;
+  name: string;
+  email: string;
+  specialization: string;
+  department: {
+    id: number;
+    name: string;
+  };
+  hospital: {
+    id: number;
+    name: string;
+  };
+}
+
+export interface AppointmentResponse {
+  pending_department_appointments: any[];
+  my_appointments: {
+    confirmed: any[];
+    in_progress: any[];
+    completed: any[];
+    cancelled: any[];
+    no_show: any[];
+    all: any[];
+  };
+  doctor_info: DoctorInfo;
+  summary: AppointmentSummary;
+}
+
+// Create a basic appointment interface
+export interface Appointment {
+  appointment_id: string;
+  status: string;
+  priority: string;
+  appointment_date: string;
+  [key: string]: any; // Allow other properties
+}
+
 /**
- * Fetch all appointments for the doctor
- * @returns Promise that resolves to an array of appointments
+ * Fetch all appointments for the doctor's department and the doctor's own appointments
+ * @param filters Optional query parameters for filtering
+ * @returns Promise that resolves to the appointment data
  */
-export async function fetchDoctorAppointments() {
+export async function fetchDoctorAppointments(filters?: {
+  status?: string;
+  start_date?: string;
+  end_date?: string;
+  priority?: string;
+  doctor_id?: number;
+}) {
   const token = localStorage.getItem(AUTH_TOKEN_KEY);
   
   if (!token) {
@@ -14,7 +74,20 @@ export async function fetchDoctorAppointments() {
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}/api/doctor-appointments/`, {
+    // Build the query string from filters
+    let queryParams = '';
+    if (filters) {
+      const params = new URLSearchParams();
+      if (filters.status) params.append('status', filters.status);
+      if (filters.start_date) params.append('start_date', filters.start_date);
+      if (filters.end_date) params.append('end_date', filters.end_date);
+      if (filters.priority) params.append('priority', filters.priority);
+      if (filters.doctor_id) params.append('doctor_id', filters.doctor_id.toString());
+      
+      queryParams = `?${params.toString()}`;
+    }
+    
+    const response = await fetch(`${API_BASE_URL}/api/department-pending-appointments/${queryParams}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -27,16 +100,24 @@ export async function fetchDoctorAppointments() {
       throw new Error(errorData.message || `Error fetching appointments: ${response.status}`);
     }
     
-    const rawData = await response.json();
+    const data = await response.json();
     
-    // Log the raw API response to understand its structure
-    console.log('Raw API Response:', rawData);
+    console.log('Raw data:', data);
     
-    // If the response has data in nested structure, extract it
-    const appointments = Array.isArray(rawData) ? rawData : 
-                         rawData.appointments ? rawData.appointments : 
-                         rawData.data ? rawData.data : 
-                         rawData.results ? rawData.results : [];
+    // Check if the response follows the new format
+    if (data.pending_department_appointments !== undefined && 
+        data.my_appointments !== undefined && 
+        data.doctor_info !== undefined) {
+      // Return the complete response for the new format
+      return data as AppointmentResponse;
+    }
+    
+    // If it's still using the old format, transform it to match the expected structure
+    const appointments = Array.isArray(data) ? data : 
+                         data.appointments ? data.appointments : 
+                         data.data ? data.data : 
+                         data.results ? data.results : [];
+    console.log('Appointments:', appointments);
     
     // Log the structure of the first appointment if available
     if (appointments.length > 0) {
@@ -44,7 +125,41 @@ export async function fetchDoctorAppointments() {
       console.log('Available keys in first appointment:', Object.keys(appointments[0]));
     }
     
-    return appointments;
+    // Create a mock structure that matches the new format
+    const mockResponse: AppointmentResponse = {
+      pending_department_appointments: appointments.filter((a: Appointment) => a.status === 'pending'),
+      my_appointments: {
+        confirmed: appointments.filter((a: Appointment) => a.status === 'confirmed'),
+        in_progress: appointments.filter((a: Appointment) => a.status === 'in_progress'),
+        completed: appointments.filter((a: Appointment) => a.status === 'completed'),
+        cancelled: appointments.filter((a: Appointment) => a.status === 'cancelled'),
+        no_show: appointments.filter((a: Appointment) => a.status === 'no_show'),
+        all: appointments
+      },
+      doctor_info: {
+        id: 0,
+        name: '',
+        email: '',
+        specialization: '',
+        department: { id: 0, name: '' },
+        hospital: { id: 0, name: '' }
+      },
+      summary: {
+        pending_department_count: appointments.filter((a: Appointment) => a.status === 'pending').length,
+        my_appointments_count: {
+          confirmed: appointments.filter((a: Appointment) => a.status === 'confirmed').length,
+          in_progress: appointments.filter((a: Appointment) => a.status === 'in_progress').length,
+          completed: appointments.filter((a: Appointment) => a.status === 'completed').length,
+          cancelled: appointments.filter((a: Appointment) => a.status === 'cancelled').length,
+          no_show: appointments.filter((a: Appointment) => a.status === 'no_show').length,
+          total: appointments.length
+        },
+        today_appointments: 0,
+        upcoming_appointments: 0
+      }
+    };
+    
+    return mockResponse;
   } catch (error) {
     console.error('Error fetching doctor appointments:', error);
     throw error;
@@ -125,10 +240,116 @@ export async function fetchDoctorAppointmentDetails(appointmentId: string) {
       processedData.patient_name = `Patient #${processedData.appointment_id.slice(-6)}`;
     }
     
-    console.log("Processed appointment details:", processedData);
     return processedData;
   } catch (error) {
     console.error('Error fetching doctor appointment details:', error);
+    throw error;
+  }
+}
+
+/**
+ * Accept an appointment as a doctor
+ * @param appointmentId The ID of the appointment to accept
+ * @returns Promise that resolves to the updated appointment
+ */
+export async function acceptAppointment(appointmentId: string) {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/accept/`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Error accepting appointment: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('Accepted appointment:', data);
+    return data;
+  } catch (error) {
+    console.error('Error accepting appointment:', error);
+    throw error;
+  }
+}
+
+/**
+ * Start a consultation for an appointment
+ * @param appointmentId The ID of the appointment to start consultation for
+ * @returns Promise that resolves to the updated appointment
+ */
+export async function startConsultation(appointmentId: string) {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/start-consultation/`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Error starting consultation: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('Started consultation:', data);
+    return data;
+  } catch (error) {
+    console.error('Error starting consultation:', error);
+    throw error;
+  }
+}
+
+/**
+ * Complete a consultation for an appointment
+ * @param appointmentId The ID of the appointment to complete consultation for
+ * @param notes The doctor's notes for the consultation
+ * @returns Promise that resolves to the updated appointment
+ */
+export async function completeConsultation(appointmentId: string, notes: string) {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/complete-consultation/`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ notes }),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Error completing consultation: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('Completed consultation:', data);
+    return data;
+  } catch (error) {
+    console.error('Error completing consultation:', error);
     throw error;
   }
 }
@@ -184,7 +405,7 @@ export async function fetchAppointments(viewAsDoctor: boolean = false) {
  */
 export async function updateAppointmentStatus(
   appointmentId: string, 
-  status: 'confirmed' | 'cancelled' | 'completed' | 'rescheduled' | 'no_show', 
+  status: 'confirmed' | 'cancelled' | 'completed' | 'rescheduled' | 'no_show' | 'in_progress', 
   notes?: string,
   medicalSummary?: string
 ) {
@@ -227,15 +448,259 @@ export async function updateAppointmentStatus(
     }
     
     const data = await response.json();
-    
-    // Log notification status if available
-    if (data.notification) {
-      console.log('Notification status:', data.notification);
-    }
-    
     return data;
   } catch (error) {
     console.error('Error updating appointment status:', error);
+    throw error;
+  }
+}
+
+/**
+ * Add notes to an appointment without changing its status
+ * @param appointmentId The ID of the appointment to add notes to
+ * @param notes The doctor's notes to add
+ * @returns Promise that resolves to the updated appointment
+ */
+export async function addDoctorNotes(appointmentId: string, notes: string) {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+  
+  if (!notes || !notes.trim()) {
+    throw new Error('Notes cannot be empty');
+  }
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/add-notes/`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ notes }),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Error adding notes: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('Added notes:', data);
+    return data;
+  } catch (error) {
+    console.error('Error adding doctor notes:', error);
+    throw error;
+  }
+}
+
+/**
+ * Cancel an appointment using the dedicated endpoint
+ * @param appointmentId The ID of the appointment to cancel
+ * @param reason Optional reason for cancellation
+ * @returns Promise that resolves to the updated appointment
+ */
+export async function cancelAppointment(appointmentId: string, reason?: string) {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+  
+  if (!reason || !reason.trim()) {
+    throw new Error('Cancellation reason is required');
+  }
+  
+  try {
+    const requestBody = {
+      cancellation_reason: reason
+    };
+    
+    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/cancel/`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Error cancelling appointment: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('Cancelled appointment:', data);
+    return data;
+  } catch (error) {
+    console.error('Error cancelling appointment:', error);
+    throw error;
+  }
+}
+
+/**
+ * Mark an appointment as no-show using the dedicated endpoint
+ * @param appointmentId The ID of the appointment to mark as no-show
+ * @param notes Optional notes about the no-show
+ * @returns Promise that resolves to the updated appointment
+ */
+export async function markAppointmentNoShow(appointmentId: string, notes?: string) {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+  
+  try {
+    const requestBody: any = {};
+    
+    // Add notes if provided
+    if (notes) {
+      requestBody.notes = notes;
+    }
+    
+    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/no-show/`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Error marking appointment as no-show: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('Marked appointment as no-show:', data);
+    return data;
+  } catch (error) {
+    console.error('Error marking appointment as no-show:', error);
+    throw error;
+  }
+}
+
+/**
+ * Interface for prescription medication
+ */
+export interface PrescriptionMedication {
+  id: number;
+  medication_name: string;
+  generic_name?: string;
+  strength: string;
+  form: string;
+  route: string;
+  dosage: string;
+  frequency: string;
+  duration?: string;
+  patient_instructions: string;
+  indication: string;
+  status?: string;
+  status_display?: string;
+  start_date?: string;
+  end_date?: string;
+  is_ongoing?: boolean;
+  catalog_details?: any;
+  prescribed_by?: number;
+  patient_name?: string;
+  doctor_name?: string;
+  pharmacy_name?: string;
+  prescription_number?: string;
+  refills_authorized?: number;
+  refills_remaining?: number;
+  side_effects_experienced?: string;
+}
+
+/**
+ * Interface for prescription response
+ */
+export interface PrescriptionResponse {
+  status: string;
+  appointment_id: string;
+  patient_name: string;
+  doctor_name: string;
+  appointment_date: string;
+  medication_count: number;
+  medications: PrescriptionMedication[];
+}
+
+/**
+ * Add prescriptions to an appointment
+ * @param appointmentId The ID of the appointment to add prescriptions to
+ * @param medications Array of medications to prescribe
+ * @returns Promise that resolves to the created prescriptions
+ */
+export async function addAppointmentPrescriptions(appointmentId: string, medications: PrescriptionMedication[]) {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+  
+  if (!medications || medications.length === 0) {
+    throw new Error('At least one medication is required');
+  }
+  console.log('medications', medications)
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/prescriptions/`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ medications }),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Error adding prescriptions: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('Added prescriptions:', data);
+    return data;
+  } catch (error) {
+    console.error('Error adding prescriptions:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get prescriptions for an appointment
+ * @param appointmentId The ID of the appointment to get prescriptions for
+ * @returns Promise that resolves to the appointment prescriptions
+ */
+export async function getAppointmentPrescriptions(appointmentId: string) {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/prescriptions/view/`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Error getting prescriptions: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('Retrieved prescriptions:', data);
+    return data;
+  } catch (error) {
+    console.error('Error getting prescriptions:', error);
     throw error;
   }
 } 

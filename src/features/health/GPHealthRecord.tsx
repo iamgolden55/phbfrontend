@@ -7,12 +7,14 @@ import {
   clearMedAccessToken, 
   ERROR_CODES 
 } from './medicalRecordsAuthService';
+import { API_BASE_URL } from '../../utils/config';
 
 // Import the service singleton
 import medicalRecordsService from './medicalRecordsService';
 
 interface RecordType {
   id: string;
+  appointment_id?: string;
   date: string;
   formattedDate?: string;
   provider: string;
@@ -25,57 +27,49 @@ interface RecordType {
   doctorName?: string;
   interactionType?: string;
   patientName?: string;
+  status?: string;
 }
 
-// Sample appointment summaries for demonstration
-const mockAppointments: RecordType[] = [
-  {
-    id: '1',
-    date: '2025-05-07',
-    formattedDate: 'May 07, 2025 at 06:14 PM',
-    provider: 'Dr. Fatima Yusuf',
-    title: 'Emergency Visit',
-    summary: 'Patient presented with headache, fatigue, and mild fever for the past 3 days.',
-    details: 'Temperature: 37.5°C\nBlood Pressure: 130/85 mmHg',
-    type: 'doctorInteraction',
-    hospital: 'St. Nicholas Hospital Lagos',
-    department: 'Emergency',
-    doctorName: 'Dr. Fatima Yusuf',
-    patientName: 'Goldin Eruwa'
-  },
-  {
-    id: '2',
-    date: '2025-04-15',
-    formattedDate: 'April 15, 2025 at 10:30 AM',
-    provider: 'Dr. James Wilson',
-    title: 'Regular Check-up',
-    summary: 'Routine health check-up. Patient in good health.',
-    details: 'Blood pressure normal. Weight stable.',
-    type: 'doctorInteraction',
-    hospital: 'St. Nicholas Hospital Lagos',
-    department: 'General Practice',
-    doctorName: 'Dr. James Wilson',
-    patientName: 'Goldin Eruwa'
-  },
-  {
-    id: '3',
-    date: '2025-03-22',
-    formattedDate: 'March 22, 2025 at 02:15 PM',
-    provider: 'Dr. Sarah Johnson',
-    title: 'Follow-up Appointment',
-    summary: 'Follow-up on previous treatment. Symptoms improving.',
-    details: 'Patient reports improved condition. Medication continued.',
-    type: 'doctorInteraction',
-    hospital: 'St. Nicholas Hospital Lagos',
-    department: 'Internal Medicine',
-    doctorName: 'Dr. Sarah Johnson',
-    patientName: 'Goldin Eruwa'
-  }
-];
+interface AppointmentSummary {
+  appointment_details: {
+    appointment_id: string;
+    doctor: string;
+    date: string;
+    time: string;
+    formatted_date_time: string;
+    hospital: string;
+    department: string;
+    type: string;
+    priority: string;
+    duration: string;
+    status: string;
+  };
+  patient_details: {
+    name: string;
+    chief_complaint: string;
+    symptoms: string;
+    medical_history: string;
+    allergies: string;
+    current_medications: string;
+  };
+  important_notes: string;
+  payment_info: {
+    payment_required: boolean;
+    payment_status: string;
+    is_insurance_based: boolean;
+    insurance_details: any;
+  };
+  additional_info: {
+    notes: string;
+    created_at: string;
+    updated_at: string;
+  };
+}
 
 const GPHealthRecord: React.FC = () => {
   const { user, isLoading, error: authError, hasPrimaryHospital, primaryHospital, checkPrimaryHospital } = useAuth();
   const [selectedRecord, setSelectedRecord] = useState<RecordType | null>(null);
+  const [selectedSummary, setSelectedSummary] = useState<AppointmentSummary | null>(null);
   const [activeTab, setActiveTab] = useState<'appointment' | 'complete'>('appointment');
   
   // Add state for medical record access
@@ -84,24 +78,21 @@ const GPHealthRecord: React.FC = () => {
   const [accessExpiry, setAccessExpiry] = useState<Date | null>(null);
   
   // Add state for doctor interactions (appointments)
-  const [appointments, setAppointments] = useState<RecordType[]>(mockAppointments);
+  const [appointments, setAppointments] = useState<RecordType[]>([]);
   const [isLoadingAppointments, setIsLoadingAppointments] = useState<boolean>(false);
   const [appointmentsError, setAppointmentsError] = useState<string | null>(null);
+  const [isFetchingSummary, setIsFetchingSummary] = useState<boolean>(false);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
 
   // Load data when component mounts
   useEffect(() => {
     // For appointment summaries, we don't need OTP verification
     // so we can fetch them right away
-    fetchAppointmentSummaries();
+    fetchUserAppointments();
     
     // For complete medical records access,
     // we'd need to check for OTP verification
     checkMedicalRecordsAccess();
-    
-    // Select the first record by default
-    if (appointments.length > 0 && !selectedRecord) {
-      setSelectedRecord(appointments[0]);
-    }
   }, []);
 
   // Check if we have medical records access
@@ -123,32 +114,108 @@ const GPHealthRecord: React.FC = () => {
     }
   };
   
-  // Fetch appointment summaries
-  const fetchAppointmentSummaries = async () => {
+  // Fetch user's appointments from the API
+  const fetchUserAppointments = async () => {
     setIsLoadingAppointments(true);
     setAppointmentsError(null);
     
     try {
-      // In a real implementation, this would be an API call
-      // For now, we'll use the mock data
-      setAppointments(mockAppointments);
-      
-      if (mockAppointments.length > 0 && !selectedRecord) {
-        setSelectedRecord(mockAppointments[0]);
+      const token = localStorage.getItem('phb_auth_token');
+      if (!token) {
+        throw new Error('No authentication token found');
       }
       
-      // We successfully got appointment summaries
+      // Fetch appointments from the regular API endpoint
+      const response = await fetch(`${API_BASE_URL}api/appointments/`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch appointments: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      // Process the appointments data to match our RecordType interface
+      const processedAppointments = data.map((appointment: any) => ({
+        id: appointment.id.toString(),
+        appointment_id: appointment.appointment_id,
+        date: appointment.appointment_date,
+        formattedDate: appointment.formatted_date_time || `${appointment.formatted_date} at ${appointment.formatted_time}`,
+        provider: appointment.doctor_full_name || appointment.doctor_name || 'Unknown Doctor',
+        title: appointment.formatted_appointment_type || 'Appointment',
+        summary: appointment.chief_complaint || 'No complaint recorded',
+        hospital: appointment.hospital_name || 'Unknown Hospital',
+        department: appointment.department_name || 'Unknown Department',
+        doctorName: appointment.doctor_full_name || appointment.doctor_name || 'Unknown Doctor',
+        patientName: user?.full_name || user?.email || 'Patient',
+        type: 'doctorInteraction',
+        status: appointment.status
+      }));
+      
+      // Filter to only show completed appointments
+      const completedAppointments = processedAppointments.filter(
+        (appointment: any) => appointment.status === 'completed'
+      );
+      
+      setAppointments(completedAppointments);
+      
+      // Select the first appointment by default if we have any
+      if (completedAppointments.length > 0) {
+        setSelectedRecord(completedAppointments[0]);
+        // Fetch the summary for the first appointment
+        fetchAppointmentSummary(completedAppointments[0].appointment_id);
+      }
+      
+      // Authorized to view appointments
       setAccessState('authorized');
       
-      // Set a dummy expiry time for UI display
+      // Set expiry time for UI display
       const expiryTime = new Date();
-      expiryTime.setMinutes(expiryTime.getMinutes() + 30); 
+      expiryTime.setMinutes(expiryTime.getMinutes() + 30);
       setAccessExpiry(expiryTime);
-    } catch (err) {
-      console.error('Error fetching appointment summaries:', err);
-      setAppointmentsError('An unexpected error occurred while fetching appointment summaries');
+    } catch (err: any) {
+      console.error('Error fetching appointments:', err);
+      setAppointmentsError(err.message || 'An unexpected error occurred while fetching appointments');
     } finally {
       setIsLoadingAppointments(false);
+    }
+  };
+  
+  // Fetch detailed summary for a specific appointment
+  const fetchAppointmentSummary = async (appointmentId?: string) => {
+    if (!appointmentId) return;
+    
+    setIsFetchingSummary(true);
+    setSummaryError(null);
+    
+    try {
+      const token = localStorage.getItem('phb_auth_token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+      
+      const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/summary/`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch appointment summary: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setSelectedSummary(data);
+    } catch (err: any) {
+      console.error('Error fetching appointment summary:', err);
+      setSummaryError(err.message || 'An error occurred while fetching the appointment summary');
+    } finally {
+      setIsFetchingSummary(false);
     }
   };
 
@@ -163,6 +230,15 @@ const GPHealthRecord: React.FC = () => {
   const handleCancelVerification = () => {
     // Just show a message instead of the verification form
     setAccessState('need_auth');
+  };
+  
+  // Handle selecting an appointment from the list
+  const handleSelectAppointment = (record: RecordType) => {
+    setSelectedRecord(record);
+    setSelectedSummary(null); // Clear the previous summary
+    if (record.appointment_id) {
+      fetchAppointmentSummary(record.appointment_id);
+    }
   };
 
   // Format date in human-readable form
@@ -300,7 +376,7 @@ const GPHealthRecord: React.FC = () => {
                   {/* Left Column - List of Appointments */}
                   <div className="col-span-1">
                     <div className="bg-white shadow-sm rounded-lg p-4 mb-4">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Appointment Summaries</h3>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Completed Appointments</h3>
                       
                       {accessState === 'authorized' ? (
                         <div className="bg-green-50 flex justify-between items-center px-3 py-2 rounded-md mb-4">
@@ -318,14 +394,14 @@ const GPHealthRecord: React.FC = () => {
                         </div>
                       ) : appointments.length === 0 ? (
                         <div className="bg-gray-50 text-gray-600 p-3 rounded-md">
-                          No appointment summaries available.
+                          No completed appointments available.
                         </div>
                       ) : (
                         <div className="space-y-3">
                           {appointments.map(record => (
                             <div
                               key={record.id}
-                              onClick={() => setSelectedRecord(record)}
+                              onClick={() => handleSelectAppointment(record)}
                               className={`p-3 rounded-md cursor-pointer border ${
                                 selectedRecord?.id === record.id
                                   ? 'border-blue-300 bg-blue-50'
@@ -340,9 +416,9 @@ const GPHealthRecord: React.FC = () => {
                                 </div>
                                 <div className="flex-1">
                                   <p className="text-xs text-gray-500">{record.formattedDate || formatDate(record.date)}</p>
-                                  <p className="font-medium text-sm">Patient: {record.patientName}</p>
+                                  <p className="font-medium text-sm">{record.title}</p>
                                   <div className="text-sm text-gray-600">
-                                    {record.provider} - {record.hospital}
+                                    {record.doctorName} - {record.hospital}
                                   </div>
                                 </div>
                               </div>
@@ -355,16 +431,28 @@ const GPHealthRecord: React.FC = () => {
 
                   {/* Right Column - Appointment Details */}
                   <div className="col-span-1 lg:col-span-2">
-                    {selectedRecord ? (
+                    {isFetchingSummary ? (
+                      <div className="bg-white shadow-sm rounded-lg p-6 flex justify-center items-center">
+                        <div className="animate-spin h-6 w-6 border-2 border-blue-500 border-t-transparent rounded-full mr-2"></div>
+                        <p className="text-gray-600">Loading appointment summary...</p>
+                      </div>
+                    ) : summaryError ? (
+                      <div className="bg-white shadow-sm rounded-lg p-6">
+                        <div className="bg-red-50 text-red-700 p-3 rounded-md mb-4">
+                          {summaryError}
+                        </div>
+                        <p className="text-gray-600">Unable to load appointment summary. Please try again later.</p>
+                      </div>
+                    ) : selectedRecord && selectedSummary ? (
                       <div className="bg-white shadow-sm rounded-lg overflow-hidden">
                         <div className="p-6">
                           <div className="flex justify-between">
                             <div>
                               <div className="text-xs text-gray-500 mb-1">
-                                HPN Number: UNK 530 796 6405
+                                Appointment ID: {selectedRecord.appointment_id}
                               </div>
                               <div className="text-xs text-gray-500">
-                                Primary Hospital: {selectedRecord.hospital}
+                                Hospital: {selectedSummary.appointment_details.hospital}
                               </div>
                             </div>
                             <div className="bg-green-50 px-3 py-1 rounded-md">
@@ -375,43 +463,81 @@ const GPHealthRecord: React.FC = () => {
                           </div>
 
                           <div className="mt-6">
-                            <h3 className="text-lg font-semibold mb-4">Summary Details</h3>
+                            <h3 className="text-lg font-semibold mb-4">Appointment Summary</h3>
                             <div className="bg-gray-50 rounded-lg p-4">
-                              <h4 className="text-xl font-medium mb-4">Appointment Summary</h4>
+                              <h4 className="text-xl font-medium mb-4">Consultation Details</h4>
                               
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                 <div>
-                                  <p className="text-sm text-gray-500">Date</p>
+                                  <p className="text-sm text-gray-500">Date & Time</p>
                                   <p className="font-medium">
-                                    {selectedRecord.formattedDate || formatDate(selectedRecord.date)}
+                                    {selectedSummary.appointment_details.formatted_date_time}
                                   </p>
                                 </div>
                                 <div>
                                   <p className="text-sm text-gray-500">Doctor</p>
-                                  <p className="font-medium">{selectedRecord.provider}</p>
+                                  <p className="font-medium">{selectedSummary.appointment_details.doctor}</p>
                                 </div>
                                 <div>
                                   <p className="text-sm text-gray-500">Hospital</p>
-                                  <p className="font-medium">{selectedRecord.hospital}</p>
+                                  <p className="font-medium">{selectedSummary.appointment_details.hospital}</p>
                                 </div>
                                 <div>
                                   <p className="text-sm text-gray-500">Department</p>
-                                  <p className="font-medium">{selectedRecord.department}</p>
+                                  <p className="font-medium">{selectedSummary.appointment_details.department}</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-500">Type</p>
+                                  <p className="font-medium">{selectedSummary.appointment_details.type}</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-500">Duration</p>
+                                  <p className="font-medium">{selectedSummary.appointment_details.duration}</p>
                                 </div>
                               </div>
                               
                               <h4 className="font-medium mb-2">Medical Summary</h4>
                               <div className="bg-white p-4 rounded-md">
-                                <p className="font-medium mb-2">Patient: {selectedRecord.patientName}</p>
+                                <p className="font-medium mb-2">Patient: {selectedSummary.patient_details.name}</p>
                                 
                                 <p className="font-medium mt-4 mb-2">Presenting Complaint:</p>
-                                <p className="text-gray-700">{selectedRecord.summary}</p>
+                                <p className="text-gray-700">{selectedSummary.patient_details.chief_complaint}</p>
                                 
-                                <p className="font-medium mt-4 mb-2">Examination:</p>
-                                <p className="text-gray-700">
-                                  - Temperature: 37.5°C<br />
-                                  - Blood Pressure: 130/85 mmHg
-                                </p>
+                                {selectedSummary.patient_details.symptoms && (
+                                  <>
+                                    <p className="font-medium mt-4 mb-2">Symptoms:</p>
+                                    <p className="text-gray-700">
+                                      {selectedSummary.patient_details.symptoms}
+                                    </p>
+                                  </>
+                                )}
+
+                                {selectedSummary.additional_info?.notes && (
+                                  <>
+                                    <p className="font-medium mt-4 mb-2">Doctor's Notes:</p>
+                                    <p className="text-gray-700 whitespace-pre-line">
+                                      {selectedSummary.additional_info.notes}
+                                    </p>
+                                  </>
+                                )}
+                                
+                                {selectedSummary.patient_details.current_medications && (
+                                  <>
+                                    <p className="font-medium mt-4 mb-2">Current Medications:</p>
+                                    <p className="text-gray-700">
+                                      {selectedSummary.patient_details.current_medications}
+                                    </p>
+                                  </>
+                                )}
+                                
+                                {selectedSummary.patient_details.allergies && (
+                                  <>
+                                    <p className="font-medium mt-4 mb-2">Allergies:</p>
+                                    <p className="text-gray-700">
+                                      {selectedSummary.patient_details.allergies}
+                                    </p>
+                                  </>
+                                )}
                               </div>
                             </div>
                           </div>

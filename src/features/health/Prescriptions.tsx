@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../auth/authContext';
 import { Link } from 'react-router-dom';
 import AccountHealthLayout from '../../layouts/AccountHealthLayout';
+import { fetchPatientPrescriptions, orderPrescription, completePrescription, ApiMedication, ApiPrescriptionsResponse } from './prescriptionsService';
 
 interface PrescriptionType {
   id: string;
@@ -9,10 +10,16 @@ interface PrescriptionType {
   dosage: string;
   prescribed: string;
   lastDispensed: string;
-  nextDue: string;
-  remainingRepeats: number;
-  status: 'active' | 'ordered' | 'dispensed' | 'expired' | 'cancelled';
   prescriber: string;
+  status: 'active' | 'collected' | 'completed' | 'expired';
+  form?: string;
+  route?: string;
+  frequency?: string;
+  duration?: string;
+  patient_instructions?: string;
+  indication?: string;
+  strength?: string;
+  generic_name?: string;
 }
 
 interface NotificationType {
@@ -22,109 +29,131 @@ interface NotificationType {
   date: string;
 }
 
-// Sample prescriptions for demonstration
-const mockPrescriptions: PrescriptionType[] = [
-  {
-    id: 'p1',
-    medication: 'Cetirizine 10mg tablets',
-    dosage: 'One tablet once a day',
-    prescribed: '2023-09-15',
-    lastDispensed: '2023-10-01',
-    nextDue: '2023-11-01',
-    remainingRepeats: 3,
-    status: 'active',
-    prescriber: 'Dr. Michael Brown'
-  },
-  {
-    id: 'p2',
-    medication: 'Salbutamol 100mcg inhaler',
-    dosage: 'One or two puffs up to four times a day when required',
-    prescribed: '2023-08-22',
-    lastDispensed: '2023-09-01',
-    nextDue: '2023-10-15',
-    remainingRepeats: 5,
-    status: 'active',
-    prescriber: 'Dr. Sarah Johnson'
-  },
-  {
-    id: 'p3',
-    medication: 'Omeprazole 20mg capsules',
-    dosage: 'One capsule once a day',
-    prescribed: '2023-10-05',
-    lastDispensed: '2023-10-07',
-    nextDue: '2023-11-07',
-    remainingRepeats: 2,
-    status: 'ordered',
-    prescriber: 'Dr. Michael Brown'
-  },
-  {
-    id: 'p4',
-    medication: 'Amoxicillin 500mg capsules',
-    dosage: 'One capsule three times a day',
-    prescribed: '2023-07-10',
-    lastDispensed: '2023-07-10',
-    nextDue: '-',
-    remainingRepeats: 0,
-    status: 'expired',
-    prescriber: 'Dr. James Wilson'
-  },
-  {
-    id: 'p5',
-    medication: 'Ibuprofen 400mg tablets',
-    dosage: 'One tablet up to three times a day',
-    prescribed: '2023-10-10',
-    lastDispensed: '2023-10-12',
-    nextDue: '2023-11-12',
-    remainingRepeats: 0,
-    status: 'dispensed',
-    prescriber: 'Dr. Sarah Johnson'
-  },
-];
-
 // Sample notifications
 const mockNotifications: NotificationType[] = [
   {
     id: 'n1',
     type: 'success',
-    message: 'Your prescription for Omeprazole 20mg has been ordered and will be ready for collection soon.',
+    message: 'Your prescription for Omeprazole 20mg has been collected and is ready for use.',
     date: '2023-10-06'
   },
   {
     id: 'n2',
     type: 'info',
-    message: 'Your Cetirizine prescription will be due for renewal in 14 days.',
+    message: 'Your Cetirizine prescription will be dispensed at your next appointment.',
     date: '2023-10-18'
   },
 ];
 
 const Prescriptions: React.FC = () => {
   const { user } = useAuth();
-  const [view, setView] = useState<'all' | 'active' | 'ordered' | 'history'>('active');
+  const [view, setView] = useState<'all' | 'active' | 'inProgress' | 'history'>('active');
   const [selectedPrescription, setSelectedPrescription] = useState<PrescriptionType | null>(null);
-  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [showCollectModal, setShowCollectModal] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [prescriptions, setPrescriptions] = useState<PrescriptionType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadPrescriptions = async () => {
+      setIsLoading(true);
+      try {
+        const data = await fetchPatientPrescriptions();
+        console.log('Fetched prescriptions:', data);
+        
+        // Process the API response - only use medications array from the response
+        const apiPrescriptions = data.medications || [];
+        console.log('API prescriptions:', apiPrescriptions);
+        
+        // Convert API format to our component format
+        const formattedPrescriptions: PrescriptionType[] = apiPrescriptions.map((apiMed: ApiMedication) => {
+          // Get creation date safely
+          const creationDateStr = apiMed.created_at || new Date().toISOString();
+          const creationDate = new Date(creationDateStr);
+          
+          // Safely extract date part or use a fallback
+          const prescribedDate = apiMed.created_at ? apiMed.created_at.split('T')[0] : new Date().toISOString().split('T')[0];
+          
+          let status: 'active' | 'collected' | 'completed' | 'expired';
+          if (apiMed.status === 'expired') {
+            status = 'expired';
+          } else if (apiMed.status === 'dispensed' || apiMed.status === 'ordered') {
+            status = 'collected';
+          } else if (apiMed.status === 'completed') {
+            status = 'completed';
+          } else {
+            status = 'active';
+          }
+
+          // Get the prescriber name safely
+          const prescriber = apiMed.prescriber_name || 
+                          // @ts-ignore - doctor_name is added to the interface
+                          apiMed.doctor_name || 
+                          'Your Doctor';
+          
+          return {
+            id: apiMed.id || String(Math.random()),
+            medication: `${apiMed.medication_name || 'Unknown'} ${apiMed.strength || ''}`.trim(),
+            dosage: `${apiMed.dosage || 'As directed'}, ${apiMed.frequency || 'as needed'}${apiMed.duration ? `, for ${apiMed.duration}` : ''}`,
+            prescribed: prescribedDate,
+            lastDispensed: prescribedDate, // Assuming dispensed on creation for demo
+            status: status,
+            prescriber: prescriber,
+            // Save original API fields for detail view
+            form: apiMed.form,
+            route: apiMed.route,
+            frequency: apiMed.frequency,
+            duration: apiMed.duration,
+            patient_instructions: apiMed.patient_instructions,
+            indication: apiMed.indication,
+            strength: apiMed.strength,
+            generic_name: apiMed.generic_name
+          };
+        });
+        console.log('Formatted prescriptions:', formattedPrescriptions);
+        setPrescriptions(formattedPrescriptions);
+      } catch (err: any) {
+        console.error('Failed to load prescriptions:', err);
+        setError(err.message || 'Failed to load prescriptions');
+        
+        // Fallback to empty array if API fails
+        setPrescriptions([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadPrescriptions();
+  }, []);
 
   // Filter prescriptions based on current view
-  const filteredPrescriptions = mockPrescriptions.filter(prescription => {
+  const filteredPrescriptions = prescriptions.filter(prescription => {
     if (view === 'all') return true;
     if (view === 'active') return prescription.status === 'active';
-    if (view === 'ordered') return prescription.status === 'ordered' || prescription.status === 'dispensed';
-    if (view === 'history') return prescription.status === 'expired' || prescription.status === 'cancelled';
+    if (view === 'inProgress') return prescription.status === 'collected';
+    if (view === 'history') return prescription.status === 'completed' || prescription.status === 'expired';
     return true;
   });
 
   const formatDate = (dateString: string) => {
     if (dateString === '-') return '-';
-    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('en-GB', options);
+    try {
+      const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+      return new Date(dateString).toLocaleDateString('en-GB', options);
+    } catch (e) {
+      return dateString;
+    }
   };
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'active': return 'Ready to order';
-      case 'ordered': return 'Processing';
-      case 'dispensed': return 'Ready for collection';
+      case 'active': return 'Ready to collect';
+      case 'collected': return 'Collected';
+      case 'completed': return 'Completed';
       case 'expired': return 'Expired';
-      case 'cancelled': return 'Cancelled';
       default: return status;
     }
   };
@@ -132,25 +161,87 @@ const Prescriptions: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'text-green-600 bg-green-50';
-      case 'ordered': return 'text-blue-600 bg-blue-50';
-      case 'dispensed': return 'text-purple-600 bg-purple-50';
+      case 'collected': return 'text-blue-600 bg-blue-50';
+      case 'completed': return 'text-purple-600 bg-purple-50';
       case 'expired': return 'text-gray-600 bg-gray-50';
-      case 'cancelled': return 'text-red-600 bg-red-50';
       default: return 'text-gray-600 bg-gray-50';
     }
   };
 
-  // Handle prescription order
-  const handleOrderPrescription = (prescription: PrescriptionType) => {
+  // Handle prescription collection
+  const handleCollectPrescription = (prescription: PrescriptionType) => {
     setSelectedPrescription(prescription);
-    setShowOrderModal(true);
+    setShowCollectModal(true);
   };
 
-  // Simplified mock order submission
-  const submitOrder = () => {
-    console.log('Order submitted for:', selectedPrescription?.medication);
-    setShowOrderModal(false);
-    // In a real app, this would update the prescription status and trigger API calls
+  // Handle prescription completion
+  const handleCompletePrescription = (prescription: PrescriptionType) => {
+    setSelectedPrescription(prescription);
+    setShowCompleteModal(true);
+  };
+
+  // Handle view prescription details
+  const handleViewPrescriptionDetails = (prescription: PrescriptionType) => {
+    setSelectedPrescription(prescription);
+    setShowDetailModal(true);
+  };
+
+  // Submit collect using the service
+  const submitCollect = async () => {
+    if (!selectedPrescription) return;
+    
+    try {
+      setIsLoading(true);
+      // Call the orderPrescription function
+      const result = await orderPrescription(selectedPrescription.id);
+      
+      // Update the prescription status locally
+      setPrescriptions(prescriptions.map(p => 
+        p.id === selectedPrescription.id 
+          ? { 
+              ...p, 
+              status: 'collected',
+              lastDispensed: new Date().toISOString().split('T')[0] 
+            } 
+          : p
+      ));
+      
+      setShowCollectModal(false);
+      setActionSuccess(`Your ${selectedPrescription.medication} has been marked as purchased successfully.`);
+      setTimeout(() => setActionSuccess(null), 5000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to purchase prescription');
+      setTimeout(() => setError(null), 5000);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Submit completion
+  const submitComplete = async () => {
+    if (!selectedPrescription) return;
+    
+    try {
+      setIsLoading(true);
+      // Use the completePrescription function
+      const result = await completePrescription(selectedPrescription.id);
+      
+      // Update the prescription status locally
+      setPrescriptions(prescriptions.map(p => 
+        p.id === selectedPrescription.id 
+          ? { ...p, status: 'completed' } 
+          : p
+      ));
+      
+      setShowCompleteModal(false);
+      setActionSuccess(`Your ${selectedPrescription.medication} has been marked as completed successfully.`);
+      setTimeout(() => setActionSuccess(null), 5000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to complete prescription');
+      setTimeout(() => setError(null), 5000);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -163,8 +254,32 @@ const Prescriptions: React.FC = () => {
           </div>
         </div>
 
+        {/* Error message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-md">
+            <p className="font-medium">Error</p>
+            <p className="text-sm">{error}</p>
+          </div>
+        )}
+
+        {/* Success message */}
+        {actionSuccess && (
+          <div className="mb-6 p-4 bg-green-50 text-green-700 rounded-md">
+            <p className="font-medium">Success</p>
+            <p className="text-sm">{actionSuccess}</p>
+          </div>
+        )}
+
+        {/* Loading indicator */}
+        {isLoading && (
+          <div className="mb-6 text-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading your prescriptions...</p>
+          </div>
+        )}
+
         {/* Notifications */}
-        {mockNotifications.length > 0 && (
+        {!isLoading && mockNotifications.length > 0 && (
           <div className="mb-6">
             <h3 className="font-bold mb-3">Notifications</h3>
             <div className="space-y-3">
@@ -214,12 +329,12 @@ const Prescriptions: React.FC = () => {
                     : 'border-b-2 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                 }`}
               >
-                Ready to order
+                Active
               </button>
               <button
-                onClick={() => setView('ordered')}
+                onClick={() => setView('inProgress')}
                 className={`whitespace-nowrap pb-3 px-1 text-sm font-medium ${
-                  view === 'ordered'
+                  view === 'inProgress'
                     ? 'border-b-2 border-[#005eb8] text-[#005eb8]'
                     : 'border-b-2 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                 }`}
@@ -264,13 +379,10 @@ const Prescriptions: React.FC = () => {
                       Last dispensed
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Next due
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Repeats
+                      Doctor
                     </th>
                     <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Action
@@ -279,7 +391,11 @@ const Prescriptions: React.FC = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredPrescriptions.map((prescription) => (
-                    <tr key={prescription.id} className="hover:bg-gray-50">
+                    <tr 
+                      key={prescription.id} 
+                      className="hover:bg-gray-50 cursor-pointer"
+                      onClick={() => handleViewPrescriptionDetails(prescription)}
+                    >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div>
@@ -292,32 +408,32 @@ const Prescriptions: React.FC = () => {
                         <div className="text-sm text-gray-900">{formatDate(prescription.lastDispensed)}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{formatDate(prescription.nextDue)}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(prescription.status)}`}>
                           {getStatusLabel(prescription.status)}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {prescription.remainingRepeats}
+                        {prescription.prescriber}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" onClick={(e) => e.stopPropagation()}>
                         {prescription.status === 'active' && (
                           <button
-                            onClick={() => handleOrderPrescription(prescription)}
+                            onClick={() => handleCollectPrescription(prescription)}
                             className="text-[#005eb8] hover:text-[#003f7e]"
                           >
-                            Order
+                            Purchased
                           </button>
                         )}
-                        {(prescription.status === 'ordered' || prescription.status === 'dispensed') && (
-                          <span className="text-gray-500 cursor-not-allowed">Ordered</span>
+                        {prescription.status === 'collected' && (
+                          <button
+                            onClick={() => handleCompletePrescription(prescription)}
+                            className="text-[#005eb8] hover:text-[#003f7e]"
+                          >
+                            Complete
+                          </button>
                         )}
-                        {prescription.status === 'expired' && prescription.remainingRepeats === 0 && (
-                          <Link to="/account/request-prescription" className="text-[#005eb8] hover:text-[#003f7e]">
-                            Request renewal
-                          </Link>
+                        {(prescription.status === 'completed' || prescription.status === 'expired') && (
+                          <span className="text-gray-500 cursor-not-allowed">-</span>
                         )}
                       </td>
                     </tr>
@@ -339,9 +455,9 @@ const Prescriptions: React.FC = () => {
         {/* Additional information */}
         <div className="space-y-6">
           <div className="bg-blue-50 p-4 rounded-md">
-            <h3 className="font-bold text-blue-800 mb-2">Order or view your prescriptions online</h3>
+            <h3 className="font-bold text-blue-800 mb-2">View and manage your prescriptions online</h3>
             <p className="text-blue-700 text-sm">
-              You can order repeat prescriptions, view your prescription history, and check the status of your prescriptions online.
+              You can manage your prescriptions, view your prescription history, and track the status of your prescriptions online.
               Your GP practice or pharmacy can answer questions about your prescription medications.
             </p>
           </div>
@@ -369,35 +485,224 @@ const Prescriptions: React.FC = () => {
           </div>
         </div>
 
-        {/* Order modal */}
-        {showOrderModal && selectedPrescription && (
+        {/* Collect modal */}
+        {showCollectModal && selectedPrescription && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg max-w-md w-full p-6">
-              <h3 className="text-lg font-bold mb-4">Order prescription</h3>
+              <h3 className="text-lg font-bold mb-4">Collect Prescription</h3>
               <p className="mb-4">
-                You are about to order:
+                You are about to mark this prescription as collected:
               </p>
               <div className="bg-gray-50 p-3 rounded-md mb-4">
                 <p className="font-bold">{selectedPrescription.medication}</p>
                 <p className="text-sm text-gray-600">{selectedPrescription.dosage}</p>
+                <p className="text-sm text-gray-600 mt-1">Prescribed by: {selectedPrescription.prescriber}</p>
               </div>
               <p className="text-sm text-gray-600 mb-6">
-                This will be sent to your nominated pharmacy for dispensing.
-                You will be notified when your prescription is ready for collection.
+                This action indicates you have collected the medication from your pharmacy and it is now in your possession.
               </p>
 
               <div className="flex justify-end gap-3">
                 <button
-                  onClick={() => setShowOrderModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                  onClick={() => setShowCollectModal(false)}
+                  disabled={isLoading}
+                  className={`px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 ${
+                    isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={submitOrder}
-                  className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e]"
+                  onClick={submitCollect}
+                  disabled={isLoading}
+                  className={`px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e] ${
+                    isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 >
-                  Confirm order
+                  {isLoading ? (
+                    <>
+                      <span className="inline-block animate-spin mr-2">⟳</span>
+                      Processing...
+                    </>
+                  ) : (
+                    'Confirm Purchase'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Complete modal */}
+        {showCompleteModal && selectedPrescription && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg max-w-md w-full p-6">
+              <h3 className="text-lg font-bold mb-4">Complete Prescription</h3>
+              <p className="mb-4">
+                You are about to mark this prescription as completed:
+              </p>
+              <div className="bg-gray-50 p-3 rounded-md mb-4">
+                <p className="font-bold">{selectedPrescription.medication}</p>
+                <p className="text-sm text-gray-600">{selectedPrescription.dosage}</p>
+                <p className="text-sm text-gray-600 mt-1">Prescribed by: {selectedPrescription.prescriber}</p>
+              </div>
+              <p className="text-sm text-gray-600 mb-6">
+                This action indicates you have finished the prescribed course of medication. The prescription will be moved to your history.
+              </p>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowCompleteModal(false)}
+                  disabled={isLoading}
+                  className={`px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 ${
+                    isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={submitComplete}
+                  disabled={isLoading}
+                  className={`px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e] ${
+                    isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  {isLoading ? (
+                    <>
+                      <span className="inline-block animate-spin mr-2">⟳</span>
+                      Processing...
+                    </>
+                  ) : (
+                    'Confirm Completion'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Prescription detail modal */}
+        {showDetailModal && selectedPrescription && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold text-blue-800">Prescription Details</h3>
+                <button 
+                  onClick={() => setShowDetailModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Prescription summary */}
+              <div className="bg-blue-50 p-4 rounded-md mb-6">
+                <h4 className="font-bold text-blue-800 mb-2">{selectedPrescription.medication}</h4>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <span className="font-medium">Status:</span>{' '}
+                    <span className={`px-2 py-0.5 rounded-full ${getStatusColor(selectedPrescription.status)}`}>
+                      {getStatusLabel(selectedPrescription.status)}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-medium">Prescribed by:</span> {selectedPrescription.prescriber}
+                  </div>
+                  <div>
+                    <span className="font-medium">Prescribed:</span> {formatDate(selectedPrescription.prescribed)}
+                  </div>
+                  <div>
+                    <span className="font-medium">Last dispensed:</span> {formatDate(selectedPrescription.lastDispensed)}
+                  </div>
+                </div>
+              </div>
+
+              {/* Medication details */}
+              <div className="mb-6">
+                <h4 className="font-bold mb-3 text-gray-700">Medication Details</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-md">
+                  <div>
+                    <p className="text-sm text-gray-500">Medication Name</p>
+                    <p className="font-medium">{selectedPrescription.medication}</p>
+                  </div>
+                  {selectedPrescription.generic_name && (
+                    <div>
+                      <p className="text-sm text-gray-500">Generic Name</p>
+                      <p className="font-medium">{selectedPrescription.generic_name}</p>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm text-gray-500">Strength</p>
+                    <p className="font-medium">{selectedPrescription.strength}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Form</p>
+                    <p className="font-medium capitalize">{selectedPrescription.form}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Route</p>
+                    <p className="font-medium capitalize">{selectedPrescription.route}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Dosage</p>
+                    <p className="font-medium">{selectedPrescription.dosage}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Frequency</p>
+                    <p className="font-medium">{selectedPrescription.frequency}</p>
+                  </div>
+                  {selectedPrescription.duration && (
+                    <div>
+                      <p className="text-sm text-gray-500">Duration</p>
+                      <p className="font-medium">{selectedPrescription.duration}</p>
+                    </div>
+                  )}
+                  {selectedPrescription.indication && (
+                    <div className="md:col-span-2">
+                      <p className="text-sm text-gray-500">Indication</p>
+                      <p className="font-medium">{selectedPrescription.indication}</p>
+                    </div>
+                  )}
+                  {selectedPrescription.patient_instructions && (
+                    <div className="md:col-span-2">
+                      <p className="text-sm text-gray-500">Instructions</p>
+                      <p className="font-medium">{selectedPrescription.patient_instructions}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex justify-end gap-3 mt-6">
+                {selectedPrescription.status === 'active' && (
+                  <button
+                    onClick={() => {
+                      setShowDetailModal(false);
+                      setShowCollectModal(true);
+                    }}
+                    className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e]"
+                  >
+                    Collect
+                  </button>
+                )}
+                {selectedPrescription.status === 'collected' && (
+                  <button
+                    onClick={() => {
+                      setShowDetailModal(false);
+                      setShowCompleteModal(true);
+                    }}
+                    className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e]"
+                  >
+                    Complete
+                  </button>
+                )}
+                <button
+                  onClick={() => setShowDetailModal(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  Close
                 </button>
               </div>
             </div>

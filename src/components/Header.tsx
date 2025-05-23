@@ -11,7 +11,8 @@ import {
   getSearchHistory,
   addToSearchHistory,
   clearSearchHistory,
-  removeFromSearchHistory
+  removeFromSearchHistory,
+  SearchHistoryItem
 } from '../utils/searchHistoryService';
 
 // Create a custom hook for dark mode
@@ -48,7 +49,7 @@ const Header: React.FC = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showCookieBanner, setShowCookieBanner] = useState(true);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-  const [searchHistory, setSearchHistory] = useState([]);
+  const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
   const [activeFilter, setActiveFilter] = useState('all');
   const [pasteAnimation, setPasteAnimation] = useState(false);
   const { user, isAuthenticated, logout, isDoctor } = useAuth();
@@ -498,7 +499,7 @@ const Header: React.FC = () => {
               </button>
 
               {/* View Toggle for Doctors */}
-              {isAuthenticated && <ViewToggle />}
+              {isAuthenticated && isDoctor && <ViewToggle />}
 
               {/* Login/Account button */}
               {isAuthenticated ? (

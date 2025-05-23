@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router-dom';
-import { fetchDoctorAppointments, updateAppointmentStatus, fetchDoctorAppointmentDetails } from '../../features/professional/appointmentsService';
+import { 
+  fetchDoctorAppointments, 
+  updateAppointmentStatus, 
+  fetchDoctorAppointmentDetails,
+  acceptAppointment,
+  startConsultation,
+  completeConsultation,
+  cancelAppointment,
+  markAppointmentNoShow
+} from '../../features/professional/appointmentsService';
 import { useAuth } from '../../features/auth/authContext';
+import { useProfessionalAuth } from '../../features/professional/professionalAuthContext';
 
 interface Appointment {
   id: number;
@@ -30,7 +40,6 @@ interface Appointment {
     age?: number;
     gender?: string;
   };
-  patient_name?: string;
   patient_full_name?: string;
   patient_id?: string;
   notification_status?: string;
@@ -53,6 +62,8 @@ interface Appointment {
       sent_at: string;
     }>;
   };
+  is_own_appointment?: boolean;
+  is_department_pending?: boolean;
 }
 
 interface NotificationStatus {
@@ -84,19 +95,35 @@ const ProfessionalAppointmentsPage: React.FC = () => {
   const [medicalSummary, setMedicalSummary] = useState('');
   const [meetingStartTime, setMeetingStartTime] = useState('');
   const [meetingEndTime, setMeetingEndTime] = useState('');
-  const { user } = useAuth();
+  
+  // Get data from both auth contexts
+  const { user, isAuthenticated: mainIsAuthenticated, isLoading: mainIsLoading, isDoctor } = useAuth();
+  const { professionalUser, isAuthenticated: profIsAuthenticated, isLoading: profIsLoading } = useProfessionalAuth();
   const navigate = useNavigate();
+
+  // Check if the user is authenticated and is a doctor
+  const isAuthLoading = mainIsLoading || profIsLoading;
+  const isAuthenticated = mainIsAuthenticated && isDoctor;
+
+  // Redirect if not authenticated or not a doctor
+  useEffect(() => {
+    if (!isAuthLoading && !isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthLoading, isAuthenticated, navigate]);
 
   useEffect(() => {
     const loadAppointments = async () => {
+      if (!isAuthenticated) return;
+      
       setIsLoading(true);
       setError(null);
       
       try {
         const data = await fetchDoctorAppointments();
         
-        // Process the data to properly handle patient information
-        const processedData = data.map((appointment: any) => {
+        // Process the data to properly handle patient information for both appointment types
+        const processMyAppointments = data.my_appointments.all.map((appointment: any) => {
           const processed = { ...appointment };
           
           let patientName = processed.patient_name || 
@@ -117,12 +144,56 @@ const ProfessionalAppointmentsPage: React.FC = () => {
           if (patientName) processed.patient_name = patientName;
           if (patientId) processed.patient_id = patientId;
           
+          // Ensure status_display is properly capitalized
+          if (processed.status && !processed.status_display) {
+            processed.status_display = processed.status.charAt(0).toUpperCase() + processed.status.slice(1).replace('_', ' ');
+          }
+          
+          // Mark as doctor's own appointment
+          processed.is_own_appointment = true;
+          
           return processed;
         });
         
+        // Process department pending appointments
+        const processDeptPendingAppointments = data.pending_department_appointments.map((appointment: any) => {
+          const processed = { ...appointment };
+          
+          let patientName = processed.patient_name || 
+                          processed.patient_full_name || 
+                          (processed.patient && (processed.patient.name || processed.patient.full_name)) ||
+                          processed.name ||
+                          processed.full_name ||
+                          processed.customer_name || 
+                          processed.user_name ||
+                          processed.client_name;
+          
+          let patientId = processed.patient_id ||
+                          (processed.patient && processed.patient.id) ||
+                          processed.user_id ||
+                          processed.customer_id ||
+                          processed.client_id;
+                          
+          if (patientName) processed.patient_name = patientName;
+          if (patientId) processed.patient_id = patientId;
+          
+          // Ensure status_display is properly capitalized
+          if (processed.status && !processed.status_display) {
+            processed.status_display = processed.status.charAt(0).toUpperCase() + processed.status.slice(1).replace('_', ' ');
+          }
+          
+          // Mark as department pending appointment
+          processed.is_department_pending = true;
+          
+          return processed;
+        });
+
+        // Combine both types of appointments
+        const allAppointments = [...processMyAppointments, ...processDeptPendingAppointments];
+        
         // For appointments without patient names, try to fetch patient details
         const appointmentsWithDetailsFetched = await Promise.all(
-          processedData.map(async (appointment: any) => {
+          allAppointments.map(async (appointment: any) => {
             if (!appointment.patient_name || appointment.patient_name === 'No Patient Name Available') {
               try {
                 const details = await fetchDoctorAppointmentDetails(appointment.appointment_id);
@@ -154,7 +225,7 @@ const ProfessionalAppointmentsPage: React.FC = () => {
     };
     
     loadAppointments();
-  }, []);
+  }, [isAuthenticated]);
 
   const handleBackToDashboard = () => {
     navigate('/professional/dashboard');
@@ -169,11 +240,15 @@ const ProfessionalAppointmentsPage: React.FC = () => {
     const now = new Date();
     
     if (activeFilter === 'upcoming') {
-      return appointmentDate >= now && appointment.status === 'confirmed';
+      return appointmentDate >= now && (appointment.status === 'confirmed' || appointment.status === 'pending');
     } else if (activeFilter === 'past') {
-      return appointment.status === 'completed';
+      return appointmentDate < now && (appointment.status === 'completed' || appointment.status === 'cancelled');
     } else if (activeFilter === 'cancelled') {
       return appointment.status === 'cancelled';
+    } else if (activeFilter === 'in_progress') {
+      return appointment.status === 'in_progress';
+    } else if (activeFilter === 'department_pending') {
+      return appointment.is_department_pending === true;
     } else if (activeFilter === 'all') {
       return true;
     }
@@ -240,16 +315,34 @@ const ProfessionalAppointmentsPage: React.FC = () => {
       const endTimeFormatted = new Date(meetingEndTime).toISOString();
       const enhancedSummary = `Meeting Time: ${startTimeFormatted} to ${endTimeFormatted}\n\n${medicalSummary}`;
       
-      await handleStatusChange(completionAppointmentId, 'completed', enhancedSummary);
+      // Use the completeConsultation endpoint
+      const result = await completeConsultation(completionAppointmentId, enhancedSummary);
+      
+      // Update the appointment in the list
+      setAppointments(appointments.map(appointment => {
+        if (appointment.appointment_id === completionAppointmentId) {
+          return {
+            ...appointment,
+            status: 'completed',
+            status_display: 'Completed',
+          };
+        }
+        return appointment;
+      }));
+      
+      setStatusUpdateSuccess(`Consultation for appointment ${completionAppointmentId} has been completed successfully`);
       
       setShowCompletionModal(false);
       setCompletionAppointmentId(null);
       setMedicalSummary('');
       setMeetingStartTime('');
       setMeetingEndTime('');
-    } catch (err) {
+      
+      setTimeout(() => setStatusUpdateSuccess(null), 5000);
+    } catch (err: any) {
       console.error('Error submitting completion:', err);
-      setError('Failed to submit completion information');
+      setError(err.message || 'Failed to submit completion information');
+      setTimeout(() => setError(null), 5000);
     }
   };
 
@@ -286,12 +379,21 @@ const ProfessionalAppointmentsPage: React.FC = () => {
     setStatusUpdateLoading(appointmentId);
     
     try {
-      const result = await updateAppointmentStatus(
-        appointmentId, 
-        newStatus as 'confirmed' | 'cancelled' | 'completed' | 'rescheduled' | 'no_show',
-        undefined,
-        summary
-      );
+      let result;
+      
+      // Use the dedicated endpoints for specific status changes
+      if (newStatus === 'cancelled') {
+        result = await cancelAppointment(appointmentId, summary);
+      } else if (newStatus === 'no_show') {
+        result = await markAppointmentNoShow(appointmentId, summary);
+      } else {
+        // Use the general status update endpoint for other statuses
+        result = await updateAppointmentStatus(
+          appointmentId, 
+          newStatus as 'confirmed' | 'cancelled' | 'completed' | 'rescheduled' | 'no_show' | 'in_progress',
+          summary
+        );
+      }
       
       if (result.notification) {
         setNotificationStatus(processNotificationResponse(result.notification, appointmentId));
@@ -348,6 +450,170 @@ const ProfessionalAppointmentsPage: React.FC = () => {
     return `ID: ${patientId || appointment.appointment_id}`;
   };
 
+  // Handle start consultation button click
+  const handleStartConsultation = async (appointmentId: string) => {
+    setStatusUpdateLoading(appointmentId);
+    try {
+      const result = await startConsultation(appointmentId);
+      
+      // Update the appointment in the list
+      setAppointments(appointments.map(appointment => {
+        if (appointment.appointment_id === appointmentId) {
+          return {
+            ...appointment,
+            status: 'in_progress',
+            status_display: 'In Progress',
+          };
+        }
+        return appointment;
+      }));
+      
+      setStatusUpdateSuccess(`Consultation for appointment ${appointmentId} has started`);
+      setTimeout(() => setStatusUpdateSuccess(null), 5000);
+    } catch (err: any) {
+      console.error(`Failed to start consultation:`, err);
+      setError(err.message || `Failed to start consultation`);
+      setTimeout(() => setError(null), 5000);
+    } finally {
+      setStatusUpdateLoading(null);
+    }
+  };
+
+  // Handle accepting an appointment
+  const handleAcceptAppointment = async (appointmentId: string) => {
+    setStatusUpdateLoading(appointmentId);
+    
+    try {
+      const result = await acceptAppointment(appointmentId);
+      
+      // Find the appointment that's being accepted
+      const appointmentToAccept = appointments.find(app => app.appointment_id === appointmentId);
+      
+      // Update the appointments list
+      setAppointments(appointments.map(appointment => {
+        if (appointment.appointment_id === appointmentId) {
+          return {
+            ...appointment,
+            status: 'confirmed',
+            status_display: 'Confirmed',
+            is_department_pending: false, // No longer a pending department appointment
+            is_own_appointment: true // Now owned by this doctor
+          };
+        }
+        return appointment;
+      }));
+      
+      setStatusUpdateSuccess(`Appointment ${appointmentId} has been accepted successfully`);
+      setTimeout(() => setStatusUpdateSuccess(null), 5000);
+    } catch (err: any) {
+      console.error(`Failed to accept appointment:`, err);
+      setError(err.message || `Failed to accept appointment`);
+      setTimeout(() => setError(null), 5000);
+    } finally {
+      setStatusUpdateLoading(null);
+    }
+  };
+
+  // Handle cancellation using the dedicated endpoint
+  const handleCancelAppointment = async (appointmentId: string) => {
+    setStatusUpdateLoading(appointmentId);
+    
+    try {
+      const reason = prompt('Please provide a reason for cancellation (required):');
+      if (reason === null) {
+        // User cancelled the prompt
+        setStatusUpdateLoading(null);
+        return;
+      }
+      
+      if (!reason.trim()) {
+        // Empty reason provided
+        setError('A cancellation reason is required');
+        setTimeout(() => setError(null), 5000);
+        setStatusUpdateLoading(null);
+        return;
+      }
+      
+      const result = await cancelAppointment(appointmentId, reason);
+      
+      if (result.notification) {
+        setNotificationStatus(processNotificationResponse(result.notification, appointmentId));
+      }
+      
+      // Update the appointment in the list
+      setAppointments(appointments.map(appointment => {
+        if (appointment.appointment_id === appointmentId) {
+          return {
+            ...appointment,
+            status: 'cancelled',
+            status_display: 'Cancelled',
+          };
+        }
+        return appointment;
+      }));
+      
+      setStatusUpdateSuccess(`Appointment cancelled successfully`);
+      setTimeout(() => setStatusUpdateSuccess(null), 5000);
+    } catch (err: any) {
+      console.error(`Failed to cancel appointment:`, err);
+      setError(err.message || `Failed to cancel appointment`);
+      setTimeout(() => setError(null), 5000);
+    } finally {
+      setStatusUpdateLoading(null);
+    }
+  };
+
+  // Handle no-show using the dedicated endpoint
+  const handleNoShowAppointment = async (appointmentId: string) => {
+    setStatusUpdateLoading(appointmentId);
+    
+    try {
+      const result = await markAppointmentNoShow(appointmentId);
+      
+      if (result.notification) {
+        setNotificationStatus(processNotificationResponse(result.notification, appointmentId));
+      }
+      
+      // Update the appointment in the list
+      setAppointments(appointments.map(appointment => {
+        if (appointment.appointment_id === appointmentId) {
+          return {
+            ...appointment,
+            status: 'no_show',
+            status_display: 'No Show',
+          };
+        }
+        return appointment;
+      }));
+      
+      setStatusUpdateSuccess(`Appointment marked as no-show successfully`);
+      setTimeout(() => setStatusUpdateSuccess(null), 5000);
+    } catch (err: any) {
+      console.error(`Failed to mark appointment as no-show:`, err);
+      setError(err.message || `Failed to mark appointment as no-show`);
+      setTimeout(() => setError(null), 5000);
+    } finally {
+      setStatusUpdateLoading(null);
+    }
+  };
+
+  // Show loading state while authentication is being checked
+  if (isAuthLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  // If not authenticated or not a doctor, this will redirect (see useEffect above)
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  // Get the doctor's name
+  const doctorName = professionalUser?.name || user?.full_name || 'Doctor';
+
   return (
     <div className="container mx-auto px-4 py-8">
       <Helmet>
@@ -358,7 +624,10 @@ const ProfessionalAppointmentsPage: React.FC = () => {
         <div>
           <h1 className="text-3xl font-bold text-blue-800">My Appointments</h1>
           <p className="mt-2 text-gray-600">
-            Manage appointments for Dr. {user?.full_name}
+            Manage appointments for Dr. {doctorName}
+          </p>
+          <p className="text-sm text-gray-500 mt-1">
+            View and manage both your assigned appointments and pending department appointments that need assignment.
           </p>
         </div>
         <button
@@ -384,6 +653,26 @@ const ProfessionalAppointmentsPage: React.FC = () => {
             }`}
           >
             Upcoming
+          </button>
+          <button
+            onClick={() => setActiveFilter('department_pending')}
+            className={`px-4 py-2 rounded-md text-sm font-medium ${
+              activeFilter === 'department_pending'
+                ? 'bg-blue-100 text-blue-800'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            Department Pending
+          </button>
+          <button
+            onClick={() => setActiveFilter('in_progress')}
+            className={`px-4 py-2 rounded-md text-sm font-medium ${
+              activeFilter === 'in_progress'
+                ? 'bg-blue-100 text-blue-800'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            In Progress
           </button>
           <button
             onClick={() => setActiveFilter('past')}
@@ -416,6 +705,14 @@ const ProfessionalAppointmentsPage: React.FC = () => {
             All
           </button>
         </div>
+        
+        {activeFilter === 'department_pending' && (
+          <div className="mt-3 p-3 bg-blue-50 rounded-md text-sm text-blue-700">
+            <p>
+              <strong>Department Pending:</strong> These are appointments waiting for a doctor in your department to accept. Click "Accept" to take responsibility for these appointments.
+            </p>
+          </div>
+        )}
       </div>
       
       {statusUpdateSuccess && (
@@ -505,7 +802,7 @@ const ProfessionalAppointmentsPage: React.FC = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredAppointments.map((appointment) => (
-                  <tr key={appointment.id}>
+                  <tr key={appointment.id} className={appointment.is_department_pending ? "bg-blue-50" : ""}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
                         {appointment.patient_name || 
@@ -514,6 +811,11 @@ const ProfessionalAppointmentsPage: React.FC = () => {
                       </div>
                       <div className="text-sm text-gray-500">
                         {formatPatientId(appointment)}
+                        {appointment.is_department_pending && 
+                          <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            Department
+                          </span>
+                        }
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -550,39 +852,51 @@ const ProfessionalAppointmentsPage: React.FC = () => {
                       {appointment.status === 'pending' && (
                         <>
                           <button 
-                            onClick={() => handleStatusChange(appointment.appointment_id, 'confirmed')}
+                            onClick={() => handleAcceptAppointment(appointment.appointment_id)}
                             className="text-green-600 hover:text-green-900 mr-3"
                             disabled={statusUpdateLoading === appointment.appointment_id}
                           >
-                            {statusUpdateLoading === appointment.appointment_id ? 'Loading...' : 'Confirm'}
+                            {statusUpdateLoading === appointment.appointment_id ? 'Loading...' : 'Accept'}
                           </button>
-                          <button 
-                            onClick={() => handleStatusChange(appointment.appointment_id, 'cancelled')}
-                            className="text-red-600 hover:text-red-900"
-                            disabled={statusUpdateLoading === appointment.appointment_id}
-                          >
-                            {statusUpdateLoading === appointment.appointment_id ? 'Loading...' : 'Cancel'}
-                          </button>
+                          {!appointment.is_department_pending && (
+                            <button 
+                              onClick={() => handleCancelAppointment(appointment.appointment_id)}
+                              className="text-red-600 hover:text-red-900"
+                              disabled={statusUpdateLoading === appointment.appointment_id}
+                            >
+                              {statusUpdateLoading === appointment.appointment_id ? 'Loading...' : 'Cancel'}
+                            </button>
+                          )}
                         </>
                       )}
                       
                       {appointment.status === 'confirmed' && (
                         <>
                           <button 
-                            onClick={() => handleCompleteClick(appointment.appointment_id)}
-                            className="text-blue-600 hover:text-blue-900 mr-3"
+                            onClick={() => handleStartConsultation(appointment.appointment_id)}
+                            className="text-green-600 hover:text-green-900 mr-3"
                             disabled={statusUpdateLoading === appointment.appointment_id}
                           >
-                            {statusUpdateLoading === appointment.appointment_id ? 'Loading...' : 'Complete'}
+                            {statusUpdateLoading === appointment.appointment_id ? 'Loading...' : 'Start Consultation'}
                           </button>
                           <button 
-                            onClick={() => handleStatusChange(appointment.appointment_id, 'no_show')}
+                            onClick={() => handleNoShowAppointment(appointment.appointment_id)}
                             className="text-gray-600 hover:text-gray-900"
                             disabled={statusUpdateLoading === appointment.appointment_id}
                           >
                             {statusUpdateLoading === appointment.appointment_id ? 'Loading...' : 'No Show'}
                           </button>
                         </>
+                      )}
+                      
+                      {appointment.status === 'in_progress' && (
+                        <button 
+                          onClick={() => handleCompleteClick(appointment.appointment_id)}
+                          className="text-blue-600 hover:text-blue-900 mr-3"
+                          disabled={statusUpdateLoading === appointment.appointment_id}
+                        >
+                          {statusUpdateLoading === appointment.appointment_id ? 'Loading...' : 'Complete Consultation'}
+                        </button>
                       )}
                     </td>
                   </tr>
