@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../features/auth/authContext';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useLocation } from 'react-router-dom';
 
 const AccountPage: React.FC = () => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, hasPrimaryHospital, primaryHospital, checkPrimaryHospital } = useAuth();
   const [isProfessionalView, setIsProfessionalView] = useState(false);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Check if the user is a doctor and what view they're in
   useEffect(() => {
@@ -45,6 +47,42 @@ const AccountPage: React.FC = () => {
     };
   }, [user, navigate]);
 
+  // Check the primary hospital status when the component mounts - only once
+  useEffect(() => {
+    // Create a flag to prevent duplicate API calls
+    let isMounted = true;
+    
+    const checkHospitalStatus = async () => {
+      if (isAuthenticated && user && isMounted) {
+        try {
+          // Check if the user has a primary hospital registered
+          await checkPrimaryHospital();
+        } catch (error) {
+          console.error('Failed to check primary hospital status:', error);
+        }
+      }
+    };
+    
+    checkHospitalStatus();
+    
+    // Cleanup function to prevent state updates after unmount
+    return () => {
+      isMounted = false;
+    };
+  }, [isAuthenticated, user]); // Removed checkPrimaryHospital from dependencies
+  
+  // Check for redirect messages in location state
+  useEffect(() => {
+    // Check if we have a redirect message in the location state
+    if (location.state && 'hospitalMessage' in location.state) {
+      setAlertMessage(location.state.hospitalMessage as string);
+      
+      // Clear the location state to prevent showing the message again on refresh
+      // This is a bit of a hack but necessary since we can't modify the location state directly
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
@@ -68,6 +106,23 @@ const AccountPage: React.FC = () => {
       </div>
 
       <div className="phb-container py-8">
+        {/* Hospital status alert message */}
+        {alertMessage && (
+          <div className="mb-6 p-4 rounded-md bg-amber-50 border border-amber-200 text-amber-800">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium">
+                  {alertMessage}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left sidebar with user info */}
           <div className="lg:col-span-1">
@@ -197,6 +252,40 @@ const AccountPage: React.FC = () => {
                 </Link>
               </div>
             </div>
+
+            {/* Primary Hospital Registration Alert - Only shows when user doesn't have a primary hospital */}
+            {!hasPrimaryHospital && (
+              <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <div className="p-3 rounded-md bg-blue-50 text-blue-700">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm font-medium">
+                        Please register with a primary hospital to access all health services
+                      </p>
+                      <p className="text-sm mt-1">
+                        Registering with a primary hospital allows you to access prescriptions, appointments, and other health services.
+                      </p>
+                      <div className="mt-2">
+                        <Link 
+                          to="/account/link-phb" 
+                          className="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center"
+                        >
+                          View available hospitals
+                          <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                          </svg>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-xl font-bold mb-4">Your Health</h2>

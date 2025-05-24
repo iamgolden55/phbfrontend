@@ -877,7 +877,36 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // New function to check if user has a primary hospital
   const checkPrimaryHospital = async () => {
+    // Don't proceed if no user is authenticated
     if (!user) throw new Error("User not authenticated");
+    
+    // Skip hospital checks for professional users entirely
+    // This prevents unnecessary API calls for doctors
+    if (user.role === 'doctor' || !!user.hpn) {
+      return Promise.resolve({ 
+        has_primary: true, // Doctors don't need to register with hospitals
+        primary_hospital: undefined 
+      } as PrimaryHospitalResponse);
+    }
+    
+    // Check if current URL path includes professional routes and skip check if so
+    const currentPath = window.location.pathname;
+    if (currentPath.startsWith('/professional')) {
+      return Promise.resolve({ 
+        has_primary: true, // Skip check for professional routes
+        primary_hospital: undefined 
+      } as PrimaryHospitalResponse);
+    }
+    
+    // Use the throttling mechanism to prevent rapid repeated API calls
+    if (shouldThrottleApiCall('/api/user/has-primary-hospital/', {}, 2000)) {
+      // Return the current values if we're throttling, making sure they match the expected type
+      return Promise.resolve({ 
+        has_primary: hasPrimaryHospital, 
+        primary_hospital: primaryHospital === null ? undefined : primaryHospital 
+      } as PrimaryHospitalResponse);
+    }
+    
     setIsLoading(true);
     setError(null);
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
@@ -899,6 +928,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setHasPrimaryHospital(response.has_primary);
         setPrimaryHospital(response.primary_hospital || null);
       }
+      
+      // Only log in development (removed production check to fix TypeScript error)
+      // console.log("Primary hospital status:", response);
       
       return response;
     } catch (err: any) {
@@ -1148,7 +1180,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     primaryHospital,
     hasPrimaryHospital,
     // Doctor role check - check both role and hpn for reliability
-    isDoctor: user?.role === 'doctor' || !!user?.hpn,
+    isDoctor: user?.role === 'doctor',
     // CAPTCHA-related properties
     captchaRequired,
     captchaChallenge,

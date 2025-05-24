@@ -138,6 +138,7 @@ import GPHealthRecord from './features/health/GPHealthRecord';
 import Prescriptions from './features/health/Prescriptions';
 import Appointments from './features/health/Appointments';
 import TestResults from './features/health/TestResults';
+import HospitalStatusGuard from './features/health/HospitalStatusGuard';
 
 // Advanced Search Features
 import AdvancedSearchPage from './features/search/AdvancedSearchPage';
@@ -491,27 +492,37 @@ function App() {
                 } />
                 <Route path="account/appointments" element={
                   <ProtectedRoute>
-                    <Appointments />
+                    <HospitalStatusGuard>
+                      <Appointments />
+                    </HospitalStatusGuard>
                   </ProtectedRoute>
                 } />
                 <Route path="account/appointments/book" element={
                   <ProtectedRoute>
-                    <BookAppointment />
+                    <HospitalStatusGuard>
+                      <BookAppointment />
+                    </HospitalStatusGuard>
                   </ProtectedRoute>
                 } />
                 <Route path="account/appointments/view" element={
                   <ProtectedRoute>
-                    <ViewAppointments />
+                    <HospitalStatusGuard>
+                      <ViewAppointments />
+                    </HospitalStatusGuard>
                   </ProtectedRoute>
                 } />
                 <Route path="account/appointments/confirmation" element={
                   <ProtectedRoute>
-                    <AppointmentConfirmation />
+                    <HospitalStatusGuard>
+                      <AppointmentConfirmation />
+                    </HospitalStatusGuard>
                   </ProtectedRoute>
                 } />
                 <Route path="account/appointments/:id" element={
                   <ProtectedRoute>
-                    <AppointmentDetail />
+                    <HospitalStatusGuard>
+                      <AppointmentDetail />
+                    </HospitalStatusGuard>
                   </ProtectedRoute>
                 } />
                 <Route path="account/medical-records" element={

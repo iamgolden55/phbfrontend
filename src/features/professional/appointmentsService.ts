@@ -636,8 +636,11 @@ export interface PrescriptionResponse {
  * @returns Promise that resolves to the created prescriptions
  */
 export async function addAppointmentPrescriptions(appointmentId: string, medications: PrescriptionMedication[]) {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+const token = localStorage.getItem(AUTH_TOKEN_KEY);
   
+if (!token) {
+  throw new Error('Authentication required');
+}
   if (!token) {
     throw new Error('Authentication required');
   }
@@ -647,7 +650,7 @@ export async function addAppointmentPrescriptions(appointmentId: string, medicat
   }
   console.log('medications', medications)
   try {
-    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/prescriptions/`, {
+    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/prescriptions/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -703,4 +706,48 @@ export async function getAppointmentPrescriptions(appointmentId: string) {
     console.error('Error getting prescriptions:', error);
     throw error;
   }
-} 
+}
+
+/**
+ * Fetch patient medical records for the professional view
+ * @param patientId The ID of the patient
+ * @returns Promise that resolves to the patient's medical records
+ */
+export async function getPatientMedicalRecords(patientId: string | number) {
+  if (!patientId) {
+    throw new Error('Patient ID is required to fetch medical records');
+  }
+
+  // Get the auth token
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+
+  const url = `${API_BASE_URL}/api/professional/patients/${patientId}/medical-records/`;
+  
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      if (response.status === 403) {
+        throw new Error('You are not authorized to view this patient\'s medical records');
+      }
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Failed to fetch patient medical records: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Retrieved patient medical records:', data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching patient medical records:', error);
+    throw error;
+  }
+}
