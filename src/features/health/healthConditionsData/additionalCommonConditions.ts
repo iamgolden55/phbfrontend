@@ -8,8 +8,9 @@ export const additionalCommonConditions: HealthCondition[] = [
   {
     id: 'allergies',
     name: 'Allergies',
-    description: 'An allergy is a reaction the body has to a particular food or substance, causing symptoms such as sneezing, itchy eyes, and rashes.',
+    description: 'An allergy is a reaction the body has to a particular food or substance that occurs when the immune system overreacts to typically harmless substances in the environment.[1][2] Allergies can affect the nose, eyes, skin, lungs, and gastrointestinal tract.[3] These allergic reactions can range from mild discomfort to life-threatening emergencies like anaphylaxis.[4][6] The incidence of allergic reactions, particularly anaphylaxis, has been increasing in the general population.[6]',
     category: 'immune-system',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Allergy',
     symptoms: [
       'Sneezing',
       'Runny or blocked nose',
@@ -60,7 +61,40 @@ export const additionalCommonConditions: HealthCondition[] = [
       'food-intolerance',
       'anaphylaxis',
       'rhinitis',
-      'sinusitis'
+      'sinusitis',
+      'contact dermatitis'
+    ],
+    references: [
+      {
+        id: '1',
+        text: 'Types of Allergic Diseases. NIAID. 29 May 2015.',
+        url: 'https://www.niaid.nih.gov/diseases-conditions/types-allergic-diseases'
+      },
+      {
+        id: '2',
+        text: 'Kay AB (2000). "Overview of allergy and allergic diseases: with a view to the future". British Medical Bulletin. 56 (4): 843–64.',
+        url: 'https://doi.org/10.1258/0007142001903481'
+      },
+      {
+        id: '3',
+        text: 'Sicherer SH, Sampson HA (February 2014). "Food allergy: Epidemiology, pathogenesis, diagnosis, and treatment". The Journal of Allergy and Clinical Immunology. 133 (2): 291–307.',
+        url: 'https://doi.org/10.1016/j.jaci.2013.11.020'
+      },
+      {
+        id: '4',
+        text: 'Simons FE (October 2009). "Anaphylaxis: Recent advances in assessment and treatment". The Journal of Allergy and Clinical Immunology. 124 (4): 625–36.',
+        url: 'https://doi.org/10.1016/j.jaci.2009.08.025'
+      },
+      {
+        id: '5',
+        text: 'Wheatley LM, Togias A (January 2015). "Clinical practice. Allergic rhinitis". The New England Journal of Medicine. 372 (5): 456–63.',
+        url: 'https://doi.org/10.1056/NEJMcp1412282'
+      },
+      {
+        id: '6',
+        text: 'Dougherty JM, Alsayouri K, Sadowski A (2023). "Allergy". StatPearls Publishing LLC.',
+        url: 'https://pubmed.ncbi.nlm.nih.gov/31424821/'
+      }
     ],
     commonQuestions: [
       {
@@ -99,8 +133,9 @@ export const additionalCommonConditions: HealthCondition[] = [
   {
     id: 'common-cold',
     name: 'Common Cold',
-    description: 'A mild viral infection of the nose, throat, sinuses, and upper airways. It\'s usually harmless but can cause discomfort.',
+    description: 'The common cold is a viral infectious disease of the upper respiratory tract that primarily affects the nose, throat, sinuses, and larynx.[1][2] It is the most frequent infectious disease in humans and is usually mild and self-limiting.[3] Common colds are defined as upper respiratory tract infections that affect the predominantly nasal part of the respiratory mucosa.[4]',
     category: 'respiratory',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Common_cold',
     symptoms: [
       'Runny or blocked nose',
       'Sore throat',
@@ -152,6 +187,33 @@ export const additionalCommonConditions: HealthCondition[] = [
       'strep-throat',
       'covid-19',
       'allergic-rhinitis'
+    ],
+    references: [
+      {
+        id: '1',
+        text: 'Eccles R (November 2005). "Understanding the symptoms of the common cold and influenza". The Lancet. Infectious Diseases. 5 (11): 718–25.',
+        url: 'https://doi.org/10.1016/S1473-3099(05)70270-X'
+      },
+      {
+        id: '2',
+        text: 'Heikkinen T, Järvinen A (January 2003). "The common cold". Lancet. 361 (9351): 51–9.',
+        url: 'https://doi.org/10.1016/S0140-6736(03)12162-9'
+      },
+      {
+        id: '3',
+        text: 'Allan GM, Arroll B (February 2014). "Prevention and treatment of the common cold: making sense of the evidence". CMAJ. 186 (3): 190–9.',
+        url: 'https://doi.org/10.1503/cmaj.121442'
+      },
+      {
+        id: '4',
+        text: 'Arroll B (March 2011). "Common cold". BMJ Clinical Evidence. 2011 (3): 1510.',
+        url: 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3275147/'
+      },
+      {
+        id: '5',
+        text: 'Centers for Disease Control and Prevention. "Common Colds: Protect Yourself and Others".',
+        url: 'https://www.cdc.gov/features/rhinoviruses/'
+      }
     ],
     commonQuestions: [
       {

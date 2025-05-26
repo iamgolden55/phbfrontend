@@ -17,11 +17,27 @@ export interface HealthCondition {
   emergencySigns?: string[];    // Signs to seek immediate medical attention
   prevalence?: string;          // How common the condition is
   affectedGroups?: string[];    // Groups most commonly affected
+  wikipediaUrl?: string;        // URL to the Wikipedia article for more information
+  references?: Reference[];     // Scientific references and citations
+  extraInfo?: string;           // Additional important information about the condition
+  moreInfoLinks?: MoreInfoLink[]; // Links to additional resources
+  transmissions?: string[];     // How the condition is transmitted (for infectious diseases)
 }
 
 export interface Question {
   question: string;
   answer: string;
+}
+
+export interface Reference {
+  id: string;                   // Reference identifier (e.g., [1], [2], etc.)
+  text: string;                 // Full citation text
+  url?: string;                 // Optional URL to the reference source
+}
+
+export interface MoreInfoLink {
+  label: string;                // Display text for the link
+  url: string;                 // URL for the link
 }
 
 export type HealthCategory =

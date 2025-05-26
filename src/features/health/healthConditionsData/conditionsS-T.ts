@@ -5,368 +5,307 @@ import { HealthCondition } from '../healthConditionsData';
  */
 export const conditionsStoT: HealthCondition[] = [
   {
-    id: 'sleep-apnea',
-    name: 'Sleep Apnea',
-    description: 'A serious sleep disorder where breathing repeatedly stops and starts during sleep, leading to decreased oxygen levels and disrupted rest.',
-    category: 'respiratory',
-    subcategory: 'sleep-disorders',
+    id: 'schizophrenia',
+    name: 'Schizophrenia',
+    description: 'A chronic and severe mental disorder that affects how a person thinks, feels, and behaves.[1] People with schizophrenia may seem like they have lost touch with reality, experiencing hallucinations, delusions, disorganized thinking, and abnormal motor behavior.[2] These symptoms can be disabling and significantly impact a person\'s ability to function in daily life.[3] Contrary to popular misconception, schizophrenia is not a split or multiple personality disorder.[4] With appropriate treatment and support, many people with schizophrenia can manage their symptoms and lead fulfilling lives.[5]',
+    category: 'mental-health',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Schizophrenia',
     symptoms: [
-      'Loud snoring',
-      'Episodes of stopped breathing during sleep (observed by another person)',
-      'Gasping for air during sleep',
-      'Awakening with a dry mouth',
-      'Morning headache',
-      'Difficulty staying asleep (insomnia)',
-      'Excessive daytime sleepiness (hypersomnia)',
-      'Difficulty paying attention while awake',
-      'Irritability',
-      'Night sweats'
+      'Positive symptoms (psychotic behaviors not generally seen in healthy people):',
+      'Hallucinations (hearing, seeing, or feeling things that aren\'t there)',
+      'Delusions (false beliefs that don\'t change even when presented with conflicting evidence)',
+      'Thought disorders (unusual or dysfunctional ways of thinking)',
+      'Movement disorders (agitated body movements or catatonia)',
+      'Negative symptoms (disruptions to normal emotions and behaviors):',
+      'Reduced expression of emotions via facial expressions or voice tone',
+      'Reduced feelings of pleasure in everyday life',
+      'Difficulty beginning and sustaining activities',
+      'Reduced speaking',
+      'Social withdrawal',
+      'Cognitive symptoms:',
+      'Poor executive functioning (ability to understand information and use it to make decisions)',
+      'Trouble focusing or paying attention',
+      'Problems with working memory (using information immediately after learning it)',
+      'Disorganized thinking and speech',
+      'Difficulty filtering sensory information'
     ],
     causes: [
-      'Obstructive sleep apnea: physical blockage of airway',
-      'Central sleep apnea: brain fails to signal breathing muscles',
-      'Complex sleep apnea: combination of both types',
-      'Obesity and excess weight',
-      'Large tonsils or adenoids (especially in children)',
-      'Endocrine disorders (hypothyroidism, acromegaly)',
-      'Neuromuscular disorders',
-      'Heart or kidney failure',
-      'Genetic predisposition',
-      'Smoking and alcohol use'
+      'Genetic factors:',
+      'Family history of schizophrenia (10% risk if first-degree relative has it)',
+      'Multiple genes that may increase susceptibility',
+      'Brain chemistry and structure:',
+      'Imbalances in neurotransmitters (especially dopamine and glutamate)',
+      'Differences in brain structure and neural connections',
+      'Abnormal brain development before birth',
+      'Environmental factors:',
+      'Exposure to viruses or malnutrition before birth',
+      'Complications during birth',
+      'Psychosocial factors:',
+      'Childhood trauma or abuse',
+      'Early life stressors',
+      'Urban upbringing',
+      'Migration-related social adversity',
+      'Substance use:',
+      'Cannabis use in adolescence',
+      'Use of certain psychoactive or psychotropic substances'
     ],
     treatments: [
-      'Lifestyle changes (weight loss, exercise, smoking cessation)',
-      'Continuous positive airway pressure (CPAP) therapy',
-      'Bilevel positive airway pressure (BiPAP) therapy',
-      'Oral appliances to keep throat open',
-      'Adaptive servo-ventilation (ASV)',
-      'Supplemental oxygen',
-      'Surgery to remove tissue or reposition jaw',
-      'Implanted stimulation devices',
-      'Treatment of underlying medical problems',
-      'Positional therapy (avoiding sleeping on back)'
+      'Medication:',
+      'Antipsychotic medications (first and second generation)',
+      'Mood stabilizers',
+      'Antidepressants (for co-occurring depression)',
+      'Psychosocial interventions:',
+      'Cognitive behavioral therapy (CBT)',
+      'Family therapy and education',
+      'Social skills training',
+      'Supported employment programs',
+      'Peer support and self-help groups',
+      'Assertive community treatment (ACT)',
+      'Coordinated specialty care for early intervention',
+      'Other treatments:',
+      'Electroconvulsive therapy (ECT) in specific cases',
+      'Transcranial magnetic stimulation (TMS)',
+      'Cognitive remediation to improve cognitive functioning',
+      'Supportive services:',
+      'Housing assistance',
+      'Vocational rehabilitation',
+      'Case management',
+      'Crisis intervention services'
     ],
     preventions: [
-      'Maintaining healthy weight',
-      'Regular exercise',
-      'Avoiding alcohol and sedatives before bedtime',
-      'Quitting smoking',
-      'Sleeping on side rather than back',
-      'Treating nasal allergies',
-      'Following a regular sleep schedule',
-      'Using properly fitted oral devices if recommended'
+      'No proven prevention methods',
+      'Early identification and treatment of symptoms',
+      'Reduction of early life stressors',
+      'Avoiding cannabis and other substance use, especially during adolescence',
+      'Prenatal care to reduce complications during pregnancy and birth',
+      'Support for high-risk individuals (those with family history or prodromal symptoms)',
+      'Public education to reduce stigma and promote early help-seeking'
     ],
     relatedConditions: [
-      'obesity',
-      'hypertension',
-      'heart-disease',
-      'type-2-diabetes',
-      'stroke',
-      'metabolic-syndrome',
+      'schizoaffective-disorder',
+      'schizophreniform-disorder',
+      'delusional-disorder',
+      'brief-psychotic-disorder',
+      'bipolar-disorder',
       'depression',
-      'adhd-like-symptoms'
+      'autism-spectrum-disorders',
+      'substance-induced-psychotic-disorder',
+      'obsessive-compulsive-disorder',
+      'post-traumatic-stress-disorder'
     ],
     commonQuestions: [
       {
-        question: 'How is sleep apnea diagnosed?',
-        answer: 'Sleep apnea is typically diagnosed through a sleep study (polysomnography), which can be conducted in a sleep lab or at home with portable monitoring devices. During the study, various bodily functions are monitored including brain activity, eye movement, heart rate, breathing patterns, blood oxygen levels, and body movements. The test measures the number of apnea events (complete breathing pauses) and hypopnea events (partial breathing pauses), resulting in an apnea-hypopnea index (AHI) that determines the severity of the condition.'
+        question: 'Is schizophrenia the same as having multiple personalities?',
+        answer: 'No, schizophrenia is not the same as having multiple personalities (now known as Dissociative Identity Disorder). This is one of the most common misconceptions about schizophrenia. The confusion may stem from the word\'s etymology - "schizo" (split) and "phrenia" (mind) - which might suggest a "split personality." However, this refers to the split from reality that people with schizophrenia experience, not a splitting of personality. Schizophrenia is characterized by psychotic symptoms like hallucinations, delusions, disorganized thinking, and negative symptoms (reduced emotional expression, lack of motivation). In contrast, Dissociative Identity Disorder involves the presence of two or more distinct personality states or experiences of possession. These are entirely different mental health conditions with different causes, symptoms, and treatments. People with schizophrenia typically maintain a single identity but experience a distorted perception of reality, rather than shifting between different identities.'
       },
       {
-        question: 'Is CPAP the only treatment for sleep apnea?',
-        answer: 'While CPAP (Continuous Positive Airway Pressure) therapy is the most common and effective treatment for moderate to severe sleep apnea, it\'s not the only option. Alternatives include oral appliances that reposition the jaw and tongue, positional therapy devices, various surgical procedures, implanted upper airway stimulation devices, and lifestyle changes like weight loss and exercise. For mild cases, behavioral changes alone might be sufficient. The best treatment depends on the type and severity of sleep apnea, individual anatomy, other medical conditions, and personal preference.'
+        question: 'Can people with schizophrenia live normal lives?',
+        answer: 'Yes, many people with schizophrenia can lead fulfilling, meaningful lives, especially with appropriate treatment and support. While schizophrenia is a serious mental illness that presents significant challenges, it\'s important to understand that outcomes vary greatly among individuals. With a combination of medication, psychosocial interventions, and support services, many people with schizophrenia can manage their symptoms effectively. Key factors that influence outcomes include: 1) Early intervention - detecting and treating symptoms early often leads to better outcomes; 2) Consistent treatment - following prescribed medication regimens and participating in therapy; 3) Strong support networks - family support, peer groups, and community services; 4) Access to comprehensive care - including physical health care, housing assistance, and vocational rehabilitation. Many people with schizophrenia are able to work, have relationships, live independently, and pursue their interests and goals. Public figures like Nobel Prize winner John Nash (portrayed in "A Beautiful Mind") have demonstrated that extraordinary achievement is possible despite a schizophrenia diagnosis. It\'s essential to combat stigma and have realistic hope, recognizing that recovery is a personal journey that may involve both challenges and significant achievements.'
       },
       {
-        question: 'Can children have sleep apnea?',
-        answer: 'Yes, children can have sleep apnea, with an estimated prevalence of 1-5% in the pediatric population. In children, the most common cause is enlarged tonsils and adenoids, rather than obesity (though childhood obesity can also contribute). Symptoms in children may differ from adults and include attention problems, behavioral issues, poor school performance, mouth breathing, bedwetting, excessive sweating at night, and unusual sleeping positions. Treatment often involves surgical removal of tonsils and adenoids, though other approaches may be needed depending on the cause.'
+        question: 'At what age does schizophrenia typically develop?',
+        answer: 'Schizophrenia typically emerges in late adolescence or early adulthood, with the peak age of onset between 18 and 25 years for men and 25 and 35 years for women. However, the development of schizophrenia follows different patterns: 1) Late adolescence/early adulthood onset - This is the most common pattern, particularly in males. The transition to adulthood appears to be a vulnerable period, possibly due to the significant brain development and social changes occurring during this time. 2) Later adult onset - Women tend to develop schizophrenia later than men, with many cases appearing in the late 20s to early 30s. Some research suggests that estrogen may have a protective effect until menopause. 3) Early-onset schizophrenia - While less common, schizophrenia can develop before age 18, with childhood-onset (before age 13) being particularly rare and often more severe. 4) Late-onset schizophrenia - Cases that develop after age 40 are considered late-onset and may have slightly different symptom profiles. Before full psychotic symptoms appear, many individuals experience a prodromal phase lasting months or years, characterized by subtle cognitive changes, social withdrawal, and declining functioning. This phase represents an important opportunity for early intervention. Early warning signs may include unusual thinking, mild hallucinations, social withdrawal, declining performance in school or work, and changes in self-care or personality.'
       }
     ],
     emergencySigns: [
-      'Severe shortness of breath or choking episodes during sleep',
-      'Significant and sudden increase in daytime sleepiness affecting safety',
-      'Falling asleep while driving or operating machinery',
-      'Chest pain or irregular heartbeat during sleep episodes',
-      'Severe morning headaches with confusion',
-      'Noticeable cognitive decline or personality changes'
+      'Suicidal thoughts or behaviors',
+      'Homicidal thoughts or threatening behavior toward others',
+      'Severe psychotic symptoms that put the person at risk of harm',
+      'Inability to care for basic needs (food, water, shelter)',
+      'Catatonic state (complete unresponsiveness)',
+      'Extreme disorganization that prevents basic functioning',
+      'Severe side effects from medication',
+      'Psychotic agitation with aggression'
     ],
-    prevalence: 'Sleep apnea affects approximately 936 million adults worldwide aged 30-69 (nearly 1 billion people). In the United States, about 25 million adults have obstructive sleep apnea.',
+    prevalence: 'Schizophrenia affects approximately 20 million people worldwide, or about 0.5-1% of the global population. The prevalence is relatively consistent across different countries and cultural groups, although presentation and outcomes may vary. Schizophrenia is more common in urban areas and among migrant populations. The lifetime risk of developing schizophrenia is about 0.7%. The condition affects men and women in roughly equal numbers, though men typically develop symptoms earlier than women. Schizophrenia accounts for a significant proportion of global disability, with affected individuals having a life expectancy 10-20 years shorter than the general population, primarily due to co-occurring physical health conditions and higher suicide rates.',
     affectedGroups: [
-      'Middle-aged and older adults',
-      'Men (2-3 times more common than in women, though women\'s risk increases after menopause)',
-      'People who are overweight or obese',
-      'Individuals with large neck circumference',
-      'Those with family history of sleep apnea',
-      'People with certain medical conditions (hypertension, type 2 diabetes)',
+      'Young adults (peak onset: 18-25 for men, 25-35 for women)',
+      'People with family history of schizophrenia or psychotic disorders',
+      'Urban residents',
+      'Migrant populations and ethnic minorities (possibly due to social adversity)',
+      'People born in winter/spring months (slight increase in risk)',
+      'Individuals with history of cannabis use in adolescence',
+      'People who experienced complications during birth or pregnancy',
+      'Individuals with childhood trauma or adverse life experiences',
+      'People with certain genetic variations'
+    ],
+    references: [
+      {
+        id: '1',
+        text: 'Owen MJ, Sawa A, Mortensen PB. (2016). "Schizophrenia". Lancet. 388 (10039): 86-97.',
+        url: 'https://doi.org/10.1016/S0140-6736(15)01121-6'
+      },
+      {
+        id: '2',
+        text: 'American Psychiatric Association. (2013). "Diagnostic and Statistical Manual of Mental Disorders (5th ed.)". Arlington, VA: American Psychiatric Publishing.',
+        url: 'https://doi.org/10.1176/appi.books.9780890425596'
+      },
+      {
+        id: '3',
+        text: 'Kahn RS, Sommer IE, Murray RM, et al. (2015). "Schizophrenia". Nature Reviews Disease Primers. 1: 15067.',
+        url: 'https://doi.org/10.1038/nrdp.2015.67'
+      },
+      {
+        id: '4',
+        text: 'Tandon R, Gaebel W, Barch DM, et al. (2013). "Definition and description of schizophrenia in the DSM-5". Schizophrenia Research. 150 (1): 3-10.',
+        url: 'https://doi.org/10.1016/j.schres.2013.05.028'
+      },
+      {
+        id: '5',
+        text: 'Jääskeläinen E, Juola P, Hirvonen N, et al. (2013). "A systematic review and meta-analysis of recovery in schizophrenia". Schizophrenia Bulletin. 39 (6): 1296-1306.',
+        url: 'https://doi.org/10.1093/schbul/sbs130'
+      }
+    ]
+  },
+  {
+    id: 'stroke',
+    name: 'Stroke',
+    description: 'A medical emergency that occurs when blood flow to the brain is interrupted, causing brain cells to die due to lack of oxygen and nutrients.[1] There are two main types: ischemic stroke (caused by a blood clot blocking a blood vessel) and hemorrhagic stroke (caused by a blood vessel rupturing and bleeding into the brain).[2] A transient ischemic attack (TIA) or "mini-stroke" causes temporary symptoms but is a serious warning sign.[3] Stroke requires immediate medical attention, as prompt treatment can minimize brain damage and potential complications.[4] Recognizing the signs and getting emergency care is crucial for better outcomes.[5]',
+    category: 'brain-and-nerves',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Stroke',
+    symptoms: [
+      'Sudden numbness or weakness in the face, arm, or leg, especially on one side of the body',
+      'Sudden confusion, trouble speaking, or difficulty understanding speech',
+      'Sudden trouble seeing in one or both eyes',
+      'Sudden trouble walking, dizziness, loss of balance, or lack of coordination',
+      'Sudden severe headache with no known cause',
+      'Facial drooping (one side of the face droops or is numb)',
+      'Arm weakness (inability to raise both arms evenly)',
+      'Speech difficulties (slurred speech or inability to speak)',
+      'Time to call emergency services if any of these signs appear (FAST: Face, Arms, Speech, Time)',
+      'Nausea or vomiting',
+      'Seizures',
+      'Brief loss of consciousness'
+    ],
+    causes: [
+      'Ischemic stroke: Blood clots blocking arteries (accounts for 87% of strokes)',
+      'Thrombotic stroke: Blood clot forms in an artery that supplies blood to the brain',
+      'Embolic stroke: Blood clot forms elsewhere in the body and travels to the brain',
+      'Hemorrhagic stroke: Bleeding in or around the brain',
+      'Intracerebral hemorrhage: Bleeding directly into brain tissue',
+      'Subarachnoid hemorrhage: Bleeding between brain and surrounding membranes',
+      'High blood pressure (hypertension)',
+      'Atherosclerosis (narrowing of arteries due to plaque build-up)',
+      'Heart disease (atrial fibrillation, heart valve disease)',
+      'Diabetes',
+      'Smoking',
+      'Excessive alcohol consumption',
+      'Illegal drug use (particularly cocaine and methamphetamines)',
+      'Head trauma or injury'
+    ],
+    treatments: [
+      'Emergency treatments:',
+      'Ischemic stroke: Clot-busting medications (tPA) within 3-4.5 hours of onset',
+      'Mechanical thrombectomy to physically remove large clots',
+      'Hemorrhagic stroke: Medications to reduce blood pressure and brain swelling',
+      'Surgery to repair blood vessel abnormalities',
+      'Medications:',
+      'Antiplatelet therapy (aspirin, clopidogrel)',
+      'Anticoagulants (warfarin, newer direct oral anticoagulants)',
+      'Blood pressure medications',
+      'Statins to lower cholesterol',
+      'Rehabilitation:',
+      'Physical therapy to regain movement and strength',
+      'Occupational therapy for daily activities',
+      'Speech therapy for language and swallowing difficulties',
+      'Psychological counseling for emotional adjustment'
+    ],
+    preventions: [
+      'Managing high blood pressure (most important preventable risk factor)',
+      'Not smoking or using tobacco products',
+      'Maintaining a healthy weight',
+      'Regular physical activity (at least 150 minutes of moderate exercise weekly)',
+      'Eating a diet rich in fruits, vegetables, whole grains, and low in saturated fat',
+      'Limiting alcohol consumption',
+      'Managing diabetes',
+      'Treating obstructive sleep apnea',
+      'Controlling cholesterol levels',
+      'Taking preventive medications as prescribed (antiplatelet drugs, anticoagulants)',
+      'Regular medical check-ups',
+      'Managing stress'
+    ],
+    relatedConditions: [
+      'hypertension',
+      'atrial-fibrillation',
+      'heart-disease',
+      'diabetes',
+      'atherosclerosis',
+      'high-cholesterol',
+      'vascular-dementia',
+      'brain-aneurysm',
+      'arteriovenous-malformation',
+      'carotid-artery-disease'
+    ],
+    commonQuestions: [
+      {
+        question: 'What is the difference between a stroke and a heart attack?',
+        answer: 'While both are medical emergencies involving interrupted blood flow, they affect different organs. A stroke occurs when blood flow to the brain is blocked or a blood vessel in the brain ruptures, causing brain cells to die from lack of oxygen. It primarily affects brain function, with symptoms like sudden numbness/weakness (especially on one side), confusion, trouble speaking, vision problems, dizziness, and severe headache. A heart attack (myocardial infarction) happens when blood flow to a part of the heart muscle is blocked, causing heart tissue damage. Heart attack symptoms typically include chest pain/pressure, pain radiating to the arm/jaw/back, shortness of breath, cold sweat, nausea, and fatigue. Both require immediate emergency treatment, but the medications and procedures used differ significantly. The acronym FAST (Face drooping, Arm weakness, Speech difficulties, Time to call emergency services) helps identify stroke symptoms, while heart attack recognition focuses on chest discomfort and associated symptoms.'
+      },
+      {
+        question: 'Can someone fully recover from a stroke?',
+        answer: 'Recovery from stroke varies greatly depending on several factors, including the type, severity, and location of the stroke, how quickly treatment was received, the person\'s age and overall health, and the intensity of rehabilitation efforts. Some people make a complete or near-complete recovery, particularly after mild strokes or TIAs (transient ischemic attacks). Others experience lasting disabilities ranging from minor to severe. The brain has some ability to reorganize itself (neuroplasticity), allowing healthy areas to take over functions from damaged regions. Most recovery occurs in the first 3-6 months after a stroke, but improvements can continue for years with ongoing therapy and effort. Comprehensive rehabilitation programs, including physical, occupational, and speech therapy, significantly improve outcomes. Early treatment is crucial—the faster a person receives care after stroke symptoms begin, the better their chances for meaningful recovery, highlighting the importance of recognizing stroke symptoms and seeking immediate emergency care.'
+      },
+      {
+        question: 'What are the warning signs before a stroke?',
+        answer: 'While strokes often occur suddenly without clear advance warning, some people experience transient ischemic attacks (TIAs or "mini-strokes") beforehand. TIAs produce stroke-like symptoms that typically last minutes to hours but resolve completely within 24 hours. These should be treated as medical emergencies and major warning signs of an impending full stroke—about 1 in 3 people who have a TIA will eventually have a stroke. The symptoms of a TIA are identical to those of a stroke and include sudden onset of: facial drooping, arm weakness, speech difficulties, numbness or weakness (especially on one side of the body), confusion, trouble speaking or understanding, vision problems in one or both eyes, dizziness or loss of balance, and severe headache without known cause. Other potential warning signs in the days or weeks before a stroke may include frequent headaches, changes in mental status or cognition, unexplained dizziness or unsteadiness, or brief episodes of numbness or weakness. Anyone experiencing these symptoms should seek immediate medical attention, even if they resolve quickly.'
+      }
+    ],
+    emergencySigns: [
+      'ANY stroke symptom requires immediate emergency care - call 911 or local emergency number immediately',
+      'Sudden facial drooping',
+      'Sudden arm or leg weakness or numbness, especially on one side',
+      'Sudden confusion or trouble speaking/understanding',
+      'Sudden trouble seeing in one or both eyes',
+      'Sudden dizziness, loss of balance or coordination',
+      'Sudden severe headache with no known cause',
+      'Loss of consciousness',
+      'Seizures',
+      'Severe vomiting',
+      'Symptoms that fluctuate, temporarily improve, then return (may indicate TIA)'
+    ],
+    prevalence: 'Stroke is a leading cause of death and disability worldwide. Globally, approximately 13.7 million new strokes occur each year, and about 5.5 million people die from stroke annually. In the United States, about 795,000 people experience a stroke each year, with about 610,000 being first-time strokes. On average, someone in the United States has a stroke every 40 seconds, and someone dies from stroke approximately every 4 minutes.',
+    affectedGroups: [
+      'Older adults (risk doubles each decade after age 55)',
+      'Men (have higher stroke incidence than women at younger ages)',
+      'Women (have higher lifetime risk and worse outcomes)',
+      'African Americans (twice the risk of first-time stroke compared to whites)',
+      'Hispanic and Asian/Pacific Islander populations (higher risk than non-Hispanic whites)',
+      'People with family history of stroke',
+      'Those with prior stroke or TIA',
+      'Individuals with hypertension, heart disease, diabetes, or high cholesterol',
       'Smokers',
-      'People who use alcohol, sedatives, or tranquilizers'
-    ]
-  },
-  {
-    id: 'schistosomiasis',
-    name: 'Schistosomiasis',
-    description: 'A parasitic disease caused by blood flukes (trematode worms) of the genus Schistosoma, transmitted through contact with freshwater contaminated with the parasites, leading to chronic illness.',
-    category: 'infectious-diseases',
-    subcategory: 'parasitic-infections',
-    symptoms: [
-      'Acute phase (Katayama fever): Fever, chills, cough, and muscle aches',
-      'Skin rash or itchy skin',
-      'Abdominal pain',
-      'Bloody diarrhea or blood in stool',
-      'Bloody urine (in urinary schistosomiasis)',
-      'Pain during urination',
-      'Enlarged liver or spleen',
-      'Chronic fatigue',
-      'Growth and cognitive impairments in children',
-      'Genital lesions and vaginal bleeding (genital schistosomiasis)'
+      'People with obesity',
+      'Those with sedentary lifestyles'
     ],
-    causes: [
-      'Infection with Schistosoma parasites (S. mansoni, S. haematobium, S. japonicum, etc.)',
-      'Transmission through skin contact with contaminated freshwater',
-      'Parasite larvae (cercariae) released from infected freshwater snails',
-      'Most common in tropical and subtropical areas with inadequate sanitation',
-      'Adult worms live in blood vessels and release eggs that damage organs'
-    ],
-    treatments: [
-      'Praziquantel (drug of choice, kills adult worms)',
-      'Repeated treatment may be needed in heavily endemic areas',
-      'Management of complications (including surgery in severe cases)',
-      'Supportive care for symptoms',
-      'Iron supplementation for anemia',
-      'Mass drug administration in high-prevalence communities'
-    ],
-    preventions: [
-      'Avoiding wading, swimming, or bathing in freshwater in endemic areas',
-      'Improved sanitation and access to clean water',
-      'Snail control in water bodies',
-      'Health education about transmission and prevention',
-      'Treating infected people to reduce environmental contamination',
-      'Filtering or treating potentially contaminated water'
-    ],
-    relatedConditions: ['chronic-liver-disease', 'bladder-cancer', 'chronic-kidney-disease', 'pulmonary-hypertension'],
-    commonQuestions: [
+    references: [
       {
-        question: 'How long can schistosomiasis parasites live in the body?',
-        answer: 'Adult schistosomes can live in the human body for an average of 3-10 years, but some may survive for up to 40 years. During this time, female worms produce hundreds to thousands of eggs daily, which cause most of the health problems associated with the disease. Even after the worms die naturally, the damage they\'ve caused to organs may persist and continue to cause symptoms.'
+        id: '1',
+        text: 'Virani SS, Alonso A, Aparicio HJ, et al. (2021). "Heart Disease and Stroke Statistics—2021 Update: A Report From the American Heart Association". Circulation. 143 (8): e254–e743.',
+        url: 'https://doi.org/10.1161/CIR.0000000000000950'
       },
       {
-        question: 'Is schistosomiasis contagious from person to person?',
-        answer: 'No, schistosomiasis cannot be transmitted directly from person to person. The parasite requires both a specific type of freshwater snail (intermediate host) and human (definitive host) to complete its life cycle. Infection occurs when people contact water containing infectious cercariae that have been released from infected snails. The parasite cannot complete its life cycle in chlorinated swimming pools or properly treated water.'
-      }
-    ],
-    prevalence: 'Schistosomiasis affects over 240 million people worldwide, with more than 700 million people living in endemic areas at risk of infection. It is particularly prevalent in sub-Saharan Africa, which accounts for more than 90% of cases.',
-    affectedGroups: [
-      'School-aged children in endemic areas',
-      'Farmers, fishermen, and others who work in or near water',
-      'Women doing domestic chores in infested water',
-      'Travelers to endemic regions who swim or wade in freshwater',
-      'Rural communities with limited access to safe water and sanitation'
-    ]
-  },
-  {
-    id: 'trachoma',
-    name: 'Trachoma',
-    description: 'A bacterial eye infection caused by Chlamydia trachomatis that leads to inflammation, scarring of the eyelid, and potentially blindness if left untreated.',
-    category: 'infectious-diseases',
-    subcategory: 'bacterial-infections',
-    symptoms: [
-      'Itchy, irritated eyes',
-      'Discharge from the eyes',
-      'Light sensitivity (photophobia)',
-      'Eye pain',
-      'Swollen eyelids',
-      'Turned-in eyelashes (trichiasis) in advanced cases',
-      'Cloudy cornea in advanced cases',
-      'Reduced vision or blindness in advanced cases',
-      'Formation of follicles on the inner eyelid'
-    ],
-    causes: [
-      'Infection with Chlamydia trachomatis bacteria',
-      'Spread through direct contact with eye discharge from infected person',
-      'Spread by flies that have been in contact with discharge from infected eyes',
-      'Contact with contaminated objects (towels, clothing)',
-      'Poor personal and environmental hygiene',
-      'Limited access to clean water and sanitation'
-    ],
-    treatments: [
-      'Antibiotics (azithromycin, oral or topical tetracycline)',
-      'Mass drug administration in affected communities',
-      'Surgery for advanced cases with turned-in eyelashes (trichiasis)',
-      'Epilation (removal of ingrowing eyelashes)',
-      'Facial cleanliness',
-      'Management of complications'
-    ],
-    preventions: [
-      'Improved sanitation and access to clean water',
-      'Regular face washing, especially for children',
-      'Personal hygiene practices',
-      'Environmental improvements to reduce fly breeding',
-      'Antibiotic treatment programs in endemic communities',
-      'SAFE strategy (Surgery, Antibiotics, Facial cleanliness, Environmental improvement)'
-    ],
-    relatedConditions: ['bacterial-conjunctivitis', 'corneal-opacity', 'dry-eye-syndrome'],
-    commonQuestions: [
-      {
-        question: 'Is trachoma still common worldwide?',
-        answer: 'Trachoma remains the world\'s leading infectious cause of blindness, but its prevalence has significantly decreased due to global elimination efforts. It is now primarily found in poor, rural communities in Africa, Asia, Central and South America, Australia, and the Middle East. The WHO launched a program to eliminate trachoma as a public health problem by 2030, and many countries have already achieved elimination targets. However, an estimated 137 million people still live in trachoma-endemic areas and require interventions.'
+        id: '2',
+        text: 'Campbell BCV, De Silva DA, Macleod MR, et al. (2019). "Ischaemic stroke". Nature Reviews Disease Primers. 5 (1): 70.',
+        url: 'https://doi.org/10.1038/s41572-019-0118-8'
       },
       {
-        question: 'How does trachoma lead to blindness?',
-        answer: 'Trachoma leads to blindness through a progressive process that often takes many years. Repeated infections cause chronic inflammation of the eyelids, which leads to scarring. Over time, this scarring can cause the eyelid to turn inward (entropion), resulting in eyelashes rubbing against the cornea (trichiasis). This continuous abrasion damages the cornea, causing painful corneal ulcers and scarring. Eventually, the cornea becomes opaque, leading to irreversible vision loss and blindness. This progression typically occurs over 10-40 years with repeated infections.'
-      }
-    ],
-    prevalence: 'Trachoma is endemic in 44 countries and affects about 1.9 million people worldwide, with approximately 137 million people living in endemic areas. It is responsible for the visual impairment or blindness of about 1.9 million people.',
-    affectedGroups: [
-      'People living in poor rural communities with limited access to healthcare, clean water, and sanitation',
-      'Children, who are more susceptible to infection and serve as reservoirs',
-      'Women, who are 2-3 times more likely to develop trichiasis than men (possibly due to closer contact with children)',
-      'Communities in hot, dry, dusty environments that favor transmission',
-      'Indigenous populations in certain countries'
-    ]
-  },
-  {
-    id: 'tuberculosis',
-    name: 'Tuberculosis (TB)',
-    description: 'A potentially serious infectious disease caused by Mycobacterium tuberculosis bacteria that mainly affects the lungs but can also affect other parts of the body.',
-    category: 'infectious-diseases',
-    subcategory: 'bacterial-infections',
-    symptoms: [
-      'Persistent cough (lasting more than three weeks)',
-      'Coughing up blood or mucus',
-      'Chest pain, particularly during breathing or coughing',
-      'Unintentional weight loss',
-      'Fatigue',
-      'Fever',
-      'Night sweats',
-      'Chills',
-      'Loss of appetite',
-      'Symptoms related to affected organs in extrapulmonary TB'
-    ],
-    causes: [
-      'Infection with Mycobacterium tuberculosis bacteria',
-      'Airborne transmission through droplets when infected people cough, speak, or sneeze',
-      'Close, prolonged contact with someone who has active TB disease',
-      'Reactivation of latent TB infection',
-      'Immunosuppression (especially HIV infection) increasing susceptibility'
-    ],
-    treatments: [
-      'Combination of antibiotics for 6-9 months (isoniazid, rifampin, ethambutol, pyrazinamide)',
-      'Directly Observed Therapy (DOT) to ensure medication adherence',
-      'Treatment for drug-resistant TB (longer duration, more medications)',
-      'Treatment of latent TB infection to prevent active disease',
-      'Supportive care for symptoms and complications',
-      'Surgery in rare cases (to remove damaged lung tissue)'
-    ],
-    preventions: [
-      'BCG vaccine (provides some protection, especially for children)',
-      'Early detection and treatment of active cases',
-      'Treatment of latent TB infection',
-      'Infection control measures in healthcare settings',
-      'Proper ventilation in high-risk settings',
-      'Avoiding close contact with known TB patients until they\'re no longer contagious',
-      'HIV prevention and treatment',
-      'Addressing poverty and overcrowding'
-    ],
-    relatedConditions: ['hiv-aids', 'silicosis', 'diabetes', 'copd'],
-    commonQuestions: [
-      {
-        question: 'What is the difference between latent TB infection and TB disease?',
-        answer: 'Latent TB infection means TB bacteria are living in the body but not causing symptoms (people aren\'t sick or contagious). This can last for years or a lifetime without progressing. TB disease (active TB) means the bacteria are multiplying, making the person sick and potentially contagious. Symptoms typically affect the lungs but can involve other body parts. About 5-10% of people with latent TB will develop active TB disease in their lifetime, with higher risk in the first two years after infection.'
+        id: '3',
+        text: 'Powers WJ, Rabinstein AA, Ackerson T, et al. (2019). "Guidelines for the Early Management of Patients With Acute Ischemic Stroke: 2019 Update to the 2018 Guidelines for the Early Management of Acute Ischemic Stroke". Stroke. 50 (12): e344–e418.',
+        url: 'https://doi.org/10.1161/STR.0000000000000211'
       },
       {
-        question: 'How long is TB contagious after starting treatment?',
-        answer: 'People with active pulmonary TB generally become non-contagious after about 2-3 weeks of effective antibiotic treatment, provided they\'re responding well to therapy. However, the full treatment course (typically 6-9 months) must be completed to cure the disease and prevent relapse or drug resistance. Public health authorities often use factors like clinical improvement, reduced cough, negative sputum smears, and time on effective therapy to determine when isolation can be discontinued.'
-      }
-    ],
-    emergencySigns: [
-      'Severe difficulty breathing',
-      'Coughing up large amounts of blood',
-      'Severe chest pain',
-      'High persistent fever',
-      'Confusion or altered mental status (in TB meningitis)'
-    ],
-    prevalence: 'Tuberculosis affects about 10 million people worldwide each year and is one of the top 10 causes of death globally. Approximately one-quarter of the world\'s population has latent TB infection.',
-    affectedGroups: [
-      'People living with HIV/AIDS',
-      'People living in poverty or overcrowded conditions',
-      'Healthcare workers',
-      'People with weakened immune systems',
-      'Prison inmates',
-      'Homeless populations',
-      'People from countries with high TB burden',
-      'Indigenous populations in some countries'
-    ]
-  },
-  {
-    id: 'typhoid-fever',
-    name: 'Typhoid Fever',
-    description: 'A bacterial infection caused by Salmonella Typhi, spread through contaminated food and water, characterized by high fever, abdominal pain, and potentially serious complications if untreated.',
-    category: 'infectious-diseases',
-    subcategory: 'bacterial-infections',
-    symptoms: [
-      'Persistent high fever (gradually increasing to 103°F-104°F)',
-      'Headache',
-      'Weakness and fatigue',
-      'Abdominal pain',
-      'Constipation or diarrhea',
-      'Loss of appetite',
-      'Rash of flat, rose-colored spots (rose spots)',
-      'Dry cough',
-      'Muscle aches',
-      'Enlarged spleen and liver',
-      'Bradycardia (slow heart rate) relative to fever'
-    ],
-    causes: [
-      'Infection with Salmonella Typhi bacteria',
-      'Consuming food or water contaminated with feces from infected person',
-      'Poor sanitation and inadequate hygiene',
-      'Close contact with infected individuals (less common)',
-      'Some people become carriers without symptoms (like "Typhoid Mary")'
-    ],
-    treatments: [
-      'Antibiotics (ciprofloxacin, azithromycin, ceftriaxone)',
-      'Supportive care including fluids and nutrition',
-      'Management of complications',
-      'Isolation to prevent spread to others',
-      'Longer antibiotic courses for chronic carriers'
-    ],
-    preventions: [
-      'Typhoid vaccines (injectable Vi capsular polysaccharide or oral Ty21a)',
-      'Safe drinking water (boiled, treated, or bottled)',
-      'Proper food handling and preparation',
-      'Thorough handwashing with soap',
-      'Avoiding raw foods in high-risk areas',
-      'Proper sewage disposal systems',
-      'Identifying and treating carriers',
-      'Water chlorination and sanitation improvement'
-    ],
-    relatedConditions: ['paratyphoid-fever', 'salmonellosis', 'gastroenteritis', 'intestinal-perforation'],
-    commonQuestions: [
-      {
-        question: 'How long do typhoid symptoms last without treatment?',
-        answer: 'Without treatment, typhoid fever typically progresses through four stages over 3-4 weeks. Symptoms worsen during the first week with rising fever, peak in severity during the second week with potential complications, begin to ease during the third week, and gradually resolve in the fourth week. However, without proper treatment, the mortality rate can reach 12-30%. Additionally, about 10-15% of untreated patients who survive will experience relapse, and 2-5% may become chronic carriers.'
+        id: '4',
+        text: 'Hankey GJ. (2017). "Stroke". Lancet. 389 (10069): 641–654.',
+        url: 'https://doi.org/10.1016/S0140-6736(16)30962-X'
       },
       {
-        question: 'Is typhoid fever only found in developing countries?',
-        answer: 'Typhoid fever predominantly affects developing nations with limited access to clean water and proper sanitation. About 11-20 million cases occur worldwide annually, with most in South Asia, Southeast Asia, and sub-Saharan Africa. In developed countries like the United States, Canada, and Western Europe, typhoid is relatively rare (fewer than 500 cases annually in the US) and most cases are acquired during international travel to endemic regions. However, the disease can occur anywhere if water or food becomes contaminated with S. Typhi.'
+        id: '5',
+        text: 'Meschia JF, Bushnell C, Boden-Albala B, et al. (2014). "Guidelines for the primary prevention of stroke: a statement for healthcare professionals from the American Heart Association/American Stroke Association". Stroke. 45 (12): 3754–3832.',
+        url: 'https://doi.org/10.1161/STR.0000000000000046'
       }
-    ],
-    emergencySigns: [
-      'Persistent high fever unresponsive to treatment',
-      'Severe abdominal pain or distension',
-      'Neurological symptoms (confusion, delirium)',
-      'Intestinal bleeding (bloody stools)',
-      'Signs of intestinal perforation (severe pain, rigid abdomen)',
-      'Shock',
-      'Severe dehydration'
-    ],
-    prevalence: 'Typhoid fever affects an estimated 11-20 million people worldwide annually, causing between 128,000-161,000 deaths. The highest incidence is in South Asia, Southeast Asia, and sub-Saharan Africa.',
-    affectedGroups: [
-      'Children and young adults in endemic areas',
-      'Travelers to endemic regions',
-      'People in areas with poor sanitation and limited access to clean water',
-      'Populations in conflict zones or after natural disasters',
-      'Those living in crowded conditions with inadequate hygiene'
     ]
   },
+
   {
     id: 'thyroid-disorders',
     name: 'Thyroid Disorders',

@@ -5,11 +5,141 @@ import { HealthCondition } from '../healthConditionsData';
  */
 export const conditionsDtoF: HealthCondition[] = [
   {
+    id: 'endometriosis',
+    name: 'Endometriosis',
+    description: 'A chronic inflammatory condition where tissue similar to the lining of the uterus (endometrium) grows outside the uterine cavity.[1] These growths, called endometrial implants, most commonly occur on the ovaries, fallopian tubes, pelvic peritoneum, and bowel.[2] The condition affects approximately 10% of reproductive-age women worldwide and is a leading cause of pelvic pain and infertility.[3] Despite its prevalence, endometriosis is often underdiagnosed, with an average delay of 7-10 years from symptom onset to diagnosis.[4]',
+    category: 'reproductive-health',
+    subcategory: 'gynecological-disorders',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Endometriosis',
+    symptoms: [
+      'Painful periods (dysmenorrhea)',
+      'Chronic pelvic pain',
+      'Pain during or after sexual intercourse (dyspareunia)',
+      'Pain with bowel movements or urination, particularly during menstruation',
+      'Excessive bleeding during periods or between periods',
+      'Infertility or difficulty becoming pregnant',
+      'Fatigue',
+      'Bloating and nausea',
+      'Diarrhea or constipation, especially during menstrual periods',
+      'Lower back pain that may occur at any time',
+      'Symptoms may vary widely in severity and don\'t necessarily correlate with the extent of the disease'
+    ],
+    causes: [
+      'Retrograde menstruation (menstrual blood flowing back through the fallopian tubes)',
+      'Cellular metaplasia (cells outside the uterus transform into endometrial-like cells)',
+      'Embryonic cell transformation (embryonic cells develop into endometrial tissue)',
+      'Surgical scar implantation (during surgeries like C-section or hysterectomy)',
+      'Endometrial cell transport (through blood vessels or lymphatic system)',
+      'Immune system dysfunction',
+      'Genetic factors (family history increases risk)',
+      'Environmental factors (including exposure to certain chemicals)'
+    ],
+    treatments: [
+      'Pain management:',
+      'Nonsteroidal anti-inflammatory drugs (NSAIDs)',
+      'Hormonal therapies:',
+      'Combined hormonal contraceptives (pills, patches, rings)',
+      'Progestins (pills, IUDs, implants, injections)',
+      'Gonadotropin-releasing hormone (GnRH) agonists and antagonists',
+      'Aromatase inhibitors',
+      'Surgical treatments:',
+      'Laparoscopic excision or ablation of endometriosis lesions',
+      'Removal of endometriomas (ovarian cysts)',
+      'Hysterectomy with or without oophorectomy (in severe cases)',
+      'Complementary approaches:',
+      'Physical therapy for pelvic pain',
+      'Acupuncture',
+      'Dietary modifications',
+      'Exercise',
+      'Cognitive behavioral therapy',
+      'Fertility treatments for those trying to conceive'
+    ],
+    preventions: [
+      'No known definitive prevention methods',
+      'Factors that may reduce risk:',
+      'Regular exercise',
+      'Maintaining a healthy weight',
+      'Avoiding large amounts of alcohol and caffeine',
+      'Reducing exposure to environmental toxins',
+      'Pregnancy and breastfeeding (may temporarily suppress symptoms)',
+      'Early diagnosis and treatment to prevent progression'
+    ],
+    relatedConditions: [
+      'adenomyosis',
+      'uterine-fibroids',
+      'pelvic-inflammatory-disease',
+      'irritable-bowel-syndrome',
+      'interstitial-cystitis',
+      'fibromyalgia',
+      'autoimmune-disorders',
+      'certain-cancers (rare association)'
+    ],
+    commonQuestions: [
+      {
+        question: 'Does endometriosis always cause infertility?',
+        answer: 'No, endometriosis does not always cause infertility, though it is associated with fertility challenges. Approximately 30-50% of women with endometriosis experience infertility, but many women with the condition can and do conceive naturally. The relationship between endometriosis and fertility is complex and depends on several factors including the severity and location of endometriosis lesions, whether the condition has affected the ovaries or fallopian tubes, the presence of adhesions (scar tissue), and other individual factors. Endometriosis may impact fertility through mechanisms such as distorted pelvic anatomy, altered immune function, impaired egg quality, compromised implantation, and inflammation. For women with endometriosis who are trying to conceive, treatment options range from surgical removal of endometriosis lesions to fertility treatments like intrauterine insemination (IUI) or in vitro fertilization (IVF). The approach depends on the woman\'s age, the severity of endometriosis, duration of infertility, and other fertility factors.'
+      },
+      {
+        question: 'Is endometriosis just "bad period pain"?',
+        answer: 'No, endometriosis is much more than "bad period pain." While painful periods (dysmenorrhea) are a common symptom, endometriosis is a complex, chronic inflammatory condition where tissue similar to the uterine lining grows outside the uterus. The pain of endometriosis can be debilitating and is often not limited to menstruation—many women experience pain throughout their cycle, during sexual intercourse, or with bowel movements and urination. Beyond pain, endometriosis can cause a range of other symptoms including heavy or irregular bleeding, fatigue, digestive issues, and infertility. The condition can significantly impact quality of life, affecting relationships, work productivity, mental health, and daily activities. Unfortunately, the misconception that endometriosis is just severe menstrual pain contributes to diagnostic delays, with many women\'s symptoms being dismissed or normalized. This highlights the importance of increased awareness and education about this condition among both the public and healthcare providers.'
+      },
+      {
+        question: 'Can endometriosis be cured?',
+        answer: 'Currently, there is no definitive cure for endometriosis. It is considered a chronic condition that requires ongoing management. While treatments can effectively control symptoms and slow disease progression, endometriosis often recurs after treatment, particularly after conservative surgeries that preserve the uterus and ovaries. The only procedure that completely eliminates endometriosis is a total hysterectomy with removal of both ovaries and all visible endometriosis lesions, but even this is not guaranteed to resolve all symptoms, especially if microscopic disease remains. Additionally, this approach causes surgical menopause and eliminates the possibility of future pregnancy, making it inappropriate for many women, particularly those of reproductive age who wish to preserve fertility. Most treatment approaches aim to manage symptoms, improve quality of life, preserve fertility when desired, and slow disease progression through a combination of pain management, hormonal therapies, surgical interventions, and lifestyle modifications. Research into more effective treatments and potential cures continues, with promising developments in understanding the genetic and immunological aspects of the disease.'
+      }
+    ],
+    emergencySigns: [
+      'Severe, acute pelvic pain that doesn\'t respond to usual pain management',
+      'Signs of ruptured endometrioma (sudden, sharp abdominal pain)',
+      'Symptoms of bowel or urinary obstruction',
+      'Heavy vaginal bleeding requiring more than one pad or tampon per hour',
+      'Signs of infection (fever, chills) after endometriosis surgery'
+    ],
+    prevalence: 'Endometriosis affects approximately 10% of reproductive-age women worldwide, which translates to roughly 190 million women globally. The actual prevalence may be higher due to underdiagnosis. Studies show that endometriosis is present in 25-50% of women with infertility and 70-90% of women with chronic pelvic pain. The condition can affect women of any age after puberty, though it is most commonly diagnosed between ages 25-35. There is often a significant delay in diagnosis, averaging 7-10 years from symptom onset.',
+    affectedGroups: [
+      'Women of reproductive age (typically ages 15-49)',
+      'Those with a family history of endometriosis (7-10 times higher risk)',
+      'Women who have never given birth',
+      'Women with shorter menstrual cycles or longer periods',
+      'Women with certain anatomical abnormalities of the reproductive tract',
+      'Those with immune system disorders',
+      'Individuals assigned female at birth with retrograde menstruation'
+    ],
+    references: [
+      {
+        id: '1',
+        text: 'Zondervan KT, Becker CM, Missmer SA. (2020). "Endometriosis". New England Journal of Medicine. 382 (13): 1244-1256.',
+        url: 'https://doi.org/10.1056/NEJMra1810764'
+      },
+      {
+        id: '2',
+        text: 'Giudice LC. (2010). "Clinical practice. Endometriosis". New England Journal of Medicine. 362 (25): 2389-2398.',
+        url: 'https://doi.org/10.1056/NEJMcp1000274'
+      },
+      {
+        id: '3',
+        text: 'As-Sanie S, Black R, Giudice LC, et al. (2019). "Assessing research gaps and unmet needs in endometriosis". American Journal of Obstetrics and Gynecology. 221 (2): 86-94.',
+        url: 'https://doi.org/10.1016/j.ajog.2019.02.033'
+      },
+      {
+        id: '4',
+        text: 'Agarwal SK, Chapron C, Giudice LC, et al. (2019). "Clinical diagnosis of endometriosis: a call to action". American Journal of Obstetrics and Gynecology. 220 (4): 354.e1-354.e12.',
+        url: 'https://doi.org/10.1016/j.ajog.2018.12.039'
+      },
+      {
+        id: '5',
+        text: 'Dunselman GA, Vermeulen N, Becker C, et al. (2014). "ESHRE guideline: management of women with endometriosis". Human Reproduction. 29 (3): 400-412.',
+        url: 'https://doi.org/10.1093/humrep/det457'
+      }
+    ]
+  },
+  {
     id: 'diarrheal-diseases',
     name: 'Diarrheal Diseases',
-    description: 'A group of conditions characterized by loose, watery stools occurring more frequently than normal, often caused by viral, bacterial, or parasitic infections and resulting in dehydration if severe or untreated.',
-    category: 'digestive',
+    description: 'A group of conditions characterized by loose, watery stools occurring more frequently than normal (typically three or more loose/liquid stools per day), often caused by viral, bacterial, or parasitic infections.[1] Diarrheal disease is the third leading cause of death in children under 5 years old[2] and can result in severe dehydration if untreated.[3] The condition can negatively impact both physical fitness and mental development, particularly in children.[4]',
+    category: 'digestive-health',
     subcategory: 'infectious-diarrhea',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Diarrhea',
     symptoms: [
       'Loose, watery stools',
       'Abdominal cramps or pain',
@@ -53,6 +183,33 @@ export const conditionsDtoF: HealthCondition[] = [
       'Proper disposal of human waste'
     ],
     relatedConditions: ['dysentery', 'cholera', 'gastroenteritis', 'food-poisoning', 'malnutrition'],
+    references: [
+      {
+        id: '1',
+        text: 'World Health Organization. (2023). "Diarrhoeal disease". WHO Fact Sheet.',
+        url: 'https://www.who.int/news-room/fact-sheets/detail/diarrhoeal-disease'
+      },
+      {
+        id: '2',
+        text: 'GBD 2016 Diarrhoeal Disease Collaborators. (2018). "Estimates of the global, regional, and national morbidity, mortality, and aetiologies of diarrhoea in 195 countries: a systematic analysis for the Global Burden of Disease Study 2016". The Lancet Infectious Diseases, 18(11), 1211-1228.',
+        url: 'https://doi.org/10.1016/S1473-3099(18)30362-1'
+      },
+      {
+        id: '3',
+        text: 'Shane AL, Mody RK, Crump JA, et al. (2017). "2017 Infectious Diseases Society of America Clinical Practice Guidelines for the Diagnosis and Management of Infectious Diarrhea". Clinical Infectious Diseases, 65(12), e45-e80.',
+        url: 'https://doi.org/10.1093/cid/cix669'
+      },
+      {
+        id: '4',
+        text: 'Guerrant RL, DeBoer MD, Moore SR, Scharf RJ, Lima AA. (2013). "The impoverished gut—a triple burden of diarrhoea, stunting and chronic disease". Nature Reviews Gastroenterology & Hepatology, 10(4), 220-229.',
+        url: 'https://doi.org/10.1038/nrgastro.2012.239'
+      },
+      {
+        id: '5',
+        text: 'Kotloff KL, Nataro JP, Blackwelder WC, et al. (2013). "Burden and aetiology of diarrhoeal disease in infants and young children in developing countries (the Global Enteric Multicenter Study, GEMS): a prospective, case-control study". The Lancet, 382(9888), 209-222.',
+        url: 'https://doi.org/10.1016/S0140-6736(13)60844-2'
+      }
+    ],
     commonQuestions: [
       {
         question: 'When should I seek medical attention for diarrhea?',
@@ -308,10 +465,261 @@ export const conditionsDtoF: HealthCondition[] = [
     ]
   },
   {
+    id: 'deep-vein-thrombosis',
+    name: 'Deep Vein Thrombosis (DVT)',
+    description: 'A condition that occurs when a blood clot (thrombus) forms in one or more of the deep veins in the body, most commonly in the legs.[1] Deep vein thrombosis can cause leg pain or swelling, but can also occur without any symptoms.[2] If the blood clot breaks loose, it can travel through the bloodstream and lodge in the lungs, blocking blood flow (pulmonary embolism), which can be life-threatening.[3] DVT is a serious condition that requires prompt medical attention and treatment.[4]',
+    category: 'heart-and-circulation',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Deep_vein_thrombosis',
+    symptoms: [
+      'Swelling in the affected leg (less commonly, both legs)',
+      'Pain in the leg, often starting in the calf',
+      'Red or discolored skin on the leg',
+      'Feeling of warmth in the affected leg',
+      'Visible surface veins',
+      'Leg fatigue',
+      'Note: About 50% of people with DVT have no symptoms at all'
+    ],
+    causes: [
+      'Prolonged immobility (long trips, bed rest)',
+      'Injury or surgery',
+      'Pregnancy and childbirth',
+      'Hormone therapy or birth control pills',
+      'Cancer and cancer treatments',
+      'Genetic blood clotting disorders (e.g., Factor V Leiden)',
+      'Previous history of DVT or pulmonary embolism',
+      'Advanced age',
+      'Obesity',
+      'Smoking',
+      'Heart failure',
+      'Inflammatory bowel disease',
+      'COVID-19 infection'
+    ],
+    treatments: [
+      'Anticoagulant medications (blood thinners) like heparin, warfarin, or direct oral anticoagulants',
+      'Thrombolytic therapy (clot dissolvers) for severe cases',
+      'Inferior vena cava (IVC) filters for those who can\'t take anticoagulants',
+      'Compression stockings to prevent swelling and reduce risk of complications',
+      'Elevation of the affected limb',
+      'Surgical thrombectomy (removal of clot) in extreme cases',
+      'Treatment of underlying conditions'
+    ],
+    preventions: [
+      'Regular movement during long trips or periods of sitting',
+      'Compression stockings during high-risk situations',
+      'Anticoagulant medications for high-risk individuals',
+      'Early ambulation after surgery',
+      'Maintaining a healthy weight',
+      'Regular exercise',
+      'Quitting smoking',
+      'Staying hydrated',
+      'Avoiding tight clothing that restricts blood flow',
+      'Preventative anticoagulants after certain surgeries',
+      'Pneumatic compression devices during hospitalization'
+    ],
+    relatedConditions: [
+      'pulmonary-embolism',
+      'post-thrombotic-syndrome',
+      'chronic-venous-insufficiency',
+      'may-thurner-syndrome',
+      'protein-c-deficiency',
+      'protein-s-deficiency',
+      'factor-v-leiden',
+      'prothrombin-gene-mutation',
+      'antiphospholipid-syndrome'
+    ],
+    commonQuestions: [
+      {
+        question: 'How serious is a DVT?',
+        answer: 'A deep vein thrombosis (DVT) is a serious medical condition that requires prompt treatment. While the clot itself can cause damage to the vein and surrounding tissues, the most significant danger is that the clot could break loose and travel to the lungs, causing a pulmonary embolism (PE). PE is a potentially life-threatening emergency that can cause severe damage to the lungs and other organs due to reduced oxygen in the blood. Additionally, DVT can lead to long-term complications such as post-thrombotic syndrome, which causes chronic pain, swelling, and skin changes in the affected limb. The severity depends on the size and location of the clot, pre-existing health conditions, and how quickly treatment is initiated. With proper and timely treatment, many people recover completely from DVT, but it often requires several months of medication and monitoring.'
+      },
+      {
+        question: 'How long does it take for a DVT to dissolve with treatment?',
+        answer: 'With appropriate anticoagulant (blood thinner) treatment, a deep vein thrombosis (DVT) doesn\'t actually dissolve immediately but becomes stabilized, preventing it from growing larger or breaking off. The body\'s natural clot dissolution process (fibrinolysis) then works to gradually break down the clot. The timeline varies significantly between individuals: Small clots may dissolve within a few weeks. Larger clots can take 3-6 months to resolve completely. Some very large clots may never dissolve entirely, though they become adherent to the vein wall and less dangerous over time. During treatment, symptom improvement often occurs within days to weeks, even though the clot itself is still present. Pain and swelling typically decrease within 1-2 weeks as collateral circulation develops. Most patients require anticoagulant therapy for at least 3 months, sometimes longer depending on risk factors. For particularly severe or life-threatening clots, thrombolytic therapy (clot-busting drugs) might be used, which can dissolve clots more quickly but carries increased bleeding risks.'
+      },
+      {
+        question: 'Can I fly with a DVT?',
+        answer: 'Flying with a diagnosed DVT (deep vein thrombosis) is generally not recommended in the early stages of diagnosis and treatment. Air travel involves prolonged sitting in a confined space with reduced mobility and lower cabin pressure, which can increase the risk of clot progression or embolization (breaking off and traveling to the lungs). If you have been diagnosed with a DVT, you should: Wait until your treatment has stabilized the clot, typically at least 2-4 weeks after starting anticoagulation therapy. Consult with your healthcare provider before planning any air travel. They can provide personalized advice based on your specific situation, clot location, and treatment progress. If your doctor approves travel, they may recommend: Taking your anticoagulant medication exactly as prescribed before and during travel. Wearing properly fitted compression stockings. Getting an aisle seat to facilitate movement. Standing, stretching, and walking every 1-2 hours during the flight. Staying well-hydrated and avoiding alcohol. In some cases, your doctor might recommend a temporary adjustment to your anticoagulant regimen before flying. Never make travel plans against medical advice if you have a recently diagnosed DVT, as the risk of pulmonary embolism is highest in the early weeks after clot formation.'
+      }
+    ],
+    emergencySigns: [
+      'Sudden shortness of breath',
+      'Chest pain that worsens with deep breathing',
+      'Coughing up blood',
+      'Rapid or irregular heartbeat',
+      'Lightheadedness or fainting',
+      'Severe swelling that develops suddenly',
+      'Extreme pain in the leg',
+      'Bluish discoloration of the limb',
+      'Stroke-like symptoms (if clot travels to the brain)'
+    ],
+    prevalence: 'Deep vein thrombosis affects approximately 1-2 people per 1,000 annually in the general population. The incidence increases dramatically with age, rising from about 1 in 10,000 for people in their 20s to 1 in 100 for people in their 80s. In the United States, it\'s estimated that 60,000-100,000 people die annually from DVT/PE, and 10-30% of people with DVT/PE die within one month of diagnosis.',
+    affectedGroups: [
+      'Adults over 60 years of age',
+      'Hospitalized patients, especially after surgery',
+      'People with limited mobility or paralysis',
+      'Cancer patients',
+      'Pregnant women and women who recently gave birth',
+      'Women taking estrogen-containing contraceptives or hormone replacement therapy',
+      'People with inherited blood clotting disorders',
+      'Overweight and obese individuals',
+      'Smokers',
+      'People with previous history of DVT or PE',
+      'Individuals with certain chronic illnesses (heart disease, lung disease, inflammatory bowel disease)'
+    ],
+    references: [
+      {
+        id: '1',
+        text: 'Di Nisio M, van Es N, Büller HR. (2016). "Deep vein thrombosis and pulmonary embolism". Lancet. 388 (10063): 3060-3073.',
+        url: 'https://doi.org/10.1016/S0140-6736(16)30514-1'
+      },
+      {
+        id: '2',
+        text: 'Cushman M. (2007). "Epidemiology and risk factors for venous thrombosis". Seminars in Hematology. 44 (2): 62-69.',
+        url: 'https://doi.org/10.1053/j.seminhematol.2007.02.004'
+      },
+      {
+        id: '3',
+        text: 'Kearon C, Akl EA, Ornelas J, et al. (2016). "Antithrombotic Therapy for VTE Disease: CHEST Guideline and Expert Panel Report". Chest. 149 (2): 315-352.',
+        url: 'https://doi.org/10.1016/j.chest.2015.11.026'
+      },
+      {
+        id: '4',
+        text: 'Heit JA, Spencer FA, White RH. (2016). "The epidemiology of venous thromboembolism". Journal of Thrombosis and Thrombolysis. 41 (1): 3-14.',
+        url: 'https://doi.org/10.1007/s11239-015-1311-6'
+      },
+      {
+        id: '5',
+        text: 'Anderson FA Jr, Spencer FA. (2003). "Risk factors for venous thromboembolism". Circulation. 107 (23 Suppl 1): I9-16.',
+        url: 'https://doi.org/10.1161/01.CIR.0000078469.07362.E6'
+      }
+    ]
+  },
+  {
+    id: 'dyslexia',
+    name: 'Dyslexia',
+    description: 'A specific learning disorder that affects the brain\'s ability to process written language, characterized by difficulties with accurate and fluent word recognition, spelling, and decoding abilities.[1] Despite these challenges, dyslexia is not related to intelligence, vision problems, or lack of motivation to learn.[2] It is the most common learning disability, affecting about 5-10% of the population, and often runs in families.[3] With appropriate teaching methods and accommodations, people with dyslexia can learn successfully and excel in many areas.[4]',
+    category: 'brain-and-nerves',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Dyslexia',
+    symptoms: [
+      'Difficulty reading fluently and accurately',
+      'Slow reading speed',
+      'Problems with spelling',
+      'Difficulty with phonological processing (manipulating sounds in words)',
+      'Trouble with rapid naming of familiar objects or colors',
+      'Challenges with reading comprehension',
+      'Difficulty learning letter-sound correspondences',
+      'Problems with sequencing letters or numbers',
+      'Avoiding reading tasks or activities',
+      'Mispronouncing names or words, especially those that are unfamiliar',
+      'Difficulty retrieving specific words when speaking',
+      'Problems with writing and organizing written expression',
+      'Challenges with time management and organization',
+      'Difficulty following multi-step directions',
+      'May have strengths in reasoning, problem-solving, creativity, and visual-spatial abilities'
+    ],
+    causes: [
+      'Genetic factors (runs in families)',
+      'Differences in brain structure and function, particularly in areas involved in language processing',
+      'Differences in how the brain processes phonological information',
+      'Heritability estimated at 40-60%',
+      'Environmental factors may interact with genetic predisposition',
+      'Possible neurological factors affecting connections between different brain regions'
+    ],
+    treatments: [
+      'Structured literacy instruction with explicit, systematic phonics-based approaches',
+      'Multisensory teaching methods (Orton-Gillingham, Wilson Reading System, Lindamood-Bell)',
+      'Specialized educational interventions tailored to individual needs',
+      'Assistive technology (text-to-speech software, speech recognition, audiobooks)',
+      'Educational accommodations (extended time, alternative formats for assignments)',
+      'Remediation focused on phonological awareness, decoding, fluency, and comprehension',
+      'Working with specialized tutors or educational therapists',
+      'Psychological support to address potential emotional and social impacts',
+      'Early intervention for better outcomes'
+    ],
+    preventions: [
+      'While dyslexia cannot be prevented, early identification and intervention can reduce its impact',
+      'Early screening for children with family history of dyslexia',
+      'Monitoring language development in young children',
+      'Developing strong oral language skills before formal reading instruction',
+      'Universal screening in early elementary school',
+      'Providing appropriate educational support as soon as difficulties are identified'
+    ],
+    relatedConditions: [
+      'dyscalculia',
+      'dysgraphia',
+      'developmental-language-disorder',
+      'attention-deficit-hyperactivity-disorder',
+      'auditory-processing-disorder',
+      'specific-learning-disorder',
+      'visual-processing-disorder',
+      'executive-function-disorder'
+    ],
+    commonQuestions: [
+      {
+        question: 'Is dyslexia just reading words backward?',
+        answer: 'No, reading words backward is not the primary characteristic of dyslexia, although it\'s a common misconception. Dyslexia is a complex learning disorder involving difficulties with accurate and fluent word recognition, poor spelling, and decoding abilities. People with dyslexia may occasionally reverse letters (like confusing \'b\' and \'d\') or transpose letters within words, but these are just some of many possible symptoms. The core difficulty in dyslexia involves phonological processing—connecting speech sounds to letters and words. This affects how individuals decode written language, making reading laborious and affecting comprehension. Other challenges may include problems with rapid naming, working memory, processing speed, and organizing written and spoken language. Each person with dyslexia has a unique pattern of strengths and weaknesses, with symptoms ranging from mild to severe.'
+      },
+      {
+        question: 'Can dyslexia be cured?',
+        answer: 'Dyslexia is not a disease or illness that can be "cured," but rather a lifelong neurological difference in how the brain processes language. It is best understood as a different pattern of brain organization and function that has both challenges and strengths. While dyslexia cannot be cured, its impact can be significantly reduced through appropriate evidence-based interventions and accommodations. Structured literacy programs, multisensory teaching methods, and assistive technologies can help individuals with dyslexia become successful readers and writers. Many people with dyslexia develop effective coping strategies and compensatory skills over time. With proper support, individuals with dyslexia can achieve academic success and thrive in various careers—many become highly successful professionals, entrepreneurs, artists, and leaders. The focus should be on providing the right tools and strategies rather than seeking a cure for what is essentially a different, but equally valid, way of processing information.'
+      },
+      {
+        question: 'How is dyslexia diagnosed?',
+        answer: 'Dyslexia diagnosis typically involves a comprehensive evaluation by qualified professionals, such as psychologists, neuropsychologists, or educational specialists with expertise in learning disabilities. The process generally includes: A detailed history, including family history, developmental milestones, and educational experiences. Standardized tests of intellectual abilities to rule out intellectual disability as a cause of reading difficulties. Assessment of reading skills, including word recognition, decoding, reading fluency, and comprehension. Evaluation of phonological processing abilities, which are typically core deficits in dyslexia. Assessment of other language skills, including vocabulary and listening comprehension. Spelling and writing assessments. Additional tests of related cognitive functions like working memory, processing speed, and attention. Vision and hearing screenings to rule out sensory issues as primary causes. The diagnosis is based on establishing a pattern of strengths and weaknesses that is characteristic of dyslexia, with reading and spelling skills significantly below what would be expected based on the individual\'s age, education, and intellectual abilities. Early diagnosis (kindergarten through grade 2) is ideal, but dyslexia can be diagnosed at any age, including in adulthood.'
+      }
+    ],
+    emergencySigns: [
+      'While dyslexia itself is not a medical emergency, watch for:',
+      'Severe anxiety or depression related to academic difficulties',
+      'School refusal or significant distress about attending school',
+      'Signs of bullying or social isolation due to learning differences',
+      'Expressions of worthlessness, hopelessness, or suicidal thoughts',
+      'Sudden changes in behavior or personality related to learning struggles'
+    ],
+    prevalence: 'Dyslexia affects approximately 5-10% of the population worldwide, making it the most common learning disability. It occurs across all cultures, socioeconomic backgrounds, and intellectual abilities. In the United States, estimates suggest that 15-20% of the population has some symptoms of dyslexia, with about 5-10% having moderate to severe manifestations that significantly impact reading acquisition and academic performance.',
+    affectedGroups: [
+      'Occurs in all populations and demographic groups',
+      'Affects males and females, though historically more males have been identified (possibly due to referral bias)',
+      'Present across all intellectual ability levels, from below average to gifted',
+      'Runs in families (40-60% heritability)',
+      'Often co-occurs with other neurodevelopmental conditions like ADHD (30-50% comorbidity)',
+      'Can affect individuals regardless of educational opportunities or socioeconomic status',
+      'Present across languages and writing systems, though manifestation may differ'
+    ],
+    references: [
+      {
+        id: '1',
+        text: 'Lyon GR, Shaywitz SE, Shaywitz BA. (2003). "A definition of dyslexia". Annals of Dyslexia. 53 (1): 1-14.',
+        url: 'https://doi.org/10.1007/s11881-003-0001-9'
+      },
+      {
+        id: '2',
+        text: 'Shaywitz SE, Shaywitz BA. (2005). "Dyslexia (Specific Reading Disability)". Biological Psychiatry. 57 (11): 1301-1309.',
+        url: 'https://doi.org/10.1016/j.biopsych.2005.01.043'
+      },
+      {
+        id: '3',
+        text: 'Peterson RL, Pennington BF. (2015). "Developmental Dyslexia". Annual Review of Clinical Psychology. 11: 283-307.',
+        url: 'https://doi.org/10.1146/annurev-clinpsy-032814-112842'
+      },
+      {
+        id: '4',
+        text: 'International Dyslexia Association. (2002). "Definition of Dyslexia".',
+        url: 'https://dyslexiaida.org/definition-of-dyslexia/'
+      },
+      {
+        id: '5',
+        text: 'Ozernov-Palchik O, Gaab N. (2016). "Tackling the \'dyslexia paradox\': reading brain and behavior for early markers of developmental dyslexia". Wiley Interdisciplinary Reviews: Cognitive Science. 7 (2): 156-176.',
+        url: 'https://doi.org/10.1002/wcs.1383'
+      }
+    ]
+  },
+  {
     id: 'diabetes',
-    name: 'Diabetes',
-    description: 'A chronic disease that affects how your body turns food into energy by impacting how it produces or uses insulin, resulting in too much sugar in the bloodstream.',
+    name: 'Diabetes Mellitus',
+    description: 'A group of metabolic disorders characterized by high blood sugar levels over a prolonged period due to problems with insulin secretion, insulin action, or both.[1] Insulin, a hormone produced by the pancreas, regulates blood glucose by helping cells absorb glucose from the bloodstream for energy.[2] In diabetes, this process is impaired, leading to chronic high blood sugar that can cause serious health complications.[3] The main types include Type 1 (autoimmune), Type 2 (insulin resistance), and gestational diabetes (during pregnancy).[4]',
     category: 'endocrine-system',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Diabetes_mellitus',
     symptoms: [
       'Increased thirst and urination',
       'Extreme hunger',
@@ -389,13 +797,41 @@ export const conditionsDtoF: HealthCondition[] = [
       'Certain ethnic groups (higher rates in African Americans, Hispanics, Native Americans, Asian Americans, Pacific Islanders)',
       'People who are overweight or obese',
       'Women who had gestational diabetes or gave birth to babies weighing over 9 pounds'
+    ],
+    references: [
+      {
+        id: '1',
+        text: 'American Diabetes Association. (2022). "Standards of Medical Care in Diabetes—2022". Diabetes Care. 45 (Supplement 1): S1-S264.',
+        url: 'https://doi.org/10.2337/dc22-Sint'
+      },
+      {
+        id: '2',
+        text: 'Skyler JS, Bakris GL, Bonifacio E, et al. (2017). "Differentiation of Diabetes by Pathophysiology, Natural History, and Prognosis". Diabetes. 66 (2): 241-255.',
+        url: 'https://doi.org/10.2337/db16-0806'
+      },
+      {
+        id: '3',
+        text: 'Zheng Y, Ley SH, Hu FB. (2018). "Global aetiology and epidemiology of type 2 diabetes mellitus and its complications". Nature Reviews Endocrinology. 14 (2): 88-98.',
+        url: 'https://doi.org/10.1038/nrendo.2017.151'
+      },
+      {
+        id: '4',
+        text: 'International Diabetes Federation. (2021). "IDF Diabetes Atlas, 10th edition".',
+        url: 'https://diabetesatlas.org/'
+      },
+      {
+        id: '5',
+        text: 'Atkinson MA, Eisenbarth GS, Michels AW. (2014). "Type 1 diabetes". Lancet. 383 (9911): 69-82.',
+        url: 'https://doi.org/10.1016/S0140-6736(13)60591-7'
+      }
     ]
   },
   {
     id: 'eczema',
-    name: 'Eczema',
-    description: 'A group of conditions that cause the skin to become inflamed, itchy, red, and rough. The most common type is atopic dermatitis.',
+    name: 'Eczema (Atopic Dermatitis)',
+    description: 'A chronic inflammatory skin condition characterized by intense itching, redness, and a dry, scaly rash.[1] The most common form is atopic dermatitis, which often begins in infancy or childhood and can persist into adulthood.[2] This condition typically follows a relapsing and remitting course with flares triggered by various environmental and physiological factors.[3] Eczema is often associated with other atopic conditions such as asthma and allergic rhinitis, and is thought to result from a complex interaction between genetic, immunologic, and environmental factors.[4]',
     category: 'skin-and-hair',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Atopic_dermatitis',
     symptoms: [
       'Dry, sensitive skin',
       'Intense itching',
@@ -468,6 +904,33 @@ export const conditionsDtoF: HealthCondition[] = [
       'Those living in urban areas or developed countries',
       'People in colder, drier climates',
       'Individuals with certain genetic mutations affecting skin barrier function'
+    ],
+    references: [
+      {
+        id: '1',
+        text: 'Weidinger S, Novak N (2016). "Atopic dermatitis". Lancet. 387 (10023): 1109–1122.',
+        url: 'https://doi.org/10.1016/S0140-6736(15)00149-X'
+      },
+      {
+        id: '2',
+        text: 'Eichenfield LF, Tom WL, Chamlin SL, et al. (2014). "Guidelines of care for the management of atopic dermatitis: section 1. Diagnosis and assessment of atopic dermatitis". Journal of the American Academy of Dermatology. 70 (2): 338–351.',
+        url: 'https://doi.org/10.1016/j.jaad.2013.10.010'
+      },
+      {
+        id: '3',
+        text: 'Langan SM, Irvine AD, Weidinger S (2020). "Atopic dermatitis". Lancet. 396 (10247): 345–360.',
+        url: 'https://doi.org/10.1016/S0140-6736(20)31286-1'
+      },
+      {
+        id: '4',
+        text: 'Kantor R, Silverberg JI (2017). "Environmental risk factors and their role in the management of atopic dermatitis". Expert Review of Clinical Immunology. 13 (1): 15–26.',
+        url: 'https://doi.org/10.1080/1744666X.2016.1212660'
+      },
+      {
+        id: '5',
+        text: 'Bieber T, Traidl-Hoffmann C, Schäppi G, Lauener R, Akdis C, Schmid-Grendelmeier P (2020). "Unraveling the complexity of atopic dermatitis: The CK-CARE approach toward precision medicine". Allergy. 75 (11): 2936–2938.',
+        url: 'https://doi.org/10.1111/all.14194'
+      }
     ]
   },
   {

@@ -2,6 +2,44 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getConditionById, HealthCondition } from '../features/health/healthConditionsData';
 
+// Function to convert citation numbers [1] into clickable links
+const renderTextWithCitations = (text?: string) => {
+  if (!text) return null;
+  
+  // Split the text by citation pattern [n]
+  const parts = text.split(/\[(\d+)\]/);
+  
+  if (parts.length === 1) {
+    // No citations found
+    return text;
+  }
+  
+  // Create array of text and citation links
+  const result = [];
+  
+  for (let i = 0; i < parts.length; i++) {
+    if (i % 2 === 0) {
+      // Even parts are regular text
+      result.push(parts[i]);
+    } else {
+      // Odd parts are citation numbers
+      const citationNumber = parts[i];
+      result.push(
+        <a 
+          key={`citation-${i}`}
+          href={`#reference-${citationNumber}`}
+          className="text-blue-600 hover:bg-blue-100 rounded-md px-1"
+          title={`View reference ${citationNumber}`}
+        >
+          [{citationNumber}]
+        </a>
+      );
+    }
+  }
+  
+  return result;
+};
+
 const HealthConditionPage: React.FC = () => {
   const { conditionSlug } = useParams<{ conditionSlug: string }>();
 
@@ -76,11 +114,13 @@ const HealthConditionPage: React.FC = () => {
         {/* Overview */}
         <section className="mb-8">
           <h2 className="text-2xl font-bold mb-4">About {condition.name}</h2>
-          <p className="text-lg mb-4">{condition.description}</p>
+          <p className="text-lg mb-4">
+            {renderTextWithCitations(condition.description)}
+          </p>
 
           {condition.prevalence && (
             <div className="bg-blue-50 p-4 rounded-md mb-4">
-              <p className="font-medium text-blue-800">{condition.prevalence}</p>
+              <p className="font-medium text-blue-800">{renderTextWithCitations(condition.prevalence)}</p>
             </div>
           )}
         </section>
@@ -227,6 +267,63 @@ const HealthConditionPage: React.FC = () => {
           </div>
         )}
 
+        {/* Wikipedia and References */}
+        {condition.wikipediaUrl && (
+          <section className="mb-8">
+            <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">Sources & References</h2>
+            <p className="mb-4">This information is based on data from reliable medical sources including <a href={condition.wikipediaUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Wikipedia</a>. <a href="#references" className="text-blue-600 hover:underline">View all references</a> or click any citation number [<span className="text-blue-600">n</span>] in the text for specific sources.</p>
+            <a 
+              href={condition.wikipediaUrl} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="inline-flex items-center mb-6 bg-blue-100 hover:bg-blue-200 text-blue-800 py-2 px-4 rounded-md transition-colors"
+            >
+              <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+                <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+              </svg>
+              View on Wikipedia
+            </a>
+            
+            {condition.references && condition.references.length > 0 && (
+              <div>
+                <h3 className="text-xl font-bold mb-3" id="references">Scientific References</h3>
+                <div className="border border-gray-200 rounded-md overflow-hidden">
+                  {condition.references.map((reference, index) => (
+                    <div 
+                      key={reference.id} 
+                      className={`p-4 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}
+                      id={`reference-${reference.id}`}
+                    >
+                      <div className="flex">
+                        <span className="font-semibold mr-2">[{reference.id}]</span>
+                        <div>
+                          <span>{reference.text}</span>
+                          {reference.url && (
+                            <div className="mt-1">
+                              <a 
+                                href={reference.url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:underline text-sm inline-flex items-center"
+                              >
+                                View source
+                                <svg className="h-3 w-3 ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+                                </svg>
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </section>
+        )}
+        
         {/* Further resources */}
         <section className="bg-gray-50 p-6 rounded-md">
           <h2 className="text-xl font-bold mb-4">Further resources</h2>
