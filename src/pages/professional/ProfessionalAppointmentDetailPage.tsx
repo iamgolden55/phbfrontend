@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
+import { Tab, Tabs, Box, Typography } from '@mui/material';
+import MedicalRecordsTab from '../../features/medical/MedicalRecordsTab';
 import { 
   fetchDoctorAppointmentDetails, 
   updateAppointmentStatus, 
@@ -9,7 +11,6 @@ import {
   markAppointmentNoShow,
   addAppointmentPrescriptions,
   getAppointmentPrescriptions,
-  getPatientMedicalRecords,
   PrescriptionMedication,
   PrescriptionResponse
 } from '../../features/professional/appointmentsService';
@@ -75,6 +76,39 @@ interface MedicationForm {
   generic_name?: string;
 }
 
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`appointment-tabpanel-${index}`}
+      aria-labelledby={`appointment-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}
+
+function a11yProps(index: number) {
+  return {
+    id: `appointment-tab-${index}`,
+    'aria-controls': `appointment-tabpanel-${index}`,
+  };
+}
+
 const ProfessionalAppointmentDetailPage: React.FC = () => {
   const { appointmentId } = useParams<{ appointmentId: string }>();
   const navigate = useNavigate();
@@ -91,16 +125,17 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
   const [meetingStartTime, setMeetingStartTime] = useState('');
   const [meetingEndTime, setMeetingEndTime] = useState('');
   
+  // Tab state
+  const [tabValue, setTabValue] = useState(0);
+  
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
+  
   // Prescription state variables
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
   const [prescriptions, setPrescriptions] = useState<PrescriptionResponse[]>([]);
   const [isLoadingPrescriptions, setIsLoadingPrescriptions] = useState(false);
-  
-  // Medical records state variables
-  const [medicalRecords, setMedicalRecords] = useState<any[]>([]);
-  const [isLoadingMedicalRecords, setIsLoadingMedicalRecords] = useState(false);
-  const [medicalRecordsError, setMedicalRecordsError] = useState<string | null>(null);
-  
   const [medications, setMedications] = useState<MedicationForm[]>([{
     medication_name: '',
     strength: '',
@@ -127,27 +162,23 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
         // Process patient information
         const processedData: AppointmentDetails = {
           ...data,
-          id: appointmentId // Ensure we have the ID
+          patient_name: data.patient_name || 
+                       data.patient?.name || 
+                       data.patient?.full_name ||
+                       data.name ||
+                       data.full_name ||
+                       data.customer_name || 
+                       data.user_name ||
+                       `Patient #${data.appointment_id?.slice(-6)}`,
+          patient_email: data.patient_email || data.patient?.email || data.email,
+          patient_id: data.patient_id || data.patient?.id || data.appointment_id
         };
-        
+
         setAppointmentDetails(processedData);
         
-        // Pre-fill notes field if there's a medical summary
-        if (processedData.medical_summary) {
-          setMedicalSummary(processedData.medical_summary);
-        }
-        
-        // Load prescriptions for in_progress or completed appointments
+        // If the appointment is in progress or completed, fetch prescriptions
         if (processedData.status === 'in_progress' || processedData.status === 'completed') {
           loadPrescriptions();
-        }
-
-        // Load patient medical records if patient_id is available
-        if (processedData.patient_id) {
-          // Small delay to avoid too many simultaneous API calls
-          setTimeout(() => {
-            loadPatientMedicalRecords();
-          }, 300);
         }
       } catch (err: any) {
         console.error('Failed to load appointment details:', err);
@@ -185,35 +216,6 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
       // We don't set the main error here to avoid disrupting the UI if only prescriptions fail
     } finally {
       setIsLoadingPrescriptions(false);
-    }
-  };
-
-  // Function to load patient medical records
-  const loadPatientMedicalRecords = async () => {
-    if (!appointmentDetails?.patient_id) return;
-    
-    setIsLoadingMedicalRecords(true);
-    setMedicalRecordsError(null);
-    
-    try {
-      const data = await getPatientMedicalRecords(appointmentDetails.patient_id);
-      console.log('Loaded medical records for patient:', data);
-      
-      // Process and store the medical records
-      if (data && (data.records || data.data || data.medical_records)) {
-        const records = data.records || data.data || data.medical_records || [];
-        setMedicalRecords(Array.isArray(records) ? records : [records]);
-      } else if (data && Array.isArray(data)) {
-        setMedicalRecords(data);
-      } else {
-        setMedicalRecords([]);
-      }
-    } catch (err: any) {
-      console.error('Failed to load medical records:', err);
-      setMedicalRecordsError(err.message || 'Failed to load medical records');
-      // We don't set the main error here to avoid disrupting the UI
-    } finally {
-      setIsLoadingMedicalRecords(false);
     }
   };
 
@@ -563,7 +565,6 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
       }));
       console.log('Medications to submit:', medicationsToSubmit);
       const result = await addAppointmentPrescriptions(appointmentId, medicationsToSubmit);
-      console.log('Prescriptions added successfully:', result);
       
       // Reset the form
       setMedications([{
@@ -770,7 +771,159 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
         </div>
       </div>
       
-      {/* Patient Details */}
+      {/* Tabs */}
+      <Box sx={{ width: '100%', mb: 3 }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs 
+            value={tabValue} 
+            onChange={handleTabChange} 
+            aria-label="appointment details tabs"
+            variant="scrollable"
+            scrollButtons="auto"
+          >
+            <Tab label="Appointment Details" {...a11yProps(0)} />
+            <Tab label="Medical Records" {...a11yProps(1)} disabled={!appointmentDetails?.patient_id} />
+          </Tabs>
+        </Box>
+        
+        {/* Tab Panels */}
+        <TabPanel value={tabValue} index={0}>
+          {/* Original content goes here */}
+          <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 className="text-xl font-bold text-blue-800 mb-4">Appointment Information</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <p className="text-sm text-gray-500">Status</p>
+                <p className="text-base font-medium">
+                  {appointmentDetails.status_display}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Date</p>
+                <p className="text-base font-medium">
+                  {appointmentDetails.formatted_date || 'Not specified'}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Time</p>
+                <p className="text-base font-medium">
+                  {appointmentDetails.formatted_time || 'Not specified'}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Type</p>
+                <p className="text-base font-medium">
+                  {appointmentDetails.formatted_appointment_type || 'Consultation'}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Priority</p>
+                <p className="text-base font-medium">
+                  {appointmentDetails.formatted_priority || 'Normal Priority'}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Duration</p>
+                <p className="text-base font-medium">
+                  {appointmentDetails.appointment_duration_display || 
+                   (appointmentDetails.duration ? `${appointmentDetails.duration} minutes` : 'Not specified')}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Created</p>
+                <p className="text-base font-medium">
+                  {appointmentDetails.created_at 
+                    ? new Date(appointmentDetails.created_at).toLocaleString() 
+                    : 'Not specified'}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Patient Details */}
+          <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 className="text-xl font-bold text-blue-800 mb-4">Patient Details</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-500">Patient Name</p>
+                <p className="text-base font-medium">
+                  {appointmentDetails.patient_name}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Patient ID</p>
+                <p className="text-base font-medium">
+                  {appointmentDetails.patient_id || 'Not Available'}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Patient Email</p>
+                <p className="text-base font-medium">
+                  {appointmentDetails.patient_email || 'Not Available'}
+                  {appointmentDetails.email_verified === false && (
+                    <span className="ml-2 px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
+                      Not Verified
+                    </span>
+                  )}
+                </p>
+                {appointmentDetails.email_verified === false && (
+                  <p className="text-xs text-red-600 mt-1">
+                    Warning: Email not verified. Notifications may not be delivered.
+                  </p>
+                )}
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Chief Complaint</p>
+                <p className="text-base font-medium">
+                  {appointmentDetails.chief_complaint || 'None recorded'}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Symptoms</p>
+                <p className="text-base font-medium">
+                  {appointmentDetails.symptoms || 'None recorded'}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Medical History</p>
+                <p className="text-base font-medium">
+                  {appointmentDetails.medical_history || 'None recorded'}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Allergies</p>
+                <p className="text-base font-medium">
+                  {appointmentDetails.allergies || 'None recorded'}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Current Medications</p>
+                <p className="text-base font-medium">
+                  {appointmentDetails.current_medications || 'None recorded'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </TabPanel>
+        
+        {/* Medical Records Tab */}
+        <TabPanel value={tabValue} index={1}>
+          {appointmentDetails?.patient_id ? (
+            <MedicalRecordsTab 
+              patientId={appointmentDetails.patient_id} 
+              patientName={appointmentDetails.patient_name} 
+            />
+          ) : (
+            <Box sx={{ p: 3, textAlign: 'center' }}>
+              <Typography variant="body1" color="text.secondary">
+                No patient information available to view medical records.
+              </Typography>
+            </Box>
+          )}
+        </TabPanel>
+      </Box>
+      
+      {/* Rest of the content */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">
         <h2 className="text-xl font-bold text-blue-800 mb-4">Patient Details</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -833,112 +986,6 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
             </p>
           </div>
         </div>
-      </div>
-      
-      {/* Medical Records */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <h2 className="text-xl font-bold text-blue-800 mb-4">Medical Records</h2>
-        
-        {isLoadingMedicalRecords ? (
-          <div className="text-center py-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-800 mx-auto"></div>
-            <p className="mt-2 text-gray-500">Loading medical records...</p>
-          </div>
-        ) : medicalRecordsError ? (
-          <div className="p-4 bg-red-50 text-red-700 rounded-md mb-4">
-            <p className="font-medium">Error loading medical records:</p>
-            <p>{medicalRecordsError}</p>
-            <button
-              onClick={loadPatientMedicalRecords}
-              className="mt-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors text-sm"
-            >
-              Retry
-            </button>
-          </div>
-        ) : medicalRecords.length > 0 ? (
-          <div className="space-y-4">
-            {medicalRecords.map((record, index) => (
-              <div key={index} className="border rounded-md p-4 bg-blue-50">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-semibold">{record.title || record.type || 'Medical Record'}</h3>
-                  <span className="text-sm text-gray-500">
-                    {record.date ? new Date(record.date).toLocaleDateString() : 'Date not available'}
-                  </span>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                  {record.provider && (
-                    <div>
-                      <p className="text-sm text-gray-500">Provider</p>
-                      <p className="text-base font-medium">{record.provider}</p>
-                    </div>
-                  )}
-                  
-                  {record.type && (
-                    <div>
-                      <p className="text-sm text-gray-500">Record Type</p>
-                      <p className="text-base font-medium">{record.type}</p>
-                    </div>
-                  )}
-                  
-                  {record.description && (
-                    <div className="md:col-span-2">
-                      <p className="text-sm text-gray-500">Description</p>
-                      <p className="text-base">{record.description}</p>
-                    </div>
-                  )}
-                  
-                  {/* Check for allergies, diagnoses and other medical info */}
-                  {record.allergies && (
-                    <div className="md:col-span-2">
-                      <p className="text-sm text-gray-500">Allergies</p>
-                      <p className="text-base">{record.allergies}</p>
-                    </div>
-                  )}
-                  
-                  {record.chronic_conditions && (
-                    <div className="md:col-span-2">
-                      <p className="text-sm text-gray-500">Chronic Conditions</p>
-                      <p className="text-base">{record.chronic_conditions}</p>
-                    </div>
-                  )}
-                  
-                  {record.blood_type && (
-                    <div>
-                      <p className="text-sm text-gray-500">Blood Type</p>
-                      <p className="text-base font-medium">{record.blood_type}</p>
-                    </div>
-                  )}
-                  
-                  {/* Display attachments if available */}
-                  {record.attachments && record.attachments.length > 0 && (
-                    <div className="md:col-span-2 mt-2">
-                      <p className="text-sm text-gray-500 mb-2">Attachments</p>
-                      <div className="flex flex-wrap gap-2">
-                        {record.attachments.map((attachment, idx) => (
-                          <a
-                            key={idx}
-                            href={attachment.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-md text-sm flex items-center space-x-1"
-                          >
-                            <span>{attachment.name}</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-500">No medical records available for this patient.</p>
-        )}
       </div>
       
       {/* Payment Information */}
