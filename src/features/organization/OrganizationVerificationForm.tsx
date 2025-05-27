@@ -59,19 +59,18 @@ const OrganizationVerificationForm: React.FC<OrganizationVerificationFormProps> 
       // Perform the 2FA verification
       await verify2FA(currentEmail, verificationCode, rememberDevice);
       
-      // After successful verification, check if auth data exists in localStorage
-      const authData = localStorage.getItem('organizationAuth');
-      if (authData) {
-        console.log('Verification successful, redirecting to dashboard');
-        
-        // Use a short timeout to ensure state updates have completed
-        setTimeout(() => {
-          // Direct navigation to dashboard, bypassing any React Router issues
+      // Verification successful! The auth context has updated the state
+      console.log('Verification successful, redirecting to dashboard');
+      
+      // Navigate to dashboard using React Router
+      navigate(redirectPath || getDashboardPath());
+      
+      // If navigation doesn't work, force it as a fallback
+      setTimeout(() => {
+        if (window.location.pathname !== '/organization/dashboard') {
           window.location.href = '/organization/dashboard';
-        }, 250);
-      } else {
-        console.error('Verification completed but no auth data found');
-      }
+        }
+      }, 500);
     } catch (err) {
       // Error is handled in the auth context
       console.error('2FA verification error:', err);

@@ -20,23 +20,17 @@ const OrganizationLoginForm: React.FC<OrganizationLoginFormProps> = ({ redirectP
       console.log('Submitting login form...');
       await login(email, password, hospitalCode);
       
-      // Force the verification form to show by directly setting session state
-      sessionStorage.setItem('org_auth_email', email);
-      sessionStorage.setItem('org_auth_needs_verification', 'true');
-      
-      // Force a component re-render to show the verification form
-      window.location.reload();
+      // The login function in auth context already sets needsVerification state
+      // Component will re-render automatically to show verification form
+      console.log('Login successful, verification form should appear');
     } catch (err) {
       console.error('Login error:', err);
       // Error is handled in the auth context
     }
   };
 
-  // Check if we need to show verification form (either from context or session storage)
-  // This ensures verification state persists even if components remount
-  const showVerification = needsVerification || sessionStorage.getItem('org_auth_needs_verification') === 'true';
-  
-  if (showVerification) {
+  // Show verification form when needed
+  if (needsVerification) {
     return <OrganizationVerificationForm redirectPath={redirectPath} />;
   }
 

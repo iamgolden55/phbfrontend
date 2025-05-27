@@ -70,8 +70,32 @@ export interface OrganizationRegistrationData {
 const OrganizationAuthContext = createContext<OrganizationAuthContextType | undefined>(undefined);
 
 export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [userData, setUserData] = useState<UserData | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    // Check localStorage immediately to prevent auth flash
+    const storedAuth = localStorage.getItem('organizationAuth');
+    if (storedAuth) {
+      try {
+        const authData = JSON.parse(storedAuth);
+        return !!(authData.userData && authData.tokens);
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  });
+  const [userData, setUserData] = useState<UserData | null>(() => {
+    // Initialize userData from localStorage if available
+    const storedAuth = localStorage.getItem('organizationAuth');
+    if (storedAuth) {
+      try {
+        const authData = JSON.parse(storedAuth);
+        return authData.userData || null;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [needsVerification, setNeedsVerification] = useState<boolean>(false);
@@ -137,9 +161,8 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
       // There have been issues with detecting verification state from backend response
       console.log('Login successful, proceeding to OTP verification');
       
-      // Store verification state in both sessionStorage and localStorage for redundancy
-      localStorage.setItem('org_auth_email', email);
-      localStorage.setItem('org_auth_needs_verification', 'true');
+      // Store verification state in sessionStorage ONLY (not localStorage)
+      // This prevents conflicts with auth state checks
       sessionStorage.setItem('org_auth_email', email);
       sessionStorage.setItem('org_auth_needs_verification', 'true');
       sessionStorage.setItem('org_auth_timestamp', Date.now().toString());
@@ -303,20 +326,19 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
       // Then update localStorage with the auth data to ensure persistence
       localStorage.setItem('organizationAuth', JSON.stringify(authData));
       
-      // Important: Clear all verification flags and data to prevent re-verification
+      // Important: Clear all verification flags and data
       setNeedsVerification(false);
       setCurrentEmail(null);
       
-      // Clear all verification data from both storage types
-      localStorage.removeItem('org_auth_email');
-      localStorage.removeItem('org_auth_needs_verification');
+      // Clear verification data from sessionStorage only
       sessionStorage.removeItem('org_auth_email');
       sessionStorage.removeItem('org_auth_needs_verification');
+      sessionStorage.removeItem('org_auth_timestamp');
       
       console.log('Authentication successful, state updated');
       
-      // Force navigation to dashboard after successful verification
-      forceDashboardNavigation();
+      // Navigation will be handled by the component that called verify2FA
+      // This prevents the full page reload issue
     } catch (err) {
       if (err instanceof Error) {
         console.error('2FA verification error:', err.message);
