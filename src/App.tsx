@@ -31,6 +31,7 @@ import StaffRosterPage from './pages/organization/StaffRosterPage';
 import InventoryCheckPage from './pages/organization/InventoryCheckPage';
 import AnalyticsPage from './pages/organization/AnalyticsPage';
 import EmergencyPage from './pages/organization/EmergencyPage';
+import UserRegistrationsPage from './pages/organization/UserRegistrationsPage';
 import { OrganizationAuthProvider } from './features/organization/organizationAuthContext';
 import ForgotPasswordPage from './pages/ForgotPasswordPage'; // Add this import
 import ResetPasswordPage from './pages/ResetPasswordPage'; // Add this import
@@ -261,6 +262,11 @@ function App() {
                 <Route path="dashboard" element={
                   <OrganizationRouteGuard>
                     <OrganizationDashboardPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="user-registrations" element={
+                  <OrganizationRouteGuard>
+                    <UserRegistrationsPage />
                   </OrganizationRouteGuard>
                 } />
                 <Route path="admissions" element={

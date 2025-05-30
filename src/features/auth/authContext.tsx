@@ -255,7 +255,40 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         console.log("has_completed_onboarding value:", userData.has_completed_onboarding);
         console.log("has_completed_onboarding type:", typeof userData.has_completed_onboarding);
         
-        setUser(userData);
+        // Create a mutable copy of userData to add role if needed
+        let userDataWithRole = {...userData};
+        
+        // Make sure the role field is preserved - check if we need to add the role field
+        if (userData && userData.hpn && !userData.role) {
+          // If user has HPN but no role, they're likely a doctor - fetch their role
+          try {
+            const roleResponse = await apiRequest<{role?: string}>(
+              '/api/user/role/',
+              'GET',
+              undefined,
+              token
+            );
+            
+            // If role exists in response, update the user data
+            if (roleResponse && roleResponse.role) {
+              userDataWithRole.role = roleResponse.role;
+            } else if (userData.hpn) {
+              // As a fallback for doctor users with HPN
+              userDataWithRole.role = 'doctor'; // Set default role for users with HPN
+            }
+            
+            console.log("Updated user data with role:", userDataWithRole);
+          } catch (roleErr) {
+            console.error('Error fetching user role:', roleErr);
+            // Fallback if we can't fetch the role
+            if (userData.hpn) {
+              userDataWithRole.role = 'doctor';
+              console.log("Set fallback role for user with HPN:", userDataWithRole);
+            }
+          }
+        }
+        
+        setUser(userDataWithRole);
         
         // Check if user has a primary hospital after successful authentication
         // But only if we haven't already loaded this information
@@ -308,8 +341,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const handleAuthSuccess = (userData: User, token: string) => {
       console.log("Auth success with user data:", userData);
       console.log("has_completed_onboarding value:", userData.has_completed_onboarding);
+      console.log("User role received:", userData.role);
       
-      setUser(userData);
+      // Make sure the role field is preserved in the user data
+      const updatedUserData = {
+        ...userData,
+        role: userData.role // Explicitly preserve the role field
+      };
+      
+      setUser(updatedUserData);
       localStorage.setItem(AUTH_TOKEN_KEY, token);
       setOtpVerificationRequired(false);
       setPendingEmail(null);
