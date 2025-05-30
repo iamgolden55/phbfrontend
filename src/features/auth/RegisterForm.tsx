@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from './authContext';
 import { Link } from 'react-router-dom';
+import CountryPhoneInput from '../../components/ui/PhoneInput';
 
 // List of countries
 const countries = [
@@ -169,13 +170,26 @@ const RegisterForm: React.FC = () => {
     // Validate date of birth
     if (!dateOfBirth) {
       errors.dateOfBirth = 'Date of birth is required';
+    } else {
+      const birthDate = new Date(dateOfBirth);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      
+      // Check if they haven't had their birthday this year yet
+      const hasHadBirthdayThisYear = monthDiff > 0 || (monthDiff === 0 && today.getDate() >= birthDate.getDate());
+      const actualAge = hasHadBirthdayThisYear ? age : age - 1;
+      
+      if (actualAge < 18) {
+        errors.dateOfBirth = 'You must be at least 18 years old to register';
+      }
     }
 
-    // Validate phone number (simple validation)
+    // Validate phone number (enhanced validation)
     if (!phoneNumber) {
       errors.phoneNumber = 'Phone number is required';
-    } else if (!/^\+?[0-9\s\-()]{8,20}$/.test(phoneNumber)) {
-      errors.phoneNumber = 'Please enter a valid phone number with country code';
+    } else if (phoneNumber.length < 8) {
+      errors.phoneNumber = 'Please enter a valid phone number';
     }
 
     // Validate preferred language
@@ -499,31 +513,33 @@ const RegisterForm: React.FC = () => {
                 }`}
                 value={dateOfBirth}
                 onChange={(e) => setDateOfBirth(e.target.value)}
-                max={new Date().toISOString().split('T')[0]} // Prevent future dates
+                max={(() => {
+                  const today = new Date();
+                  const eighteenYearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+                  return eighteenYearsAgo.toISOString().split('T')[0];
+                })()} // Must be 18+ years old
               />
               {formErrors.dateOfBirth && (
                 <p className="mt-1 text-red-500 text-sm">{formErrors.dateOfBirth}</p>
               )}
+              <p className="mt-1 text-gray-500 text-sm">You must be at least 18 years old to register</p>
             </div>
 
             <div className="mb-4">
               <label htmlFor="phoneNumber" className="block font-medium mb-1">
                 Phone Number
               </label>
-              <input
-                type="tel"
-                id="phoneNumber"
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8] ${
-                  formErrors.phoneNumber ? 'border-red-500' : 'border-gray-300'
-                }`}
+              <CountryPhoneInput
                 value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="e.g. +1 234 567 8901"
+                onChange={(value) => setPhoneNumber(value)}
+                placeholder="Enter your phone number"
+                error={!!formErrors.phoneNumber}
+                className={formErrors.phoneNumber ? 'border-red-500' : ''}
               />
               {formErrors.phoneNumber && (
                 <p className="mt-1 text-red-500 text-sm">{formErrors.phoneNumber}</p>
               )}
-              <p className="mt-1 text-gray-500 text-sm">Include country code (e.g. +1, +44, +234)</p>
+              <p className="mt-1 text-gray-500 text-sm">Select your country and enter your phone number</p>
             </div>
 
             <div className="mb-4">
