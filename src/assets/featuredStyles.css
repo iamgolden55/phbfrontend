@@ -1,0 +1,37 @@
+.featured-banner-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.featured-banner-image {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 0.5rem;
+}
+
+.coming-soon-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: #e53e3e; /* Red */
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-weight: bold;
+  font-size: 1rem;
+  transform: rotate(3deg);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+/* Slightly smaller badge on mobile devices */
+@media (max-width: 768px) {
+  .coming-soon-badge {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.875rem;
+  }
+}

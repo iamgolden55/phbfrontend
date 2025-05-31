@@ -1,6 +1,9 @@
 import React from 'react';
+import featuredBanner from '../assets/featured-banner.png';
+import '../assets/featuredStyles.css';
 
 const FeaturedSection: React.FC = () => {
+
   const featuredItems = [
     {
       title: 'Flu vaccine',
@@ -23,6 +26,19 @@ const FeaturedSection: React.FC = () => {
     <section className="bg-gray-100 py-8">
       <div className="phb-container">
         <h2 className="text-2xl font-bold mb-6">Featured</h2>
+        
+        {/* Featured banner with Coming Soon badge */}
+        <div className="featured-banner-container">
+          <img 
+            src={featuredBanner} 
+            alt="Featured content" 
+            className="featured-banner-image"
+          />
+          
+          <div className="coming-soon-badge">
+            Coming Soon
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {featuredItems.map((item, index) => (
