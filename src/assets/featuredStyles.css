@@ -31,7 +31,7 @@
 /* Slightly smaller badge on mobile devices */
 @media (max-width: 768px) {
   .coming-soon-badge {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.875rem;
+    padding: 0.1rem 0.2rem;
+    font-size: 0.775rem;
   }
 }
