@@ -15,8 +15,8 @@
 
 .coming-soon-badge {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 0.3rem;
+  right: 0.3rem;
   background-color: #e53e3e; /* Red */
   color: white;
   padding: 0.5rem 1rem;
@@ -31,7 +31,7 @@
 /* Slightly smaller badge on mobile devices */
 @media (max-width: 768px) {
   .coming-soon-badge {
-    padding: 0.1rem 0.2rem;
+    padding: 0.2rem 0.4rem;
     font-size: 0.775rem;
   }
 }
