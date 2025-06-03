@@ -344,29 +344,12 @@ const GPHealthRecord: React.FC = () => {
 
             {/* Main Content */}
             <div className="flex-grow">
-              {/* Tabs */}
+              {/* Single heading replacing tabs */}
               <div className="border-b border-gray-200 mb-6">
                 <div className="flex">
-                  <button
-                    onClick={() => setActiveTab('appointment')}
-                    className={`py-3 px-4 text-sm font-medium ${
-                      activeTab === 'appointment' 
-                        ? 'border-b-2 border-blue-500 text-blue-600' 
-                        : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                  >
+                  <div className="py-3 px-4 text-sm font-medium border-b-2 border-blue-500 text-blue-600">
                     Appointment Summaries
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('complete')}
-                    className={`py-3 px-4 text-sm font-medium ${
-                      activeTab === 'complete' 
-                        ? 'border-b-2 border-blue-500 text-blue-600' 
-                        : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                  >
-                    Complete Medical Records
-                  </button>
+                  </div>
                 </div>
               </div>
 
@@ -377,12 +360,6 @@ const GPHealthRecord: React.FC = () => {
                   <div className="col-span-1">
                     <div className="bg-white shadow-sm rounded-lg p-4 mb-4">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">Completed Appointments</h3>
-                      
-                      {accessState === 'authorized' ? (
-                        <div className="bg-green-50 flex justify-between items-center px-3 py-2 rounded-md mb-4">
-                          <span className="text-sm text-green-700">Access expires: {formatExpiryTime()}</span>
-                        </div>
-                      ) : null}
                       
                       {isLoadingAppointments ? (
                         <div className="flex justify-center py-6">
@@ -454,11 +431,6 @@ const GPHealthRecord: React.FC = () => {
                               <div className="text-xs text-gray-500">
                                 Hospital: {selectedSummary.appointment_details.hospital}
                               </div>
-                            </div>
-                            <div className="bg-green-50 px-3 py-1 rounded-md">
-                              <p className="text-xs text-green-700">
-                                Access expires: {formatExpiryTime()}
-                              </p>
                             </div>
                           </div>
 
@@ -552,43 +524,7 @@ const GPHealthRecord: React.FC = () => {
                 </div>
               )}
 
-              {/* Complete Medical Records Tab */}
-              {activeTab === 'complete' && (
-                <div className="bg-white shadow-sm rounded-lg p-6">
-                  <h3 className="text-lg font-semibold mb-4">Complete Medical Records</h3>
-                  
-                  {accessState === 'authorized' ? (
-                    <div>
-                      <div className="bg-green-50 flex justify-between items-center px-4 py-2 rounded-md mb-6">
-                        <span className="text-sm text-green-700">Secure access granted - expires in {formatExpiryTime()}</span>
-                      </div>
-                      
-                      <p className="text-gray-600 mb-4">
-                        Your complete medical records will be displayed here. This section is currently under development.
-                      </p>
-                    </div>
-                  ) : accessState === 'need_auth' ? (
-                    <div>
-                      <div className="bg-yellow-50 p-4 rounded-md mb-6">
-                        <p className="text-yellow-700">
-                          Your complete medical records require additional verification to view.
-                        </p>
-                      </div>
-                      
-                      <button
-                        onClick={() => setAccessState('loading')}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                      >
-                        Verify Identity to Access Records
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex justify-center py-6">
-                      <div className="animate-spin h-6 w-6 border-2 border-blue-500 border-t-transparent rounded-full"></div>
-                    </div>
-                  )}
-                </div>
-              )}
+              {/* Complete Medical Records Tab content removed since we're now linking directly to the medical records page */}
             </div>
           </div>
         </div>

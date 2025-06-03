@@ -148,7 +148,7 @@ const HowToBookPage: React.FC = () => {
               </span>
               <h3 className="font-medium text-lg mb-1">Sign in to your PHB account</h3>
               <p className="text-gray-600 mb-2">
-                Log in to your PHB account using your username and password or NHS login
+                Log in to your PHB account using your username and password
               </p>
               <Link to="/login" className="text-blue-600 hover:underline inline-flex items-center">
                 <span>Go to login page</span>

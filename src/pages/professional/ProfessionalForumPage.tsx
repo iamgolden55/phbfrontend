@@ -133,6 +133,16 @@ Has anyone else encountered similar atypical presentations of GBS? I'd be intere
 
       {/* Rest of the component remains the same... */}
 
+      <div className="mt-6">
+        <div className="flex items-center justify-center">
+          <div className="bg-blue-100 rounded p-4 text-center">
+            <h2 className="text-2xl font-bold text-blue-800">Coming Soon</h2>
+            <p className="text-gray-600">This page is currently under development.</p>
+          </div>
+        </div>
+        
+      </div>
+
     </div>
   );
 };

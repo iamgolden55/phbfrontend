@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import AccountHealthLayout from '../../layouts/AccountHealthLayout';
 
-const TestResults: React.FC = () => {
+const TestResultsPage: React.FC = () => {
   return (
     <AccountHealthLayout title="Test Results">
       <div className="bg-white p-6 rounded-lg shadow-sm">
@@ -22,17 +22,17 @@ const TestResults: React.FC = () => {
               </svg>
             </div>
             <h2 className="text-3xl font-bold text-gray-800 mb-2">Coming Soon</h2>
-            <p className="text-xl text-gray-600 mb-8">Test Results Portal</p>
+            <p className="text-xl text-gray-600 mb-8">Test Results Viewer</p>
             
             <div className="max-w-2xl mx-auto bg-blue-50 border-l-4 border-blue-400 p-5 rounded-md mb-8 text-left">
               <h3 className="font-medium text-blue-800 mb-2">When available, this service will allow you to:</h3>
               <ul className="list-disc list-inside space-y-2 text-blue-700">
                 <li>View all your medical test results in one place</li>
-                <li>Search for specific tests by name, date, or doctor</li>
+                <li>Search for specific tests by name or date</li>
                 <li>See detailed information about each test result</li>
                 <li>Track changes in your results over time</li>
                 <li>Receive notifications when new results are available</li>
-                <li>Download and share results with other healthcare providers</li>
+                <li>Download or share your results with other healthcare providers</li>
               </ul>
             </div>
             
@@ -41,18 +41,37 @@ const TestResults: React.FC = () => {
             </p>
             
             <Link 
-              to="/account"
+              to="/account/health-records"
               className="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              Return to Account
+              Return to Health Records
             </Link>
           </div>
         </div>
 
-
+        {/* Sample test result cards for visual context */}
+        <div className="opacity-50 pointer-events-none">
+          <h3 className="text-xl font-semibold mb-4">Recent Test Results</h3>
+          <div className="grid gap-4 md:grid-cols-2">
+            {[1, 2, 3, 4].map((item) => (
+              <div key={item} className="border rounded-lg p-4 hover:shadow-md transition">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h4 className="font-medium">Blood Test - Full Blood Count</h4>
+                    <p className="text-sm text-gray-500">Date: 15 May 2023</p>
+                  </div>
+                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Normal</span>
+                </div>
+                <div className="mt-2">
+                  <p className="text-sm text-gray-600">Requested by: Dr. Sarah Johnson</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </AccountHealthLayout>
   );
 };
 
-export default TestResults;
+export default TestResultsPage;

@@ -1,73 +1,125 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { getMedicinesByLetter } from '../features/medicines/medicinesDataUtils';
+import { useDebounce } from '../hooks/useDebounce';
 
-interface MedicineType {
+interface MedicineItem {
   name: string;
-  description: string;
-  dosage: string;
-  sideEffects: string[];
-  warnings: string[];
+  href: string;
+  id: string;
+}
+
+interface FilteredMedicineGroup {
+  letter: string;
+  medicines: MedicineItem[];
+}
+
+interface MedicineData {
+  id: string;
+  name: string;
+  // Add other medicine properties as needed
 }
 
 const MedicinesAZPage: React.FC = () => {
-  const commonMedicines: MedicineType[] = [
-    {
-      name: 'Paracetamol',
-      description: 'Used to treat pain and fever. It\'s typically used for mild to moderate pain relief.',
-      dosage: 'Adults and children 12 years and over: 500-1000mg every 4-6 hours when necessary, up to a maximum of 4g daily.',
-      sideEffects: [
-        'Side effects of paracetamol are rare but can include:',
-        'Allergic reactions (very rare)',
-        'Flushing, low blood pressure and increased heart rate (if given too rapidly by intravenous infusion)',
-        'Liver and kidney damage (overdose)'
-      ],
-      warnings: [
-        'Do not exceed the recommended dose',
-        'Consult your doctor if you have liver or kidney problems',
-        'Seek immediate medical attention in case of overdose'
-      ]
-    },
-    {
-      name: 'Ibuprofen',
-      description: 'A nonsteroidal anti-inflammatory drug (NSAID) used to relieve pain, reduce inflammation, and lower fever.',
-      dosage: 'Adults and children over 12 years: 200-400mg every 4-6 hours, with a maximum of 1200mg in 24 hours.',
-      sideEffects: [
-        'Stomach pain or discomfort',
-        'Heartburn',
-        'Nausea or vomiting',
-        'Headache',
-        'Dizziness',
-        'Allergic reactions (rare)'
-      ],
-      warnings: [
-        'Not recommended for those with certain heart conditions',
-        'Avoid if you have a history of stomach ulcers',
-        'Not recommended during the third trimester of pregnancy',
-        'Take with food to reduce stomach upset'
-      ]
-    },
-    {
-      name: 'Omeprazole',
-      description: 'A proton pump inhibitor (PPI) that reduces the amount of acid produced in the stomach.',
-      dosage: 'Adults: Usually 20-40mg once daily for 4-8 weeks, depending on the condition being treated.',
-      sideEffects: [
-        'Headache',
-        'Stomach pain',
-        'Diarrhea or constipation',
-        'Nausea or vomiting',
-        'Gas or flatulence'
-      ],
-      warnings: [
-        'Long-term use may increase risk of bone fractures',
-        'May interact with certain medications',
-        'Discuss with your doctor if you need to take it for more than a few weeks',
-        'Tell your doctor if you are taking other medicines'
-      ]
-    },
-  ];
+  const navigate = useNavigate();
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
+  const [showDisclaimer, setShowDisclaimer] = useState(true);
+  const [medicines, setMedicines] = useState<Record<string, MedicineItem[]>>({});
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadMedicines = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const medicinesByLetter = getMedicinesByLetter();
+        const formattedMedicines: Record<string, MedicineItem[]> = {};
+
+        Object.keys(medicinesByLetter).forEach(letter => {
+          formattedMedicines[letter] = (medicinesByLetter[letter] as MedicineData[]).map((medicine: MedicineData) => ({
+            name: medicine.name,
+            href: `/medicines-a-z/${medicine.id}`,
+            id: medicine.id
+          }));
+        });
+
+        setMedicines(formattedMedicines);
+        setDisclaimerAccepted(false);
+        setShowDisclaimer(true);
+      } catch (err) {
+        setError('Failed to load medicines. Please try again later.');
+        console.error('Error loading medicines:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMedicines();
+  }, []);
+
+  const filteredMedicines = useMemo<FilteredMedicineGroup[]>(() => {
+    if (!debouncedSearchTerm) {
+      return Object.entries(medicines)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([letter, medicines]) => ({
+          letter,
+          medicines
+        }));
+    }
+    
+    const term = debouncedSearchTerm.toLowerCase();
+    const result: FilteredMedicineGroup[] = [];
+
+    Object.entries(medicines).forEach(([letter, medicines]) => {
+      const matchingMedicines = medicines.filter(medicine =>
+        medicine.name.toLowerCase().includes(term)
+      );
+
+      if (matchingMedicines.length > 0) {
+        result.push({
+          letter,
+          medicines: matchingMedicines
+        });
+      }
+    });
+
+    return result.sort((a, b) => a.letter.localeCompare(b.letter));
+  }, [medicines, debouncedSearchTerm]);
+
+  const highlightMatch = useCallback((text: string, term: string): React.ReactNode => {
+    if (!term || term.trim() === '') return text;
+    
+    const regex = new RegExp(`(${term})`, 'gi');
+    return text.split(regex).map((part, i) => 
+      part.toLowerCase() === term.toLowerCase() 
+        ? <span key={i} className="bg-yellow-200">{part}</span> 
+        : part
+    );
+  }, []);
+
+  const handleAcceptDisclaimer = () => {
+    setDisclaimerAccepted(true);
+    setShowDisclaimer(false);
+  };
+
+  const handleAlphabetClick = (letter: string) => {
+    setActiveFilter(letter === activeFilter ? null : letter);
+    setSearchTerm('');
+  };
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setActiveFilter(null);
+  };
+
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
   return (
-    <div className="bg-white">
+    <div className="bg-white relative">
       <div className="bg-[#005eb8] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Medicines A to Z</h1>
@@ -77,67 +129,158 @@ const MedicinesAZPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="phb-container py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main content */}
-          <div className="lg:col-span-2">
-            <div className="bg-blue-50 p-6 rounded-lg mb-8">
-              <h2 className="text-xl font-bold mb-4">About Medicines A to Z</h2>
-              <p className="mb-4">
-                Our Medicines A to Z provides information on prescription and over-the-counter medicines.
-                You can find out about a medicine's side effects, how to take it safely, and what to expect.
-              </p>
-              <p>
-                Always follow the instructions provided by your doctor or pharmacist and read the patient information
-                leaflet that comes with your medicine. Contact your doctor or pharmacist if you have any concerns
-                about your medicine.
-              </p>
-            </div>
-
-            {/* Alphabet navigation */}
-            <div className="flex flex-wrap gap-2 mb-8">
-              {Array.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ').map(letter => (
-                <a
-                  key={letter}
-                  href={`#${letter}`}
-                  className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200"
-                >
-                  {letter}
-                </a>
-              ))}
-            </div>
-
-            <h2 className="text-2xl font-bold mb-6">Common Medicines</h2>
-
-            {commonMedicines.map((medicine, index) => (
-              <div key={index} className="bg-white p-6 rounded-lg shadow-sm mb-8">
-                <h3 className="text-xl font-bold text-[#005eb8] mb-4">{medicine.name}</h3>
-                <div className="mb-4">
-                  <h4 className="font-bold mb-2">What it's used for</h4>
-                  <p>{medicine.description}</p>
-                </div>
-                <div className="mb-4">
-                  <h4 className="font-bold mb-2">Usual dosage</h4>
-                  <p>{medicine.dosage}</p>
-                </div>
-                <div className="mb-4">
-                  <h4 className="font-bold mb-2">Common side effects</h4>
-                  <ul className="list-disc pl-6 space-y-1">
-                    {medicine.sideEffects.map((effect, i) => (
-                      <li key={i}>{effect}</li>
-                    ))}
+      {/* Disclaimer Modal */}
+      {showDisclaimer && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 mx-auto">
+            <div className="flex items-start mb-4">
+              <div className="flex-shrink-0 mr-4">
+                <svg className="h-8 w-8 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Important Medical Disclaimer</h3>
+                <div className="text-gray-700 mb-6 space-y-2">
+                  <p>The information provided on PHB about medicines is for educational purposes only and is not intended as medical advice.</p>
+                  <p><strong>PHB does not support or endorse:</strong></p>
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li>Self-diagnosis or self-medication based on the information provided</li>
+                    <li>Changing or stopping any prescribed medication without consulting a healthcare professional</li>
+                    <li>Using medicines without proper medical guidance</li>
                   </ul>
+                  <p className="font-medium mt-2">Always consult with a qualified healthcare professional before taking any medication or making any changes to your treatment plan.</p>
+                  
+                  <div className="bg-yellow-100 p-3 rounded-md mt-3 border border-yellow-300">
+                    <p className="text-sm font-medium text-yellow-800">
+                      <strong>Pidgin Summary:</strong> Make you no go take any medicine by yourself o! Always talk to doctor first. PHB no go de responsible if you take medicine wey no good for your body. Na only qualified doctor fit tell you which medicine good for you. No change or stop any medicine wey doctor don give you without asking dem first. Your health na important thing, so make you dey careful well well!
+                    </p>
+                  </div>
                 </div>
-                <div className="bg-yellow-50 p-4 rounded-md border-l-4 border-yellow-400">
-                  <h4 className="font-bold mb-2">Important warnings</h4>
-                  <ul className="list-disc pl-6 space-y-1">
-                    {medicine.warnings.map((warning, i) => (
-                      <li key={i}>{warning}</li>
-                    ))}
-                  </ul>
+                <div className="flex gap-4">
+                  <button 
+                    onClick={() => navigate('/')}
+                    className="w-full py-3 px-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
+                  >
+                    Back to Home
+                  </button>
+                  <button 
+                    onClick={handleAcceptDisclaimer}
+                    className="w-full py-3 px-4 bg-[#005eb8] hover:bg-[#003f7e] text-white font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#005eb8]"
+                  >
+                    I understand and accept
+                  </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <div className={`phb-container py-8 ${!disclaimerAccepted ? 'pointer-events-none filter blur-sm' : ''}`}>
+
+        {/* Disclaimer */}
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-yellow-700">
+                <strong>Disclaimer:</strong> This information is not a substitute for professional medical advice. Always consult a healthcare professional before stopping or changing any medicines. Always follow the instructions provided by your doctor or pharmacist and read the patient information leaflet that comes with your medicine.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Search */}
+        <div className="mb-8">
+          <label htmlFor="medicine-search" className="block font-bold mb-2">Search for a medicine</label>
+          <div className="flex max-w-xl">
+            <input
+              type="search"
+              id="medicine-search"
+              placeholder="Enter medicine name"
+              className="px-4 py-2 border border-gray-300 rounded-l-md w-full focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+              value={searchTerm}
+              onChange={handleSearch}
+              aria-label="Search medicines input"
+            />
+            <button
+              type="submit"
+              className="bg-[#005eb8] hover:bg-[#003f7e] text-white px-4 py-2 rounded-r-md"
+              aria-label="Search medicines"
+            >
+              Search
+            </button>
+          </div>
+        </div>
+
+        {isLoading ? (
+          <div className="text-center py-8">Loading medicines...</div>
+        ) : error ? (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-8" role="alert">
+            <strong className="font-bold">Error: </strong>
+            <span className="block sm:inline">{error}</span>
+          </div>
+        ) : (
+          <>
+            {/* Alphabet navigation */}
+            <div className="mb-8">
+              <h2 className="text-xl font-bold mb-4">Browse by letter</h2>
+              <div className="flex flex-wrap gap-2">
+                {alphabet.map(letter => (
+                  <button
+                    key={letter}
+                    onClick={() => handleAlphabetClick(letter)}
+                    className={`w-10 h-10 flex items-center justify-center rounded-md font-bold text-lg
+                      ${activeFilter === letter
+                        ? 'bg-[#005eb8] text-white'
+                        : medicines[letter] && medicines[letter].length > 0
+                          ? 'bg-gray-100 hover:bg-gray-200 text-[#005eb8]'
+                          : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      }`}
+                    disabled={!medicines[letter] || medicines[letter].length === 0}
+                  >
+                    {letter}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Medicines list */}
+              <div className="lg:col-span-2">
+            {filteredMedicines.map(({ letter, medicines }) => (
+              <div key={letter} className="mb-8">
+                <h2 id={`letter-${letter}`} className="text-2xl font-bold mb-4 text-[#005eb8] border-b border-gray-200 pb-2">
+                  {letter}
+                </h2>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {medicines.map((medicine) => (
+                    <li key={medicine.id}>
+                      <Link
+                        to={medicine.href}
+                        className="text-[#005eb8] hover:underline font-medium flex items-center"
+                      >
+                        <svg className="h-5 w-5 mr-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                        {highlightMatch(medicine.name, debouncedSearchTerm)}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
+            {filteredMedicines.length === 0 && (
+              <div className="bg-gray-100 p-6 rounded-md">
+                <h3 className="text-lg font-bold mb-2">No medicines found</h3>
+                <p>Try searching with a different term or browse by letter.</p>
+              </div>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -150,56 +293,44 @@ const MedicinesAZPage: React.FC = () => {
                 <h3 className="font-bold mb-3">Related Links</h3>
                 <ul className="space-y-2">
                   <li>
-                    <Link to="/health-a-z" className="text-[#005eb8] hover:underline">
+                    <Link to="/health-a-z" className="text-[#005eb8] hover:underline flex items-center">
+                      <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
                       Health A to Z
                     </Link>
                   </li>
                   <li>
-                    <Link to="/phb-services#pharmacy" className="text-[#005eb8] hover:underline">
+                    <Link to="/find-a-pharmacy" className="text-[#005eb8] hover:underline flex items-center">
+                      <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
                       Find a pharmacy
                     </Link>
                   </li>
                   <li>
-                    <a href="https://www.nhs.uk/medicines-information/" className="text-[#005eb8] hover:underline" target="_blank" rel="noopener noreferrer">
-                      NHS medicines information
-                    </a>
+                    <Link to="/phb-medicines-information" className="text-[#005eb8] hover:underline flex items-center">
+                      <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                      PHB medicines information
+                    </Link>
                   </li>
                 </ul>
-
-                <div className="mt-6 mb-4">
-                  <h3 className="font-bold mb-3">Search for a medicine</h3>
-                  <form className="space-y-4">
-                    <div>
-                      <label htmlFor="medicine-search" className="block mb-1 font-medium">
-                        Medicine name
-                      </label>
-                      <input
-                        type="text"
-                        id="medicine-search"
-                        placeholder="Enter medicine name"
-                        className="w-full p-2 border border-gray-300 rounded"
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      className="bg-[#005eb8] text-white px-4 py-2 rounded hover:bg-[#003f7e] transition-colors w-full"
-                    >
-                      Search
-                    </button>
-                  </form>
-                </div>
-
-                <div className="bg-red-50 p-4 rounded-md">
-                  <h3 className="font-bold text-red-800 mb-2">Important notice</h3>
-                  <p className="text-sm text-red-700 mb-3">
-                    This information is not a substitute for professional medical advice. Always consult a healthcare professional
-                    before stopping or changing any medicines.
+                
+                <div className="mt-6 p-4 bg-yellow-50 rounded-md">
+                  <h3 className="font-bold mb-2">Important notice</h3>
+                  <p className="text-sm">
+                    This information is not a substitute for professional medical advice. Always consult a healthcare
+                    professional before stopping or changing any medicines.
                   </p>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

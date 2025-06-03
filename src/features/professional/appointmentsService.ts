@@ -87,7 +87,7 @@ export async function fetchDoctorAppointments(filters?: {
       queryParams = `?${params.toString()}`;
     }
     
-    const response = await fetch(`${API_BASE_URL}/api/department-pending-appointments/${queryParams}`, {
+    const response = await fetch(`${API_BASE_URL}api/department-pending-appointments/${queryParams}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -179,7 +179,7 @@ export async function fetchDoctorAppointmentDetails(appointmentId: string) {
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}/api/doctor-appointments/${appointmentId}/`, {
+    const response = await fetch(`${API_BASE_URL}api/doctor-appointments/${appointmentId}/`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -260,7 +260,7 @@ export async function acceptAppointment(appointmentId: string) {
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/accept/`, {
+    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/accept/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -295,7 +295,7 @@ export async function startConsultation(appointmentId: string) {
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/start-consultation/`, {
+    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/start-consultation/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -331,7 +331,7 @@ export async function completeConsultation(appointmentId: string, notes: string)
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/complete-consultation/`, {
+    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/complete-consultation/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -473,7 +473,7 @@ export async function addDoctorNotes(appointmentId: string, notes: string) {
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/add-notes/`, {
+    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/add-notes/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -518,7 +518,7 @@ export async function cancelAppointment(appointmentId: string, reason?: string) 
       cancellation_reason: reason
     };
     
-    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/cancel/`, {
+    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/cancel/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -686,7 +686,7 @@ export async function getAppointmentPrescriptions(appointmentId: string) {
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/prescriptions/view/`, {
+    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/prescriptions/view/`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -751,3 +751,32 @@ export async function getPatientMedicalRecords(patientId: string | number) {
     throw error;
   }
 }
+
+/**
+ * Fetch appointment notes
+ * @param appointmentId The ID of the appointment to fetch notes for
+ * @returns Promise that resolves to the appointment notes
+ */
+export const fetchAppointmentNotes = async (appointmentId: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/notes/`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem(AUTH_TOKEN_KEY)}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Failed to fetch appointment notes: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Retrieved appointment notes:', data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching appointment notes:', error);
+    throw error;
+  }
+};

@@ -63,9 +63,11 @@ import HomePage from './pages/HomePage';
 import HealthAZPage from './pages/HealthAZPage';
 import HealthConditionPage from './pages/HealthConditionPage';
 import MedicinesAZPage from './pages/MedicinesAZPage';
+import MedicineDetailPage from './pages/MedicineDetailPage';
 import LiveWellPage from './pages/LiveWellPage';
 // Live Well Pages
 import HealthyEatingPage from './pages/live-well/HealthyEatingPage';
+import MealPlansPage from './pages/live-well/healthy-eating/MealPlansPage';
 import ExercisePage from './pages/live-well/ExercisePage';
 import MentalWellbeingPage from './pages/live-well/MentalWellbeingPage';
 import SleepPage from './pages/live-well/SleepPage';
@@ -138,7 +140,7 @@ import { useOrganizationAuth } from './features/organization/organizationAuthCon
 import GPHealthRecord from './features/health/GPHealthRecord';
 import Prescriptions from './features/health/Prescriptions';
 import Appointments from './features/health/Appointments';
-import TestResults from './features/health/TestResults';
+import TestResultsPage from './pages/account/TestResultsPage';
 import HospitalStatusGuard from './features/health/HospitalStatusGuard';
 
 // Advanced Search Features
@@ -326,10 +328,12 @@ function App() {
                 <Route path="health-a-z" element={<HealthAZPage />} />
                 <Route path="health-a-z/:conditionSlug" element={<HealthConditionPage />} />
                 <Route path="medicines-a-z" element={<MedicinesAZPage />} />
+                <Route path="medicines-a-z/:medicineId" element={<MedicineDetailPage />} />
                 <Route path="research-publications" element={<ResearchPublicationsPage />} /> {/* New route for Research Publications */}
                 <Route path="live-well" element={<LiveWellPage />} />
                 {/* Live Well Subroutes */}
                 <Route path="live-well/healthy-eating" element={<HealthyEatingPage />} />
+                <Route path="live-well/healthy-eating/meal-plans" element={<MealPlansPage />} />
                 <Route path="live-well/exercise" element={<ExercisePage />} />
                 <Route path="live-well/mental-wellbeing" element={<MentalWellbeingPage />} />
                 <Route path="live-well/sleep" element={<SleepPage />} />
@@ -538,22 +542,22 @@ function App() {
                 } />
                 <Route path="account/test-results" element={
                   <ProtectedRoute>
-                    <TestResults />
+                    <TestResultsPage />
                   </ProtectedRoute>
                 } />
                 <Route path="account/test-results/all" element={
                   <ProtectedRoute>
-                    <TestResults />
+                    <TestResultsPage />
                   </ProtectedRoute>
                 } />
                 <Route path="account/test-results/recent" element={
                   <ProtectedRoute>
-                    <TestResults />
+                    <TestResultsPage />
                   </ProtectedRoute>
                 } />
                 <Route path="account/test-results/search" element={
                   <ProtectedRoute>
-                    <TestResults />
+                    <TestResultsPage />
                   </ProtectedRoute>
                 } />
 

@@ -157,10 +157,10 @@ const UrgentRequestsPage: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h3 className="ml-3 text-lg font-medium text-gray-900">NHS 111</h3>
+                <h3 className="ml-3 text-lg font-medium text-gray-900">PHB Urgent Care</h3>
               </div>
               <p className="text-gray-600 mb-3">
-                If your GP practice is closed and you need urgent advice about medication, contact NHS 111 online or by phone.
+                If your GP practice is closed and you need urgent advice about medication, contact PHB Urgent Care online or by phone.
               </p>
               <p className="text-sm text-gray-500">
                 <strong>Best for:</strong> Out-of-hours urgent medication needs

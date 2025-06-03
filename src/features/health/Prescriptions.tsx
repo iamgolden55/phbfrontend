@@ -2,7 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../auth/authContext';
 import { Link } from 'react-router-dom';
 import AccountHealthLayout from '../../layouts/AccountHealthLayout';
-import { fetchPatientPrescriptions, orderPrescription, completePrescription, ApiMedication, ApiPrescriptionsResponse } from './prescriptionsService';
+import { 
+  fetchPatientPrescriptions, 
+  orderPrescription, 
+  completePrescription, 
+  ApiMedication, 
+  ApiPrescriptionsResponse,
+  Notification,
+  generateNotifications,
+  getSavedNotifications,
+  saveNotifications,
+  deleteNotification
+} from './prescriptionsService';
 
 interface PrescriptionType {
   id: string;
@@ -22,40 +33,26 @@ interface PrescriptionType {
   generic_name?: string;
 }
 
-interface NotificationType {
-  id: string;
-  type: 'info' | 'success' | 'warning' | 'error';
-  message: string;
-  date: string;
-}
-
-// Sample notifications
-const mockNotifications: NotificationType[] = [
-  {
-    id: 'n1',
-    type: 'success',
-    message: 'Your prescription for Omeprazole 20mg has been collected and is ready for use.',
-    date: '2023-10-06'
-  },
-  {
-    id: 'n2',
-    type: 'info',
-    message: 'Your Cetirizine prescription will be dispensed at your next appointment.',
-    date: '2023-10-18'
-  },
-];
+// NotificationType interface is now imported from prescriptionsService.ts as 'Notification'
 
 const Prescriptions: React.FC = () => {
   const { user } = useAuth();
-  const [view, setView] = useState<'all' | 'active' | 'inProgress' | 'history'>('active');
+  const [view, setView] = useState<'all' | 'inProgress' | 'history'>('all');
   const [selectedPrescription, setSelectedPrescription] = useState<PrescriptionType | null>(null);
   const [showCollectModal, setShowCollectModal] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [prescriptions, setPrescriptions] = useState<PrescriptionType[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+
+  // Load notifications from local storage on component mount
+  useEffect(() => {
+    const savedNotifications = getSavedNotifications();
+    setNotifications(savedNotifications);
+  }, []);
 
   useEffect(() => {
     const loadPrescriptions = async () => {
@@ -67,6 +64,25 @@ const Prescriptions: React.FC = () => {
         // Process the API response - only use medications array from the response
         const apiPrescriptions = data.medications || [];
         console.log('API prescriptions:', apiPrescriptions);
+        
+        // Generate notifications from prescription data
+        const generatedNotifications = generateNotifications(apiPrescriptions);
+        
+        // Merge with existing notifications, avoiding duplicates
+        const existingNotifications = getSavedNotifications();
+        const mergedNotifications = [...existingNotifications];
+        
+        // Add only new notifications that don't already exist
+        generatedNotifications.forEach(newNotif => {
+          // Check if notification with same ID exists
+          if (!mergedNotifications.some(existing => existing.id === newNotif.id)) {
+            mergedNotifications.push(newNotif);
+          }
+        });
+        
+        // Save and set notifications
+        saveNotifications(mergedNotifications);
+        setNotifications(mergedNotifications);
         
         // Convert API format to our component format
         const formattedPrescriptions: PrescriptionType[] = apiPrescriptions.map((apiMed: ApiMedication) => {
@@ -88,10 +104,9 @@ const Prescriptions: React.FC = () => {
             status = 'active';
           }
 
-          // Get the prescriber name safely
-          const prescriber = apiMed.prescriber_name || 
-                          // @ts-ignore - doctor_name is added to the interface
-                          apiMed.doctor_name || 
+          // Get the prescriber name safely - prioritize the actual doctor who prescribed the medication
+          const prescriber = apiMed.doctor_name || 
+                          apiMed.prescriber_name || 
                           'Your Doctor';
           
           return {
@@ -131,8 +146,7 @@ const Prescriptions: React.FC = () => {
 
   // Filter prescriptions based on current view
   const filteredPrescriptions = prescriptions.filter(prescription => {
-    if (view === 'all') return true;
-    if (view === 'active') return prescription.status === 'active';
+    if (view === 'all') return prescription.status === 'active'; // All prescriptions tab now shows only active prescriptions
     if (view === 'inProgress') return prescription.status === 'collected';
     if (view === 'history') return prescription.status === 'completed' || prescription.status === 'expired';
     return true;
@@ -201,10 +215,13 @@ const Prescriptions: React.FC = () => {
           ? { 
               ...p, 
               status: 'collected',
-              lastDispensed: new Date().toISOString().split('T')[0] 
-            } 
+              lastDispensed: new Date().toISOString().split('T')[0]
+            }
           : p
       ));
+      
+      // Update the view to show In Progress after purchase
+      setView('inProgress');
       
       setShowCollectModal(false);
       setActionSuccess(`Your ${selectedPrescription.medication} has been marked as purchased successfully.`);
@@ -229,9 +246,15 @@ const Prescriptions: React.FC = () => {
       // Update the prescription status locally
       setPrescriptions(prescriptions.map(p => 
         p.id === selectedPrescription.id 
-          ? { ...p, status: 'completed' } 
+          ? { 
+              ...p, 
+              status: 'completed' 
+            }
           : p
       ));
+      
+      // Update the view to show History after finishing medication
+      setView('history');
       
       setShowCompleteModal(false);
       setActionSuccess(`Your ${selectedPrescription.medication} has been marked as completed successfully.`);
@@ -279,11 +302,11 @@ const Prescriptions: React.FC = () => {
         )}
 
         {/* Notifications */}
-        {!isLoading && mockNotifications.length > 0 && (
+        {!isLoading && notifications.length > 0 && (
           <div className="mb-6">
             <h3 className="font-bold mb-3">Notifications</h3>
             <div className="space-y-3">
-              {mockNotifications.map(notification => (
+              {notifications.map(notification => (
                 <div
                   key={notification.id}
                   className={`p-3 rounded-md ${
@@ -293,23 +316,50 @@ const Prescriptions: React.FC = () => {
                     'bg-blue-50 text-blue-700'
                   }`}
                 >
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      {notification.type === 'success' && (
-                        <svg className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      )}
-                      {notification.type === 'info' && (
-                        <svg className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      )}
+                  <div className="flex justify-between">
+                    <div className="flex">
+                      <div className="flex-shrink-0">
+                        {notification.type === 'success' && (
+                          <svg className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        )}
+                        {notification.type === 'info' && (
+                          <svg className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        )}
+                        {notification.type === 'warning' && (
+                          <svg className="h-5 w-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                          </svg>
+                        )}
+                        {notification.type === 'error' && (
+                          <svg className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        )}
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm">{notification.message}</p>
+                        <p className="text-xs mt-1 opacity-70">{formatDate(notification.date)}</p>
+                      </div>
                     </div>
-                    <div className="ml-3">
-                      <p className="text-sm">{notification.message}</p>
-                      <p className="text-xs mt-1 opacity-70">{formatDate(notification.date)}</p>
-                    </div>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const updatedNotifications = deleteNotification(notification.id);
+                        setNotifications(updatedNotifications);
+                        setActionSuccess('Notification dismissed');
+                        setTimeout(() => setActionSuccess(null), 3000);
+                      }}
+                      className="text-gray-400 hover:text-gray-600 transition-colors"
+                      aria-label="Delete notification"
+                    >
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -321,16 +371,6 @@ const Prescriptions: React.FC = () => {
         <div className="mb-6">
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8">
-              <button
-                onClick={() => setView('active')}
-                className={`whitespace-nowrap pb-3 px-1 text-sm font-medium ${
-                  view === 'active'
-                    ? 'border-b-2 border-[#005eb8] text-[#005eb8]'
-                    : 'border-b-2 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                }`}
-              >
-                Active
-              </button>
               <button
                 onClick={() => setView('inProgress')}
                 className={`whitespace-nowrap pb-3 px-1 text-sm font-medium ${
@@ -421,7 +461,7 @@ const Prescriptions: React.FC = () => {
                             onClick={() => handleCollectPrescription(prescription)}
                             className="text-[#005eb8] hover:text-[#003f7e]"
                           >
-                            Purchased
+                            Purchase
                           </button>
                         )}
                         {prescription.status === 'collected' && (
@@ -429,7 +469,7 @@ const Prescriptions: React.FC = () => {
                             onClick={() => handleCompletePrescription(prescription)}
                             className="text-[#005eb8] hover:text-[#003f7e]"
                           >
-                            Complete
+                            Finished medication
                           </button>
                         )}
                         {(prescription.status === 'completed' || prescription.status === 'expired') && (
@@ -444,10 +484,14 @@ const Prescriptions: React.FC = () => {
           ) : (
             <div className="text-center py-6 bg-gray-50 rounded-md">
               <svg className="h-12 w-12 text-gray-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <h3 className="text-lg font-medium text-gray-900">No prescriptions found</h3>
-              <p className="text-gray-500 mt-1">There are no prescriptions in this category.</p>
+              <p className="text-gray-500 mt-1">
+                {view === 'all' && 'There are no prescribed medications for you at this time.'}
+                {view === 'inProgress' && 'You have no medications in progress at this time.'}
+                {view === 'history' && 'You have no medication history at this time.'}
+              </p>
             </div>
           )}
         </div>
@@ -684,7 +728,7 @@ const Prescriptions: React.FC = () => {
                     }}
                     className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e]"
                   >
-                    Collect
+                    Purchase
                   </button>
                 )}
                 {selectedPrescription.status === 'collected' && (
@@ -695,7 +739,7 @@ const Prescriptions: React.FC = () => {
                     }}
                     className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e]"
                   >
-                    Complete
+                    Finished medication
                   </button>
                 )}
                 <button

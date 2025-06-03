@@ -535,35 +535,37 @@ const ProfessionalDashboardPage: React.FC = () => {
 
         {/* Announcements */}
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-bold text-blue-800 mb-4">Latest Announcements</h2>
-          <div className="space-y-4">
-            {announcements.map((announcement) => (
-              <div key={announcement.id} className="border-b pb-3 last:border-0">
-                <h3 className="text-md font-semibold">{announcement.title}</h3>
-                <p className="text-xs text-gray-500 mb-1">{announcement.date}</p>
-                <p className="text-sm text-gray-700">{announcement.summary}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4">
-            <a href="#" className="text-blue-600 hover:underline text-sm">View all announcements</a>
+          <div className="flex flex-col items-center justify-center p-8 text-center">
+            <div className="bg-blue-50 rounded-full p-4 mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Announcements Coming Soon</h3>
+            <p className="text-gray-600 max-w-md">
+              We're working on an announcements system to keep you updated with important practice news and updates.
+            </p>
+            <div className="mt-4 px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+              Under Development
+            </div>
           </div>
         </div>
 
         {/* Upcoming Events */}
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-bold text-blue-800 mb-4">Upcoming Events</h2>
-          <div className="space-y-4">
-            {events.map((event) => (
-              <div key={event.id} className="border-b pb-3 last:border-0">
-                <h3 className="text-md font-semibold">{event.title}</h3>
-                <p className="text-xs text-gray-500 mb-1">{event.date}</p>
-                <p className="text-sm text-gray-700">{event.time}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4">
-            <a href="#" className="text-blue-600 hover:underline text-sm">View all events</a>
+          <div className="flex flex-col items-center justify-center p-8 text-center">
+            <div className="bg-purple-50 rounded-full p-4 mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Events Coming Soon</h3>
+            <p className="text-gray-600 max-w-md">
+              Our events calendar will help you track important dates, meetings, and professional development opportunities.
+            </p>
+            <div className="mt-4 px-4 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
+              Under Development
+            </div>
           </div>
         </div>
       </div>

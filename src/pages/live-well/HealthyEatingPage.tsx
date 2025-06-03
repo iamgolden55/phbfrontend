@@ -15,19 +15,6 @@ const HealthyEatingPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Breadcrumbs */}
-      <div className="bg-gray-100 py-2">
-        <div className="phb-container">
-          <Breadcrumbs
-            items={[
-              { label: 'Home', href: '/' },
-              { label: 'Live Well', href: '/live-well' },
-              { label: 'Healthy Eating', href: '/live-well/healthy-eating' }
-            ]}
-          />
-        </div>
-      </div>
-
       {/* Main Content */}
       <div className="phb-container py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -39,11 +26,11 @@ const HealthyEatingPage: React.FC = () => {
                 A healthy, balanced diet is essential for maintaining good health and preventing various diseases. It should include a variety of foods from all major food groups in the right proportions.
               </p>
               <p className="mb-4">
-                The Nigerian Dietary Guidelines recommend that your diet should include:
+                Dietary guidelines generally recommend that your diet should include:
               </p>
               <ul className="list-disc pl-6 mb-4 space-y-2">
                 <li>At least 5 portions of fruits and vegetables every day</li>
-                <li>Meals based on starchy foods like rice, yam, potatoes, and whole grains</li>
+                <li>Meals based on starchy foods like rice, potatoes, and whole grains</li>
                 <li>Some protein-rich foods such as beans, fish, eggs, and lean meat</li>
                 <li>Some dairy or dairy alternatives</li>
                 <li>Small amounts of unsaturated oils and spreads</li>
@@ -89,7 +76,7 @@ const HealthyEatingPage: React.FC = () => {
                     <svg className="h-6 w-6 text-green-600 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span>Base your meals on starchy carbohydrates like rice, yam, or whole grains</span>
+                    <span>Base your meals on starchy carbohydrates like rice or whole grains</span>
                   </li>
                   <li className="flex items-start">
                     <svg className="h-6 w-6 text-green-600 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -12,7 +12,8 @@ import {
   addAppointmentPrescriptions,
   getAppointmentPrescriptions,
   PrescriptionMedication,
-  PrescriptionResponse
+  PrescriptionResponse,
+  fetchAppointmentNotes
 } from '../../features/professional/appointmentsService';
 
 interface AppointmentDetails {
@@ -128,6 +129,14 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
   // Tab state
   const [tabValue, setTabValue] = useState(0);
   
+  // Notes state
+  const [appointmentNotes, setAppointmentNotes] = useState<{
+    notes?: string;
+    doctor_notes?: string;
+  } | null>(null);
+  const [notesError, setNotesError] = useState<string | null>(null);
+  const [isLoadingNotes, setIsLoadingNotes] = useState(false);
+  
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
@@ -189,6 +198,27 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
     };
     
     loadAppointmentDetails();
+  }, [appointmentId]);
+
+  useEffect(() => {
+    const loadAppointmentNotes = async () => {
+      if (!appointmentId) return;
+      
+      setIsLoadingNotes(true);
+      setNotesError(null);
+      
+      try {
+        const notesData = await fetchAppointmentNotes(appointmentId);
+        setAppointmentNotes(notesData);
+      } catch (err: any) {
+        console.error('Failed to load appointment notes:', err);
+        setNotesError(err.message || 'Failed to load appointment notes');
+      } finally {
+        setIsLoadingNotes(false);
+      }
+    };
+    
+    loadAppointmentNotes();
   }, [appointmentId]);
 
   // Function to load prescriptions
@@ -791,7 +821,7 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
           {/* Original content goes here */}
           <div className="bg-white p-6 rounded-lg shadow-md mb-6">
             <h2 className="text-xl font-bold text-blue-800 mb-4">Appointment Information</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-500">Status</p>
                 <p className="text-base font-medium">
@@ -1177,17 +1207,46 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
         </div>
       </div>
       
-      {/* Important Notes */}
+      {/* Appointment Notes */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <h2 className="text-xl font-bold text-blue-800 mb-4">Important Notes</h2>
-        {appointmentDetails.important_notes && appointmentDetails.important_notes.length > 0 ? (
-          <ul className="list-disc pl-5 space-y-2">
-            {appointmentDetails.important_notes.map((note: string, index: number) => (
-              <li key={index} className="text-gray-700">{note}</li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-gray-500">No notes recorded</p>
+        <h2 className="text-xl font-bold text-blue-800 mb-4">Appointment Notes</h2>
+        {isLoadingNotes ? (
+          <div className="flex justify-center py-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          </div>
+        ) : notesError ? (
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-700">
+                  Could not load notes: {notesError}
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : appointmentNotes && (
+          <div className="space-y-4">
+            {appointmentNotes.notes && (
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">General Notes</h3>
+                <p className="text-gray-700 whitespace-pre-wrap">{appointmentNotes.notes}</p>
+              </div>
+            )}
+            {appointmentNotes.doctor_notes && (
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Doctor Notes</h3>
+                <p className="text-gray-700 whitespace-pre-wrap">{appointmentNotes.doctor_notes}</p>
+              </div>
+            )}
+            {!appointmentNotes.notes && !appointmentNotes.doctor_notes && (
+              <p className="text-gray-500">No notes available for this appointment</p>
+            )}
+          </div>
         )}
       </div>
       
@@ -1571,7 +1630,7 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
                 className="flex items-center text-blue-600 hover:text-blue-800"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+                  <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 01-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
                 </svg>
                 Add Another Medication
               </button>

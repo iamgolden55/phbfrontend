@@ -242,11 +242,13 @@ const ProfessionalAppointmentsPage: React.FC = () => {
     if (activeFilter === 'upcoming') {
       return appointmentDate >= now && (appointment.status === 'confirmed' || appointment.status === 'pending');
     } else if (activeFilter === 'past') {
-      return appointmentDate < now && (appointment.status === 'completed' || appointment.status === 'cancelled');
+      return appointmentDate < now || (appointment.status === 'completed' || appointment.status === 'cancelled');
     } else if (activeFilter === 'cancelled') {
       return appointment.status === 'cancelled';
     } else if (activeFilter === 'in_progress') {
       return appointment.status === 'in_progress';
+    } else if (activeFilter === 'completed') {
+      return appointment.status === 'completed';
     } else if (activeFilter === 'department_pending') {
       return appointment.is_department_pending === true;
     } else if (activeFilter === 'all') {
@@ -675,6 +677,16 @@ const ProfessionalAppointmentsPage: React.FC = () => {
             In Progress
           </button>
           <button
+            onClick={() => setActiveFilter('completed')}
+            className={`px-4 py-2 rounded-md text-sm font-medium ${
+              activeFilter === 'completed'
+                ? 'bg-blue-100 text-blue-800'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            Completed
+          </button>
+          <button
             onClick={() => setActiveFilter('past')}
             className={`px-4 py-2 rounded-md text-sm font-medium ${
               activeFilter === 'past'
@@ -796,6 +808,9 @@ const ProfessionalAppointmentsPage: React.FC = () => {
                     Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Priority
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -839,6 +854,16 @@ const ProfessionalAppointmentsPage: React.FC = () => {
                         'bg-gray-100 text-gray-800'
                       }`}>
                         {appointment.status_display}
+                      </span>
+                    </td>
+                    <td className='px-6 py-4 whitespace-nowrap'
+                    >
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        appointment.priority === 'urgent' ? 'bg-red-100 text-red-800' :
+                        appointment.priority === 'high' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-green-100 text-green-800'
+                      }`}>
+                        {appointment.formatted_priority || appointment.priority}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
