@@ -91,7 +91,7 @@ const Prescriptions: React.FC = () => {
           // Get the prescriber name safely
           const prescriber = apiMed.prescriber_name || 
                           // @ts-ignore - doctor_name is added to the interface
-                          apiMed.doctor_name || 
+                          apiMed.doctor_name || 'Dr.' + apiMed.prescribed_by.first_name + ' ' + apiMed.prescribed_by.last_name ||
                           'Your Doctor';
           
           return {

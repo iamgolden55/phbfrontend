@@ -584,7 +584,7 @@ function App() {
                 <Route path="guidelines" element={<ClinicalGuidelinesPage />} />
                 <Route path="doctor-resources" element={<DoctorResourcesPage />} />
                 <Route path="resources" element={<ProfessionalResourcesPage />} />
-                <Route path="patients" element={<ProfessionalPatientsPage />} />
+                <Route path="patients" element={<PatientManagementPage />} />
                 <Route path="research" element={<ProfessionalResearchPage />} />
                 <Route path="forum" element={<ProfessionalForumPage />} />
                 <Route path="profile" element={<ProfessionalProfilePage />} />

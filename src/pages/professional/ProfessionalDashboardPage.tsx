@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, FC, ReactElement } from 'react';
 import { Helmet } from 'react-helmet';
 import { fetchDoctorAppointments, acceptAppointment, AppointmentResponse, Appointment, DoctorInfo, AppointmentSummary } from '../../features/professional/appointmentsService';
 import { useProfessionalAuth } from '../../features/professional/professionalAuthContext';
 import { useAuth } from '../../features/auth/authContext';
 import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns/format';
+import { ProfessionalCalendar } from '../../components/ProfessionalCalendar';
 
 // Mock data for a doctor dashboard
 const mockDoctorData = {
@@ -81,6 +83,8 @@ const ProfessionalDashboardPage: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [doctorInfo, setDoctorInfo] = useState<DoctorInfo | null>(null);
   const [appointmentSummary, setAppointmentSummary] = useState<AppointmentSummary | null>(null);
+  const [expandedEvents, setExpandedEvents] = useState<Record<string, boolean>>({});
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
 
   // Check if the user is authenticated and is a doctor
   const isAuthLoading = mainIsLoading || profIsLoading;
@@ -239,7 +243,7 @@ const ProfessionalDashboardPage: React.FC = () => {
       case 'high':
         return 'Follow-up';
       case 'normal':
-      default:
+      default: 
         return 'Stable';
     }
   };
@@ -253,6 +257,77 @@ const ProfessionalDashboardPage: React.FC = () => {
       return dateString;
     }
   };
+  // Helper function to get status color
+  const getStatusColor = (status: string) => {
+    switch(status) {
+      case 'completed': return '#4CAF50';
+      case 'in_progress': return '#2196F3';
+      case 'confirmed': return '#FFC107';
+      case 'cancelled': return '#F44336';
+      default: return '#9E9E9E';
+    }
+  };
+  // Handle event selection for the calendar
+  const handleSelectEvent = (event: any) => {
+    console.log('Event selected:', event.id);
+    setSelectedEvent((prev: any) => prev?.id === event.id ? null : event);
+    
+    // If the event has an appointment_id, we can navigate to the detail page
+    if (event.appointment_id && !event.appointment_id.startsWith('temp-')) {
+      navigate(`/professional/appointments/${event.appointment_id}`);
+    }
+  };
+
+  // Handle adding a new event to the calendar
+  const handleAddEvent = (event: any) => {
+    console.log('New event added:', event);
+    
+    // Add the new event to the appointments list
+    if (appointmentData && appointmentData.my_appointments) {
+      // Create a new appointment object from the event
+      const newAppointment: Appointment = {
+        appointment_id: event.appointment_id,
+        appointment_date: event.date.toISOString(),
+        chief_complaint: event.title,
+        status: event.status,
+        priority: event.priority,
+        formatted_date: format(event.date, 'MMM d, yyyy'),
+        formatted_time: event.time,
+        notes: event.notes,
+        location: event.location,
+        // Add any other required fields with default values
+        patient_name: event.event_type === 'personal' ? 'Personal Event' : 'Patient Name',
+        doctor_full_name: doctorName,
+        appointment_type: event.event_type === 'personal' ? 'Personal' : 'Consultation',
+        // Add a custom field to identify personal events
+        is_personal: event.event_type === 'personal'
+      };
+      
+      // Update the appointment data state
+      setAppointmentData({
+        ...appointmentData,
+        my_appointments: {
+          ...appointmentData.my_appointments,
+          all: [...appointmentData.my_appointments.all, newAppointment],
+          // Safely update the status-specific array
+          ...(event.status === 'confirmed' || event.status === 'in_progress' || 
+             event.status === 'completed' || event.status === 'cancelled' || 
+             event.status === 'no_show' ? 
+            { [event.status]: [...(appointmentData.my_appointments[event.status as keyof typeof appointmentData.my_appointments] as Appointment[] || []), newAppointment] } : 
+            {})
+        }
+      });
+      
+      // Show a success message based on event type
+      if (event.event_type === 'personal') {
+        alert('Personal event added successfully!');
+      } else {
+        alert('Appointment added successfully!');
+      }
+    }
+  };
+
+
 
   // Show loading state while authentication is being checked
   if (isAuthLoading) {
@@ -535,37 +610,52 @@ const ProfessionalDashboardPage: React.FC = () => {
 
         {/* Announcements */}
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-bold text-blue-800 mb-4">Latest Announcements</h2>
-          <div className="space-y-4">
-            {announcements.map((announcement) => (
-              <div key={announcement.id} className="border-b pb-3 last:border-0">
-                <h3 className="text-md font-semibold">{announcement.title}</h3>
-                <p className="text-xs text-gray-500 mb-1">{announcement.date}</p>
-                <p className="text-sm text-gray-700">{announcement.summary}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4">
-            <a href="#" className="text-blue-600 hover:underline text-sm">View all announcements</a>
+          <div className="flex flex-col items-center justify-center p-8 text-center">
+            <div className="bg-blue-50 rounded-full p-4 mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Announcements Coming Soon</h3>
+            <p className="text-gray-600 max-w-md">
+              We're working on an announcements system to keep you updated with important practice news and updates.
+            </p>
+            <div className="mt-4 px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+              Under Development
+            </div>
           </div>
         </div>
 
         {/* Upcoming Events */}
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-bold text-blue-800 mb-4">Upcoming Events</h2>
-          <div className="space-y-4">
-            {events.map((event) => (
-              <div key={event.id} className="border-b pb-3 last:border-0">
-                <h3 className="text-md font-semibold">{event.title}</h3>
-                <p className="text-xs text-gray-500 mb-1">{event.date}</p>
-                <p className="text-sm text-gray-700">{event.time}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4">
-            <a href="#" className="text-blue-600 hover:underline text-sm">View all events</a>
+          <div className="flex flex-col items-center justify-center p-8 text-center">
+            <div className="bg-purple-50 rounded-full p-4 mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Events Coming Soon</h3>
+            <p className="text-gray-600 max-w-md">
+              Our events calendar will help you track important dates, meetings, and professional development opportunities.
+            </p>
+            <div className="mt-4 px-4 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
+              Under Development
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Appointment Calendar */}
+      <div className="mt-8">
+        {appointmentData?.my_appointments?.all && (
+          <ProfessionalCalendar
+            appointments={appointmentData.my_appointments.all}
+            onSelectEvent={handleSelectEvent}
+            selectedEvent={selectedEvent}
+            onAddEvent={handleAddEvent}
+            className="mb-8"
+          />
+        )}
       </div>
     </div>
   );

@@ -83,11 +83,10 @@ export async function fetchDoctorAppointments(filters?: {
       if (filters.end_date) params.append('end_date', filters.end_date);
       if (filters.priority) params.append('priority', filters.priority);
       if (filters.doctor_id) params.append('doctor_id', filters.doctor_id.toString());
-      
       queryParams = `?${params.toString()}`;
     }
     
-    const response = await fetch(`${API_BASE_URL}/api/department-pending-appointments/${queryParams}`, {
+    const response = await fetch(`${API_BASE_URL}api/department-pending-appointments/${queryParams}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -179,7 +178,7 @@ export async function fetchDoctorAppointmentDetails(appointmentId: string) {
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}/api/doctor-appointments/${appointmentId}/`, {
+    const response = await fetch(`${API_BASE_URL}api/doctor-appointments/${appointmentId}/`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -260,7 +259,7 @@ export async function acceptAppointment(appointmentId: string) {
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/accept/`, {
+    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/accept/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -295,7 +294,7 @@ export async function startConsultation(appointmentId: string) {
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/start-consultation/`, {
+    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/start-consultation/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -331,7 +330,7 @@ export async function completeConsultation(appointmentId: string, notes: string)
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/complete-consultation/`, {
+    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/complete-consultation/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -473,7 +472,7 @@ export async function addDoctorNotes(appointmentId: string, notes: string) {
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/add-notes/`, {
+    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/add-notes/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -518,7 +517,7 @@ export async function cancelAppointment(appointmentId: string, reason?: string) 
       cancellation_reason: reason
     };
     
-    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/cancel/`, {
+    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/cancel/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -686,7 +685,7 @@ export async function getAppointmentPrescriptions(appointmentId: string) {
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/prescriptions/view/`, {
+    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/prescriptions/view/`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -751,3 +750,97 @@ export async function getPatientMedicalRecords(patientId: string | number) {
     throw error;
   }
 }
+
+/**
+ * Fetch appointment notes
+ * @param appointmentId The ID of the appointment to fetch notes for
+ * @returns Promise that resolves to the appointment notes
+ */
+export const fetchAppointmentNotes = async (appointmentId: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/notes/`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem(AUTH_TOKEN_KEY)}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Failed to fetch appointment notes: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Retrieved appointment notes:', data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching appointment notes:', error);
+    throw error;
+  }
+};
+
+/**
+ * Edit appointment notes
+ * @param appointmentId The ID of the appointment to edit notes for
+ * @param notes Object containing updated notes
+ * @returns Promise that resolves to the updated notes
+ */
+export const editAppointmentNotes = async (appointmentId: string, notes: { general_notes?: string; doctor_notes?: string }) => {
+  try {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    if (!token) throw new Error('No authentication token found');
+    console.log('Editing appointment notes:', notes);
+    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/notes/edit/`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(notes)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Failed to edit appointment notes: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Updated appointment notes:', data);
+    return data;
+  } catch (error) {
+    console.error('Error editing appointment notes:', error);
+    throw error;
+  }
+};
+
+/**
+ * Delete appointment notes
+ * @param appointmentId The ID of the appointment to delete notes for
+ * @returns Promise that resolves to the deletion status
+ */
+export const deleteAppointmentNotes = async (appointmentId: string) => {
+  try {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    if (!token) throw new Error('No authentication token found');
+    
+    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/notes/delete/`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Failed to delete appointment notes: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Deleted appointment notes:', data);
+    return data;
+  } catch (error) {
+    console.error('Error deleting appointment notes:', error);
+    throw error;
+  }
+};
