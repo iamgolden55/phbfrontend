@@ -302,7 +302,7 @@ const PatientDetailModal: React.FC<PatientDetailModalProps> = ({
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-600">Age</label>
-                      <p>{patient.patient_age || 'N/A'}</p>
+                      <p>{patient.patient_age || patient.temp_patient_details?.age || 'N/A'}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-600">Status</label>

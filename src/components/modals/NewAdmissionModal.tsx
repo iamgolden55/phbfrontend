@@ -63,6 +63,7 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
     priority: 'elective',
     admission_type_detail: 'inpatient',
     is_icu_bed: false,
+    admission_action: 'admit_immediately', // Default to immediate admission
     expected_discharge_date: '',
     additional_notes: '',
     
@@ -137,6 +138,7 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
       priority: 'elective',
       admission_type_detail: 'inpatient',
       is_icu_bed: false,
+      admission_action: 'admit_immediately',
       expected_discharge_date: '',
       additional_notes: '',
       allergies: '',
@@ -310,6 +312,27 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
     }));
     
+    // Auto-calculate age when date of birth changes
+    if (name === 'date_of_birth' && value) {
+      const birthDate = new Date(value);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      
+      // Adjust age if birthday hasn't occurred this year yet
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      
+      // Update age field automatically
+      setFormData(prev => ({
+        ...prev,
+        age: age.toString()
+      }));
+      
+      console.log(`🎂 Auto-calculated age: ${age} years from DOB: ${value}`);
+    }
+    
     // If department is selected, fetch doctors for that department
     if (name === 'department_id' && value) {
       console.log('🏥 Department selected, fetching doctors for department:', value);
@@ -336,15 +359,23 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
       }
 
       // Prepare data based on admission type
+      const shouldAssignBed = formData.admission_action === 'admit_immediately';
+      
       const admissionData = admissionType === 'emergency' 
         ? {
-            // Emergency admission data
-            is_registered_patient: false,
+            // Emergency admission data - FIXED admission_type per backend AI
+            hospital_id: hospitalId,
+            department_id: parseInt(formData.department_id),
+            attending_doctor_id: parseInt(formData.attending_doctor_id) || null,
+            reason_for_admission: formData.reason_for_admission,
+            admission_type: 'inpatient',  // FIXED: Changed from 'emergency' to 'inpatient'
+            priority: 'emergency',        // CORRECT: This indicates emergency priority
+            assign_bed: shouldAssignBed,
             temp_patient_details: {
               first_name: formData.first_name,
               last_name: formData.last_name,
-              age: parseInt(formData.age) || undefined,
-              date_of_birth: formData.date_of_birth || undefined,
+              age: parseInt(formData.age) || null,  // FIXED: Ensure age is sent as number, not undefined
+              date_of_birth: formData.date_of_birth || null,  // FIXED: Send as null instead of undefined
               gender: formData.gender,
               phone_number: formData.phone_number,
               city: formData.city,
@@ -352,38 +383,39 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
               emergency_contact: formData.emergency_contact,
               emergency_contact_name: formData.emergency_contact_name,
               chief_complaint: formData.chief_complaint,
-              allergies: formData.allergies.split(',').map(a => a.trim()).filter(a => a),
-              current_medications: formData.current_medications.split(',').map(m => m.trim()).filter(m => m),
+              allergies: formData.allergies,
+              current_medications: formData.current_medications,
               brief_history: formData.brief_history,
               insurance_provider: formData.insurance_provider,
               insurance_id: formData.insurance_id
-            },
-            department: parseInt(formData.department_id),
-            attending_doctor: parseInt(formData.attending_doctor_id) || null,
-            reason_for_admission: formData.reason_for_admission,
-            priority: 'emergency',
-            admission_type: 'emergency',
-            is_icu_bed: formData.is_icu_bed
+            }
           }        : {
             // Regular admission data - Fixed to match backend expectations
-            patient_id: selectedPatient?.id,
-            hospital_id: hospitalId,
-            department_id: parseInt(formData.department_id),
-            attending_doctor_id: parseInt(formData.attending_doctor_id) || null,
+            patient: selectedPatient?.id,
+            hospital: hospitalId,
+            department: parseInt(formData.department_id),
+            attending_doctor: parseInt(formData.attending_doctor_id) || null,
             reason_for_admission: formData.reason_for_admission,
             diagnosis: formData.diagnosis,
             priority: formData.priority,
             admission_type: formData.admission_type_detail,
-            is_icu_bed: formData.is_icu_bed,
-            expected_discharge_date: formData.expected_discharge_date || null,
-            additional_notes: formData.additional_notes || null
+            assign_bed: shouldAssignBed  // Use user's choice
           };
 
       const endpoint = admissionType === 'emergency' 
-        ? `${API_BASE_URL}/api/admissions/emergency/`
+        ? `${API_BASE_URL}/api/admissions/emergency_admission/`
         : `${API_BASE_URL}/api/admissions/`;
 
-      console.log('🚀 Submitting admission:', { endpoint, admissionData });
+      console.log('🚀 Submitting admission:', { 
+        endpoint, 
+        admissionType, 
+        shouldAssignBed, 
+        hospitalId,
+        departmentId: formData.department_id,
+        patientAge: formData.age,
+        patientDOB: formData.date_of_birth,
+        admissionData 
+      });
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -397,6 +429,13 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
       if (response.ok) {
         const newAdmission = await response.json();
         console.log('✅ Admission created:', newAdmission);
+        
+        // Show success message based on what action was taken
+        const actionMessage = shouldAssignBed 
+          ? `Patient admitted successfully! Bed assigned in ${newAdmission.admission?.department_name || 'department'}.`
+          : `Admission created as pending. Patient can be admitted later when bed is available.`;
+        
+        alert(actionMessage);
         onSubmit(newAdmission);
         onClose();
         resetForm();
@@ -493,7 +532,7 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Age
+                      Age {formData.date_of_birth && <span className="text-xs text-green-600">(auto-calculated)</span>}
                     </label>
                     <input
                       type="number"
@@ -503,11 +542,13 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       min="0"
                       max="150"
+                      placeholder={formData.date_of_birth ? "Auto-calculated" : "Enter age or use DOB"}
+                      readOnly={!!formData.date_of_birth} // Make read-only if DOB is filled
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Date of Birth
+                      Date of Birth <span className="text-xs text-blue-600">(will auto-calculate age)</span>
                     </label>
                     <input
                       type="date"
@@ -826,7 +867,7 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
                 )}
               </div>
               
-              <div className="mt-4">
+              <div className="mt-4 space-y-3">
                 <label className="flex items-center">
                   <input
                     type="checkbox"
@@ -837,6 +878,46 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
                   />
                   <span className="ml-2 text-sm text-gray-700">Requires ICU Bed</span>
                 </label>
+                
+                {/* Admission Action Selection */}
+                <div className="bg-blue-50 p-3 rounded-lg">
+                  <label className="block text-sm font-medium text-blue-800 mb-2">
+                    Admission Action
+                  </label>
+                  {admissionType === 'emergency' && (
+                    <div className="mb-2 text-xs text-red-600 bg-red-50 p-2 rounded">
+                      💡 <strong>Emergency cases</strong> typically require immediate bed assignment for patient safety
+                    </div>
+                  )}
+                  <div className="space-y-2">
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="admission_action"
+                        value="admit_immediately"
+                        checked={formData.admission_action === 'admit_immediately'}
+                        onChange={handleInputChange}
+                        className="text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="ml-2 text-sm text-gray-700">
+                        <span className="font-medium">Admit Immediately</span> - Assign bed and admit patient now
+                      </span>
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="admission_action"
+                        value="create_pending"
+                        checked={formData.admission_action === 'create_pending'}
+                        onChange={handleInputChange}
+                        className="text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="ml-2 text-sm text-gray-700">
+                        <span className="font-medium">Create Pending</span> - Schedule for later admission
+                      </span>
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
             {/* Insurance Section */}
@@ -888,7 +969,14 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
                 disabled={loading || (admissionType === 'regular' && !selectedPatient)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
               >                {loading && <span className="material-icons animate-spin text-sm mr-2">refresh</span>}
-                {admissionType === 'emergency' ? 'Create Emergency Admission' : 'Create Admission'}
+                {admissionType === 'emergency' 
+                  ? (formData.admission_action === 'admit_immediately' 
+                     ? 'Create & Admit Emergency Patient' 
+                     : 'Create Pending Emergency Admission')
+                  : (formData.admission_action === 'admit_immediately'
+                     ? 'Create & Admit Patient'
+                     : 'Create Pending Admission')
+                }
               </button>
             </div>
           </form>

@@ -66,6 +66,7 @@ const UserRegistrationsPanel: React.FC<UserRegistrationsPanelProps> = ({ classNa
   const fetchRegistrations = async (status: 'pending' | 'approved') => {
     try {
       let token = null;
+      
       const organizationAuth = localStorage.getItem('organizationAuth');
       if (organizationAuth) {
         try {
@@ -76,7 +77,9 @@ const UserRegistrationsPanel: React.FC<UserRegistrationsPanelProps> = ({ classNa
         }
       }
       
+      // FIXED: Use correct endpoint - backend handles hospital filtering via authentication
       const apiUrl = `${API_BASE_URL}/api/hospitals/registrations/?status=${status}`;
+      console.log(`🏥 Fetching ${status} registrations from:`, apiUrl);
       
       const response = await fetch(apiUrl, {
         headers: {
@@ -91,6 +94,7 @@ const UserRegistrationsPanel: React.FC<UserRegistrationsPanelProps> = ({ classNa
       }
 
       const data = await response.json();
+      console.log(`✅ ${status} registrations fetched:`, data);
       return Array.isArray(data) ? data : [];
     } catch (err) {
       console.error(`Error fetching ${status} registrations:`, err);
@@ -177,6 +181,7 @@ const UserRegistrationsPanel: React.FC<UserRegistrationsPanelProps> = ({ classNa
     setActionLoading(registrationId);
     try {
       let token = null;
+      
       const organizationAuth = localStorage.getItem('organizationAuth');
       if (organizationAuth) {
         try {
@@ -187,6 +192,7 @@ const UserRegistrationsPanel: React.FC<UserRegistrationsPanelProps> = ({ classNa
         }
       }
 
+      // FIXED: Use correct endpoint from backend URLs
       const response = await fetch(`${API_BASE_URL}/api/hospitals/registrations/${registrationId}/approve/`, {
         method: 'POST',
         headers: {
