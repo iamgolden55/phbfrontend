@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { Tab, Tabs, Box, Typography } from '@mui/material';
+import { Tab, Tabs, Box, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, InputLabel, Select, MenuItem } from '@mui/material';
 import MedicalRecordsTab from '../../features/medical/MedicalRecordsTab';
 import { 
   fetchDoctorAppointmentDetails, 
@@ -16,7 +16,11 @@ import {
   fetchAppointmentNotes,
   editAppointmentNotes,
   deleteAppointmentNotes,
-  completeConsultation
+  completeConsultation,
+  referAppointment,
+  ReferralRequest,
+  fetchHospitals,
+  fetchDepartments
 } from '../../features/professional/appointmentsService';
 
 interface AppointmentDetails {
@@ -30,8 +34,10 @@ interface AppointmentDetails {
   formatted_date?: string;
   formatted_time?: string;
   formatted_date_time?: string;
+  hospital?: string;
   hospital_name?: string;
   department_name?: string;
+  department?: string;
   formatted_appointment_type?: string;
   formatted_priority?: string;
   duration?: string | number;
@@ -78,6 +84,16 @@ interface MedicationForm {
   patient_instructions: string;
   indication: string;
   generic_name?: string;
+}
+
+interface Hospital {
+  id: number;
+  name: string;
+}
+
+interface Department {
+  id: number;
+  name: string;
 }
 
 interface TabPanelProps {
@@ -142,10 +158,6 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [editingNotesType, setEditingNotesType] = useState<'general' | 'doctor'>('general');
   
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
-  };
-  
   // Prescription state variables
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
   const [prescriptions, setPrescriptions] = useState<PrescriptionResponse[]>([]);
@@ -161,6 +173,20 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
     patient_instructions: '',
     indication: ''
   }]);
+  
+  // Referral state variables
+  const [showReferralModal, setShowReferralModal] = useState(false);
+  const [hospitals, setHospitals] = useState<Hospital[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [selectedHospitalId, setSelectedHospitalId] = useState<number | null>(null);
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState<number | null>(null);
+  const [referralReason, setReferralReason] = useState('');
+  const [isLoadingReferral, setIsLoadingReferral] = useState(false);
+  const [loadingDepartments, setLoadingDepartments] = useState(false);
+  const [referralType, setReferralType] = useState<'same-hospital' | 'other-hospital'>('same-hospital');
+
+  // Effect to load mock hospitals and departments data
+
 
   useEffect(() => {
     const loadAppointmentDetails = async () => {
@@ -172,7 +198,7 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
       try {
         const data = await fetchDoctorAppointmentDetails(appointmentId);
         console.log('Appointment details:', data);
-        
+        console.log('symptoms:', data?.symptoms_data[0].description);
         // Process patient information
         const processedData: AppointmentDetails = {
           ...data,
@@ -185,8 +211,10 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
                        data.user_name ||
                        `Patient #${data.appointment_id?.slice(-6)}`,
           patient_email: data.patient_email || data.patient?.email || data.email,
-          patient_id: data.patient_id || data.patient?.id || data.appointment_id
+          patient_id: data.patient_id || data.patient?.id || data.appointment_id,
+          symptoms: data.symptoms_data[0]?.description || data.chief_complaint
         };
+        
 
         setAppointmentDetails(processedData);
         
@@ -204,6 +232,58 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
     
     loadAppointmentDetails();
   }, [appointmentId]);
+
+// Effect to load mock hospitals and departments data
+  // In production, these would be fetched from an API
+  useEffect(() => {
+    const loadHospitals = async () => {
+      try {
+        const response = await fetchHospitals();
+        setHospitals(response.hospitals);
+      } catch (error) {
+        console.error('Failed to fetch hospitals:', error);
+      }
+    };
+    
+    loadHospitals();
+  }, []);
+
+  useEffect(() => {
+    console.log('Start loading departments')
+    if (selectedHospitalId) {
+      setLoadingDepartments(true);
+      
+      const loadDepartments = async () => {
+        try {
+          const depts = await fetchDepartments(selectedHospitalId);
+          setDepartments(depts);
+          console.log(`Departments from hospital ${selectedHospitalId}:`, depts);
+        } catch (error) {
+          console.error(`Failed to fetch departments for hospital ${selectedHospitalId}:`, error);
+        } finally {
+          setLoadingDepartments(false);
+        }
+      };
+      
+      loadDepartments();
+    } else if (appointmentDetails?.hospital) {
+      console.log('No hospital selected, using appointment hospital')
+      const loadDepartments = async () => {
+        try {
+          const depts = await fetchDepartments(Number(appointmentDetails?.hospital));
+          setDepartments(depts);
+          console.log(`Departments from hospital ${appointmentDetails?.hospital}:`, depts);
+        } catch (error) {
+          console.error(`Failed to fetch departments for hospital ${appointmentDetails?.hospital}:`, error);
+        } finally {
+          setLoadingDepartments(false);
+        }
+      };
+  
+
+      loadDepartments();
+    }
+  }, [selectedHospitalId, appointmentDetails?.hospital]);
 
   useEffect(() => {
     const loadAppointmentNotes = async () => {
@@ -606,6 +686,82 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
     setShowPrescriptionModal(true);
   };
   
+  // Open the referral modal
+  const handleShowReferralModal = () => {
+    setSelectedHospitalId(null);
+    setSelectedDepartmentId(null);
+    setReferralReason('');
+    setShowReferralModal(true);
+  };
+  
+  // Handle referral type change
+  const handleReferralTypeChange = (type: 'same-hospital' | 'other-hospital') => {
+    setSelectedHospitalId(null);
+    setSelectedDepartmentId(null);
+    setReferralType(type);
+  };
+  
+  // Submit referral
+  const handleSubmitReferral = async () => {
+    if (!appointmentId) return;
+    
+    // Validate form
+    if (
+      (referralType === 'same-hospital' && !selectedDepartmentId) ||
+      (referralType === 'other-hospital' && (!selectedHospitalId || !selectedDepartmentId)) ||
+      !referralReason.trim()
+    ) {
+      setError('Please fill in all required fields');
+      setTimeout(() => setError(null), 3000);
+      return;
+    }
+    
+    setIsLoadingReferral(true);
+    setActionLoading('refer');
+    
+    try {
+      const referralData: ReferralRequest = {
+        ...(referralType === 'same-hospital' 
+          ? { referred_to_department: Number(selectedDepartmentId)}
+          : { 
+              referred_to_hospital: selectedHospitalId!,
+              referred_to_department: selectedDepartmentId!
+            }),
+        referral_reason: referralReason
+      };
+      
+      const result = await referAppointment(appointmentId, referralData);
+      
+      // Process notification response if applicable
+      if (result.notification) {
+        setNotificationStatus(processNotificationResponse(result.notification));
+      }
+      
+      // Update appointment status to 'referred'
+      if (appointmentDetails) {
+        setAppointmentDetails({
+          ...appointmentDetails,
+          status: 'referred',
+          status_display: 'Referred'
+        });
+      }
+      
+      setShowReferralModal(false);
+      setReferralReason('');
+      setSelectedHospitalId(null);
+      setSelectedDepartmentId(null);
+      
+      setStatusUpdateSuccess('Appointment referred successfully');
+      setTimeout(() => setStatusUpdateSuccess(null), 3000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to refer appointment');
+      setTimeout(() => setError(null), 3000);
+    } finally {
+      setIsLoadingReferral(false);
+      setActionLoading(null);
+    }
+  };
+  
   // Submit prescriptions
   const handleSubmitPrescriptions = async () => {
     if (!appointmentId) return;
@@ -669,6 +825,10 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
     } finally {
       setActionLoading(null);
     }
+  };
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
   };
 
   if (isLoading) {
@@ -1123,6 +1283,17 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
               >
                 {actionLoading === 'cancel' ? 'Cancelling...' : 'Cancel Appointment'}
               </button>
+              {appointmentDetails.status === 'accepted' || appointmentDetails.status === 'confirmed' || appointmentDetails.status === 'in_progress'  && (
+                <button 
+                  onClick={handleShowReferralModal}
+                  disabled={actionLoading !== null}
+                  className={`px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md transition-colors ${
+                    actionLoading === 'refer' ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  {actionLoading === 'refer' ? 'Referring...' : 'Refer Patient'}
+                </button>
+              )}
               <button 
                 onClick={handleAddNotes}
                 disabled={actionLoading !== null}
@@ -1168,6 +1339,15 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
                 {actionLoading === 'no_show' ? 'Processing...' : 'Mark as No-Show'}
               </button>
               <button 
+                onClick={handleShowReferralModal}
+                disabled={actionLoading !== null}
+                className={`px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md transition-colors ${
+                  actionLoading === 'refer' ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {actionLoading === 'refer' ? 'Referring...' : 'Refer Patient'}
+              </button>
+              <button 
                 onClick={handleAddNotes}
                 disabled={actionLoading !== null}
                 className={`px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors ${
@@ -1190,6 +1370,15 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
                 }`}
               >
                 {actionLoading === 'complete' ? 'Completing...' : 'Mark as Completed'}
+              </button>
+              <button 
+                onClick={handleShowReferralModal}
+                disabled={actionLoading !== null}
+                className={`px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md transition-colors ${
+                  actionLoading === 'refer' ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {actionLoading === 'refer' ? 'Referring...' : 'Refer Patient'}
               </button>
               <button 
                 onClick={handleAddNotes}
@@ -1553,8 +1742,8 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
                         onClick={() => handleRemoveMedication(index)}
                         className="text-red-500 hover:text-red-700"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                       </button>
                     )}
@@ -1755,6 +1944,118 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+      
+      {/* Referral Modal */}
+      {showReferralModal && (
+        <Dialog open={showReferralModal} onClose={() => setShowReferralModal(false)}>
+          <DialogTitle>Refer Appointment</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Referral Reason"
+              fullWidth
+              value={referralReason}
+              onChange={(e) => setReferralReason(e.target.value)}
+              required
+            />
+            
+            {/* Referral type selection */}
+            <FormControl component="fieldset" fullWidth margin="dense">
+              <FormLabel component="legend">Referral Type</FormLabel>
+              <RadioGroup 
+                value={referralType} 
+                onChange={(e) => handleReferralTypeChange(e.target.value as 'same-hospital' | 'other-hospital')}
+              >
+                <FormControlLabel 
+                  value="same-hospital" 
+                  control={<Radio />} 
+                  label="Refer to department within same hospital" 
+                />
+                <FormControlLabel 
+                  value="other-hospital" 
+                  control={<Radio />} 
+                  label="Refer to another hospital" 
+                />
+              </RadioGroup>
+            </FormControl>
+            
+            {/* Department selection for same hospital */}
+            {referralType === 'same-hospital' && (
+              <FormControl fullWidth margin="dense">
+                <InputLabel>Select Department</InputLabel>
+                <Select
+                  value={selectedDepartmentId || ''}
+                  onChange={(e) => setSelectedDepartmentId(Number(e.target.value))}
+                  label="Select Department"
+                  required
+                >
+                  {departments.map((dept) => (
+                    <MenuItem key={dept.id} value={dept.id}>
+                      {dept.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+            
+            {/* Hospital and department selection for other hospital */}
+            {referralType === 'other-hospital' && (
+              <>
+                <FormControl fullWidth margin="dense">
+                  <InputLabel>Select Hospital</InputLabel>
+                  <Select
+                    value={selectedHospitalId || ''}
+                    onChange={(e) => setSelectedHospitalId(Number(e.target.value))}
+                    label="Select Hospital"
+                    required
+                  >
+                    {hospitals.map((hospital) => (
+                      <MenuItem key={hospital.id} value={hospital.id}>
+                        {hospital.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                
+                <FormControl fullWidth margin="dense">
+                  <InputLabel>Select Department</InputLabel>
+                  <Select
+                    value={selectedDepartmentId || ''}
+                    onChange={(e) => setSelectedDepartmentId(Number(e.target.value))}
+                    label="Select Department"
+                    required
+                    disabled={!selectedHospitalId || loadingDepartments}
+                  >
+                    {loadingDepartments ? (
+                      <MenuItem>Loading departments...</MenuItem>
+                    ) : departments.length > 0 ? (
+                      departments.map((dept) => (
+                        <MenuItem key={dept.id} value={dept.id}>
+                          {dept.name}
+                        </MenuItem>
+                      ))
+                    ) : (
+                      <MenuItem>No departments available</MenuItem>
+                    )}
+                  </Select>
+                </FormControl>
+              </>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setShowReferralModal(false)}>Cancel</Button>
+            <Button 
+              onClick={handleSubmitReferral} 
+              disabled={!referralReason.trim() || 
+                (referralType === 'same-hospital' && !selectedDepartmentId) || 
+                (referralType === 'other-hospital' && (!selectedHospitalId || !selectedDepartmentId))}
+            >
+              Refer
+            </Button>
+          </DialogActions>
+        </Dialog>
       )}
     </div>
   );

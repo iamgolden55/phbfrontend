@@ -844,3 +844,116 @@ export const deleteAppointmentNotes = async (appointmentId: string) => {
     throw error;
   }
 };
+
+/**
+ * Interface for referral request
+ */
+export interface ReferralRequest {
+  referred_to_hospital?: number;
+  referred_to_department?: number;
+  referral_reason: string;
+}
+
+/**
+ * Refer an appointment to another hospital or department
+ * @param appointmentId The ID of the appointment to refer
+ * @param referralData The referral data (hospital or department ID and reason)
+ * @returns Promise that resolves to the referral response
+ */
+export const referAppointment = async (appointmentId: string, referralData: ReferralRequest) => {
+  try {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    if (!token) throw new Error('No authentication token found');
+    console.log('Refer appointment:', referralData);
+    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/refer/`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(referralData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Failed to refer appointment: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Referred appointment:', data);
+    return data;
+  } catch (error) {
+    console.error('Error referring appointment:', error);
+    throw error;
+  }
+};
+
+/**
+ * Fetch hospitals
+ * @returns Promise that resolves to the list of hospitals
+ */
+export async function fetchHospitals() {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}api/hospitals/`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Error fetching hospitals: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching hospitals:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch departments by hospital ID
+ * @param hospitalId The ID of the hospital to fetch departments for
+ * @returns Promise that resolves to the list of departments
+ */
+export async function fetchDepartments(hospitalId: number) {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}api/departments/${hospitalId}/`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Error fetching departments: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    if (data.status === 'success') {
+      return data.departments;
+    } else {
+      throw new Error(data.message || 'Failed to fetch departments');
+    }
+  } catch (error) {
+    console.error('Error fetching departments:', error);
+    throw error;
+  }
+}
