@@ -91,7 +91,7 @@ const PatientDetail: React.FC<PatientDetailProps> = ({ onClose }) => {
               </h2>
               <div className="flex flex-wrap items-center gap-2 mt-1">
                 <span className="text-gray-600">
-                  NHS: {selectedPatient.hpn}
+                  PHB ID: {selectedPatient.hpn}
                 </span>
                 <span className="text-gray-400">•</span>
                 <span className="text-gray-600">

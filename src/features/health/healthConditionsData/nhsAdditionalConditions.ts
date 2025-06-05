@@ -1,10 +1,10 @@
 import { HealthCondition } from '../healthConditionsData';
 
 /**
- * Additional common health conditions from the NHS website
- * These are frequently searched conditions on the NHS health A-Z pages
+ * Additional common health conditions
+ * These are frequently searched conditions on health information pages
  */
-export const nhsAdditionalConditions: HealthCondition[] = [
+export const additionalConditions: HealthCondition[] = [
   {
     id: 'chickenpox',
     name: 'Chickenpox',
@@ -484,4 +484,4 @@ export const nhsAdditionalConditions: HealthCondition[] = [
   }
 ];
 
-export default nhsAdditionalConditions;
+export default additionalConditions;

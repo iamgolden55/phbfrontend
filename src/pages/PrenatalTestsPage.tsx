@@ -52,7 +52,7 @@ const prenatalTests: TestType[] = [
       'No physical risks to mother or baby',
       'Although highly accurate, it is still a screening test, not a diagnostic test',
       'Possibility of inconclusive results (more common in women with high BMI)',
-      'Can be expensive if not covered by insurance/NHS'
+      'Can be expensive if not covered by insurance'
     ],
     results: 'Results typically take 1-2 weeks and are reported as "high risk" or "low risk" for each condition. A "high risk" result should be confirmed with a diagnostic test.',
     category: 'screening'

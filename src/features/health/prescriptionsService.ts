@@ -64,6 +64,14 @@ export interface PrescriptionDetails {
   status?: string;
 }
 
+export interface Notification {
+  id: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  message: string;
+  date: string;
+  prescription_id?: string;
+}
+
 /**
  * Fetch all prescriptions for the current patient
  * @returns Promise that resolves to the patient's prescriptions
@@ -281,4 +289,103 @@ export async function completePrescription(prescriptionId: string) {
     console.error('Error completing prescription:', error);
     throw error;
   }
-} 
+}
+
+/**
+ * Generate notifications based on prescription data
+ * @param prescriptions The prescriptions to generate notifications for
+ * @returns Array of notifications
+ */
+export function generateNotifications(prescriptions: ApiMedication[]): Notification[] {
+  const notifications: Notification[] = [];
+  
+  if (!prescriptions || prescriptions.length === 0) {
+    return [];
+  }
+  
+  // Process prescriptions to generate relevant notifications
+  prescriptions.forEach((prescription) => {
+    const today = new Date().toISOString().split('T')[0];
+    
+    // For newly added/active prescriptions
+    if (prescription.status === 'active') {
+      notifications.push({
+        id: `notification-${prescription.id}-active`,
+        type: 'info',
+        message: `Your prescription for ${prescription.medication_name} ${prescription.strength || ''} is ready to collect.`,
+        date: today,
+        prescription_id: prescription.id
+      });
+    }
+    
+    // For collected prescriptions
+    else if (prescription.status === 'dispensed' || prescription.status === 'ordered') {
+      notifications.push({
+        id: `notification-${prescription.id}-collected`,
+        type: 'success',
+        message: `Your prescription for ${prescription.medication_name} ${prescription.strength || ''} has been collected and is ready for use.`,
+        date: today,
+        prescription_id: prescription.id
+      });
+    }
+    
+    // For completed prescriptions - only show if completed recently (within 7 days)
+    else if (prescription.status === 'completed' && prescription.updated_at) {
+      const completedDate = new Date(prescription.updated_at);
+      const currentDate = new Date();
+      const daysDifference = Math.floor((currentDate.getTime() - completedDate.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (daysDifference <= 7) {
+        notifications.push({
+          id: `notification-${prescription.id}-completed`,
+          type: 'info',
+          message: `You've completed your course of ${prescription.medication_name} ${prescription.strength || ''}.`,
+          date: prescription.updated_at.split('T')[0],
+          prescription_id: prescription.id
+        });
+      }
+    }
+    
+    // For expired prescriptions
+    else if (prescription.status === 'expired') {
+      notifications.push({
+        id: `notification-${prescription.id}-expired`,
+        type: 'warning',
+        message: `Your prescription for ${prescription.medication_name} ${prescription.strength || ''} has expired.`,
+        date: today,
+        prescription_id: prescription.id
+      });
+    }
+  });
+  
+  return notifications;
+}
+
+/**
+ * Save notifications to local storage
+ * @param notifications Array of notifications to save
+ */
+export function saveNotifications(notifications: Notification[]): void {
+  localStorage.setItem('phb_prescription_notifications', JSON.stringify(notifications));
+}
+
+/**
+ * Get saved notifications from local storage
+ * @returns Array of saved notifications
+ */
+export function getSavedNotifications(): Notification[] {
+  const savedNotifications = localStorage.getItem('phb_prescription_notifications');
+  return savedNotifications ? JSON.parse(savedNotifications) : [];
+}
+
+/**
+ * Delete a notification by ID
+ * @param notificationId ID of the notification to delete
+ * @returns Updated array of notifications
+ */
+export function deleteNotification(notificationId: string): Notification[] {
+  const notifications = getSavedNotifications();
+  const updatedNotifications = notifications.filter(notification => notification.id !== notificationId);
+  saveNotifications(updatedNotifications);
+  return updatedNotifications;
+}

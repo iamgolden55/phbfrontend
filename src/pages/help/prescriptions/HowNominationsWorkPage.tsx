@@ -288,7 +288,7 @@ const HowNominationsWorkPage: React.FC = () => {
             <div>
               <h3 className="font-medium text-lg text-gray-900">Is my prescription information secure?</h3>
               <p className="text-gray-600 mt-1">
-                Yes, electronic prescriptions are transmitted securely through the NHS Electronic Prescription Service. The system meets strict security standards to ensure your data is protected.
+                Yes, electronic prescriptions are transmitted securely through the PHB Electronic Prescription Service. The system meets strict security standards to ensure your data is protected.
               </p>
             </div>
 

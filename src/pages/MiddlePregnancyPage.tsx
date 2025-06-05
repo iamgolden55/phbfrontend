@@ -386,7 +386,7 @@ const MiddlePregnancyPage: React.FC = () => {
           <div className="bg-blue-50 p-4 rounded-md mb-6">
             <h4 className="font-bold mb-2">Types of antenatal classes</h4>
             <ul className="list-disc pl-5 space-y-1">
-              <li><strong>NHS classes</strong> – free classes covering basic information about pregnancy, birth, and early parenting</li>
+              <li><strong>PHB classes</strong> – free classes covering basic information about pregnancy, birth, and early parenting</li>
               <li><strong>NCT (National Childbirth Trust) classes</strong> – more detailed courses that often create lasting social connections</li>
               <li><strong>Hypnobirthing classes</strong> – focused on relaxation techniques and positive mindset for labor</li>
               <li><strong>Breastfeeding workshops</strong> – specific guidance on breastfeeding techniques and challenges</li>

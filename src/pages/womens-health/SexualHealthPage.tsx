@@ -7,7 +7,7 @@ const SexualHealthPage: React.FC = () => {
     {
       id: 'chlamydia',
       name: 'Chlamydia',
-      description: 'The most common STI in the UK, especially in young people. It often has no symptoms, but can cause serious problems if left untreated.',
+      description: 'A very common STI, especially in young people. It often has no symptoms, but can cause serious problems if left untreated.',
       symptoms: [
         'Often no symptoms',
         'Pain when urinating',
@@ -22,7 +22,7 @@ const SexualHealthPage: React.FC = () => {
     {
       id: 'gonorrhea',
       name: 'Gonorrhea',
-      description: 'The second most common bacterial STI in the UK. It can infect the genital area, rectum, and throat.',
+      description: 'A common bacterial STI that can infect the genital area, rectum, and throat.',
       symptoms: [
         'Often no symptoms',
         'Thick, green or yellow discharge from the vagina',
@@ -50,7 +50,7 @@ const SexualHealthPage: React.FC = () => {
     {
       id: 'genital-warts',
       name: 'Genital warts',
-      description: 'The most common viral STI in the UK, caused by certain types of human papillomavirus (HPV).',
+      description: 'A very common viral STI caused by certain types of human papillomavirus (HPV).',
       symptoms: [
         'Small, flesh-colored growths or bumps on or around the genital or anal area',
         'Several warts close together that take on a cauliflower-like shape',

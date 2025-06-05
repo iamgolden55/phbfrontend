@@ -1,10 +1,10 @@
 import { HealthCondition } from '../healthConditionsData';
 
 /**
- * Popular health conditions frequently searched on NHS website
- * These are among the most viewed conditions on the NHS health pages
+ * Popular health conditions frequently searched on health websites
+ * These are among the most viewed health conditions
  */
-export const nhsPopularConditions: HealthCondition[] = [
+export const popularConditions: HealthCondition[] = [
   {
     id: 'covid-19',
     name: 'COVID-19',
@@ -381,4 +381,4 @@ export const nhsPopularConditions: HealthCondition[] = [
   }
 ];
 
-export default nhsPopularConditions;
+export default popularConditions;

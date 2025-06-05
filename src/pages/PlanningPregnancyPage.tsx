@@ -256,7 +256,7 @@ const PlanningPregnancyPage: React.FC = () => {
                 <li>Maternity clothes</li>
                 <li>Baby gear (cot, pram, car seat, etc.)</li>
                 <li>Baby clothes and supplies</li>
-                <li>Hospital or birth center fees (if not covered by NHS)</li>
+                <li>Hospital or birth center fees (if not covered by insurance)</li>
                 <li>Additional healthcare expenses</li>
               </ul>
             </div>
@@ -352,7 +352,7 @@ const PlanningPregnancyPage: React.FC = () => {
 
           <div className="bg-blue-50 p-4 rounded-md">
             <p>
-              <strong>NHS fertility treatment:</strong> Availability of NHS-funded fertility treatment varies by location. Your GP can provide information about criteria and waiting times in your area.
+              <strong>Public fertility treatment:</strong> Availability of publicly-funded fertility treatment varies by location. Your GP can provide information about criteria and waiting times in your area.
             </p>
           </div>
         </div>

@@ -128,7 +128,7 @@ CREATE TABLE medications (
   name VARCHAR(255) NOT NULL,
   form VARCHAR(100) NOT NULL, -- tablet, capsule, liquid, etc.
   strength VARCHAR(100) NOT NULL,
-  bnf_code VARCHAR(50), -- British National Formulary code
+  formulary_code VARCHAR(50), -- National Formulary code
   dm_d_code VARCHAR(50), -- Dictionary of Medicines and Devices code
   controlled_drug_category VARCHAR(10), -- NULL, CD1, CD2, etc.
   requires_approval BOOLEAN DEFAULT TRUE,
@@ -298,8 +298,8 @@ The system integrates with several external systems:
 
 1. **Regulatory Requirements**:
    - GDPR compliance for patient data
-   - NHS Digital Data Security and Protection requirements
-   - Medicines and Healthcare products Regulatory Agency (MHRA) guidelines
+   - National Health Data Security and Protection requirements
+   - National Medicines and Healthcare products Regulatory Agency guidelines
 
 2. **Audit & Monitoring**:
    - Real-time security monitoring
@@ -417,7 +417,7 @@ The system includes a comprehensive notification service:
 
 2. **Regulatory Testing**:
    - EPS compliance verification
-   - NHS Digital DCB0129/DCB0160 compliance
+   - National Health Digital Standards compliance
    - GDPR compliance audit
 
 ## Deployment Notes

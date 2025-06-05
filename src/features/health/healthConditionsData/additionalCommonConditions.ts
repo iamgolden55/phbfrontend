@@ -2,7 +2,7 @@ import { HealthCondition } from '../healthConditionsData';
 
 /**
  * Additional common health conditions to supplement our current dataset
- * These are commonly searched conditions on the NHS website
+ * These are commonly searched health conditions
  */
 export const additionalCommonConditions: HealthCondition[] = [
   {
@@ -120,7 +120,7 @@ export const additionalCommonConditions: HealthCondition[] = [
       'Loss of consciousness',
       'Severe skin rash or hives over much of the body'
     ],
-    prevalence: 'Allergies affect more than 1 in 4 people in the UK at some point in their lives. Food allergies affect approximately 2% of adults and 5-8% of children.',
+    prevalence: 'Allergies affect more than 1 in 4 people at some point in their lives. Food allergies affect approximately 2% of adults and 5-8% of children.',
     affectedGroups: [
       'Children (though many outgrow allergies)',
       'People with a family history of allergies',
@@ -316,7 +316,7 @@ export const additionalCommonConditions: HealthCondition[] = [
       'Not waking up or not interacting',
       'Seizures'
     ],
-    prevalence: 'Seasonal flu epidemics occur yearly, affecting 5-10% of adults and 20-30% of children globally each year. In the UK, an average of 17,000 people die from flu complications annually.',
+    prevalence: 'Seasonal flu epidemics occur yearly, affecting 5-10% of adults and 20-30% of children globally each year. Worldwide, annual influenza epidemics result in about 3-5 million cases of severe illness and approximately 290,000-650,000 deaths from respiratory causes.',
     affectedGroups: [
       'Children under 5 years old, especially those under 2',
       'Adults 65 years and older',

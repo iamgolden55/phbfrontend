@@ -12,9 +12,10 @@ export interface HealthCondition {
   causes: string[];             // Known causes or risk factors
   treatments: string[];         // Treatment options
   preventions: string[];        // Prevention methods
-  relatedConditions: string[];  // Related health conditions
+  relatedConditions?: string[];  // Related health conditions
   commonQuestions: Question[];  // Frequently asked questions
   emergencySigns?: string[];    // Signs to seek immediate medical attention
+  whenToSeekHelp?: string[];   // When to seek medical help (less urgent than emergency signs)
   prevalence?: string;          // How common the condition is
   affectedGroups?: string[];    // Groups most commonly affected
   wikipediaUrl?: string;        // URL to the Wikipedia article for more information
@@ -137,7 +138,7 @@ export function getConditionById(id: string): HealthCondition | undefined {
  */
 export function getRelatedConditions(conditionId: string): HealthCondition[] {
   const condition = getConditionById(conditionId);
-  if (!condition) return [];
+  if (!condition || !condition.relatedConditions) return [];
 
   return condition.relatedConditions
     .map(id => getConditionById(id))
@@ -170,8 +171,8 @@ import conditionsPtoR from './healthConditionsData/conditionsP-R';
 import conditionsStoT from './healthConditionsData/conditionsS-T';
 import conditionsUtoZ from './healthConditionsData/conditionsU-Z';
 import additionalCommonConditions from './healthConditionsData/additionalCommonConditions';
-import nhsAdditionalConditions from './healthConditionsData/nhsAdditionalConditions';
-import nhsPopularConditions from './healthConditionsData/nhsPopularConditions';
+import additionalConditions from './healthConditionsData/additionalConditions';
+import popularConditions from './healthConditionsData/popularConditions';
 
 // Combine all conditions into one array
 export const healthConditions: HealthCondition[] = [
@@ -184,6 +185,6 @@ export const healthConditions: HealthCondition[] = [
   ...conditionsStoT,
   ...conditionsUtoZ,
   ...additionalCommonConditions,
-  ...nhsAdditionalConditions,
-  ...nhsPopularConditions
+  ...additionalConditions,
+  ...popularConditions
 ];

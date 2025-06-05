@@ -321,7 +321,7 @@ const Header: React.FC = () => {
 
   return (
     <header className={`sticky top-0 z-40 w-full transition-colors duration-300 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
-      {/* Cookie banner - similar to NHS */}
+      {/* Cookie banner */}
       {showCookieBanner && (
         <div className={`${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} p-4 border-b border-gray-700/10`}>
           <div className="phb-container">

@@ -130,7 +130,7 @@ const PatientList: React.FC<PatientListProps> = ({ onSelectPatient }) => {
         <div className="relative">
           <input
             type="text"
-            placeholder="Search patients by name, NHS number..."
+            placeholder="Search patients by name, PHB ID..."
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={patientFilter.searchTerm || ''}
             onChange={handleSearchChange}
@@ -234,7 +234,7 @@ const PatientList: React.FC<PatientListProps> = ({ onSelectPatient }) => {
                     Patient
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    NHS Number
+                    PHB ID
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Last Appointment
