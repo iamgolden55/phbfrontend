@@ -131,46 +131,48 @@ const MedicinesAZPage: React.FC = () => {
 
       {/* Disclaimer Modal */}
       {showDisclaimer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 mx-auto">
-            <div className="flex items-start mb-4">
-              <div className="flex-shrink-0 mr-4">
-                <svg className="h-8 w-8 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md md:max-w-2xl mx-auto my-4 md:my-8">
+            <div className="p-4 md:p-6">
+              <div className="flex items-center mb-4">
+                <div className="flex-shrink-0 mr-3">
+                  <svg className="h-6 w-6 md:h-8 md:w-8 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg md:text-xl font-bold text-gray-900">Important Medical Disclaimer</h3>
               </div>
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Important Medical Disclaimer</h3>
-                <div className="text-gray-700 mb-6 space-y-2">
-                  <p>The information provided on PHB about medicines is for educational purposes only and is not intended as medical advice.</p>
-                  <p><strong>PHB does not support or endorse:</strong></p>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>Self-diagnosis or self-medication based on the information provided</li>
-                    <li>Changing or stopping any prescribed medication without consulting a healthcare professional</li>
-                    <li>Using medicines without proper medical guidance</li>
-                  </ul>
-                  <p className="font-medium mt-2">Always consult with a qualified healthcare professional before taking any medication or making any changes to your treatment plan.</p>
-                  
-                  <div className="bg-yellow-100 p-3 rounded-md mt-3 border border-yellow-300">
-                    <p className="text-sm font-medium text-yellow-800">
-                      <strong>Pidgin Summary:</strong> Make you no go take any medicine by yourself o! Always talk to doctor first. PHB no go de responsible if you take medicine wey no good for your body. Na only qualified doctor fit tell you which medicine good for you. No change or stop any medicine wey doctor don give you without asking dem first. Your health na important thing, so make you dey careful well well!
-                    </p>
-                  </div>
+              
+              <div className="text-gray-700 mb-5 space-y-2 text-sm md:text-base">
+                <p>The information provided on PHB about medicines is for educational purposes only and is not intended as medical advice.</p>
+                <p className="font-medium mt-3"><strong>PHB does not support or endorse:</strong></p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Self-diagnosis or self-medication based on the information provided</li>
+                  <li>Changing or stopping any prescribed medication without consulting a healthcare professional</li>
+                  <li>Using medicines without proper medical guidance</li>
+                </ul>
+                <p className="font-medium mt-3">Always consult with a qualified healthcare professional before taking any medication or making any changes to your treatment plan.</p>
+                
+                <div className="bg-yellow-100 p-3 rounded-md mt-4 border border-yellow-300">
+                  <p className="text-xs md:text-sm font-medium text-yellow-800">
+                    <strong>Pidgin Summary:</strong> Make you no go take any medicine by yourself o! Always talk to doctor first. PHB no go de responsible if you take medicine wey no good for your body. Na only qualified doctor fit tell you which medicine good for you. No change or stop any medicine wey doctor don give you without asking dem first. Your health na important thing, so make you dey careful well well!
+                  </p>
                 </div>
-                <div className="flex gap-4">
-                  <button 
-                    onClick={() => navigate('/')}
-                    className="w-full py-3 px-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
-                  >
-                    Back to Home
-                  </button>
-                  <button 
-                    onClick={handleAcceptDisclaimer}
-                    className="w-full py-3 px-4 bg-[#005eb8] hover:bg-[#003f7e] text-white font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#005eb8]"
-                  >
-                    I understand and accept
-                  </button>
-                </div>
+              </div>
+              
+              <div className="flex flex-col md:flex-row gap-3 md:gap-4">
+                <button 
+                  onClick={() => navigate('/')}
+                  className="w-full py-2 md:py-3 px-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 text-sm md:text-base"
+                >
+                  Back to Home
+                </button>
+                <button 
+                  onClick={handleAcceptDisclaimer}
+                  className="w-full py-2 md:py-3 px-4 bg-[#005eb8] hover:bg-[#003f7e] text-white font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#005eb8] text-sm md:text-base"
+                >
+                  I understand and accept
+                </button>
               </div>
             </div>
           </div>
