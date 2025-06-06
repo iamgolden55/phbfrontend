@@ -112,6 +112,7 @@ import BirthPlanCreatorPage from './pages/BirthPlanCreatorPage';
 import AboutPHBPage from './pages/AboutPHBPage';
 import ElaraAIPage from './pages/ElaraAIPage';
 import PHBServicesPage from './pages/PHBServicesPage';
+import FindPharmacyPage from './pages/FindPharmacyPage';
 import LinkValidatorPage from './pages/LinkValidatorPage';
 import SiteMapPage from './pages/SiteMapPage';
 
@@ -565,6 +566,7 @@ function App() {
                 <Route path="about" element={<AboutPHBPage />} />
                 <Route path="elara-ai" element={<ElaraAIPage />} />
                 <Route path="phb-services" element={<PHBServicesPage />} />
+                <Route path="find-pharmacy" element={<FindPharmacyPage />} />
                 <Route path="link-validator" element={<LinkValidatorPage />} />
                 <Route path="site-map" element={<SiteMapPage />} />
                 

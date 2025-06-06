@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const PHBServicesSection: React.FC = () => {
   const serviceLinks = [
     {
-      href: '/phb-services#pharmacy',
+      href: '/find-pharmacy',
       text: 'Find a pharmacy',
     },
     {
