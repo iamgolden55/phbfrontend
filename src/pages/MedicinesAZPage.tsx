@@ -26,7 +26,7 @@ const MedicinesAZPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
-  const [showDisclaimer, setShowDisclaimer] = useState(true);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [medicines, setMedicines] = useState<Record<string, MedicineItem[]>>({});
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -48,8 +48,6 @@ const MedicinesAZPage: React.FC = () => {
         });
 
         setMedicines(formattedMedicines);
-        setDisclaimerAccepted(false);
-        setShowDisclaimer(true);
       } catch (err) {
         setError('Failed to load medicines. Please try again later.');
         console.error('Error loading medicines:', err);
@@ -59,6 +57,17 @@ const MedicinesAZPage: React.FC = () => {
     };
 
     loadMedicines();
+  }, []);
+
+  // Check if user has already accepted the disclaimer
+  useEffect(() => {
+    const hasAcceptedDisclaimer = localStorage.getItem('medicineDisclaimerAccepted');
+    if (hasAcceptedDisclaimer === 'true') {
+      setDisclaimerAccepted(true);
+      setShowDisclaimer(false);
+    } else {
+      setShowDisclaimer(true);
+    }
   }, []);
 
   const filteredMedicines = useMemo<FilteredMedicineGroup[]>(() => {
@@ -104,6 +113,8 @@ const MedicinesAZPage: React.FC = () => {
   const handleAcceptDisclaimer = () => {
     setDisclaimerAccepted(true);
     setShowDisclaimer(false);
+    // Save to localStorage so it doesn't show again
+    localStorage.setItem('medicineDisclaimerAccepted', 'true');
   };
 
   const handleAlphabetClick = (letter: string) => {
