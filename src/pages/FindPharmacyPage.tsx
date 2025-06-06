@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, Filter, Navigation, Phone, Clock, Star, MapPin, ChevronDown, X } from 'lucide-react';
 
 const FindPharmacyPage = () => {
-  const mapContainer = useRef(null);
-  const map = useRef(null);
+  const desktopMapContainer = useRef(null);
+  const mobileMapContainer = useRef(null);
+  const desktopMap = useRef(null);
+  const mobileMap = useRef(null);
   const [lng, setLng] = useState(-0.1278);
   const [lat, setLat] = useState(51.5074);
   const [zoom, setZoom] = useState(12);
@@ -128,8 +130,6 @@ const FindPharmacyPage = () => {
   const [filteredPharmacies, setFilteredPharmacies] = useState(pharmacies);
 
   useEffect(() => {
-    if (map.current) return;
-
     // Initialize MapBox
     const mapboxgl = window.mapboxgl;
     if (!mapboxgl) {
@@ -141,49 +141,91 @@ const FindPharmacyPage = () => {
         link.href = 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css';
         link.rel = 'stylesheet';
         document.head.appendChild(link);
-        // Longer delay for mobile
-        setTimeout(initializeMap, 300);
+        setTimeout(() => {
+          initializeDesktopMap();
+          initializeMobileMap();
+        }, 500);
       };
       document.head.appendChild(script);
     } else {
-      // Longer delay for mobile
-      setTimeout(initializeMap, 300);
+      setTimeout(() => {
+        initializeDesktopMap();
+        initializeMobileMap();
+      }, 500);
     }
   }, []);
 
-  const initializeMap = () => {
-    if (!mapContainer.current) return;
+  const initializeDesktopMap = () => {
+    if (!desktopMapContainer.current || desktopMap.current) return;
     
     const mapboxgl = window.mapboxgl;
     mapboxgl.accessToken = 'pk.eyJ1IjoiaWFtZ29sZGVuNTU1IiwiYSI6ImNtNWVqejJxdzE1anQybXFvM3E4djNyOGIifQ.LltJt0HC549Bc8n8eOmg6g';
     
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v11',
-      center: [lng, lat],
-      zoom: zoom
-    });
+    try {
+      desktopMap.current = new mapboxgl.Map({
+        container: desktopMapContainer.current,
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [lng, lat],
+        zoom: zoom
+      });
 
-    map.current.on('load', () => {
-      setIsLoading(false);
-      addPharmacyMarkers();
-      // Force resize for mobile
-      setTimeout(() => {
-        if (map.current) {
-          map.current.resize();
+      desktopMap.current.on('load', () => {
+        setIsLoading(false);
+        addPharmacyMarkers(desktopMap.current);
+      });
+
+      desktopMap.current.on('move', () => {
+        if (desktopMap.current) {
+          setLng(desktopMap.current.getCenter().lng.toFixed(4));
+          setLat(desktopMap.current.getCenter().lat.toFixed(4));
+          setZoom(desktopMap.current.getZoom().toFixed(2));
         }
-      }, 100);
-    });
-
-    map.current.on('move', () => {
-      setLng(map.current.getCenter().lng.toFixed(4));
-      setLat(map.current.getCenter().lat.toFixed(4));
-      setZoom(map.current.getZoom().toFixed(2));
-    });
+      });
+    } catch (error) {
+      console.error('Desktop map initialization failed:', error);
+    }
   };
 
-  const addPharmacyMarkers = () => {
-    if (!map.current) return;
+  const initializeMobileMap = () => {
+    if (!mobileMapContainer.current || mobileMap.current) return;
+    
+    const mapboxgl = window.mapboxgl;
+    mapboxgl.accessToken = 'pk.eyJ1IjoiaWFtZ29sZGVuNTU1IiwiYSI6ImNtNWVqejJxdzE1anQybXFvM3E4djNyOGIifQ.LltJt0HC549Bc8n8eOmg6g';
+    
+    try {
+      mobileMap.current = new mapboxgl.Map({
+        container: mobileMapContainer.current,
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [lng, lat],
+        zoom: zoom
+      });
+
+      mobileMap.current.on('load', () => {
+        setIsLoading(false);
+        addPharmacyMarkers(mobileMap.current);
+        // Force resize for mobile
+        setTimeout(() => {
+          if (mobileMap.current) {
+            mobileMap.current.resize();
+          }
+        }, 100);
+      });
+
+      mobileMap.current.on('move', () => {
+        if (mobileMap.current) {
+          setLng(mobileMap.current.getCenter().lng.toFixed(4));
+          setLat(mobileMap.current.getCenter().lat.toFixed(4));
+          setZoom(mobileMap.current.getZoom().toFixed(2));
+        }
+      });
+    } catch (error) {
+      console.error('Mobile map initialization failed:', error);
+      setIsLoading(false);
+    }
+  };
+
+  const addPharmacyMarkers = (mapInstance) => {
+    if (!mapInstance) return;
 
     filteredPharmacies.forEach(pharmacy => {
       const category = categories.find(cat => cat.id === pharmacy.category);
@@ -220,7 +262,7 @@ const FindPharmacyPage = () => {
 
       el.addEventListener('click', () => {
         setSelectedPharmacy(pharmacy);
-        map.current.flyTo({
+        mapInstance.flyTo({
           center: [pharmacy.lng, pharmacy.lat],
           zoom: 15
         });
@@ -228,7 +270,7 @@ const FindPharmacyPage = () => {
 
       new window.mapboxgl.Marker(el)
         .setLngLat([pharmacy.lng, pharmacy.lat])
-        .addTo(map.current);
+        .addTo(mapInstance);
     });
   };
 
@@ -261,13 +303,22 @@ const FindPharmacyPage = () => {
 
   // Re-add markers when filtered pharmacies change
   useEffect(() => {
-    if (map.current && map.current.loaded()) {
+    if (desktopMap.current && desktopMap.current.loaded()) {
       // Clear existing markers
       const markers = document.querySelectorAll('.pharmacy-marker');
       markers.forEach(marker => marker.remove());
       
-      // Add new markers
-      addPharmacyMarkers();
+      // Add new markers to both maps
+      addPharmacyMarkers(desktopMap.current);
+    }
+    
+    if (mobileMap.current && mobileMap.current.loaded()) {
+      // Clear existing markers
+      const markers = document.querySelectorAll('.pharmacy-marker');
+      markers.forEach(marker => marker.remove());
+      
+      // Add new markers to mobile map
+      addPharmacyMarkers(mobileMap.current);
     }
   }, [filteredPharmacies]);
 
@@ -379,7 +430,7 @@ const FindPharmacyPage = () => {
         <div className="lg:hidden flex flex-col h-full">
           {/* Mobile Map (Top Half) */}
           <div className="h-1/2 relative">
-            <div ref={mapContainer} className="w-full h-full" />
+            <div ref={mobileMapContainer} className="w-full h-full" />
             
             {isLoading && (
               <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center">
@@ -492,7 +543,7 @@ const FindPharmacyPage = () => {
 
         {/* Desktop Map Container */}
         <div className="hidden lg:block h-full relative p-12">
-          <div ref={mapContainer} className="w-full h-full rounded-2xl overflow-hidden shadow-lg" />
+          <div ref={desktopMapContainer} className="w-full h-full rounded-2xl overflow-hidden shadow-lg" />
           
           
           {isLoading && (
