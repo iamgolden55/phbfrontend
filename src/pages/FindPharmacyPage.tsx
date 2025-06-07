@@ -164,7 +164,7 @@ const FindPharmacyPage = () => {
     try {
       desktopMap.current = new mapboxgl.Map({
         container: desktopMapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v11',
+        style: 'mapbox://styles/mapbox/outdoors-v11',
         center: [lng, lat],
         zoom: zoom
       });
@@ -542,7 +542,7 @@ const FindPharmacyPage = () => {
         </div>
 
         {/* Desktop Map Container */}
-        <div className="hidden lg:block h-full relative p-12">
+        <div className="hidden lg:block h-full relative p-6">
           <div ref={desktopMapContainer} className="w-full h-full rounded-2xl overflow-hidden shadow-lg" />
           
           
