@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
+import { createApiUrl } from '../../utils/config';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/';
 const AUTH_TOKEN_KEY = 'phb_auth_token';
 
 export interface AppointmentType {
@@ -32,7 +32,7 @@ export function useAppointments(view: 'upcoming' | 'past' | 'all' = 'upcoming') 
         if (view === 'upcoming') queryParams = '?upcoming=true';
         else if (view === 'past') queryParams = '?past=true';
         // 'all' returns all appointments
-        const response = await fetch(`${API_BASE_URL.replace(/\/$/, '')}/api/appointments/${queryParams}`, {
+        const response = await fetch(createApiUrl(`api/appointments/${queryParams}`), {
           headers: {
             'Authorization': `Bearer ${authToken}`,
             'Accept': 'application/json',

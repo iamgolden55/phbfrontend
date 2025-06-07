@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '../../utils/config';
+import { API_BASE_URL, createApiUrl } from '../../utils/config';
 
 const AUTH_TOKEN_KEY = 'phb_auth_token';
 
@@ -259,7 +259,7 @@ export async function acceptAppointment(appointmentId: string) {
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/accept/`, {
+    const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/accept/`), {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -294,7 +294,7 @@ export async function startConsultation(appointmentId: string) {
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/start-consultation/`, {
+    const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/start-consultation/`), {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -330,7 +330,7 @@ export async function completeConsultation(appointmentId: string, notes: string)
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/complete-consultation/`, {
+    const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/complete-consultation/`), {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -369,8 +369,8 @@ export async function fetchAppointments(viewAsDoctor: boolean = false) {
   // to fetch appointments where the doctor is the provider.
   // Otherwise, use the regular appointments endpoint for patient appointments.
   const url = viewAsDoctor 
-    ? `${API_BASE_URL}/api/doctor-appointments/` 
-    : `${API_BASE_URL}/api/appointments/`;
+    ? createApiUrl('api/doctor-appointments/') 
+    : createApiUrl('api/appointments/');
   
   try {
     const response = await fetch(url, {
@@ -472,7 +472,7 @@ export async function addDoctorNotes(appointmentId: string, notes: string) {
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/add-notes/`, {
+    const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/add-notes/`), {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -517,7 +517,7 @@ export async function cancelAppointment(appointmentId: string, reason?: string) 
       cancellation_reason: reason
     };
     
-    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/cancel/`, {
+    const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/cancel/`), {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -561,7 +561,7 @@ export async function markAppointmentNoShow(appointmentId: string, notes?: strin
       requestBody.notes = notes;
     }
     
-    const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/no-show/`, {
+    const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/no-show/`), {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -649,7 +649,7 @@ if (!token) {
   }
   console.log('medications', medications)
   try {
-    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/prescriptions/`, {
+    const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/prescriptions/`), {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -685,7 +685,7 @@ export async function getAppointmentPrescriptions(appointmentId: string) {
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/prescriptions/view/`, {
+    const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/prescriptions/view/`), {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -758,7 +758,7 @@ export async function getPatientMedicalRecords(patientId: string | number) {
  */
 export const fetchAppointmentNotes = async (appointmentId: string) => {
   try {
-    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/notes/`, {
+    const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/notes/`), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -791,7 +791,7 @@ export const editAppointmentNotes = async (appointmentId: string, notes: { gener
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
     if (!token) throw new Error('No authentication token found');
     console.log('Editing appointment notes:', notes);
-    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/notes/edit/`, {
+    const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/notes/edit/`), {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -824,7 +824,7 @@ export const deleteAppointmentNotes = async (appointmentId: string) => {
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
     if (!token) throw new Error('No authentication token found');
     
-    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/notes/delete/`, {
+    const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/notes/delete/`), {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -865,7 +865,7 @@ export const referAppointment = async (appointmentId: string, referralData: Refe
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
     if (!token) throw new Error('No authentication token found');
     console.log('Refer appointment:', referralData);
-    const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/refer/`, {
+    const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/refer/`), {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,

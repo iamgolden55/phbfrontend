@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AccountHealthLayout from '../../layouts/AccountHealthLayout';
+import { createApiUrl } from '../../utils/config';
 import { useAuth } from '../auth/authContext';
 import { useAppointments } from './useAppointments';
 
@@ -142,7 +143,7 @@ const ViewAppointments: React.FC = () => {
 
   // Handle add to calendar
   const handleAddToCalendar = (appointmentId: string) => {
-    window.open(`${API_BASE_URL.replace(/\/$/, '')}/api/appointments/${appointmentId}/calendar/`, '_blank');
+    window.open(createApiUrl(`api/appointments/${appointmentId}/calendar/`), '_blank');
   };
 
   // Filter appointments based on search term

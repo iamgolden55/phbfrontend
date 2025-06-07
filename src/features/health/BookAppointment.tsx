@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AccountHealthLayout from '../../layouts/AccountHealthLayout';
 import { useAuth } from '../auth/authContext';
+import { createApiUrl } from '../../utils/config';
 import BodyMapSearch from '../search/BodyMapSearch';
 
 interface SelectedSymptom {
@@ -709,7 +710,7 @@ const BookAppointment: React.FC = () => {
       }
 
       // Submit appointment to API
-      const response = await fetch(`${API_BASE_URL.replace(/\/$/, '')}/api/appointments/`, {
+      const response = await fetch(createApiUrl('api/appointments/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -7,7 +7,7 @@ import {
   clearMedAccessToken, 
   ERROR_CODES 
 } from './medicalRecordsAuthService';
-import { API_BASE_URL } from '../../utils/config';
+import { API_BASE_URL, createApiUrl } from '../../utils/config';
 
 // Import the service singleton
 import medicalRecordsService from './medicalRecordsService';
@@ -126,7 +126,7 @@ const GPHealthRecord: React.FC = () => {
       }
       
       // Fetch appointments from the regular API endpoint
-      const response = await fetch(`${API_BASE_URL}/api/appointments/`, {
+      const response = await fetch(createApiUrl('api/appointments/'), {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
