@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_BASE_URL, createApiUrl } from '../utils/config';
 
 // 🛏️ BED MAGIC HOOK! ✨
 // This hook fetches real department data from the enhanced API endpoint
@@ -133,11 +134,33 @@ export const useDepartmentStats = (): UseDepartmentStatsReturn => {
         throw new Error('No authentication token available');
       }
 
-      console.log('🛏️ Fetching department stats with BED MAGIC...');
-      console.log('🛏️ API Base URL:', import.meta.env.VITE_API_BASE_URL);
+      // Get auth data from localStorage
+      const authData = JSON.parse(localStorage.getItem('organizationAuth') || '{}');
+      console.log('🛏️ Auth data from localStorage:', authData);
+      
+      // Log the full user data structure for debugging
+      const userData = authData?.user || authData?.userData || {};
+      console.log('🛏️ User data from auth:', userData);
+      
+      // Get hospital ID from the user data structure
+      const hospitalId = userData?.hospital?.id;
+      
+      if (!hospitalId) {
+        console.error('🛏️ No hospital ID found in user data. Available keys:', Object.keys(userData));
+        console.error('🛏️ Full auth data structure:', JSON.stringify(authData, null, 2));
+        throw new Error('No hospital ID found in user data');
+      }
+      
+      console.log('🛏️ Found hospital ID:', hospitalId);
+      
+      // Use the createApiUrl utility to ensure proper URL construction
+      const apiUrl = `${API_BASE_URL}api/hospitals/departments/?hospital=${hospitalId}`;
+      
+      console.log('🛏️ Fetching department stats for hospital:', hospitalId);
+      console.log('🛏️ Full API URL:', apiUrl);
       console.log('🛏️ Auth Token Available:', !!authToken);
       
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/departments/`, {
+      const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -146,29 +169,46 @@ export const useDepartmentStats = (): UseDepartmentStatsReturn => {
       });
 
       console.log('🛏️ Response Status:', response.status);
-      console.log('🛏️ Response OK:', response.ok);
+      console.log('🛏️ Response Headers:', Object.fromEntries(response.headers.entries()));
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.log('🛏️ Error Response:', errorData);
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      // Handle non-JSON responses
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('🛏️ Non-JSON response:', text);
+        throw new Error(`Expected JSON response, got ${contentType}`);
       }
 
-      const data = await response.json();
+      const data = await response.json().catch(async (parseError) => {
+        const text = await response.text();
+        console.error('🛏️ Failed to parse JSON:', text);
+        throw new Error(`Failed to parse response: ${parseError.message}`);
+      });
+      
       console.log('🛏️ Department API Response:', data);
 
-      if (data.status === 'success' && data.departments) {
-        setDepartments(data.departments);
-        
-        // 🧮 Calculate aggregated statistics
-        const aggregatedStats = calculateAggregatedStats(data.departments);
-        setStats(aggregatedStats);
-        
-        console.log('🛏️ Calculated Stats:', aggregatedStats);
-      } else {
-        console.log('🛏️ Unexpected response format:', data);
-        throw new Error(data.message || 'Invalid response format');
+      // Handle different response formats
+      if (!response.ok) {
+        console.error('🛏️ API Error Response:', data);
+        throw new Error(data.detail || data.message || `HTTP error! status: ${response.status}`);
       }
+
+      // Handle both array and object responses
+      let departments = Array.isArray(data) ? data : data.departments || [];
+      
+      if (!departments || !Array.isArray(departments)) {
+        console.error('🛏️ Invalid departments data:', departments);
+        throw new Error('Invalid departments data received from server');
+      }
+
+      console.log(`🛏️ Found ${departments.length} departments`);
+      setDepartments(departments);
+      
+      // 🧮 Calculate aggregated statistics
+      const aggregatedStats = calculateAggregatedStats(departments);
+      setStats(aggregatedStats);
+      
+      console.log('🛏️ Calculated Stats:', aggregatedStats);
     } catch (err) {
       console.error('🛏️ Error fetching department stats:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch department stats');
@@ -179,23 +219,61 @@ export const useDepartmentStats = (): UseDepartmentStatsReturn => {
 
   // 🧮 Calculate aggregated statistics from department data
   const calculateAggregatedStats = (departmentData: DepartmentData[]): DepartmentStats => {
-    const activeDepts = departmentData.filter(dept => dept.is_active);
+    console.log('🛏️ Calculating stats for departments:', departmentData);
     
-    // 🛏️ Bed statistics
-    const totalBeds = activeDepts.reduce((sum, dept) => sum + dept.total_beds, 0);
-    const occupiedBeds = activeDepts.reduce((sum, dept) => sum + dept.occupied_beds, 0);
-    const availableBeds = activeDepts.reduce((sum, dept) => sum + dept.available_beds, 0);
-    const totalICUBeds = activeDepts.reduce((sum, dept) => sum + dept.icu_beds, 0);
-    const occupiedICUBeds = activeDepts.reduce((sum, dept) => sum + dept.occupied_icu_beds, 0);
-    const availableICUBeds = activeDepts.reduce((sum, dept) => sum + dept.available_icu_beds, 0);
+    // Safely filter and process departments
+    const activeDepts = departmentData.filter(dept => dept?.is_active);
+    console.log(`🛏️ Found ${activeDepts.length} active departments`);
+    
+    // Safely calculate bed statistics with fallback to 0 for undefined/null values
+    const safeNumber = (value: any): number => {
+      const num = Number(value);
+      return isNaN(num) ? 0 : num;
+    };
+    
+    // Log a sample department to see its structure
+    if (activeDepts.length > 0) {
+      console.log('🛏️ Sample department data:', activeDepts[0]);
+    }
+    
+    // 🛏️ Bed statistics with safe number conversion
+    const totalBeds = activeDepts.reduce((sum, dept) => {
+      const beds = safeNumber(dept.total_beds || dept.bed_capacity);
+      return sum + beds;
+    }, 0);
+    
+    const occupiedBeds = activeDepts.reduce((sum, dept) => {
+      return sum + safeNumber(dept.occupied_beds);
+    }, 0);
+    
+    const availableBeds = activeDepts.reduce((sum, dept) => {
+      return sum + safeNumber(dept.available_beds || (dept.total_beds - dept.occupied_beds));
+    }, 0);
+    
+    const totalICUBeds = activeDepts.reduce((sum, dept) => {
+      return sum + safeNumber(dept.icu_beds);
+    }, 0);
+    
+    const occupiedICUBeds = activeDepts.reduce((sum, dept) => {
+      return sum + safeNumber(dept.occupied_icu_beds);
+    }, 0);
+    
+    const availableICUBeds = activeDepts.reduce((sum, dept) => {
+      return sum + safeNumber(dept.available_icu_beds || (dept.icu_beds - dept.occupied_icu_beds));
+    }, 0);
+    
+    console.log('🛏️ Bed Statistics:', { totalBeds, occupiedBeds, availableBeds, totalICUBeds, occupiedICUBeds, availableICUBeds });
     
     // 👥 Staff statistics
     const totalStaff = activeDepts.reduce((sum, dept) => sum + dept.current_staff_count, 0);
     const totalMinimumStaff = activeDepts.reduce((sum, dept) => sum + dept.minimum_staff_required, 0);
     const understaffedDepartments = activeDepts.filter(dept => dept.is_understaffed);
     
-    // 🏥 Patient statistics
-    const totalPatients = activeDepts.reduce((sum, dept) => sum + dept.current_patient_count, 0);
+    // 🏥 Patient statistics - Use occupied_beds instead of current_patient_count to avoid double-counting
+    // Note: current_patient_count might include outpatients or other non-bed patients
+    const totalPatients = occupiedBeds; // Use occupiedBeds instead of summing current_patient_count
+    
+    console.log('🛏️ Total patients (using occupied beds):', totalPatients, 'Occupied beds:', occupiedBeds);
     
     // 📊 Department counts
     const clinicalDepartments = activeDepts.filter(dept => dept.is_clinical);
@@ -210,7 +288,7 @@ export const useDepartmentStats = (): UseDepartmentStatsReturn => {
     // Calculate overall utilization rates
     const overallBedUtilization = totalBeds > 0 ? (occupiedBeds / totalBeds) * 100 : 0;
     const overallStaffUtilization = totalMinimumStaff > 0 ? (totalStaff / totalMinimumStaff) * 100 : 0;
-    const overallUtilization = totalBeds > 0 ? (totalPatients / totalBeds) * 100 : 0;
+    const overallUtilization = overallBedUtilization; // Use bed utilization for overall utilization
 
     return {
       // 🛏️ Bed statistics
