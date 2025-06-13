@@ -72,7 +72,7 @@ const Covid19VaccinePage: React.FC = () => {
                 <p className="mb-2">If you're eligible, you can book an appointment online, through your GP, or at a participating pharmacy.</p>
                 <div className="flex space-x-4 mt-4">
                   <Link
-                    to="/find-a-pharmacy"
+                    to="/find-pharmacy"
                     className="bg-[#005eb8] text-white px-6 py-2 rounded-md hover:bg-[#004b93] transition-colors"
                   >
                     Find a pharmacy

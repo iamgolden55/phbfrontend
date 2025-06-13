@@ -194,7 +194,7 @@ const VaccinationsPage: React.FC = () => {
                 Many pharmacies offer certain vaccines, such as the flu vaccine, COVID-19 vaccine, and travel vaccines.
               </p>
               <Link
-                to="/find-a-pharmacy"
+                to="/find-pharmacy"
                 className="inline-flex items-center text-[#005eb8] font-medium hover:underline"
               >
                 Find a pharmacy

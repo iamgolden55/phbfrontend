@@ -115,6 +115,7 @@ import PHBServicesPage from './pages/PHBServicesPage';
 import FindPharmacyPage from './pages/FindPharmacyPage';
 import LinkValidatorPage from './pages/LinkValidatorPage';
 import SiteMapPage from './pages/SiteMapPage';
+import MedicalAIDemoPage from './pages/MedicalAIDemoPage';
 
 // Professional Pages
 import ProfessionalLoginPage from './pages/professional/ProfessionalLoginPage';
@@ -150,6 +151,11 @@ import AdvancedSearchPage from './features/search/AdvancedSearchPage';
 // New Imports for Vaccinations and Health Pages
 import VaccinationsPage from './pages/vaccinations/VaccinationsPage';
 import FluVaccinePage from './pages/vaccinations/FluVaccinePage';
+import Covid19VaccinePage from './pages/vaccinations/Covid19VaccinePage';
+import AdultVaccinePage from './pages/vaccinations/AdultVaccinePage';
+import ChildrenVaccinePage from './pages/vaccinations/ChildrenVaccinePage';
+import PregnancyVaccinePage from './pages/vaccinations/PregnancyVaccinePage';
+import TravelVaccinePage from './pages/vaccinations/TravelVaccinePage';
 import HealthcareAbroadPage from './pages/using-the-phb/healthcare-abroad/HealthcareAbroadPage';
 import GHICPage from './pages/using-the-phb/healthcare-abroad/GHICPage';
 import WomensHealthPage from './pages/womens-health/WomensHealthPage';
@@ -436,6 +442,11 @@ function App() {
                 {/* New Routes for Vaccinations and Health Pages */}
                 <Route path="vaccinations" element={<VaccinationsPage />} />
                 <Route path="vaccinations/flu-vaccine" element={<FluVaccinePage />} />
+                <Route path="vaccinations/covid-19-vaccine" element={<Covid19VaccinePage />} />
+                <Route path="vaccinations/adults" element={<AdultVaccinePage />} />
+                <Route path="vaccinations/children" element={<ChildrenVaccinePage />} />
+                <Route path="vaccinations/pregnancy" element={<PregnancyVaccinePage />} />
+                <Route path="vaccinations/travel" element={<TravelVaccinePage />} />
                 <Route path="using-the-phb/healthcare-abroad" element={<HealthcareAbroadPage />} />
                 <Route path="using-the-phb/healthcare-abroad/nigerian-travel-health" element={<GHICPage />} />
                 <Route path="conditions/baby" element={<BabyHealthPage />} />
@@ -567,6 +578,7 @@ function App() {
                 <Route path="elara-ai" element={<ElaraAIPage />} />
                 <Route path="phb-services" element={<PHBServicesPage />} />
                 <Route path="find-pharmacy" element={<FindPharmacyPage />} />
+                <Route path="medical-ai-demo" element={<MedicalAIDemoPage />} />
                 <Route path="link-validator" element={<LinkValidatorPage />} />
                 <Route path="site-map" element={<SiteMapPage />} />
                 

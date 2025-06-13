@@ -314,7 +314,7 @@ const MedicinesAZPage: React.FC = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/find-a-pharmacy" className="text-[#005eb8] hover:underline flex items-center">
+                    <Link to="/find-pharmacy" className="text-[#005eb8] hover:underline flex items-center">
                       <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>

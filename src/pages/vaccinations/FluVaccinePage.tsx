@@ -86,7 +86,7 @@ const FluVaccinePage: React.FC = () => {
                 <p className="mb-2">If you're eligible for a free flu vaccine, you can book an appointment at your GP surgery or a pharmacy that offers it.</p>
                 <div className="flex space-x-4 mt-4">
                   <Link
-                    to="/find-a-pharmacy"
+                    to="/find-pharmacy"
                     className="bg-[#005eb8] text-white px-6 py-2 rounded-md hover:bg-[#004b93] transition-colors"
                   >
                     Find a pharmacy

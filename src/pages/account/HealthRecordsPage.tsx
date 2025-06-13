@@ -1,563 +1,384 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../features/auth/authContext';
-import { Navigate } from 'react-router-dom';
-import MedicalRecordsOTP from '../../features/health/MedicalRecordsOTP';
 import { 
-  isMedAccessTokenValid, 
-  clearMedAccessToken 
-} from '../../features/health/medicalRecordsAuthService';
+  FileText, 
+  Upload, 
+  Search, 
+  Shield, 
+  CheckCircle, 
+  Eye, 
+  Share2, 
+  Trash2, 
+  Plus,
+  X
+} from 'lucide-react';
+import { createApiUrl } from '../../utils/config';
+import MedicalOTPAccess from '../../components/MedicalOTPAccess';
 
-interface HealthDocument {
+interface Document {
   id: string;
   name: string;
-  type: 'lab_result' | 'prescription' | 'clinical_letter' | 'discharge_summary' | 'other';
+  type: 'lab-results' | 'prescriptions' | 'clinical-letters' | 'discharge-summaries' | 'other';
+  size: string;
   date: string;
   source: string;
-  size: string;
   uploadDate: string;
+  isSecure?: boolean;
 }
 
-const sampleDocuments: HealthDocument[] = [
-  {
-    id: '1',
-    name: 'Blood Test Results.pdf',
-    type: 'lab_result',
-    date: '2025-02-15',
-    source: 'City General Hospital',
-    size: '545 KB',
-    uploadDate: '2025-02-20'
-  },
-  {
-    id: '2',
-    name: 'Prescription - Amoxicillin.pdf',
-    type: 'prescription',
-    date: '2025-01-10',
-    source: 'Dr. Sarah Johnson',
-    size: '212 KB',
-    uploadDate: '2025-01-10'
-  },
-  {
-    id: '3',
-    name: 'Hospital Discharge Summary.pdf',
-    type: 'discharge_summary',
-    date: '2024-11-28',
-    source: 'Royal Medical Center',
-    size: '1.2 MB',
-    uploadDate: '2024-12-01'
-  }
-];
-
 const HealthRecordsPage: React.FC = () => {
-  const { isAuthenticated } = useAuth();
-  const [documents, setDocuments] = useState<HealthDocument[]>(sampleDocuments);
-  const [showUploadForm, setShowUploadForm] = useState(false);
+  // ALL HOOKS DECLARED FIRST
+  const [hasAccess, setHasAccess] = useState(false);
+  const [checkingAccess, setCheckingAccess] = useState(true);
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<string>('all');
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [newDocument, setNewDocument] = useState({
-    name: '',
-    type: 'other' as HealthDocument['type'],
-    date: '',
-    source: '',
-  });
-  
-  // Add new state for medical record access
-  const [accessState, setAccessState] = useState<'checking' | 'need_auth' | 'loading' | 'authorized' | 'error'>('checking');
-  const [accessError, setAccessError] = useState<string>('');
-  const [accessExpiry, setAccessExpiry] = useState<Date | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showUploadForm, setShowUploadForm] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const recordsPerPage = 7;
 
-  useEffect(() => {
-    checkAccess();
-  }, []);
-
-  const checkAccess = () => {
-    setAccessState('checking');
-    
-    // Check if we have a valid med access token
-    if (isMedAccessTokenValid()) {
-      // We have a valid token, we can show the health records
-      setAccessState('authorized');
+  // FUNCTIONS
+  const fetchDocuments = async () => {
+    try {
+      setIsLoading(true);
       
-      // Set expiry time for UI display
-      const expiryTime = new Date();
-      expiryTime.setMinutes(expiryTime.getMinutes() + 30); // Assuming 30 min expiry
-      setAccessExpiry(expiryTime);
-    } else {
-      // We need to request authentication
-      setAccessState('need_auth');
-    }
-  };
+      const token = localStorage.getItem('phb_auth_token') ||  // Real PHB token first!
+                   localStorage.getItem('access_token') || 
+                   localStorage.getItem('authToken') ||
+                   localStorage.getItem('med_access_token');  // Mock token last
 
-  const handleVerificationSuccess = () => {
-    setAccessState('authorized');
-    // Set expiry time for UI display
-    const expiryTime = new Date();
-    expiryTime.setMinutes(expiryTime.getMinutes() + 30);
-    setAccessExpiry(expiryTime);
-  };
-
-  const handleCancelVerification = () => {
-    // Just show a message instead of the verification form
-    setAccessState('need_auth');
-  };
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  // Render different content based on access state
-  if (accessState === 'checking') {
-    return (
-      <div className="bg-white">
-        <div className="bg-[#005eb8] text-white py-8">
-          <div className="phb-container">
-            <h1 className="text-3xl font-bold mb-4">Health Records</h1>
-            <p className="text-xl font-medium">
-              Manage and access your health documents
-            </p>
-          </div>
-        </div>
-        <div className="phb-container py-8">
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin h-8 w-8 border-4 border-[#005eb8] border-t-transparent rounded-full"></div>
-            <span className="ml-3 text-gray-600">Checking access...</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (accessState === 'need_auth') {
-    return (
-      <div className="bg-white">
-        <div className="bg-[#005eb8] text-white py-8">
-          <div className="phb-container">
-            <h1 className="text-3xl font-bold mb-4">Health Records</h1>
-            <p className="text-xl font-medium">
-              Manage and access your health documents
-            </p>
-          </div>
-        </div>
-        <div className="phb-container py-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <h2 className="text-2xl font-bold mb-4">Secure Access Required</h2>
-            
-            <div className="p-4 bg-blue-50 rounded-md mb-6">
-              <p className="text-blue-800">
-                Health records contain sensitive information and require additional verification.
-              </p>
-            </div>
-            
-            <p className="mb-6">
-              To protect your privacy, we need to verify your identity before showing your health records.
-              Click the button below to proceed with verification.
-            </p>
-            
-            <button
-              onClick={() => setAccessState('loading')}
-              className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e]"
-            >
-              Request Secure Access
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (accessState === 'loading') {
-    return (
-      <div className="bg-white">
-        <div className="bg-[#005eb8] text-white py-8">
-          <div className="phb-container">
-            <h1 className="text-3xl font-bold mb-4">Health Records</h1>
-            <p className="text-xl font-medium">
-              Manage and access your health documents
-            </p>
-          </div>
-        </div>
-        <div className="phb-container py-8">
-          <MedicalRecordsOTP 
-            onVerificationSuccess={handleVerificationSuccess} 
-            onCancel={handleCancelVerification} 
-          />
-        </div>
-      </div>
-    );
-  }
-
-  if (accessState === 'error') {
-    return (
-      <div className="bg-white">
-        <div className="bg-[#005eb8] text-white py-8">
-          <div className="phb-container">
-            <h1 className="text-3xl font-bold mb-4">Health Records</h1>
-            <p className="text-xl font-medium">
-              Manage and access your health documents
-            </p>
-          </div>
-        </div>
-        <div className="phb-container py-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <h2 className="text-2xl font-bold mb-4">Access Error</h2>
-            
-            <div className="p-4 bg-red-50 rounded-md mb-6 text-red-700">
-              {accessError || 'An error occurred while accessing your health records.'}
-            </div>
-            
-            <button
-              onClick={checkAccess}
-              className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e]"
-            >
-              Try Again
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setSelectedFile(file);
-      setNewDocument({
-        ...newDocument,
-        name: file.name
+      const response = await fetch(createApiUrl('api/secure/files/'), {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        },
       });
+
+      const result = await response.json();
+      
+      if (result.success && result.data && result.data.files) {
+        const backendFiles = result.data.files.map((file: any) => ({
+          id: file.file_id,
+          name: file.display_name || `Medical Document ${file.file_id.substring(0, 8)}${file.original_extension}`,
+          type: 'other' as const,
+          size: file.size_display || `${Math.round(file.size / 1024)} KB`,
+          date: new Date(file.created_at).toISOString().split('T')[0],
+          source: 'Secure Upload',
+          uploadDate: file.created_at,
+          isSecure: true
+        }));
+        
+        setDocuments(backendFiles);
+      } else {
+        setDocuments([]);
+      }
+    } catch (error) {
+      console.error('Error fetching documents:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setNewDocument({
-      ...newDocument,
-      [name]: value
-    });
+  const handleFileUpload = async (files: FileList | null) => {
+    if (!files) return;
+    
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    try {
+      const formData = new FormData();
+      Array.from(files).forEach((file) => {
+        formData.append('files', file);
+      });
+
+      const token = localStorage.getItem('phb_auth_token') ||  // Real PHB token first!
+                   localStorage.getItem('access_token') || 
+                   localStorage.getItem('authToken') ||
+                   localStorage.getItem('med_access_token');  // Mock token last
+
+      const phases = [
+        { progress: 25, message: 'Validating files...' },
+        { progress: 50, message: 'Scanning for security...' },
+        { progress: 75, message: 'Encrypting your documents...' },
+        { progress: 100, message: 'Upload complete!' }
+      ];
+
+      for (const phase of phases) {
+        setUploadProgress(phase.progress);
+        await new Promise(resolve => setTimeout(resolve, 400));
+      }
+
+      const response = await fetch(createApiUrl('api/secure/upload/'), {
+        method: 'POST',
+        headers: {
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        },
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.successful_uploads > 0) {
+        await fetchDocuments();
+        alert(`Successfully uploaded ${result.successful_uploads} file(s) securely!`);
+      } else {
+        alert(`Upload failed: ${result.error || 'Unknown error'}`);
+      }
+
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Upload failed. Please try again.');
+    } finally {
+      setIsUploading(false);
+      setShowUploadForm(false);
+      setUploadProgress(0);
+    }
   };
 
-  const handleUpload = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!selectedFile) {
-      // Show error message about missing file
-      return;
-    }
-
-    // Create new document object
-    const newDoc: HealthDocument = {
-      id: Date.now().toString(),
-      name: newDocument.name,
-      type: newDocument.type,
-      date: newDocument.date,
-      source: newDocument.source,
-      size: `${Math.round(selectedFile.size / 1024)} KB`,
-      uploadDate: new Date().toISOString().split('T')[0]
+  const getDocumentTypeColor = (type: string) => {
+    const colors = {
+      'lab-results': 'bg-purple-100 text-purple-800 border-purple-200',
+      'prescriptions': 'bg-green-100 text-green-800 border-green-200',
+      'clinical-letters': 'bg-blue-100 text-blue-800 border-blue-200',
+      'discharge-summaries': 'bg-orange-100 text-orange-800 border-orange-200',
+      'other': 'bg-gray-100 text-gray-800 border-gray-200'
     };
+    return colors[type as keyof typeof colors] || colors.other;
+  };
 
-    // Add document to list
-    setDocuments([...documents, newDoc]);
+  const getDocumentTypeIcon = (type: string) => {
+    const icons = {
+      'lab-results': '🧪',
+      'prescriptions': '💊',
+      'clinical-letters': '📋',
+      'discharge-summaries': '🏥',
+      'other': '📄'
+    };
+    return icons[type as keyof typeof icons] || icons.other;
+  };
 
-    // Reset form
-    setSelectedFile(null);
-    setNewDocument({
-      name: '',
-      type: 'other',
-      date: '',
-      source: '',
-    });
-    setShowUploadForm(false);
+  const getDocumentTypeName = (type: string) => {
+    const names = {
+      'lab-results': 'Lab Results',
+      'prescriptions': 'Prescriptions',
+      'clinical-letters': 'Clinical Letters',
+      'discharge-summaries': 'Discharge Summary',
+      'other': 'Other'
+    };
+    return names[type as keyof typeof names] || names.other;
   };
 
   const deleteDocument = (id: string) => {
     setDocuments(documents.filter(doc => doc.id !== id));
   };
 
-  // Filter documents by type and search term
+  // EFFECTS
+  useEffect(() => {
+    const checkMedicalAccess = () => {
+      const medToken = localStorage.getItem('med_access_token');
+      const expiryTime = localStorage.getItem('med_access_expiry');
+      
+      console.log('🔐 Checking access:', { medToken: medToken ? 'Found' : 'Not found', expiryTime });
+      
+      if (medToken && expiryTime) {
+        const now = Date.now();
+        if (now < parseInt(expiryTime)) {
+          console.log('✅ Access granted - token valid');
+          setHasAccess(true);
+        } else {
+          console.log('❌ Token expired');
+          localStorage.removeItem('med_access_token');
+          localStorage.removeItem('med_access_expiry');
+          setHasAccess(false);
+        }
+      } else {
+        console.log('❌ No med_access_token found');
+        setHasAccess(false);
+      }
+      
+      setCheckingAccess(false);
+    };
+
+    checkMedicalAccess();
+  }, []);
+
+  useEffect(() => {
+    if (hasAccess && !checkingAccess) {
+      fetchDocuments();
+    }
+  }, [hasAccess, checkingAccess]);
+  
+  // Reset to first page when search term changes or documents are filtered
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, activeFilter]);
+
+  const handleAccessGranted = () => {
+    setHasAccess(true);
+  };
+
   const filteredDocuments = documents.filter(doc => {
     const matchesFilter = activeFilter === 'all' || doc.type === activeFilter;
     const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          doc.source.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
   });
+  
+  // Get current records for pagination
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = filteredDocuments.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(filteredDocuments.length / recordsPerPage);
+  
+  // Change page
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+  const nextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  const prevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
 
-  // Functions to get icon and color for document type
-  const getDocumentTypeIcon = (type: HealthDocument['type']) => {
-    switch (type) {
-      case 'lab_result':
-        return (
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-          </svg>
-        );
-      case 'prescription':
-        return (
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-        );
-      case 'clinical_letter':
-        return (
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-          </svg>
-        );
-      case 'discharge_summary':
-        return (
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
-        );
-      default:
-        return (
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-          </svg>
-        );
-    }
-  };
-
-  const getDocumentTypeColor = (type: HealthDocument['type']) => {
-    switch (type) {
-      case 'lab_result':
-        return 'text-purple-600 bg-purple-100';
-      case 'prescription':
-        return 'text-blue-600 bg-blue-100';
-      case 'clinical_letter':
-        return 'text-green-600 bg-green-100';
-      case 'discharge_summary':
-        return 'text-red-600 bg-red-100';
-      default:
-        return 'text-gray-600 bg-gray-100';
-    }
-  };
-
-  const getDocumentTypeName = (type: HealthDocument['type']) => {
-    switch (type) {
-      case 'lab_result':
-        return 'Lab Result';
-      case 'prescription':
-        return 'Prescription';
-      case 'clinical_letter':
-        return 'Clinical Letter';
-      case 'discharge_summary':
-        return 'Discharge Summary';
-      default:
-        return 'Other Document';
-    }
-  };
-
-  return (
-    <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
-        <div className="phb-container">
-          <h1 className="text-3xl font-bold mb-4">Health Records</h1>
-          <p className="text-xl font-medium">
-            Manage and access your health documents
-          </p>
-        </div>
+  // EARLY RETURNS
+  if (checkingAccess) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
+    );
+  }
 
-      <div className="phb-container py-8">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 space-y-4 md:space-y-0">
-          <div>
-            <h2 className="text-2xl font-bold">Your Documents</h2>
-            <p className="text-gray-600">Upload and manage your health-related documents</p>
-          </div>
-          <div className="flex items-center">
-            {accessExpiry && (
-              <div className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm mr-4">
-                Access expires: {accessExpiry.toLocaleTimeString()}
-              </div>
-            )}
-            <button
-              onClick={() => setShowUploadForm(!showUploadForm)}
-              className="bg-[#005eb8] hover:bg-[#003f7e] text-white px-4 py-2 rounded-md transition-colors"
-            >
-              {showUploadForm ? 'Cancel' : '+ Upload Document'}
-            </button>
-          </div>
+  if (!hasAccess) {
+    return <MedicalOTPAccess onAccessGranted={handleAccessGranted} />;
+  }
+
+  // MAIN RENDER
+  return (
+    <div className="min-h-screen bg-white p-4 md:p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-4xl font-bold text-gray-900">
+            Your Health Records
+          </h1>
+          <p className="text-gray-600 mt-1 md:mt-2 text-sm md:text-base">
+            Your medical documents are safe and secure
+          </p>
         </div>
 
         {showUploadForm && (
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <h3 className="text-xl font-bold mb-4">Upload Health Document</h3>
-            <form onSubmit={handleUpload}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label htmlFor="file" className="block text-gray-700 font-medium mb-2">
-                    Document File *
-                  </label>
+          <div className="mb-6 md:mb-8 p-4 md:p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg md:text-xl font-bold text-gray-900">Upload Your Documents</h3>
+              <button onClick={() => setShowUploadForm(false)} className="text-gray-500 hover:text-gray-700">
+                <X className="h-5 w-5 md:h-6 md:w-6" />
+              </button>
+            </div>
+            
+            {!isUploading ? (
+              <div className="border-2 border-dashed border-blue-300 rounded-xl p-6 md:p-8 text-center bg-blue-50">
+                <div className="flex flex-col items-center space-y-3 md:space-y-4">
+                  <Upload className="h-10 w-10 md:h-12 md:w-12 text-blue-600" />
+                  <div>
+                    <h4 className="text-base md:text-lg font-medium text-gray-900 mb-1 md:mb-2">
+                      Drag your files here or click to browse
+                    </h4>
+                    <p className="text-gray-600 text-sm md:text-base">
+                      PDF, images, and documents are supported
+                    </p>
+                  </div>
                   <input
                     type="file"
-                    id="file"
-                    onChange={handleFileChange}
-                    className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                    required
+                    multiple
+                    className="hidden"
+                    id="file-upload"
+                    onChange={(e) => handleFileUpload(e.target.files)}
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
                   />
-                  <p className="text-sm text-gray-500 mt-1">
-                    Accepted formats: PDF, DOC, DOCX, JPG, JPEG, PNG
-                  </p>
-                </div>
-
-                <div>
-                  <label htmlFor="type" className="block text-gray-700 font-medium mb-2">
-                    Document Type *
-                  </label>
-                  <select
-                    id="type"
-                    name="type"
-                    value={newDocument.type}
-                    onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
+                  <label
+                    htmlFor="file-upload"
+                    className="px-4 py-2 md:px-6 md:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium cursor-pointer flex items-center text-sm md:text-base"
                   >
-                    <option value="lab_result">Lab Result</option>
-                    <option value="prescription">Prescription</option>
-                    <option value="clinical_letter">Clinical Letter</option>
-                    <option value="discharge_summary">Discharge Summary</option>
-                    <option value="other">Other</option>
-                  </select>
+                    <Upload className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                    Choose Files
+                  </label>
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label htmlFor="date" className="block text-gray-700 font-medium mb-2">
-                    Document Date *
-                  </label>
-                  <input
-                    type="date"
-                    id="date"
-                    name="date"
-                    value={newDocument.date}
-                    onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
+            ) : (
+              <div className="p-4 md:p-6 bg-blue-50 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-gray-900 text-sm md:text-base">Uploading your file...</span>
+                  <span className="text-blue-600 font-medium text-sm md:text-base">{uploadProgress}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${uploadProgress}%` }}
                   />
                 </div>
-
-                <div>
-                  <label htmlFor="source" className="block text-gray-700 font-medium mb-2">
-                    Source / Provider
-                  </label>
-                  <input
-                    type="text"
-                    id="source"
-                    name="source"
-                    value={newDocument.source}
-                    onChange={handleInputChange}
-                    placeholder="Hospital, doctor, or clinic name"
-                    className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
+                <p className="text-xs md:text-sm text-gray-600 mt-2">
+                  {uploadProgress < 25 ? 'Validating files...' : 
+                   uploadProgress < 50 ? 'Scanning for security...' : 
+                   uploadProgress < 75 ? 'Encrypting your documents...' :
+                   'Upload complete!'}
+                </p>
               </div>
-
-              <div className="mt-6 flex justify-end">
-                <button
-                  type="submit"
-                  className="bg-[#005eb8] hover:bg-[#003f7e] text-white px-6 py-2 rounded-md transition-colors"
-                  disabled={!selectedFile}
-                >
-                  Upload Document
-                </button>
-              </div>
-            </form>
+            )}
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 mb-6">
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setActiveFilter('all')}
-                className={`px-3 py-1 text-sm rounded-md ${
-                  activeFilter === 'all'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
-                }`}
-              >
-                All
-              </button>
-              <button
-                onClick={() => setActiveFilter('lab_result')}
-                className={`px-3 py-1 text-sm rounded-md ${
-                  activeFilter === 'lab_result'
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-purple-100 hover:bg-purple-200 text-purple-800'
-                }`}
-              >
-                Lab Results
-              </button>
-              <button
-                onClick={() => setActiveFilter('prescription')}
-                className={`px-3 py-1 text-sm rounded-md ${
-                  activeFilter === 'prescription'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-blue-100 hover:bg-blue-200 text-blue-800'
-                }`}
-              >
-                Prescriptions
-              </button>
-              <button
-                onClick={() => setActiveFilter('clinical_letter')}
-                className={`px-3 py-1 text-sm rounded-md ${
-                  activeFilter === 'clinical_letter'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-green-100 hover:bg-green-200 text-green-800'
-                }`}
-              >
-                Clinical Letters
-              </button>
-              <button
-                onClick={() => setActiveFilter('discharge_summary')}
-                className={`px-3 py-1 text-sm rounded-md ${
-                  activeFilter === 'discharge_summary'
-                    ? 'bg-red-600 text-white'
-                    : 'bg-red-100 hover:bg-red-200 text-red-800'
-                }`}
-              >
-                Discharge Summaries
-              </button>
-            </div>
-
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search documents..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full md:w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <svg
-                className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
+        <div className="mb-6 md:mb-8 space-y-4 md:space-y-0 md:flex md:items-center md:justify-between">
+          <div className="flex flex-col space-y-3 md:space-y-0 md:flex-row md:items-center md:space-x-4">
+            <button
+              onClick={() => setShowUploadForm(!showUploadForm)}
+              className="w-full md:w-auto px-4 py-2 md:px-6 md:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center justify-center text-sm md:text-base"
+            >
+              <Plus className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+              Upload Document
+            </button>
           </div>
 
-          {filteredDocuments.length === 0 ? (
-            <div className="bg-gray-50 p-8 text-center rounded-md">
-              <p className="text-gray-600 mb-4">No documents found.</p>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search your documents..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full md:w-80 pl-9 pr-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm md:text-base"
+            />
+            <Search className="absolute left-3 top-2.5 md:top-3.5 h-4 w-4 md:h-5 md:w-5 text-gray-400" />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center">
+              <FileText className="h-6 w-6 mr-2 text-blue-600" />
+              Your Documents
+              <span className="ml-3 px-2 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+                {filteredDocuments.length} files
+              </span>
+              <span className="ml-3 px-2 py-1 bg-gray-100 text-gray-800 text-sm font-medium rounded-full">
+                Page {currentPage} of {totalPages || 1}
+              </span>
+            </h2>
+          </div>
+
+          {isLoading ? (
+            <div className="p-8 md:p-12 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 md:h-12 md:w-12 border-b-2 border-blue-600 mx-auto mb-3 md:mb-4"></div>
+              <p className="text-lg md:text-xl font-medium text-gray-900 mb-2">Loading your documents...</p>
+              <p className="text-gray-600 text-sm md:text-base">Fetching your secure medical files</p>
+            </div>
+          ) : filteredDocuments.length === 0 ? (
+            <div className="p-8 md:p-12 text-center">
+              <FileText className="h-12 w-12 md:h-16 md:w-16 text-gray-400 mx-auto mb-3 md:mb-4" />
+              <p className="text-lg md:text-xl font-medium text-gray-900 mb-2">No documents found</p>
+              <p className="text-gray-600 mb-4 md:mb-6 text-sm md:text-base">Upload your first medical document to get started</p>
               <button
-                onClick={() => {
-                  setShowUploadForm(true);
-                  setActiveFilter('all');
-                  setSearchTerm('');
-                }}
-                className="text-[#005eb8] hover:underline"
+                onClick={() => setShowUploadForm(true)}
+                className="px-4 py-2 md:px-6 md:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center mx-auto text-sm md:text-base"
               >
-                Upload your first document
+                <Upload className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                Upload Document
               </button>
             </div>
           ) : (
@@ -565,75 +386,113 @@ const HealthRecordsPage: React.FC = () => {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-3 md:px-6 md:py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Document
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Type
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Date
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Source
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-3 md:px-6 md:py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredDocuments.map((doc) => (
-                    <tr key={doc.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
+                  {currentRecords.map((doc) => (
+                    <tr key={doc.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-3 py-3 md:px-6 md:py-4">
                         <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-md border border-gray-200">
-                            <svg className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                            </svg>
+                          <div className="flex-shrink-0 h-8 w-8 md:h-10 md:w-10 flex items-center justify-center rounded-lg bg-blue-100">
+                            <FileText className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
                           </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">{doc.name}</div>
-                            <div className="text-sm text-gray-500">
-                              Uploaded: {new Date(doc.uploadDate).toLocaleDateString()} • {doc.size}
+                          <div className="ml-3 md:ml-4">
+                            <div className="text-sm font-medium text-gray-900 flex items-center">
+                              {doc.name}
+                              {doc.isSecure && (
+                                <CheckCircle className="h-3 w-3 md:h-4 md:w-4 text-green-500 ml-2" />
+                              )}
                             </div>
+                            <div className="text-xs md:text-sm text-gray-500">{doc.size}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getDocumentTypeColor(doc.type)}`}>
-                          <span className="mr-1">
-                            {getDocumentTypeIcon(doc.type)}
-                          </span>
-                          {getDocumentTypeName(doc.type)}
+                      <td className="px-3 py-3 md:px-6 md:py-4">
+                        <div className="flex items-center space-x-2 md:space-x-3">
+                          <button className="text-blue-600 hover:text-blue-900 font-medium text-xs md:text-sm">
+                            <Eye className="h-3 w-3 md:h-4 md:w-4" />
+                          </button>
+                          <button className="text-green-600 hover:text-green-900 font-medium text-xs md:text-sm">
+                            <Share2 className="h-3 w-3 md:h-4 md:w-4" />
+                          </button>
+                          <button
+                            onClick={() => deleteDocument(doc.id)}
+                            className="text-red-600 hover:text-red-900 font-medium text-xs md:text-sm"
+                          >
+                            <Trash2 className="h-3 w-3 md:h-4 md:w-4" />
+                          </button>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(doc.date).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {doc.source}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button className="text-blue-600 hover:text-blue-900 mr-4">
-                          View
-                        </button>
-                        <button className="text-blue-600 hover:text-blue-900 mr-4">
-                          Share
-                        </button>
-                        <button
-                          onClick={() => deleteDocument(doc.id)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          Delete
-                        </button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              {filteredDocuments.length > recordsPerPage && (
+                <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+                  <div className="text-sm text-gray-700">
+                    Showing <span className="font-medium">{indexOfFirstRecord + 1}</span> to{' '}
+                    <span className="font-medium">{Math.min(indexOfLastRecord, filteredDocuments.length)}</span> of{' '}
+                    <span className="font-medium">{filteredDocuments.length}</span> results
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={prevPage}
+                      disabled={currentPage === 1}
+                      className={`px-3 py-1 border rounded-md text-sm font-medium ${
+                        currentPage === 1
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : 'bg-white text-blue-600 hover:bg-blue-50'
+                      }`}
+                    >
+                      Previous
+                    </button>
+                    {[...Array(totalPages)].map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => paginate(i + 1)}
+                        className={`px-3 py-1 border rounded-md text-sm font-medium ${
+                          currentPage === i + 1
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-white text-blue-600 hover:bg-blue-50'
+                        }`}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+                    <button
+                      onClick={nextPage}
+                      disabled={currentPage === totalPages}
+                      className={`px-3 py-1 border rounded-md text-sm font-medium ${
+                        currentPage === totalPages
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : 'bg-white text-blue-600 hover:bg-blue-50'
+                      }`}
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
+        </div>
+
+        <div className="mt-4 md:mt-6 p-3 md:p-4 bg-green-50 rounded-lg border border-green-200">
+          <div className="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center space-x-2">
+              <Shield className="h-4 w-4 md:h-5 md:w-5 text-green-600" />
+              <span className="font-medium text-green-800 text-sm md:text-base">Your documents are secure and private</span>
+            </div>
+            <div className="text-xs md:text-sm text-green-700">
+              Last checked: {new Date().toLocaleTimeString()}
+            </div>
+          </div>
         </div>
       </div>
     </div>

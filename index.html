@@ -8,6 +8,13 @@
   <meta name="description" content="The Public Health Bureau (PHB) website provides health information, advice, and services to help you manage your health and healthcare." />
   <meta name="color-scheme" content="light" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.js"></script>
+  <script>
+    // Configure PDF.js worker
+    if (typeof pdfjsLib !== 'undefined') {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js';
+    }
+  </script>
   <title>PHB - Public Health Bureau</title>
   <!-- Cache busting version tag: 2.0 -->
   <script src="/force_reload.js?v=2"></script>
