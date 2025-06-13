@@ -58,6 +58,7 @@ const HealthRecordsPage: React.FC = () => {
   const [viewerRotation, setViewerRotation] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [documentError, setDocumentError] = useState<string>('');
+  const [pdfLoadFailed, setPdfLoadFailed] = useState(false); // 🔍 NEW: Track PDF load failures
 
   // 🗑️ DELETE MODAL STATES
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -154,6 +155,7 @@ const HealthRecordsPage: React.FC = () => {
     setViewerRotation(0);
     setIsFullscreen(false);
     setDocumentError('');
+    setPdfLoadFailed(false); // 🔍 Reset PDF load failure state
   };
 
   const zoomIn = () => setViewerZoom(prev => Math.min(prev + 0.25, 3));
@@ -535,17 +537,39 @@ const HealthRecordsPage: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900 flex items-center">
-              <FileText className="h-6 w-6 mr-2 text-blue-600" />
-              Your Documents
-              <span className="ml-3 px-2 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-                {filteredDocuments.length} files
-              </span>
-              <span className="ml-3 px-2 py-1 bg-gray-100 text-gray-800 text-sm font-medium rounded-full">
-                Page {currentPage} of {totalPages || 1}
-              </span>
-            </h2>
+          <div className="px-4 md:px-6 py-3 md:py-4 bg-gray-50 border-b border-gray-200">
+            {/* Mobile-Optimized Header */}
+            <div className="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center md:justify-between">
+              <h2 className="text-lg md:text-xl font-bold text-gray-900 flex items-center">
+                <FileText className="h-5 w-5 md:h-6 md:w-6 mr-2 text-blue-600" />
+                Your Documents
+              </h2>
+              
+              {/* Mobile: Simple file count */}
+              <div className="flex items-center justify-between md:justify-end space-x-3">
+                <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full flex items-center">
+                  📄 {filteredDocuments.length} {filteredDocuments.length === 1 ? 'file' : 'files'}
+                </span>
+                
+                {/* Only show pagination if there are multiple pages */}
+                {totalPages > 1 && (
+                  <span className="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full hidden md:inline-flex">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                )}
+              </div>
+            </div>
+            
+            {/* Mobile: Show pagination info only when needed and styled nicely */}
+            {totalPages > 1 && (
+              <div className="mt-2 md:hidden">
+                <div className="flex items-center justify-center">
+                  <span className="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           {isLoading ? (
@@ -782,42 +806,54 @@ const HealthRecordsPage: React.FC = () => {
             <div className={`bg-white rounded-xl shadow-2xl overflow-hidden ${isFullscreen ? 'w-full h-full' : 'w-full max-w-6xl h-5/6'} flex flex-col`}>
               {/* Header */}
               <div className="bg-gray-50 px-4 md:px-6 py-3 md:py-4 border-b border-gray-200 flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="text-2xl">{getFileIcon(viewingDocument.name)}</div>
-                  <div>
-                    <h3 className="text-lg md:text-xl font-bold text-gray-900 truncate">{viewingDocument.name}</h3>
-                    <p className="text-sm text-gray-600">{viewingDocument.size} • {viewingDocument.source}</p>
+                <div className="flex items-center space-x-3 flex-1 min-w-0">
+                  <div className="text-xl md:text-2xl">{getFileIcon(viewingDocument.name)}</div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base md:text-xl font-bold text-gray-900 truncate">{viewingDocument.name}</h3>
+                    <p className="text-xs md:text-sm text-gray-600">{viewingDocument.size} • {viewingDocument.source}</p>
                   </div>
                 </div>
                 
                 <div className="flex items-center space-x-2">
-                  {/* Zoom Controls */}
-                  <div className="hidden md:flex items-center space-x-1 bg-white rounded-lg border border-gray-300 p-1">
-                    <button onClick={zoomOut} className="p-1 hover:bg-gray-100 rounded" title="Zoom out">
-                      <ZoomOut className="h-4 w-4" />
+                  {/* Mobile Close Button - Large and Prominent */}
+                  <button 
+                    onClick={closeDocumentViewer} 
+                    className="md:hidden p-3 bg-red-100 hover:bg-red-200 rounded-xl text-red-600 flex items-center justify-center min-w-[44px] min-h-[44px]"
+                    title="Close"
+                  >
+                    <X className="h-6 w-6" />
+                  </button>
+
+                  {/* Desktop Controls */}
+                  <div className="hidden md:flex items-center space-x-2">
+                    {/* Zoom Controls */}
+                    <div className="flex items-center space-x-1 bg-white rounded-lg border border-gray-300 p-1">
+                      <button onClick={zoomOut} className="p-1 hover:bg-gray-100 rounded" title="Zoom out">
+                        <ZoomOut className="h-4 w-4" />
+                      </button>
+                      <span className="px-2 text-sm font-medium text-gray-700">{Math.round(viewerZoom * 100)}%</span>
+                      <button onClick={zoomIn} className="p-1 hover:bg-gray-100 rounded" title="Zoom in">
+                        <ZoomIn className="h-4 w-4" />
+                      </button>
+                      <button onClick={resetZoom} className="p-1 hover:bg-gray-100 rounded text-xs px-2" title="Reset zoom">
+                        Reset
+                      </button>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <button onClick={rotateDocument} className="p-2 hover:bg-gray-100 rounded-lg" title="Rotate">
+                      <RotateCw className="h-4 w-4 md:h-5 md:w-5" />
                     </button>
-                    <span className="px-2 text-sm font-medium text-gray-700">{Math.round(viewerZoom * 100)}%</span>
-                    <button onClick={zoomIn} className="p-1 hover:bg-gray-100 rounded" title="Zoom in">
-                      <ZoomIn className="h-4 w-4" />
+                    <button onClick={downloadDocument} className="p-2 hover:bg-gray-100 rounded-lg" title="Download">
+                      <Download className="h-4 w-4 md:h-5 md:w-5" />
                     </button>
-                    <button onClick={resetZoom} className="p-1 hover:bg-gray-100 rounded text-xs px-2" title="Reset zoom">
-                      Reset
+                    <button onClick={toggleFullscreen} className="p-2 hover:bg-gray-100 rounded-lg" title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}>
+                      {isFullscreen ? <Minimize2 className="h-4 w-4 md:h-5 md:w-5" /> : <Maximize2 className="h-4 w-4 md:h-5 md:w-5" />}
+                    </button>
+                    <button onClick={closeDocumentViewer} className="p-2 hover:bg-gray-100 rounded-lg" title="Close">
+                      <X className="h-4 w-4 md:h-5 md:w-5" />
                     </button>
                   </div>
-
-                  {/* Action Buttons */}
-                  <button onClick={rotateDocument} className="p-2 hover:bg-gray-100 rounded-lg" title="Rotate">
-                    <RotateCw className="h-4 w-4 md:h-5 md:w-5" />
-                  </button>
-                  <button onClick={downloadDocument} className="p-2 hover:bg-gray-100 rounded-lg" title="Download">
-                    <Download className="h-4 w-4 md:h-5 md:w-5" />
-                  </button>
-                  <button onClick={toggleFullscreen} className="p-2 hover:bg-gray-100 rounded-lg" title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}>
-                    {isFullscreen ? <Minimize2 className="h-4 w-4 md:h-5 md:w-5" /> : <Maximize2 className="h-4 w-4 md:h-5 md:w-5" />}
-                  </button>
-                  <button onClick={closeDocumentViewer} className="p-2 hover:bg-gray-100 rounded-lg" title="Close">
-                    <X className="h-4 w-4 md:h-5 md:w-5" />
-                  </button>
                 </div>
               </div>
 
@@ -863,18 +899,97 @@ const HealthRecordsPage: React.FC = () => {
                     </div>
                   </div>
                 ) : documentUrl ? (
-                  <div className="h-full overflow-auto p-4">
+                  <div className="h-full overflow-auto p-2 md:p-4">
                     <div className="flex justify-center">
                       {isPdfFile(viewingDocument.name) ? (
-                        <iframe
-                          src={documentUrl}
-                          className="w-full h-full min-h-[600px] border-2 border-gray-300 rounded-lg shadow-lg"
-                          style={{
-                            transform: `scale(${viewerZoom}) rotate(${viewerRotation}deg)`,
-                            transformOrigin: 'center center'
-                          }}
-                          title={viewingDocument.name}
-                        />
+                        // 🚀 PLATFORM-SPECIFIC PDF VIEWER
+                        <div className="w-full h-full">
+                          {/* Desktop: Always use iframe (works perfectly) */}
+                          <iframe
+                            src={`${documentUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&zoom=page-width`}
+                            className="hidden md:block w-full h-full min-h-[600px] border-2 border-gray-300 rounded-lg shadow-lg bg-white"
+                            style={{
+                              transform: `scale(${viewerZoom}) rotate(${viewerRotation}deg)`,
+                              transformOrigin: 'center center'
+                            }}
+                            title={viewingDocument.name}
+                            allow="autoplay"
+                          />
+                          
+                          {/* Mobile: Smart detection with fallback */}
+                          <div className="md:hidden">
+                            {!pdfLoadFailed ? (
+                              <iframe
+                                src={`${documentUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&zoom=page-width`}
+                                className="w-full h-full min-h-[500px] border-2 border-gray-300 rounded-lg shadow-lg bg-white"
+                                style={{
+                                  transform: `scale(${viewerZoom}) rotate(${viewerRotation}deg)`,
+                                  transformOrigin: 'center center'
+                                }}
+                                title={viewingDocument.name}
+                                allow="autoplay"
+                                onLoad={(e) => {
+                                  // 🔍 Only check on mobile
+                                  const iframe = e.target as HTMLIFrameElement;
+                                  setTimeout(() => {
+                                    try {
+                                      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+                                      if (!iframeDoc || iframeDoc.body.children.length === 0) {
+                                        console.log('📱 Mobile PDF failed to load in iframe, showing fallback');
+                                        setPdfLoadFailed(true);
+                                      }
+                                    } catch (error) {
+                                      // PDF is probably loading fine
+                                      console.log('📱 Mobile PDF loading (cross-origin protection)');
+                                    }
+                                  }, 3000); // Give more time for mobile
+                                }}
+                                onError={() => {
+                                  console.log('📱 Mobile PDF iframe failed to load');
+                                  setPdfLoadFailed(true);
+                                }}
+                              />
+                            ) : (
+                              // 🎯 Mobile Fallback Only
+                              <div className="text-center bg-white p-6 rounded-lg border-2 border-gray-300 min-h-[500px] flex flex-col items-center justify-center">
+                                <div className="text-6xl mb-4">📄</div>
+                                <h3 className="text-lg font-bold text-gray-900 mb-2">PDF Document</h3>
+                                <p className="text-gray-600 mb-4 text-sm text-center max-w-md">
+                                  This PDF is ready to view! Your browser might handle it better as a download.
+                                </p>
+                                <div className="space-y-3 w-full max-w-xs">
+                                  <button 
+                                    onClick={downloadDocument}
+                                    className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center text-sm font-medium"
+                                  >
+                                    <Download className="h-4 w-4 mr-2" />
+                                    Download PDF
+                                  </button>
+                                  <button 
+                                    onClick={() => {
+                                      window.open(documentUrl, '_blank');
+                                    }}
+                                    className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center justify-center text-sm font-medium"
+                                  >
+                                    <Eye className="h-4 w-4 mr-2" />
+                                    Open in New Tab
+                                  </button>
+                                  <button 
+                                    onClick={() => {
+                                      setPdfLoadFailed(false);
+                                    }}
+                                    className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm"
+                                  >
+                                    Try Preview Again
+                                  </button>
+                                </div>
+                                <p className="text-xs text-gray-500 mt-4">
+                                  {viewingDocument.size} • Secure Medical Document
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       ) : isImageFile(viewingDocument.name) ? (
                         <img
                           src={documentUrl}
@@ -904,20 +1019,34 @@ const HealthRecordsPage: React.FC = () => {
                 ) : null}
               </div>
 
-              {/* Mobile Zoom Controls */}
-              <div className="md:hidden bg-gray-50 px-4 py-3 border-t border-gray-200 flex items-center justify-center space-x-4">
-                <button onClick={zoomOut} className="p-2 bg-white rounded-lg border border-gray-300" title="Zoom out">
-                  <ZoomOut className="h-4 w-4" />
-                </button>
-                <span className="px-3 py-1 bg-white rounded-lg border border-gray-300 text-sm font-medium">
-                  {Math.round(viewerZoom * 100)}%
-                </span>
-                <button onClick={zoomIn} className="p-2 bg-white rounded-lg border border-gray-300" title="Zoom in">
-                  <ZoomIn className="h-4 w-4" />
-                </button>
-                <button onClick={resetZoom} className="px-3 py-2 bg-white rounded-lg border border-gray-300 text-sm" title="Reset zoom">
-                  Reset
-                </button>
+              {/* Mobile Action Bar - Bottom */}
+              <div className="md:hidden bg-gray-50 px-4 py-3 border-t border-gray-200 flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <button onClick={zoomOut} className="p-2 bg-white rounded-lg border border-gray-300" title="Zoom out">
+                    <ZoomOut className="h-4 w-4" />
+                  </button>
+                  <span className="px-3 py-1 bg-white rounded-lg border border-gray-300 text-sm font-medium">
+                    {Math.round(viewerZoom * 100)}%
+                  </span>
+                  <button onClick={zoomIn} className="p-2 bg-white rounded-lg border border-gray-300" title="Zoom in">
+                    <ZoomIn className="h-4 w-4" />
+                  </button>
+                  <button onClick={resetZoom} className="px-3 py-2 bg-white rounded-lg border border-gray-300 text-sm" title="Reset zoom">
+                    Reset
+                  </button>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <button onClick={downloadDocument} className="p-2 bg-blue-100 rounded-lg text-blue-600" title="Download">
+                    <Download className="h-5 w-5" />
+                  </button>
+                  <button 
+                    onClick={closeDocumentViewer} 
+                    className="px-4 py-2 bg-red-100 text-red-600 rounded-lg font-medium text-sm"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </div>
           </div>
