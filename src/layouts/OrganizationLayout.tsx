@@ -26,7 +26,7 @@ const OrganizationLayout: React.FC = () => {
           ...baseItems,
           { label: 'Patient Admissions', path: '/organization/admissions', icon: 'person_add' },
           { label: 'Surgery Schedule', path: '/organization/surgery-schedule', icon: 'event' },
-          { label: 'Ward Management', path: '/organization/wards', icon: 'bed' },
+          { label: 'Department Management', path: '/organization/wards', icon: 'bed' },
           { label: 'Staff Roster', path: '/organization/staffing', icon: 'badge' },
           { label: 'Inventory Check', path: '/organization/inventory', icon: 'inventory_2' },
         ];

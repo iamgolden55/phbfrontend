@@ -32,6 +32,7 @@ import InventoryCheckPage from './pages/organization/InventoryCheckPage';
 import AnalyticsPage from './pages/organization/AnalyticsPage';
 import EmergencyPage from './pages/organization/EmergencyPage';
 import UserRegistrationsPage from './pages/organization/UserRegistrationsPage';
+import AppointmentsPage from './pages/organization/AppointmentsPage';
 import { OrganizationAuthProvider } from './features/organization/organizationAuthContext';
 import ForgotPasswordPage from './pages/ForgotPasswordPage'; // Add this import
 import ResetPasswordPage from './pages/ResetPasswordPage'; // Add this import
@@ -316,6 +317,11 @@ function App() {
                 <Route path="emergency" element={
                   <OrganizationRouteGuard>
                     <EmergencyPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="appointments" element={
+                  <OrganizationRouteGuard>
+                    <AppointmentsPage />
                   </OrganizationRouteGuard>
                 } />
               </Route>

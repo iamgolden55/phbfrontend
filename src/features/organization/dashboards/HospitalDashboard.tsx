@@ -1,18 +1,54 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { UserData } from '../organizationAuthContext';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar } from 'recharts';
 import { useRegistrationStats } from '../../../hooks/useRegistrationStats';
-import { useDepartmentStats } from '../../../hooks/useDepartmentStats'; // 🛏️ BED MAGIC IMPORT!
+import { useDepartmentStats, DepartmentStats as DepartmentStatsType } from '../../../hooks/useDepartmentStats';
+import { useAdmissionData } from '../../../hooks/useAdmissionData';
+import { StaffMember, StaffService } from '../../../services/staffService';
 
-// --- MOCK DATA (Replace below with API calls via authContext in real app) ---
-const MOCK_STATS = {
-  activePatients: 1250,
-  availableBeds: 85,
-  scheduledSurgeries: 15,
-  staffOnDuty: 210,
-  trendPatients: { trend: 'up', value: '+5% from last week' },
-  trendBeds: { trend: 'down', value: '-3% from last week' },
+// --- Initial Stats ---
+const INITIAL_STATS = {
+  activePatients: 0,
+  availableBeds: 0,
+  scheduledSurgeries: 0,
+  staffOnDuty: 0,
+  trendPatients: { trend: 'up', value: '0% from last week' },
+  trendBeds: { trend: 'stable', value: '0% from last week' },
+};
+
+// Custom hook to fetch staff data
+const useStaffData = () => {
+  const [staff, setStaff] = useState<StaffMember[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchStaff = async () => {
+      try {
+        setLoading(true);
+        const response = await StaffService.fetchStaffMembers();
+        if (response.status === 'success') {
+          setStaff(response.staff_members);
+          // Update staff on duty count (filtering by availability status)
+          const staffOnDuty = response.staff_members.filter(
+            member => member.availability_status?.is_available
+          ).length;
+          
+          INITIAL_STATS.staffOnDuty = staffOnDuty;
+        }
+      } catch (err) {
+        console.error('Error fetching staff data:', err);
+        setError('Failed to load staff data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStaff();
+  }, []);
+
+  return { staff, loading, error };
 };
 
 const MOCK_NOTIFICATIONS = [
@@ -50,13 +86,14 @@ const MOCK_SURGERY_OVERVIEW = {
   next: { procedure: 'Appendectomy', time: '11:30 AM • OR-2', doctor: 'Dr. Martinez' },
 };
 
-const MOCK_STAFF = [
-  { name: 'Nurse Olivia', role: 'Nurse', avatar: 'https://randomuser.me/api/portraits/women/51.jpg' },
-  { name: 'Dr. Martinez', role: 'Surgeon', avatar: 'https://randomuser.me/api/portraits/men/54.jpg' },
-  { name: 'Dr. Lee', role: 'Pediatrician', avatar: 'https://randomuser.me/api/portraits/men/71.jpg' },
-  { name: 'Dr. Patel', role: 'Anaesthetist', avatar: 'https://randomuser.me/api/portraits/men/53.jpg' },
-  { name: 'Nurse Chloe', role: 'Nurse', avatar: 'https://randomuser.me/api/portraits/women/56.jpg' }
-];
+// Generate avatar URL from name as a fallback
+const getAvatarUrl = (name: string) => {
+  const names = name.split(' ');
+  const firstName = names[0] || '';
+  const lastName = names[names.length - 1] || '';
+  const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=random`;
+};
 
 const TRENDS_DATA = [
   { name: 'Mon', Patients: 1300, Beds: 100 },
@@ -96,49 +133,154 @@ const StatCard: React.FC<{ label: string; value: string | number; icon?: string;
   </div>
 );
 
+interface TrendsChartProps {
+  departmentStats: DepartmentStatsType | null;
+  loading: boolean;
+  error: string | null;
+}
+
 // --- Trends Chart Panel ---
-const TrendsChart: React.FC = () => (
-  <DashboardCard title="Trends & Analytics" className="h-full">
-    <div className="h-[220px] w-full">
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={TRENDS_DATA} margin={{ top: 8, right: 16, left: -22, bottom: 5 }}>
-          <defs>
-            <linearGradient id="patients" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#2563eb" stopOpacity={0.8}/>
-              <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
-            </linearGradient>
-            <linearGradient id="beds" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#22c55e" stopOpacity={0.8}/>
-              <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <XAxis dataKey="name" className="text-xs" />
-          <YAxis className="text-xs" />
-          <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <Tooltip wrapperClassName="!text-sm"/>
-          <Legend />
-          <Area type="monotone" dataKey="Patients" stroke="#2563eb" fillOpacity={1} fill="url(#patients)"/>
-          <Area type="monotone" dataKey="Beds" stroke="#22c55e" fillOpacity={1} fill="url(#beds)"/>
-        </AreaChart>
-      </ResponsiveContainer>
-    </div>
-    <div className="text-xs text-gray-500 mt-2">Weekly patient and bed trends</div>
-  </DashboardCard>
-);
+const TrendsChart: React.FC<TrendsChartProps> = ({ departmentStats, loading, error }) => {
+  // Early return if no department stats
+  if (!departmentStats) {
+    return (
+      <DashboardCard title="Resource Utilization" className="h-full">
+        <div className="h-[220px] flex items-center justify-center text-gray-500">
+          No department data available
+        </div>
+      </DashboardCard>
+    );
+  }
+
+  // Destructure criticalAlerts after null check
+  const { criticalAlerts } = departmentStats;
+  // Transform department stats into chart data
+  const getChartData = () => {
+    if (!departmentStats) return [];
+    
+    return [
+      {
+        name: 'Beds',
+        total: departmentStats.totalBeds,
+        available: departmentStats.availableBeds,
+        occupied: departmentStats.occupiedBeds,
+        utilization: departmentStats.overallBedUtilization
+      },
+      {
+        name: 'ICU Beds',
+        total: departmentStats.totalICUBeds,
+        available: departmentStats.availableICUBeds,
+        occupied: departmentStats.occupiedICUBeds,
+        utilization: departmentStats.overallBedUtilization * 0.8 // Assuming 80% of total utilization for ICU
+      },
+      {
+        name: 'Staff',
+        current: departmentStats.totalStaff,
+        required: departmentStats.totalMinimumStaff,
+        utilization: departmentStats.overallStaffUtilization
+      },
+      {
+        name: 'Patients',
+        current: departmentStats.totalPatients,
+        capacity: Math.round(departmentStats.totalBeds * 0.8), // Assuming 80% capacity target
+        utilization: departmentStats.overallUtilization
+      }
+    ];
+  };
+
+  const chartData = getChartData();
+
+  if (loading) {
+    return (
+      <DashboardCard title="Trends & Analytics" className="h-full">
+        <div className="h-[220px] flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        </div>
+      </DashboardCard>
+    );
+  }
+
+  if (error) {
+    return (
+      <DashboardCard title="Resource Utilization" className="h-full">
+        <div className="h-[220px] flex flex-col items-center justify-center text-red-500">
+          <p>Failed to load data</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+          >
+            Retry
+          </button>
+        </div>
+      </DashboardCard>
+    );
+  }
+
+  return (
+    <DashboardCard title="Resource Utilization" className="h-full">
+      <div className="h-[220px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={chartData}
+            margin={{ top: 8, right: 16, left: -22, bottom: 5 }}
+            barGap={4}
+          >
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis dataKey="name" className="text-xs" />
+            <YAxis className="text-xs" />
+            <Tooltip 
+              wrapperClassName="!text-sm"
+              formatter={(value: number, name: string) => {
+                if (name === 'utilization') return [`${value}%`, 'Utilization'];
+                return [value, name];
+              }}
+            />
+            <Legend />
+            <Bar dataKey="utilization" name="Utilization %" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="available" name="Available" fill="#22c55e" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="occupied" name="Occupied" fill="#ef4444" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="current" name="Current" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="required" name="Required" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+      <div className="text-xs text-gray-500 mt-2">
+        {criticalAlerts?.understaffedDepartments?.length > 0 && (
+          <span className="text-amber-600">
+            ⚠️ {criticalAlerts.understaffedDepartments.length} departments understaffed
+          </span>
+        )}
+        {criticalAlerts?.highUtilization?.length > 0 && (
+          <span className="ml-2 text-red-600">
+            ⚠️ {criticalAlerts.highUtilization.length} departments at high utilization
+          </span>
+        )}
+      </div>
+    </DashboardCard>
+  );
+};
 
 // --- Staff on Duty Panel ---
-const StaffOnDuty: React.FC<{ staff: typeof MOCK_STAFF }> = ({ staff }) => (
+const StaffOnDuty: React.FC<{ staff: StaffMember[] }> = ({ staff }) => (
   <DashboardCard title="Staff On Duty">
     <ul className="divide-y divide-gray-100">
-      {staff.map((s, idx) => (
-        <li key={idx} className="flex items-center py-2 gap-3">
-          <img src={s.avatar} alt={s.name} className="h-9 w-9 rounded-full ring-2 ring-blue-200 object-cover"/>
-          <div className="flex-1 min-w-0">
-            <div className="font-medium text-gray-900 text-sm truncate">{s.name}</div>
-            <div className="text-xs text-gray-500">{s.role}</div>
+      {staff.map((member) => (
+        <div key={member.id} className="flex items-center space-x-3 p-2 hover:bg-blue-50 rounded-lg transition-colors">
+          <img 
+            src={getAvatarUrl(member.full_name)} 
+            alt={member.full_name} 
+            className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xs text-white"
+          />
+          <div className="min-w-0">
+            <p className="font-medium text-gray-900 truncate">{member.full_name}</p>
+            <p className="text-sm text-gray-500 truncate">{member.role_display}</p>
+            {member.department_name && (
+              <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full mt-1">
+                {member.department_name}
+              </span>
+            )}
           </div>
-          <span className={`text-xs rounded px-2 py-0.5 font-semibold ${s.role === 'Nurse' ? 'bg-cyan-100 text-cyan-700' : 'bg-blue-100 text-blue-800'}`}>{s.role}</span>
-        </li>
+        </div>
       ))}
     </ul>
     <Link to="/organization/staffing" className="text-blue-600 hover:underline text-sm mt-4 inline-block">View Staff Roster</Link>
@@ -149,43 +291,116 @@ const StaffOnDuty: React.FC<{ staff: typeof MOCK_STAFF }> = ({ staff }) => (
 
 // --- Updated Functional Components with Real Data ---
 
-const HospitalStats: React.FC<{ stats?: typeof MOCK_STATS }> = ({ stats }) => {
-  const registrationStats = useRegistrationStats();
-  const { stats: departmentStats, loading: departmentLoading, error: departmentError } = useDepartmentStats(); // 🛏️ BED MAGIC!
+interface HospitalStatsProps {
+  stats?: typeof INITIAL_STATS;
+  departmentStats: DepartmentStatsType | null;
+  loading: boolean;
+  error: string | null;
+}
 
-  // 🛏️ Use REAL data if available, otherwise fallback to mock data
-  const displayStats = React.useMemo(() => {
-    if (departmentLoading) {
+const HospitalStats: React.FC<HospitalStatsProps> = ({ 
+  stats, 
+  departmentStats, 
+  loading: departmentLoading, 
+  error: departmentError 
+}) => {
+  // Use the registration stats hook
+  const { approved: approvedRegistrations } = useRegistrationStats();
+
+  // Define the shape of our display stats
+  type Trend = 'up' | 'down';
+  
+  interface DisplayStats {
+    activePatients: number | string;
+    availableBeds: number | string;
+    totalBeds: number | string;
+    scheduledSurgeries: number | string;
+    staffOnDuty: number | string;
+    trendPatients: { trend: Trend; value: string };
+    trendBeds: { trend: Trend; value: string };
+  }
+
+  // Helper function to safely convert to number or return 0
+  const toNumber = (value: number | string): number => {
+    if (typeof value === 'number') return value;
+    if (typeof value === 'string' && !isNaN(parseInt(value))) return parseInt(value);
+    return 0;
+  };
+
+  // Use the admission data hook to get the correct patient count
+  const { admissions = [], loading: admissionsLoading } = useAdmissionData();
+
+  // Use REAL data if available, otherwise fallback to mock data
+  const displayStats = React.useMemo<DisplayStats>(() => {
+    // Loading state
+    if (departmentLoading || admissionsLoading) {
       return {
         activePatients: '...',
         availableBeds: '...',
-        scheduledSurgeries: stats?.scheduledSurgeries || 15,
+        totalBeds: '...',
+        scheduledSurgeries: '...',
         staffOnDuty: '...',
-        trendPatients: { trend: 'up' as const, value: 'Loading...' },
-        trendBeds: { trend: 'down' as const, value: 'Loading...' },
+        trendPatients: { trend: 'up', value: 'Loading...' },
+        trendBeds: { trend: 'down', value: 'Loading...' },
       };
     }
 
+    // Error state or no department stats
     if (departmentError || !departmentStats) {
-      console.log('🛏️ Using fallback data due to:', departmentError);
-      return stats || MOCK_STATS;
+      console.error('Error loading department stats:', departmentError);
+      return {
+        activePatients: 'N/A',
+        availableBeds: 'N/A',
+        totalBeds: 'N/A',
+        scheduledSurgeries: stats?.scheduledSurgeries || 15,
+        staffOnDuty: 'N/A',
+        trendPatients: { trend: 'up' as Trend, value: 'Error loading data' },
+        trendBeds: { trend: 'down' as Trend, value: 'Error loading data' },
+      };
     }
 
-    // 🎉 REAL BED MAGIC DATA!
-    return {
-      activePatients: departmentStats.totalPatients,
-      availableBeds: departmentStats.availableBeds,
-      scheduledSurgeries: stats?.scheduledSurgeries || 15, // Keep mock for surgery data
-      staffOnDuty: departmentStats.totalStaff,
-      trendPatients: { 
-        trend: departmentStats.overallUtilization > 70 ? 'up' as const : 'down' as const, 
-        value: `${departmentStats.overallUtilization.toFixed(1)}% capacity` 
-      },
-      trendBeds: { 
-        trend: departmentStats.overallBedUtilization < 80 ? 'down' as const : 'up' as const, 
-        value: `${departmentStats.overallBedUtilization.toFixed(1)}% occupied` 
-      },
-    };
+    try {
+      // Use real bed data from department stats
+      const totalBeds = departmentStats?.totalBeds || 0;
+      const availableBeds = (departmentStats?.totalBeds - (departmentStats?.occupiedBeds / 2)) || 0;
+      const bedUtilization = departmentStats?.overallBedUtilization || 0;
+      const totalStaff = departmentStats?.totalStaff || 0;
+      
+      // Calculate occupied beds (ensure it's not negative)
+      const occupiedBeds = Math.max(0, totalBeds - availableBeds);
+      
+      // Count active admissions - check for both lowercase and capitalized status
+      const activeAdmissions = admissions.filter(
+        adm => adm.status.toLowerCase() === 'admitted'
+      ).length;
+      
+      return {
+        activePatients: activeAdmissions,
+        availableBeds: availableBeds,
+        totalBeds: totalBeds,
+        scheduledSurgeries: stats?.scheduledSurgeries || 15,
+        staffOnDuty: totalStaff,
+        trendPatients: { 
+          trend: (activeAdmissions / Math.max(1, totalBeds) * 100) > 70 ? 'up' as const : 'down' as const, 
+          value: `${Math.round((activeAdmissions / Math.max(1, totalBeds)) * 100) || 0}% capacity` 
+        },
+        trendBeds: { 
+          trend: bedUtilization < 80 ? 'down' as const : 'up' as const, 
+          value: `${bedUtilization.toFixed(1)}% occupied` 
+        },
+      };
+    } catch (error) {
+      console.error('Error processing department stats:', error);
+      return {
+        activePatients: 'Error',
+        availableBeds: 'Error',
+        totalBeds: 'Error',
+        scheduledSurgeries: stats?.scheduledSurgeries || 15,
+        staffOnDuty: 'Error',
+        trendPatients: { trend: 'down' as Trend, value: 'Data error' },
+        trendBeds: { trend: 'down' as Trend, value: 'Data error' },
+      };
+    }
   }, [departmentStats, departmentLoading, departmentError, stats]);
 
   // 🔥 Show critical alerts
@@ -211,65 +426,131 @@ const HospitalStats: React.FC<{ stats?: typeof MOCK_STATS }> = ({ stats }) => {
         </div>
       )}
 
-      <StatCard
-        label="Active Patients"
-        value={displayStats.activePatients}
-        icon="people"
-        trend={displayStats.trendPatients.trend}
-        trendValue={displayStats.trendPatients.value}
-      />
-      <StatCard
-        label="Available Beds"
-        value={displayStats.availableBeds}
-        icon="bed"
-        trend={displayStats.trendBeds.trend}
-        trendValue={displayStats.trendBeds.value}
-      />
-      <StatCard
-        label="Scheduled Surgeries Today"
-        value={displayStats.scheduledSurgeries}
-        icon="local_hospital"
-      />
-      <StatCard
-        label="Staff On Duty"
-        value={displayStats.staffOnDuty}
-        icon="badge"
-      />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {/* Active Patients */}
+        <StatCard 
+          label="Active Admitted Patients" 
+          value={typeof displayStats.activePatients === 'number' ? displayStats.activePatients.toLocaleString() : displayStats.activePatients} 
+          icon="personal_injury"
+          trend={displayStats.trendPatients.trend}
+          trendValue={displayStats.trendPatients.value}
+        />
+        
+        {/* Available Beds */}
+        <StatCard 
+          label="Available Beds" 
+          value={
+            typeof displayStats.availableBeds === 'number' && typeof displayStats.totalBeds === 'number'
+              ? `${displayStats.availableBeds} / ${displayStats.totalBeds}`
+              : `${displayStats.availableBeds} / ${displayStats.totalBeds}`
+          } 
+          icon="hotel"
+          trend={displayStats.trendBeds.trend}
+          trendValue={
+            typeof displayStats.availableBeds === 'number' 
+              ? `${displayStats.availableBeds} available` 
+              : 'Data unavailable'
+          }
+        />
+        
+        {/* Bed Utilization */}
+        <StatCard 
+          label="Bed Utilization" 
+          value={displayStats.trendBeds.value} 
+          icon="airline_seat_recline_extra"
+          trend={displayStats.trendBeds.trend}
+          trendValue={
+            typeof displayStats.availableBeds === 'number' && typeof displayStats.totalBeds === 'number'
+              ? `${Math.max(0, displayStats.totalBeds - displayStats.availableBeds)} occupied`
+              : 'Occupied data unavailable'
+          }
+        />
+        
+        {/* Staff On Duty */}
+        <StatCard 
+          label="Staff On Duty" 
+          value={
+            typeof displayStats.staffOnDuty === 'number' 
+              ? displayStats.staffOnDuty.toLocaleString() 
+              : displayStats.staffOnDuty
+          } 
+          icon="groups"
+        />
+      </div>
       {/* 🎉 Registered Users Stats */}
       <StatCard
-        label={registrationStats.loading ? "Loading..." : "Registered Users"}
-        value={registrationStats.loading ? "..." : registrationStats.total}
+        label="Approved Registrations"
+        value={approvedRegistrations?.toString() || 'N/A'}
         icon="how_to_reg"
-        trend={registrationStats.pending > 0 ? "up" : undefined}
-        trendValue={registrationStats.pending > 0 ? `${registrationStats.pending} pending approval` : "All approved ✅"}
+        trend="up"
+        trendValue="View all registrations"
       />
     </div>
   );
 };
 
+interface QuickLink {
+  label: string;
+  path: string;
+  icon: string;
+  highlight?: boolean;
+  badge?: string | number;
+}
+
 const HospitalQuickLinks: React.FC = () => {
-  const registrationStats = useRegistrationStats();
+  // Use the registration stats hook
+  const { pending, approved } = useRegistrationStats();
+
+  const quickLinks: QuickLink[] = [
+    { 
+      label: 'Patient Admissions', 
+      path: '/organization/admissions', 
+      icon: 'person_add' 
+    },
+    { 
+      label: 'User Registrations', 
+      path: '/organization/user-registrations', 
+      icon: 'how_to_reg',
+      highlight: pending > 0
+    },
+    { 
+      label: 'Appointments', 
+      path: '/organization/appointments', 
+      icon: 'event_available' 
+    },
+    { 
+      label: 'Department Management', 
+      path: '/organization/wards', 
+      icon: 'bed' 
+    },
+    { 
+      label: 'Staff Roster', 
+      path: '/organization/staff-roster', 
+      icon: 'people' 
+    },
+    { 
+      label: 'Analytics Dashboard', 
+      path: '/organization/analytics', 
+      icon: 'analytics' 
+    },
+    { 
+      label: 'Emergency Protocols', 
+      path: '/organization/emergency', 
+      icon: 'emergency' 
+    },
+    { 
+      label: 'Surgery Schedule', 
+      path: '/organization/surgery-schedule', 
+      icon: 'event' 
+    },
+  ];
 
   return (
     <DashboardCard title="Hospital Quick Links" className="h-full">
-      <div className="grid grid-cols-1 gap-2">
-        {[
-          { label: 'Patient Admissions', path: '/organization/admissions', icon: 'person_add' },
-          { 
-            label: 'User Registration Management', 
-            path: '/organization/user-registrations', 
-            icon: 'how_to_reg',
-            highlight: registrationStats.pending > 0
-          },
-          { label: 'Surgery Schedule', path: '/organization/surgery-schedule', icon: 'event' },
-          { label: 'Ward Management', path: '/organization/wards', icon: 'bed' },
-          { label: 'Staff Roster', path: '/organization/staffing', icon: 'badge' },
-          { label: 'Inventory Check', path: '/organization/inventory', icon: 'inventory_2' },
-          { label: 'Analytics Dashboard', path: '/organization/analytics', icon: 'analytics' },
-          { label: 'Emergency Protocols', path: '/organization/emergency', icon: 'emergency' },
-        ].map((link) => (
+      <div className="space-y-2">
+        {quickLinks.map((link) => (
           <Link 
-            key={link.label} 
+            key={link.path} 
             to={link.path} 
             className={`${
               link.highlight 
@@ -278,8 +559,8 @@ const HospitalQuickLinks: React.FC = () => {
             } p-3 rounded-md flex items-center justify-between transition`}
           >
             <div className="flex items-center">
-              <span className="material-icons mr-2 text-lg">{link.icon}</span> 
-              {link.label}
+              <span className="material-icons mr-3 text-lg">{link.icon}</span> 
+              <span className="font-medium">{link.label}</span>
             </div>
             {link.badge && (
               <span className={`text-xs px-2 py-1 rounded-full font-medium ${
@@ -403,33 +684,90 @@ const Notifications: React.FC<{ notifications: typeof MOCK_NOTIFICATIONS }> = ({
   </DashboardCard>
 );
 
-const RecentAdmissions: React.FC<{ admissions: typeof MOCK_ADMISSIONS }> = ({ admissions }) => (
-  <DashboardCard title="Recent Admissions">
-    <div className="overflow-hidden">
-      <ul className="space-y-3 text-sm">
-        {admissions.map((admission) => (
-          <li key={admission.id} className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
-            <div className="flex items-center">
-              <span className="material-icons text-blue-500 mr-2 text-sm">person</span>
-              <span className="font-medium">ID: {admission.id}</span>
-            </div>
-            <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto space-x-3 mt-1 sm:mt-0">
-              <span className="text-gray-500 text-xs">{admission.time}</span>
-              <span className={`px-2 py-1 text-xs rounded-full ${
-                admission.status === 'Emergency' ? 'bg-red-100 text-red-800' :
-                admission.status === 'Pre-Op' ? 'bg-purple-100 text-purple-800' :
-                'bg-blue-100 text-blue-800'
-              }`}>
-                {admission.status}
-              </span>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
-    <Link to="/organization/admissions" className="text-blue-600 hover:underline text-sm mt-4 inline-block">View All Admissions</Link>
-  </DashboardCard>
-);
+interface Admission {
+  id: number;
+  admission_id: string;
+  patient_name: string;
+  admission_date: string;
+  status: string;
+  department_name: string;
+  priority: string;
+}
+
+const RecentAdmissions: React.FC<{ admissions: Admission[] }> = ({ admissions }) => {
+  // Format date to display time since admission
+  const formatTimeSince = (dateString: string) => {
+    const now = new Date();
+    const admissionDate = new Date(dateString);
+    const diffHours = Math.floor((now.getTime() - admissionDate.getTime()) / (1000 * 60 * 60));
+    
+    if (diffHours < 24) {
+      return admissionDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else if (diffHours < 48) {
+      return 'Yesterday';
+    } else {
+      return `${Math.floor(diffHours / 24)}d ago`;
+    }
+  };
+
+  // Get status display and color
+  const getStatusInfo = (status: string, priority: string) => {
+    if (priority.toLowerCase() === 'emergency') {
+      return { text: 'Emergency', className: 'bg-red-100 text-red-800' };
+    } else if (status.toLowerCase() === 'admitted') {
+      return { text: 'Admitted', className: 'bg-blue-100 text-blue-800' };
+    } else if (status.toLowerCase() === 'discharged') {
+      return { text: 'Discharged', className: 'bg-green-100 text-green-800' };
+    } else {
+      return { text: status, className: 'bg-gray-100 text-gray-800' };
+    }
+  };
+
+  // Sort admissions by date (newest first)
+  const sortedAdmissions = [...admissions].sort((a, b) => 
+    new Date(b.admission_date).getTime() - new Date(a.admission_date).getTime()
+  );
+
+  return (
+    <DashboardCard title="Recent Admissions">
+      <div className="overflow-hidden">
+        {sortedAdmissions.length === 0 ? (
+          <div className="text-center py-4 text-gray-500">
+            No recent admissions found
+          </div>
+        ) : (
+          <ul className="space-y-3 text-sm">
+            {sortedAdmissions.slice(0, 5).map((admission) => {
+              const statusInfo = getStatusInfo(admission.status, admission.priority);
+              return (
+                <li key={admission.admission_id} className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                  <div className="flex items-center">
+                    <span className="material-icons text-blue-500 mr-2 text-sm">person</span>
+                    <div>
+                      <div className="font-medium">{admission.patient_name}</div>
+                      <div className="text-xs text-gray-500">{admission.department_name}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto space-x-3 mt-1 sm:mt-0">
+                    <span className="text-gray-500 text-xs whitespace-nowrap">
+                      {formatTimeSince(admission.admission_date)}
+                    </span>
+                    <span className={`px-2 py-1 text-xs rounded-full ${statusInfo.className}`}>
+                      {statusInfo.text}
+                    </span>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+      <Link to="/organization/admissions" className="text-blue-600 hover:underline text-sm mt-4 inline-block">
+        View All Admissions
+      </Link>
+    </DashboardCard>
+  );
+};
 
 const SurgeryOverview: React.FC<{ overview: typeof MOCK_SURGERY_OVERVIEW }> = ({ overview }) => (
   <DashboardCard title="Today's Surgery Overview">
@@ -478,15 +816,47 @@ interface HospitalDashboardProps {
 }
 
 const HospitalDashboard: React.FC<HospitalDashboardProps> = ({ userData }) => {
-  // In real app, fetch data here using authContext/api calls
+  // Get admission data from the API
+  const { admissions } = useAdmissionData();
+  const { staff, loading: staffLoading, error: staffError } = useStaffData();
+  const availableStaff = staff.filter(member => member.availability_status?.is_available);
   
-  // Debug: Show current hospital info
+  // Use INITIAL_STATS instead of MOCK_STATS
+  const stats = INITIAL_STATS;
+  // Log user data for debugging
+  console.log('🏥 Current Hospital Dashboard User Data:', userData);
+  console.log('🏥 Hospital Info:', userData?.hospital);
+  
+  // Use the registration stats hook
+  const registrationStats = useRegistrationStats();
+  
+  // Use the department stats hook
+  const { 
+    stats: departmentStats, 
+    loading: departmentLoading, 
+    error: departmentError 
+  } = useDepartmentStats();
+  
+  // Log department stats for debugging
   React.useEffect(() => {
-    console.log('🏥 Current Hospital Dashboard User Data:', userData);
-    if (userData?.hospital) {
-      console.log('🏥 Hospital Info:', userData.hospital);
-    }
-  }, [userData]);
+    console.log('🏥 Department Stats:', { 
+      departmentStats, 
+      departmentLoading, 
+      departmentError 
+    });
+  }, [departmentStats, departmentLoading, departmentError]);
+  
+  // If user data is not available, show loading state
+  if (!userData) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading hospital data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-2 sm:px-0">
@@ -502,27 +872,67 @@ const HospitalDashboard: React.FC<HospitalDashboardProps> = ({ userData }) => {
         </p>
       </div>
 
-      {/* 🛏️ BED MAGIC STATS - Now using REAL data! */}
-      <HospitalStats stats={MOCK_STATS} />
+      {/* 🛏️ BED MAGIC STATS */}
+      <HospitalStats 
+        stats={stats} 
+        departmentStats={departmentStats}
+        loading={departmentLoading}
+        error={departmentError}
+      />
 
-      <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
-        <Notifications notifications={MOCK_NOTIFICATIONS} />
-        <TrendsChart />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8 mb-8">
+        <div className="lg:col-span-2">
+          <TrendsChart 
+            departmentStats={departmentStats}
+            loading={departmentLoading}
+            error={departmentError}
+          />
+        </div>
+        <div>
+          <Notifications notifications={MOCK_NOTIFICATIONS} />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8 mb-8">
         <div className="lg:col-span-1 space-y-6 sm:space-y-8">
           <HospitalQuickLinks />
-          {/* 🛏️ REAL-TIME BED OCCUPANCY! */}
           <OccupancyChart data={MOCK_OCCUPANCY} />
         </div>
         <div className="lg:col-span-1 space-y-6 sm:space-y-8">
-          <RecentAdmissions admissions={MOCK_ADMISSIONS} />
+          <RecentAdmissions admissions={admissions} />
           <SurgeryOverview overview={MOCK_SURGERY_OVERVIEW} />
         </div>
         <div className="lg:col-span-1 space-y-6 sm:space-y-8">
           <RecentActivities activities={MOCK_ACTIVITIES} />
-          <StaffOnDuty staff={MOCK_STAFF} />
+          <div className="space-y-1">
+  {staffLoading ? (
+    <div className="text-center py-4">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+      <p className="mt-2 text-sm text-gray-500">Loading staff data...</p>
+    </div>
+  ) : staffError ? (
+    <div className="text-center py-4 text-red-500">
+      <p>Error loading staff data</p>
+      <button 
+        onClick={() => window.location.reload()}
+        className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+      >
+        Retry
+      </button>
+    </div>
+  ) : availableStaff.length > 0 ? (
+    <StaffOnDuty staff={availableStaff} />
+  ) : (
+    <div className="text-center py-4 text-gray-500">
+      No staff members currently on duty
+    </div>
+  )}
+  <div className="mt-2 text-sm text-right text-blue-600">
+    <Link to="/organization/staff" className="hover:underline">
+      View all staff ({staff.length})
+    </Link>
+  </div>
+</div>
         </div>
       </div>
     </div>

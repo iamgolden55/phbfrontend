@@ -649,13 +649,48 @@ const BookAppointment: React.FC = () => {
 
       // Get department ID using the mapping function
       let departmentId: number | null = null;
+      
       if (formData.selectedSymptoms.length > 1) {
-        // Find General Medicine department
-        const generalMedicineDept = departments.find(d => 
-          d.name.toLowerCase() === 'general medicine'
-        );
-        departmentId = generalMedicineDept?.id || departments[0]?.id;
+        // For multiple symptoms, find the most appropriate department
+        // First try to find a common department among all symptoms
+        const allDepartments = new Map<string, number>();
+        
+        // Count department occurrences across all symptoms
+        for (const symptom of formData.selectedSymptoms) {
+          const deptId = getDepartmentForBodyPart(symptom.bodyPartId, departments);
+          if (deptId) {
+            const deptName = departments.find(d => d.id === deptId)?.name.toLowerCase() || '';
+            allDepartments.set(deptName, (allDepartments.get(deptName) || 0) + 1);
+          }
+        }
+        
+        // Sort departments by occurrence count (most common first)
+        const sortedDepartments = Array.from(allDepartments.entries())
+          .sort((a, b) => b[1] - a[1]);
+        
+        // If we have departments with counts, use the most common one
+        if (sortedDepartments.length > 0) {
+          const [mostCommonDeptName] = sortedDepartments[0];
+          const mostCommonDept = departments.find(d => 
+            d.name.toLowerCase() === mostCommonDeptName
+          );
+          departmentId = mostCommonDept?.id || null;
+        }
+        
+        // If no department found or still null, try General Medicine as fallback
+        if (!departmentId) {
+          const generalMedicineDept = departments.find(d => 
+            d.name.toLowerCase() === 'general medicine'
+          );
+          departmentId = generalMedicineDept?.id || null;
+        }
+        
+        // If still no department, use the first department as last resort
+        if (!departmentId && departments.length > 0) {
+          departmentId = departments[0].id;
+        }
       } else if (formData.selectedSymptoms.length === 1) {
+        // For single symptom, use the standard mapping
         departmentId = getDepartmentForBodyPart(formData.selectedSymptoms[0].bodyPartId, departments);
       }
 
