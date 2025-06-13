@@ -9,7 +9,16 @@ import {
   Share2, 
   Trash2, 
   Plus,
-  X
+  X,
+  ZoomIn,
+  ZoomOut,
+  RotateCw,
+  Download,
+  Maximize2,
+  Minimize2,
+  ChevronLeft,
+  ChevronRight,
+  Loader2
 } from 'lucide-react';
 import { createApiUrl } from '../../utils/config';
 import MedicalOTPAccess from '../../components/MedicalOTPAccess';
@@ -23,6 +32,8 @@ interface Document {
   source: string;
   uploadDate: string;
   isSecure?: boolean;
+  file_path?: string;
+  original_extension?: string;
 }
 
 const HealthRecordsPage: React.FC = () => {
@@ -38,6 +49,20 @@ const HealthRecordsPage: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const recordsPerPage = 7;
+
+  // DOCUMENT VIEWER STATES 🚀
+  const [viewingDocument, setViewingDocument] = useState<Document | null>(null);
+  const [documentUrl, setDocumentUrl] = useState<string>('');
+  const [isLoadingDocument, setIsLoadingDocument] = useState(false);
+  const [viewerZoom, setViewerZoom] = useState(1);
+  const [viewerRotation, setViewerRotation] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [documentError, setDocumentError] = useState<string>('');
+
+  // 🗑️ DELETE MODAL STATES
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [documentToDelete, setDocumentToDelete] = useState<Document | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // FUNCTIONS
   const fetchDocuments = async () => {
@@ -68,7 +93,9 @@ const HealthRecordsPage: React.FC = () => {
           date: new Date(file.created_at).toISOString().split('T')[0],
           source: 'Secure Upload',
           uploadDate: file.created_at,
-          isSecure: true
+          isSecure: true,
+          file_path: file.file_path,
+          original_extension: file.original_extension
         }));
         
         setDocuments(backendFiles);
@@ -80,6 +107,94 @@ const HealthRecordsPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // 🚀 NUCLEAR DOCUMENT VIEWER FUNCTIONS!
+  const viewDocument = async (document: Document) => {
+    setIsLoadingDocument(true);
+    setDocumentError('');
+    setViewingDocument(document);
+    
+    try {
+      const token = localStorage.getItem('phb_auth_token') ||
+                   localStorage.getItem('access_token') || 
+                   localStorage.getItem('authToken') ||
+                   localStorage.getItem('med_access_token');
+
+      const response = await fetch(createApiUrl(`api/secure/files/${document.id}/preview/`), {
+        method: 'GET',
+        headers: {
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        },
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        setDocumentUrl(url);
+      } else {
+        const errorData = await response.json();
+        setDocumentError(errorData.error || 'Failed to load document');
+      }
+    } catch (error) {
+      console.error('Error viewing document:', error);
+      setDocumentError('Network error while loading document');
+    } finally {
+      setIsLoadingDocument(false);
+    }
+  };
+
+  const closeDocumentViewer = () => {
+    setViewingDocument(null);
+    if (documentUrl) {
+      URL.revokeObjectURL(documentUrl);
+      setDocumentUrl('');
+    }
+    setViewerZoom(1);
+    setViewerRotation(0);
+    setIsFullscreen(false);
+    setDocumentError('');
+  };
+
+  const zoomIn = () => setViewerZoom(prev => Math.min(prev + 0.25, 3));
+  const zoomOut = () => setViewerZoom(prev => Math.max(prev - 0.25, 0.25));
+  const resetZoom = () => setViewerZoom(1);
+  const rotateDocument = () => setViewerRotation(prev => (prev + 90) % 360);
+  const toggleFullscreen = () => setIsFullscreen(prev => !prev);
+
+  const downloadDocument = () => {
+    if (documentUrl && viewingDocument) {
+      const link = document.createElement('a');
+      link.href = documentUrl;
+      link.download = viewingDocument.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  const getFileIcon = (fileName: string) => {
+    const extension = fileName.toLowerCase().split('.').pop() || '';
+    const iconMap: { [key: string]: string } = {
+      'pdf': '📄',
+      'jpg': '🖼️',
+      'jpeg': '🖼️', 
+      'png': '🖼️',
+      'gif': '🖼️',
+      'doc': '📝',
+      'docx': '📝',
+      'txt': '📄'
+    };
+    return iconMap[extension] || '📄';
+  };
+
+  const isImageFile = (fileName: string) => {
+    const extension = fileName.toLowerCase().split('.').pop() || '';
+    return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(extension);
+  };
+
+  const isPdfFile = (fileName: string) => {
+    return fileName.toLowerCase().endsWith('.pdf');
   };
 
   const handleFileUpload = async (files: FileList | null) => {
@@ -171,8 +286,61 @@ const HealthRecordsPage: React.FC = () => {
     return names[type as keyof typeof names] || names.other;
   };
 
-  const deleteDocument = (id: string) => {
-    setDocuments(documents.filter(doc => doc.id !== id));
+  // 🗑️ NUCLEAR DELETE SYSTEM!
+  const showDeleteConfirmation = (document: Document) => {
+    setDocumentToDelete(document);
+    setShowDeleteModal(true);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setDocumentToDelete(null);
+    setIsDeleting(false);
+  };
+
+  const confirmDelete = async () => {
+    if (!documentToDelete) return;
+    
+    setIsDeleting(true);
+    
+    try {
+      const token = localStorage.getItem('phb_auth_token') ||
+                   localStorage.getItem('access_token') || 
+                   localStorage.getItem('authToken') ||
+                   localStorage.getItem('med_access_token');
+
+      const response = await fetch(createApiUrl(`api/secure/files/${documentToDelete.id}/delete/`), {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        },
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Remove from frontend state
+        setDocuments(documents.filter(doc => doc.id !== documentToDelete.id));
+        
+        // Close viewer if this document was being viewed
+        if (viewingDocument && viewingDocument.id === documentToDelete.id) {
+          closeDocumentViewer();
+        }
+
+        // Close delete modal
+        setShowDeleteModal(false);
+        setDocumentToDelete(null);
+        
+        // Success feedback - we'll show this in the modal
+      } else {
+        // Error will be shown in the modal
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   // EFFECTS
@@ -253,35 +421,52 @@ const HealthRecordsPage: React.FC = () => {
 
   // MAIN RENDER
   return (
-    <div className="min-h-screen bg-white p-4 md:p-6">
+    <div className="min-h-screen bg-gray-50 p-3 md:p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-6 md:mb-8">
-          <h1 className="text-2xl md:text-4xl font-bold text-gray-900">
+        {/* Mobile-Optimized Header */}
+        <div className="mb-4 md:mb-8">
+          <h1 className="text-xl md:text-4xl font-bold text-gray-900 leading-tight">
             Your Health Records
           </h1>
-          <p className="text-gray-600 mt-1 md:mt-2 text-sm md:text-base">
+          <p className="text-gray-600 mt-1 text-xs md:text-base">
             Your medical documents are safe and secure
           </p>
         </div>
 
+        {/* Mobile-Enhanced Security Notice */}
+        {documents.some(doc => doc.isSecure) && (
+          <div className="mb-4 p-3 md:p-4 bg-blue-50 border border-blue-200 rounded-xl shadow-sm">
+            <div className="flex items-start space-x-2 md:space-x-3">
+              <div className="text-blue-600 text-lg md:text-xl flex-shrink-0 mt-0.5">🔐</div>
+              <div>
+                <h3 className="font-semibold text-blue-900 text-sm md:text-base">Security Upgrade Notice</h3>
+                <p className="text-xs md:text-sm text-blue-700 mt-1 leading-relaxed">
+                  We've enhanced our security system! Some older files may need to be re-uploaded to view them. 
+                  All new uploads will be immediately viewable with our enhanced encryption.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {showUploadForm && (
-          <div className="mb-6 md:mb-8 p-4 md:p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg md:text-xl font-bold text-gray-900">Upload Your Documents</h3>
-              <button onClick={() => setShowUploadForm(false)} className="text-gray-500 hover:text-gray-700">
-                <X className="h-5 w-5 md:h-6 md:w-6" />
+          <div className="mb-4 md:mb-8 p-3 md:p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <h3 className="text-base md:text-xl font-bold text-gray-900">Upload Your Documents</h3>
+              <button onClick={() => setShowUploadForm(false)} className="text-gray-500 hover:text-gray-700 p-1">
+                <X className="h-4 w-4 md:h-6 md:w-6" />
               </button>
             </div>
             
             {!isUploading ? (
-              <div className="border-2 border-dashed border-blue-300 rounded-xl p-6 md:p-8 text-center bg-blue-50">
-                <div className="flex flex-col items-center space-y-3 md:space-y-4">
-                  <Upload className="h-10 w-10 md:h-12 md:w-12 text-blue-600" />
+              <div className="border-2 border-dashed border-blue-300 rounded-xl p-4 md:p-8 text-center bg-blue-50">
+                <div className="flex flex-col items-center space-y-2 md:space-y-4">
+                  <Upload className="h-8 w-8 md:h-12 md:w-12 text-blue-600" />
                   <div>
-                    <h4 className="text-base md:text-lg font-medium text-gray-900 mb-1 md:mb-2">
+                    <h4 className="text-sm md:text-lg font-medium text-gray-900 mb-1">
                       Drag your files here or click to browse
                     </h4>
-                    <p className="text-gray-600 text-sm md:text-base">
+                    <p className="text-gray-600 text-xs md:text-base">
                       PDF, images, and documents are supported
                     </p>
                   </div>
@@ -295,15 +480,15 @@ const HealthRecordsPage: React.FC = () => {
                   />
                   <label
                     htmlFor="file-upload"
-                    className="px-4 py-2 md:px-6 md:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium cursor-pointer flex items-center text-sm md:text-base"
+                    className="px-4 py-2 md:px-6 md:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium cursor-pointer flex items-center text-sm md:text-base transition-all duration-200 hover:shadow-md active:scale-95"
                   >
-                    <Upload className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                    <Upload className="h-3 w-3 md:h-5 md:w-5 mr-2" />
                     Choose Files
                   </label>
                 </div>
               </div>
             ) : (
-              <div className="p-4 md:p-6 bg-blue-50 rounded-lg">
+              <div className="p-3 md:p-6 bg-blue-50 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-medium text-gray-900 text-sm md:text-base">Uploading your file...</span>
                   <span className="text-blue-600 font-medium text-sm md:text-base">{uploadProgress}%</span>
@@ -325,11 +510,12 @@ const HealthRecordsPage: React.FC = () => {
           </div>
         )}
 
-        <div className="mb-6 md:mb-8 space-y-4 md:space-y-0 md:flex md:items-center md:justify-between">
-          <div className="flex flex-col space-y-3 md:space-y-0 md:flex-row md:items-center md:space-x-4">
+        {/* Mobile-Enhanced Action Bar */}
+        <div className="mb-4 md:mb-8 space-y-3 md:space-y-0 md:flex md:items-center md:justify-between">
+          <div className="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center md:space-x-4">
             <button
               onClick={() => setShowUploadForm(!showUploadForm)}
-              className="w-full md:w-auto px-4 py-2 md:px-6 md:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center justify-center text-sm md:text-base"
+              className="w-full md:w-auto px-4 py-3 md:px-6 md:py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium flex items-center justify-center text-sm md:text-base transition-all duration-200 hover:shadow-lg active:scale-95"
             >
               <Plus className="h-4 w-4 md:h-5 md:w-5 mr-2" />
               Upload Document
@@ -342,9 +528,9 @@ const HealthRecordsPage: React.FC = () => {
               placeholder="Search your documents..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full md:w-80 pl-9 pr-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm md:text-base"
+              className="w-full md:w-80 pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm md:text-base bg-white shadow-sm"
             />
-            <Search className="absolute left-3 top-2.5 md:top-3.5 h-4 w-4 md:h-5 md:w-5 text-gray-400" />
+            <Search className="absolute left-3 top-3.5 h-4 w-4 md:h-5 md:w-5 text-gray-400" />
           </div>
         </div>
 
@@ -415,17 +601,25 @@ const HealthRecordsPage: React.FC = () => {
                       </td>
                       <td className="px-3 py-3 md:px-6 md:py-4">
                         <div className="flex items-center space-x-2 md:space-x-3">
-                          <button className="text-blue-600 hover:text-blue-900 font-medium text-xs md:text-sm">
+                          <button 
+                            onClick={() => viewDocument(doc)}
+                            className="text-blue-600 hover:text-blue-900 font-medium text-xs md:text-sm hover:bg-blue-50 p-2 rounded-lg transition-all duration-200 flex items-center space-x-1"
+                            title="View document"
+                          >
                             <Eye className="h-3 w-3 md:h-4 md:w-4" />
+                            <span className="hidden md:inline">View</span>
                           </button>
-                          <button className="text-green-600 hover:text-green-900 font-medium text-xs md:text-sm">
+                          <button className="text-green-600 hover:text-green-900 font-medium text-xs md:text-sm hover:bg-green-50 p-2 rounded-lg transition-all duration-200 flex items-center space-x-1">
                             <Share2 className="h-3 w-3 md:h-4 md:w-4" />
+                            <span className="hidden md:inline">Share</span>
                           </button>
                           <button
-                            onClick={() => deleteDocument(doc.id)}
-                            className="text-red-600 hover:text-red-900 font-medium text-xs md:text-sm"
+                            onClick={() => showDeleteConfirmation(doc)}
+                            className="text-red-600 hover:text-red-900 font-medium text-xs md:text-sm hover:bg-red-50 p-2 rounded-lg transition-all duration-200 flex items-center space-x-1"
+                            title="Delete document"
                           >
                             <Trash2 className="h-3 w-3 md:h-4 md:w-4" />
+                            <span className="hidden md:inline">Delete</span>
                           </button>
                         </div>
                       </td>
@@ -494,6 +688,240 @@ const HealthRecordsPage: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* 🗑️ BEAUTIFUL DELETE CONFIRMATION MODAL */}
+        {showDeleteModal && documentToDelete && (
+          <div className="fixed inset-0 z-50 p-4 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
+            <div className="bg-white rounded-xl shadow-2xl overflow-hidden w-full max-w-md">
+              {/* Header */}
+              <div className="bg-red-50 px-6 py-4 border-b border-red-100">
+                <div className="flex items-center space-x-3">
+                  <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                    <Trash2 className="h-5 w-5 text-red-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-red-900">Delete Document</h3>
+                    <p className="text-sm text-red-700">This action cannot be undone</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="px-6 py-6">
+                <div className="mb-4">
+                  <p className="text-gray-700 text-sm mb-3">
+                    Are you sure you want to permanently delete this document?
+                  </p>
+                  
+                  {/* Document Info */}
+                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <div className="flex items-center space-x-3">
+                      <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <FileText className="h-4 w-4 text-blue-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {documentToDelete.name}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {documentToDelete.size} • {documentToDelete.source}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                  <div className="flex items-start space-x-2">
+                    <div className="text-yellow-600 text-lg">⚠️</div>
+                    <div>
+                      <p className="text-sm font-medium text-yellow-800">Warning</p>
+                      <p className="text-xs text-yellow-700">
+                        This will permanently remove the document from your medical records. 
+                        You'll need to re-upload it if you want to access it again.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-end space-x-3">
+                <button
+                  onClick={cancelDelete}
+                  disabled={isDeleting}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  disabled={isDeleting}
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                >
+                  {isDeleting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Deleting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="h-4 w-4" />
+                      <span>Delete Forever</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 🚀 NUCLEAR DOCUMENT VIEWER MODAL! */}
+        {viewingDocument && (
+          <div className={`fixed inset-0 z-50 ${isFullscreen ? 'p-0' : 'p-4'} bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center`}>
+            <div className={`bg-white rounded-xl shadow-2xl overflow-hidden ${isFullscreen ? 'w-full h-full' : 'w-full max-w-6xl h-5/6'} flex flex-col`}>
+              {/* Header */}
+              <div className="bg-gray-50 px-4 md:px-6 py-3 md:py-4 border-b border-gray-200 flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="text-2xl">{getFileIcon(viewingDocument.name)}</div>
+                  <div>
+                    <h3 className="text-lg md:text-xl font-bold text-gray-900 truncate">{viewingDocument.name}</h3>
+                    <p className="text-sm text-gray-600">{viewingDocument.size} • {viewingDocument.source}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  {/* Zoom Controls */}
+                  <div className="hidden md:flex items-center space-x-1 bg-white rounded-lg border border-gray-300 p-1">
+                    <button onClick={zoomOut} className="p-1 hover:bg-gray-100 rounded" title="Zoom out">
+                      <ZoomOut className="h-4 w-4" />
+                    </button>
+                    <span className="px-2 text-sm font-medium text-gray-700">{Math.round(viewerZoom * 100)}%</span>
+                    <button onClick={zoomIn} className="p-1 hover:bg-gray-100 rounded" title="Zoom in">
+                      <ZoomIn className="h-4 w-4" />
+                    </button>
+                    <button onClick={resetZoom} className="p-1 hover:bg-gray-100 rounded text-xs px-2" title="Reset zoom">
+                      Reset
+                    </button>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <button onClick={rotateDocument} className="p-2 hover:bg-gray-100 rounded-lg" title="Rotate">
+                    <RotateCw className="h-4 w-4 md:h-5 md:w-5" />
+                  </button>
+                  <button onClick={downloadDocument} className="p-2 hover:bg-gray-100 rounded-lg" title="Download">
+                    <Download className="h-4 w-4 md:h-5 md:w-5" />
+                  </button>
+                  <button onClick={toggleFullscreen} className="p-2 hover:bg-gray-100 rounded-lg" title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}>
+                    {isFullscreen ? <Minimize2 className="h-4 w-4 md:h-5 md:w-5" /> : <Maximize2 className="h-4 w-4 md:h-5 md:w-5" />}
+                  </button>
+                  <button onClick={closeDocumentViewer} className="p-2 hover:bg-gray-100 rounded-lg" title="Close">
+                    <X className="h-4 w-4 md:h-5 md:w-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 overflow-hidden bg-gray-100 relative">
+                {isLoadingDocument ? (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <Loader2 className="h-8 w-8 md:h-12 md:w-12 animate-spin text-blue-600 mx-auto mb-4" />
+                      <p className="text-lg font-medium text-gray-900">Loading document...</p>
+                      <p className="text-gray-600">Decrypting secure medical file</p>
+                    </div>
+                  </div>
+                ) : documentError ? (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center bg-white p-8 rounded-lg shadow-lg max-w-md mx-4">
+                      <div className="text-red-500 text-6xl mb-4">🔐</div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">File Recovery Needed</h3>
+                      <p className="text-gray-600 mb-4 text-sm">
+                        This file was encrypted with an older security system. To view it, please re-upload the document.
+                      </p>
+                      <div className="space-y-3">
+                        <button 
+                          onClick={() => {
+                            closeDocumentViewer();
+                            setShowUploadForm(true);
+                          }}
+                          className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center"
+                        >
+                          <Upload className="h-4 w-4 mr-2" />
+                          Re-upload Document
+                        </button>
+                        <button 
+                          onClick={closeDocumentViewer}
+                          className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                        >
+                          Close
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-3">
+                        New uploads use enhanced security and will be viewable immediately.
+                      </p>
+                    </div>
+                  </div>
+                ) : documentUrl ? (
+                  <div className="h-full overflow-auto p-4">
+                    <div className="flex justify-center">
+                      {isPdfFile(viewingDocument.name) ? (
+                        <iframe
+                          src={documentUrl}
+                          className="w-full h-full min-h-[600px] border-2 border-gray-300 rounded-lg shadow-lg"
+                          style={{
+                            transform: `scale(${viewerZoom}) rotate(${viewerRotation}deg)`,
+                            transformOrigin: 'center center'
+                          }}
+                          title={viewingDocument.name}
+                        />
+                      ) : isImageFile(viewingDocument.name) ? (
+                        <img
+                          src={documentUrl}
+                          alt={viewingDocument.name}
+                          className="max-w-full max-h-full object-contain border-2 border-gray-300 rounded-lg shadow-lg"
+                          style={{
+                            transform: `scale(${viewerZoom}) rotate(${viewerRotation}deg)`,
+                            transformOrigin: 'center center'
+                          }}
+                        />
+                      ) : (
+                        <div className="text-center bg-white p-8 rounded-lg shadow-lg">
+                          <div className="text-6xl mb-4">{getFileIcon(viewingDocument.name)}</div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">{viewingDocument.name}</h3>
+                          <p className="text-gray-600 mb-4">This file type cannot be previewed directly.</p>
+                          <button 
+                            onClick={downloadDocument}
+                            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center mx-auto"
+                          >
+                            <Download className="h-5 w-5 mr-2" />
+                            Download to View
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+
+              {/* Mobile Zoom Controls */}
+              <div className="md:hidden bg-gray-50 px-4 py-3 border-t border-gray-200 flex items-center justify-center space-x-4">
+                <button onClick={zoomOut} className="p-2 bg-white rounded-lg border border-gray-300" title="Zoom out">
+                  <ZoomOut className="h-4 w-4" />
+                </button>
+                <span className="px-3 py-1 bg-white rounded-lg border border-gray-300 text-sm font-medium">
+                  {Math.round(viewerZoom * 100)}%
+                </span>
+                <button onClick={zoomIn} className="p-2 bg-white rounded-lg border border-gray-300" title="Zoom in">
+                  <ZoomIn className="h-4 w-4" />
+                </button>
+                <button onClick={resetZoom} className="px-3 py-2 bg-white rounded-lg border border-gray-300 text-sm" title="Reset zoom">
+                  Reset
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
