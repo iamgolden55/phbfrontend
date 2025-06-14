@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import SearchModal from './SearchModal';
 
 interface CompactSearchBarProps {
@@ -29,9 +29,15 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
     };
   }, []);
 
-  const handleSearchClick = () => {
-    setIsModalOpen(true);
-  };
+  const handleSearchClick = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
+    // Prevent any default behavior and stop propagation
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    // Ensure modal is opened with a slight delay for mobile
+    setTimeout(() => setIsModalOpen(true), 10);
+  }, []);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -41,53 +47,43 @@ const CompactSearchBar: React.FC<CompactSearchBarProps> = ({
     <>
       {/* Compact Search Trigger */}
       <div 
-        className={`${className} cursor-pointer`}
+        className={`${className} inline-flex cursor-pointer`}
         onClick={handleSearchClick}
+        onTouchEnd={handleSearchClick}
+        role="button"
+        tabIndex={0}
+        aria-label="Search"
+        title="Search (⌘K)"
       >
         <div className={`
-          relative flex items-center rounded-2xl transition-all duration-300 ease-out group
+          relative flex items-center justify-center rounded-full transition-all duration-200 ease-out
           ${isDarkMode 
-            ? 'bg-gray-800/70 border-gray-700/50 text-white hover:bg-gray-800/90' 
-            : 'bg-gray-100/80 border-gray-200/50 text-gray-900 hover:bg-gray-100'
+            ? 'text-gray-400 hover:text-gray-300' 
+            : 'text-gray-500 hover:text-gray-700'
           }
           ${isProfessionalView 
-            ? 'bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm' 
+            ? 'text-white/70 hover:text-white' 
             : ''
           }
-          border hover:shadow-lg hover:scale-[1.02] px-4 py-3
         `}>
           {/* Search Icon */}
-          <div className="flex items-center">
+          <div className="flex items-center justify-center">
             <svg 
-              className={`w-5 h-5 transition-colors duration-200 ${
+              className={`w-4 h-4 transition-colors duration-200 ${
                 isDarkMode ? 'text-gray-400 group-hover:text-gray-300' : 'text-gray-500 group-hover:text-gray-700'
               } ${isProfessionalView ? 'text-white/70 group-hover:text-white' : ''}`}
               fill="none" 
               viewBox="0 0 24 24" 
-              strokeWidth={1.5} 
+              strokeWidth={2.5} 
               stroke="currentColor"
+              aria-hidden="true"
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
             </svg>
           </div>
-
-          {/* Search Text */}
-          <span className={`ml-3 text-sm font-medium transition-colors duration-200 ${
-            isDarkMode ? 'text-gray-400 group-hover:text-gray-300' : 'text-gray-500 group-hover:text-gray-700'
-          } ${isProfessionalView ? 'text-white/70 group-hover:text-white' : ''}`}>
-            Search PHB...
+          <span className={`ml-1 text-xs font-medium opacity-75 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} ${isProfessionalView ? 'text-white/60' : ''}`}>
+            ⌘K
           </span>
-
-          {/* Keyboard Shortcut Hint */}
-          <div className={`ml-auto flex items-center text-xs font-medium ${
-            isDarkMode ? 'text-gray-500' : 'text-gray-400'
-          } ${isProfessionalView ? 'text-white/50' : ''}`}>
-            <kbd className={`px-2 py-1 rounded ${
-              isDarkMode ? 'bg-gray-700/50' : 'bg-gray-200/50'
-            } ${isProfessionalView ? 'bg-white/10' : ''}`}>
-              ⌘K
-            </kbd>
-          </div>
         </div>
       </div>
 
