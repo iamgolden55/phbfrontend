@@ -72,6 +72,12 @@ import MealPlansPage from './pages/live-well/healthy-eating/MealPlansPage';
 import ExercisePage from './pages/live-well/ExercisePage';
 import MentalWellbeingPage from './pages/live-well/MentalWellbeingPage';
 import SleepPage from './pages/live-well/SleepPage';
+import QuitSmokingPage from './pages/live-well/QuitSmokingPage';
+import BehavioralSupportPage from './pages/live-well/quit-smoking/BehavioralSupportPage';
+import NicotineReplacementPage from './pages/live-well/quit-smoking/NicotineReplacementPage';
+import PrescriptionMedicationsPage from './pages/live-well/quit-smoking/PrescriptionMedicationsPage';
+import CopingStrategiesPage from './pages/live-well/quit-smoking/CopingStrategiesPage';
+import HealthBenefitsPage from './pages/live-well/quit-smoking/HealthBenefitsPage';
 // Programs Pages
 import ProgramsPage from './pages/programs/ProgramsPage';
 import StudentRecruitmentPage from './pages/programs/StudentRecruitmentPage';
@@ -407,6 +413,12 @@ function App() {
                 <Route path="live-well/exercise" element={<ExercisePage />} />
                 <Route path="live-well/mental-wellbeing" element={<MentalWellbeingPage />} />
                 <Route path="live-well/sleep" element={<SleepPage />} />
+                <Route path="live-well/quit-smoking" element={<QuitSmokingPage />} />
+                <Route path="live-well/quit-smoking/behavioral-support" element={<BehavioralSupportPage />} />
+                <Route path="live-well/quit-smoking/nicotine-replacement" element={<NicotineReplacementPage />} />
+                <Route path="live-well/quit-smoking/prescription-medications" element={<PrescriptionMedicationsPage />} />
+                <Route path="live-well/quit-smoking/coping-strategies" element={<CopingStrategiesPage />} />
+                <Route path="live-well/quit-smoking/health-benefits" element={<HealthBenefitsPage />} />
 
                 {/* Programs Routes */}
                 <Route path="programs" element={<ProgramsPage />} />
