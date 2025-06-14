@@ -73,6 +73,7 @@ import ExercisePage from './pages/live-well/ExercisePage';
 import MentalWellbeingPage from './pages/live-well/MentalWellbeingPage';
 import SleepPage from './pages/live-well/SleepPage';
 import QuitSmokingPage from './pages/live-well/QuitSmokingPage';
+import LiveWellSexualHealthPage from './pages/live-well/SexualHealthPage';
 import BehavioralSupportPage from './pages/live-well/quit-smoking/BehavioralSupportPage';
 import NicotineReplacementPage from './pages/live-well/quit-smoking/NicotineReplacementPage';
 import PrescriptionMedicationsPage from './pages/live-well/quit-smoking/PrescriptionMedicationsPage';
@@ -413,6 +414,7 @@ function App() {
                 <Route path="live-well/exercise" element={<ExercisePage />} />
                 <Route path="live-well/mental-wellbeing" element={<MentalWellbeingPage />} />
                 <Route path="live-well/sleep" element={<SleepPage />} />
+                <Route path="live-well/sexual-health" element={<LiveWellSexualHealthPage />} />
                 <Route path="live-well/quit-smoking" element={<QuitSmokingPage />} />
                 <Route path="live-well/quit-smoking/behavioral-support" element={<BehavioralSupportPage />} />
                 <Route path="live-well/quit-smoking/nicotine-replacement" element={<NicotineReplacementPage />} />
