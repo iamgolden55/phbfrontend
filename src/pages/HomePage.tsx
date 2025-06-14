@@ -31,7 +31,7 @@ const HomePage: React.FC = () => {
     },
     {
       href: '/about#phb-number',
-      text: 'Find your PHB number',
+      text: 'Find your HPN number',
     },
   ];
 

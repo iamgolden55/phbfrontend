@@ -330,9 +330,42 @@ const HospitalStats: React.FC<HospitalStatsProps> = ({
   // Use the admission data hook to get the correct patient count
   const { admissions = [], loading: admissionsLoading } = useAdmissionData();
 
-  // Use REAL data if available, otherwise fallback to mock data
+  // Use REAL data if available, otherwise fallback to loading states
   const displayStats = React.useMemo<DisplayStats>(() => {
-    // Loading state
+    console.log('🏥 Computing display stats:', {
+      departmentLoading,
+      admissionsLoading,
+      departmentStats,
+      admissions: admissions?.length,
+    });
+
+    // If we have department stats, use them immediately regardless of loading state
+    if (departmentStats && !departmentError) {
+      console.log('🏥 Using REAL department stats:', departmentStats);
+      
+      // Count active admissions
+      const activeAdmissions = admissions.filter(
+        adm => adm.status.toLowerCase() === 'admitted'
+      ).length;
+      
+      return {
+        activePatients: activeAdmissions,
+        availableBeds: departmentStats.availableBeds,
+        totalBeds: departmentStats.totalBeds,
+        scheduledSurgeries: stats?.scheduledSurgeries || 15,
+        staffOnDuty: departmentStats.totalStaff,
+        trendPatients: { 
+          trend: (activeAdmissions / Math.max(1, departmentStats.totalBeds) * 100) > 70 ? 'up' as const : 'down' as const, 
+          value: `${Math.round((activeAdmissions / Math.max(1, departmentStats.totalBeds)) * 100) || 0}% capacity` 
+        },
+        trendBeds: { 
+          trend: departmentStats.overallBedUtilization < 80 ? 'down' as const : 'up' as const, 
+          value: `${departmentStats.overallBedUtilization.toFixed(1)}% occupied` 
+        },
+      };
+    }
+
+    // Loading state - but keep trying
     if (departmentLoading || admissionsLoading) {
       return {
         activePatients: '...',
@@ -345,75 +378,30 @@ const HospitalStats: React.FC<HospitalStatsProps> = ({
       };
     }
 
-    // Error state or no department stats
-    if (departmentError || !departmentStats) {
-      console.error('Error loading department stats:', departmentError);
-      return {
-        activePatients: 'N/A',
-        availableBeds: 'N/A',
-        totalBeds: 'N/A',
-        scheduledSurgeries: stats?.scheduledSurgeries || 15,
-        staffOnDuty: 'N/A',
-        trendPatients: { trend: 'up' as Trend, value: 'Error loading data' },
-        trendBeds: { trend: 'down' as Trend, value: 'Error loading data' },
-      };
-    }
-
-    try {
-      // Use real bed data from department stats
-      const totalBeds = departmentStats?.totalBeds || 0;
-      const availableBeds = (departmentStats?.totalBeds - (departmentStats?.occupiedBeds / 2)) || 0;
-      const bedUtilization = departmentStats?.overallBedUtilization || 0;
-      const totalStaff = departmentStats?.totalStaff || 0;
-      
-      // Calculate occupied beds (ensure it's not negative)
-      const occupiedBeds = Math.max(0, totalBeds - availableBeds);
-      
-      // Count active admissions - check for both lowercase and capitalized status
-      const activeAdmissions = admissions.filter(
-        adm => adm.status.toLowerCase() === 'admitted'
-      ).length;
-      
-      return {
-        activePatients: activeAdmissions,
-        availableBeds: availableBeds,
-        totalBeds: totalBeds,
-        scheduledSurgeries: stats?.scheduledSurgeries || 15,
-        staffOnDuty: totalStaff,
-        trendPatients: { 
-          trend: (activeAdmissions / Math.max(1, totalBeds) * 100) > 70 ? 'up' as const : 'down' as const, 
-          value: `${Math.round((activeAdmissions / Math.max(1, totalBeds)) * 100) || 0}% capacity` 
-        },
-        trendBeds: { 
-          trend: bedUtilization < 80 ? 'down' as const : 'up' as const, 
-          value: `${bedUtilization.toFixed(1)}% occupied` 
-        },
-      };
-    } catch (error) {
-      console.error('Error processing department stats:', error);
-      return {
-        activePatients: 'Error',
-        availableBeds: 'Error',
-        totalBeds: 'Error',
-        scheduledSurgeries: stats?.scheduledSurgeries || 15,
-        staffOnDuty: 'Error',
-        trendPatients: { trend: 'down' as Trend, value: 'Data error' },
-        trendBeds: { trend: 'down' as Trend, value: 'Data error' },
-      };
-    }
-  }, [departmentStats, departmentLoading, departmentError, stats]);
+    // Error state
+    console.error('🏥 Display stats error state:', departmentError);
+    return {
+      activePatients: 'Error',
+      availableBeds: 'Error',
+      totalBeds: 'Error',
+      scheduledSurgeries: stats?.scheduledSurgeries || 15,
+      staffOnDuty: 'Error',
+      trendPatients: { trend: 'down' as Trend, value: 'Data error' },
+      trendBeds: { trend: 'down' as Trend, value: 'Data error' },
+    };
+  }, [departmentStats, departmentLoading, departmentError, admissions, admissionsLoading, stats]);
 
   // 🔥 Show critical alerts
   const criticalAlerts = departmentStats?.criticalAlerts;
   const showUrgentAlert = criticalAlerts?.lowBedAvailability || (criticalAlerts?.understaffedDepartments && criticalAlerts.understaffedDepartments.length > 0);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+    <div className="mb-8">
       {/* 🔥 Critical Alert Banner */}
       {showUrgentAlert && (
-        <div className="lg:col-span-5 mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
           <div className="flex items-center">
-            <span className="material-icons text-red-500 mr-2">priority_high</span>
+            <span className="material-icons text-red-500 mr-3 text-2xl">priority_high</span>
             <div>
               <p className="text-sm font-medium text-red-800">Critical Alert</p>
               <p className="text-xs text-red-700">
@@ -426,65 +414,134 @@ const HospitalStats: React.FC<HospitalStatsProps> = ({
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {/* Active Patients */}
-        <StatCard 
-          label="Active Admitted Patients" 
-          value={typeof displayStats.activePatients === 'number' ? displayStats.activePatients.toLocaleString() : displayStats.activePatients} 
-          icon="personal_injury"
-          trend={displayStats.trendPatients.trend}
-          trendValue={displayStats.trendPatients.value}
-        />
+      {/* Enhanced Desktop Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        {/* Active Patients - Enhanced Card */}
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl shadow-lg border border-blue-200 hover:shadow-xl transition-all duration-300">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-blue-500 rounded-xl">
+              <span className="material-icons text-white text-2xl">personal_injury</span>
+            </div>
+            <div className={`flex items-center text-sm px-3 py-1 rounded-full ${
+              displayStats.trendPatients.trend === 'up' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+            }`}>
+              <span className="material-icons text-xs mr-1">
+                {displayStats.trendPatients.trend === 'up' ? 'trending_up' : 'trending_down'}
+              </span>
+              <span className="font-medium">
+                {typeof displayStats.activePatients === 'number' ? `${displayStats.activePatients} admitted` : 'Loading'}
+              </span>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <p className="text-3xl font-bold text-blue-800">
+              {typeof displayStats.activePatients === 'number' ? displayStats.activePatients.toLocaleString() : displayStats.activePatients}
+            </p>
+            <p className="text-sm font-medium text-blue-700">Active Admitted Patients</p>
+            <p className="text-xs text-blue-600">{displayStats.trendPatients.value}</p>
+          </div>
+        </div>
         
-        {/* Available Beds */}
-        <StatCard 
-          label="Available Beds" 
-          value={
-            typeof displayStats.availableBeds === 'number' && typeof displayStats.totalBeds === 'number'
-              ? `${displayStats.availableBeds} / ${displayStats.totalBeds}`
-              : `${displayStats.availableBeds} / ${displayStats.totalBeds}`
-          } 
-          icon="hotel"
-          trend={displayStats.trendBeds.trend}
-          trendValue={
-            typeof displayStats.availableBeds === 'number' 
-              ? `${displayStats.availableBeds} available` 
-              : 'Data unavailable'
-          }
-        />
+        {/* Available Beds - Enhanced Card */}
+        <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-2xl shadow-lg border border-green-200 hover:shadow-xl transition-all duration-300">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-green-500 rounded-xl">
+              <span className="material-icons text-white text-2xl">hotel</span>
+            </div>
+            <div className="flex items-center text-sm px-3 py-1 rounded-full bg-green-100 text-green-700">
+              <span className="material-icons text-xs mr-1">check_circle</span>
+              <span className="font-medium">Available</span>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <p className="text-3xl font-bold text-green-800">
+              {typeof displayStats.availableBeds === 'number' && typeof displayStats.totalBeds === 'number'
+                ? `${displayStats.availableBeds} / ${displayStats.totalBeds}`
+                : `${displayStats.availableBeds} / ${displayStats.totalBeds}`}
+            </p>
+            <p className="text-sm font-medium text-green-700">Available Beds</p>
+            <p className="text-xs text-green-600">
+              {typeof displayStats.availableBeds === 'number' 
+                ? `${displayStats.availableBeds} beds ready` 
+                : 'Loading availability'}
+            </p>
+          </div>
+        </div>
         
-        {/* Bed Utilization */}
-        <StatCard 
-          label="Bed Utilization" 
-          value={displayStats.trendBeds.value} 
-          icon="airline_seat_recline_extra"
-          trend={displayStats.trendBeds.trend}
-          trendValue={
-            typeof displayStats.availableBeds === 'number' && typeof displayStats.totalBeds === 'number'
-              ? `${Math.max(0, displayStats.totalBeds - displayStats.availableBeds)} occupied`
-              : 'Occupied data unavailable'
-          }
-        />
+        {/* Bed Utilization - Enhanced Card */}
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl shadow-lg border border-purple-200 hover:shadow-xl transition-all duration-300">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-purple-500 rounded-xl">
+              <span className="material-icons text-white text-2xl">airline_seat_recline_extra</span>
+            </div>
+            <div className={`flex items-center text-sm px-3 py-1 rounded-full ${
+              displayStats.trendBeds.trend === 'up' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'
+            }`}>
+              <span className="material-icons text-xs mr-1">
+                {displayStats.trendBeds.trend === 'up' ? 'trending_up' : 'trending_down'}
+              </span>
+              <span className="font-medium">
+                {displayStats.trendBeds.trend === 'up' ? 'High' : 'Good'}
+              </span>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <p className="text-3xl font-bold text-purple-800">{displayStats.trendBeds.value}</p>
+            <p className="text-sm font-medium text-purple-700">Bed Utilization</p>
+            <p className="text-xs text-purple-600">
+              {typeof displayStats.availableBeds === 'number' && typeof displayStats.totalBeds === 'number'
+                ? `${Math.max(0, displayStats.totalBeds - displayStats.availableBeds)} occupied`
+                : 'Calculating occupancy'}
+            </p>
+          </div>
+        </div>
         
-        {/* Staff On Duty */}
-        <StatCard 
-          label="Staff On Duty" 
-          value={
-            typeof displayStats.staffOnDuty === 'number' 
-              ? displayStats.staffOnDuty.toLocaleString() 
-              : displayStats.staffOnDuty
-          } 
-          icon="groups"
-        />
+        {/* Staff On Duty - Enhanced Card */}
+        <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-2xl shadow-lg border border-indigo-200 hover:shadow-xl transition-all duration-300">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-indigo-500 rounded-xl">
+              <span className="material-icons text-white text-2xl">groups</span>
+            </div>
+            <div className="flex items-center text-sm px-3 py-1 rounded-full bg-indigo-100 text-indigo-700">
+              <span className="material-icons text-xs mr-1">schedule</span>
+              <span className="font-medium">On Duty</span>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <p className="text-3xl font-bold text-indigo-800">
+              {typeof displayStats.staffOnDuty === 'number' 
+                ? displayStats.staffOnDuty.toLocaleString() 
+                : displayStats.staffOnDuty}
+            </p>
+            <p className="text-sm font-medium text-indigo-700">Staff On Duty</p>
+            <p className="text-xs text-indigo-600">Across all departments</p>
+          </div>
+        </div>
+
+        {/* Approved Registrations - Enhanced Card */}
+        <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-2xl shadow-lg border border-orange-200 hover:shadow-xl transition-all duration-300">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-orange-500 rounded-xl">
+              <span className="material-icons text-white text-2xl">how_to_reg</span>
+            </div>
+            <div className="flex items-center text-sm px-3 py-1 rounded-full bg-orange-100 text-orange-700">
+              <span className="material-icons text-xs mr-1">trending_up</span>
+              <span className="font-medium">New</span>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <p className="text-3xl font-bold text-orange-800">
+              {approvedRegistrations?.toString() || 'N/A'}
+            </p>
+            <p className="text-sm font-medium text-orange-700">Approved Registrations</p>
+            <p className="text-xs text-orange-600">
+              <Link to="/organization/user-registrations" className="hover:underline">
+                View all registrations →
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
-      {/* 🎉 Registered Users Stats */}
-      <StatCard
-        label="Approved Registrations"
-        value={approvedRegistrations?.toString() || 'N/A'}
-        icon="how_to_reg"
-        trend="up"
-        trendValue="View all registrations"
-      />
     </div>
   );
 };
@@ -823,33 +880,78 @@ const HospitalDashboard: React.FC<HospitalDashboardProps> = ({ userData }) => {
   
   // Use INITIAL_STATS instead of MOCK_STATS
   const stats = INITIAL_STATS;
-  // Log user data for debugging
-  console.log('🏥 Current Hospital Dashboard User Data:', userData);
-  console.log('🏥 Hospital Info:', userData?.hospital);
   
   // Use the registration stats hook
   const registrationStats = useRegistrationStats();
   
-  // Use the department stats hook
+  // Use the department stats hook with enhanced error handling
   const { 
     stats: departmentStats, 
     loading: departmentLoading, 
-    error: departmentError 
+    error: departmentError,
+    refetch: refetchDepartmentStats
   } = useDepartmentStats();
   
-  // Log department stats for debugging
+  // Enhanced debugging
   React.useEffect(() => {
-    console.log('🏥 Department Stats:', { 
-      departmentStats, 
-      departmentLoading, 
-      departmentError 
+    console.log('🏥 Hospital Dashboard Auth Debug:', {
+      userDataAvailable: !!userData,
+      userRole: userData?.role,
+      hospitalId: userData?.hospital?.id,
+      hospitalName: userData?.hospital?.name,
     });
-  }, [departmentStats, departmentLoading, departmentError]);
+    
+    console.log('🏥 Department Stats Debug:', {
+      departmentStats,
+      departmentLoading,
+      departmentError,
+    });
+  }, [userData, departmentStats, departmentLoading, departmentError]);
+  
+  // Unified loading state - wait for critical data
+  const [isDataReady, setIsDataReady] = React.useState(false);
+  
+  React.useEffect(() => {
+    // Enhanced debug logging
+    console.log('🏥 Dashboard State Check:', {
+      departmentLoading,
+      staffLoading,
+      staffError,
+      userData: !!userData,
+      departmentStats: !!departmentStats,
+      departmentError,
+    });
+
+    // More lenient data ready check - don't wait for everything
+    const criticalDataReady = !departmentLoading || departmentStats !== null;
+    
+    if (criticalDataReady && userData) {
+      console.log('🏥 Setting dashboard as ready!');
+      // Immediate update - no delay needed since data is already loaded
+      setIsDataReady(true);
+    }
+  }, [departmentLoading, staffLoading, staffError, userData, departmentStats]);
+
+  // Add error recovery mechanism - NO MORE REFRESH!
+  const retryDataLoading = React.useCallback(() => {
+    console.log('🔄 Retrying data loading WITHOUT refresh...');
+    setIsDataReady(false);
+    
+    // Just retry the data fetch, don't refresh the page
+    if (refetchDepartmentStats) {
+      refetchDepartmentStats();
+    }
+    
+    // Reset the data ready state after a short delay
+    setTimeout(() => {
+      setIsDataReady(true);
+    }, 1000);
+  }, [refetchDepartmentStats]);
   
   // If user data is not available, show loading state
   if (!userData) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading hospital data...</p>
@@ -858,21 +960,43 @@ const HospitalDashboard: React.FC<HospitalDashboardProps> = ({ userData }) => {
     );
   }
 
-  return (
-    <div className="px-2 sm:px-0">
-      {/* Debug Hospital Info - Remove this after identifying the hospital */}
-      <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <h3 className="text-sm font-medium text-yellow-800 mb-2">🏥 Current Hospital Session:</h3>
-        <p className="text-sm text-yellow-700">
-          Hospital: {userData?.hospital?.name || 'Not found'} 
-          {userData?.hospital?.id && ` (ID: ${userData.hospital.id})`}
-        </p>
-        <p className="text-xs text-yellow-600 mt-1">
-          User: {userData?.email || 'Not found'}
-        </p>
+  // Show loading until critical data is ready
+  if (!isDataReady && !departmentStats) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-blue-600 font-medium">Loading dashboard data...</p>
+          <p className="mt-2 text-gray-500 text-sm">This may take a few moments</p>
+          
+          {/* Show debug info for data loading issues */}
+          {departmentError && (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg max-w-md mx-auto">
+              <p className="text-red-600 text-sm font-medium">Data Loading Error:</p>
+              <p className="text-red-500 text-xs mt-1">{departmentError}</p>
+              <button
+                onClick={retryDataLoading}
+                className="mt-2 px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
+              >
+                Retry Loading
+              </button>
+            </div>
+          )}
+          
+          {/* Show what data we have */}
+          <div className="mt-4 text-xs text-gray-500">
+            Debug: Departments loaded: {departmentStats ? 'Yes' : 'No'}, 
+            Loading: {departmentLoading ? 'Yes' : 'No'},
+            Error: {departmentError || 'None'}
+          </div>
+        </div>
       </div>
+    );
+  }
 
-      {/* 🛏️ BED MAGIC STATS */}
+  return (
+    <div className="space-y-6">{/* Improved spacing and removed debug box */}
+      {/* Hospital Stats - Enhanced */}
       <HospitalStats 
         stats={stats} 
         departmentStats={departmentStats}
@@ -880,59 +1004,76 @@ const HospitalDashboard: React.FC<HospitalDashboardProps> = ({ userData }) => {
         error={departmentError}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8 mb-8">
-        <div className="lg:col-span-2">
+      {/* Charts and Notifications Row */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+        <div className="xl:col-span-2">
           <TrendsChart 
             departmentStats={departmentStats}
             loading={departmentLoading}
             error={departmentError}
           />
         </div>
-        <div>
+        <div className="xl:col-span-1">
           <Notifications notifications={MOCK_NOTIFICATIONS} />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8 mb-8">
-        <div className="lg:col-span-1 space-y-6 sm:space-y-8">
+      {/* Main Content Grid - Enhanced responsive layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {/* Column 1 - Quick Links and Occupancy */}
+        <div className="space-y-6">
           <HospitalQuickLinks />
           <OccupancyChart data={MOCK_OCCUPANCY} />
         </div>
-        <div className="lg:col-span-1 space-y-6 sm:space-y-8">
+        
+        {/* Column 2 - Admissions and Surgery */}
+        <div className="space-y-6">
           <RecentAdmissions admissions={admissions} />
           <SurgeryOverview overview={MOCK_SURGERY_OVERVIEW} />
         </div>
-        <div className="lg:col-span-1 space-y-6 sm:space-y-8">
+        
+        {/* Column 3 - Activities and Staff */}
+        <div className="lg:col-span-2 xl:col-span-1 space-y-6">
           <RecentActivities activities={MOCK_ACTIVITIES} />
-          <div className="space-y-1">
-  {staffLoading ? (
-    <div className="text-center py-4">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-      <p className="mt-2 text-sm text-gray-500">Loading staff data...</p>
-    </div>
-  ) : staffError ? (
-    <div className="text-center py-4 text-red-500">
-      <p>Error loading staff data</p>
-      <button 
-        onClick={() => window.location.reload()}
-        className="mt-2 text-sm text-blue-600 hover:text-blue-800"
-      >
-        Retry
-      </button>
-    </div>
-  ) : availableStaff.length > 0 ? (
-    <StaffOnDuty staff={availableStaff} />
-  ) : (
-    <div className="text-center py-4 text-gray-500">
-      No staff members currently on duty
-    </div>
-  )}
-  <div className="mt-2 text-sm text-right text-blue-600">
-    <Link to="/organization/staff" className="hover:underline">
-      View all staff ({staff.length})
-    </Link>
-  </div>
-</div>
+          <div>
+            {staffLoading ? (
+              <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                <h2 className="text-lg font-semibold text-blue-900 mb-4">Staff On Duty</h2>
+                <div className="text-center py-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                  <p className="mt-2 text-sm text-gray-500">Loading staff data...</p>
+                </div>
+              </div>
+            ) : staffError ? (
+              <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                <h2 className="text-lg font-semibold text-blue-900 mb-4">Staff On Duty</h2>
+                <div className="text-center py-4 text-red-500">
+                  <p>Error loading staff data</p>
+                  <button 
+                    onClick={() => window.location.reload()}
+                    className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+                  >
+                    Retry
+                  </button>
+                </div>
+              </div>
+            ) : availableStaff.length > 0 ? (
+              <StaffOnDuty staff={availableStaff} />
+            ) : (
+              <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                <h2 className="text-lg font-semibold text-blue-900 mb-4">Staff On Duty</h2>
+                <div className="text-center py-4 text-gray-500">
+                  <span className="material-icons text-4xl text-gray-300 mb-2">people_outline</span>
+                  <p>No staff members currently on duty</p>
+                </div>
+              </div>
+            )}
+            <div className="mt-4 text-sm text-right">
+              <Link to="/organization/staff" className="text-blue-600 hover:underline">
+                View all staff ({staff.length})
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -136,19 +136,21 @@ export const useDepartmentStats = (): UseDepartmentStatsReturn => {
 
       // Get auth data from localStorage
       const authData = JSON.parse(localStorage.getItem('organizationAuth') || '{}');
-      console.log('🛏️ Auth data from localStorage:', authData);
+      console.log('🛏️ Full auth data structure:', JSON.stringify(authData, null, 2));
       
-      // Log the full user data structure for debugging
-      const userData = authData?.user || authData?.userData || {};
+      // The userData should be directly accessible from authData
+      const userData = authData?.userData;
       console.log('🛏️ User data from auth:', userData);
       
       // Get hospital ID from the user data structure
       const hospitalId = userData?.hospital?.id;
       
+      console.log('🛏️ Looking for hospital ID in:', userData?.hospital);
+      console.log('🛏️ Available userData keys:', userData ? Object.keys(userData) : 'No userData');
+      
       if (!hospitalId) {
-        console.error('🛏️ No hospital ID found in user data. Available keys:', Object.keys(userData));
-        console.error('🛏️ Full auth data structure:', JSON.stringify(authData, null, 2));
-        throw new Error('No hospital ID found in user data');
+        console.error('🛏️ No hospital ID found. Full userData structure:', JSON.stringify(userData, null, 2));
+        throw new Error(`No hospital ID found. User role: ${userData?.role}, Hospital data: ${JSON.stringify(userData?.hospital)}`);
       }
       
       console.log('🛏️ Found hospital ID:', hospitalId);

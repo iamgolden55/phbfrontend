@@ -24,7 +24,7 @@ const ManageHealthSection: React.FC = () => {
     },
     {
       href: '/find-phb-number',
-      text: 'Find your PHB number',
+      text: 'Find your HPN number',
     },
   ];
 

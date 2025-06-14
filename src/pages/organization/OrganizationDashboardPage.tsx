@@ -2,6 +2,8 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { useOrganizationAuth } from '../../features/organization/organizationAuthContext';
 import { Link } from 'react-router-dom';
+import ErrorBoundary from '../../components/ErrorBoundary';
+import AuthDebugConsole from '../../features/organization/AuthDebugConsole';
 
 // Import the specific dashboard components
 import HospitalDashboard from '../../features/organization/dashboards/HospitalDashboard';
@@ -63,7 +65,7 @@ const EventsSection: React.FC = () => {
 
 // --- Main Dashboard Page Container Component ---
 const OrganizationDashboardPage: React.FC = () => {
-  const { userData, logout } = useOrganizationAuth();
+  const { userData, logout, isLoading, isInitialized } = useOrganizationAuth();
 
   // Determine organization type from user role
   const getOrganizationType = () => {
@@ -98,48 +100,84 @@ const OrganizationDashboardPage: React.FC = () => {
     }
   };
 
+  // Show loading spinner while auth is initializing
+  if (!isInitialized || isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-blue-600 font-medium">Initializing Dashboard...</p>
+          <p className="mt-2 text-gray-500 text-sm">Please wait a moment</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-4 md:p-6 lg:p-8">
+    <div className="min-h-screen bg-gray-50">
+      <AuthDebugConsole />
       <Helmet>
         <title>{formattedType} Dashboard | PHB</title>
-        {/* Include Material Icons Outlined font */}
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
       </Helmet>
 
       {userData ? (
-        <>
-          {/* Header Section - Common for all org dashboards */}
-          <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-blue-800">{formattedType} Dashboard</h1>
-              <p className="mt-1 text-gray-600">
-                Welcome, {userData.full_name} | {userData.hospital?.name || userData.ngo?.name || userData.pharmacy?.name || 'Organization'}
+        <div className="p-4 md:p-6 lg:p-8">
+          {/* Header Section - Improved mobile layout */}
+          <div className="mb-6 bg-white rounded-lg shadow-sm p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+            <div className="flex-1">
+              <h1 className="text-2xl md:text-3xl font-bold text-blue-800">{formattedType} Dashboard</h1>
+              <p className="mt-2 text-gray-600 text-sm md:text-base">
+                Welcome, <span className="font-semibold">{userData.full_name}</span>
+              </p>
+              <p className="text-blue-600 text-sm font-medium">
+                {userData.hospital?.name || userData.ngo?.name || userData.pharmacy?.name || 'Organization'}
               </p>
             </div>
             <button 
               onClick={handleLogout}
-              className="mt-4 sm:mt-0 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 flex items-center transition"
+              className="mt-4 sm:mt-0 px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 flex items-center transition duration-200 shadow-sm"
             >
-              <span className="material-icons-outlined mr-1 text-lg">logout</span> Sign Out
+              <span className="material-icons-outlined mr-2 text-lg">logout</span> 
+              <span className="hidden sm:inline">Sign Out</span>
+              <span className="sm:hidden">Logout</span>
             </button>
           </div>
 
-          {/* Render the Type-Specific Dashboard Content */}
-          {renderSpecificDashboard()}
+          {/* Dashboard Content - Add error boundary */}
+          <ErrorBoundary>
+            <React.Suspense 
+              fallback={
+                <div className="text-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+                  <p className="mt-4 text-gray-600">Loading dashboard content...</p>
+                </div>
+              }
+            >
+              {renderSpecificDashboard()}
+            </React.Suspense>
+          </ErrorBoundary>
 
-          {/* Common Sections Grid (Announcements & Events) */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+          {/* Common Sections Grid - Improved spacing */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
              <AnnouncementsSection />
              <EventsSection />
           </div>
-        </>
+        </div>
       ) : (
-         // Loading or Error State
-         <div className="text-center p-10">
-            <p className="text-gray-500">Loading organization data or not logged in...</p>
-             <Link to="/organization/login" className="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
-               Go to Login
-             </Link>
+         // Enhanced loading/error state
+         <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center bg-white p-8 rounded-lg shadow-lg max-w-md mx-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+              <h2 className="mt-4 text-xl font-semibold text-gray-800">Loading Dashboard</h2>
+              <p className="mt-2 text-gray-600">Please wait while we load your organization data...</p>
+              <Link 
+                to="/organization/login" 
+                className="mt-6 inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                Return to Login
+              </Link>
+            </div>
           </div>
       )}
     </div>

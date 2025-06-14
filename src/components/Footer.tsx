@@ -15,7 +15,7 @@ const Footer: React.FC = () => {
 
   const appLinks = [
     { text: 'PHB App', path: '/phb-services' },
-    { text: 'Find my PHB number', path: '/account' },
+    { text: 'Find my HPN number', path: '/account' },
     { text: 'View your GP health record', path: '/account/gp-record' },
     { text: 'View your test results', path: '/account/test-results' },
     { text: 'About the PHB', path: '/about' },

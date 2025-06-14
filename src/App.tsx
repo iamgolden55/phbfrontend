@@ -220,9 +220,66 @@ import CaptchaTestScript from './features/auth/CaptchaTestScript';
 
 // Organization route guard component
 const OrganizationRouteGuard = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useOrganizationAuth();
+  const { isAuthenticated, isLoading, isInitialized } = useOrganizationAuth();
+  const [directCheckDone, setDirectCheckDone] = React.useState(false);
+  const [directAuthCheck, setDirectAuthCheck] = React.useState(false);
 
-  if (!isAuthenticated) {
+  // Try to directly check localStorage before relying on context state
+  React.useEffect(() => {
+    if (!isAuthenticated && !directCheckDone) {
+      try {
+        // Check localStorage directly as a last resort
+        const storedAuth = localStorage.getItem('organizationAuth');
+        if (storedAuth) {
+          const authData = JSON.parse(storedAuth);
+          if (authData.userData && authData.tokens) {
+            console.log('🛡️ Route Guard: Found valid auth in localStorage');
+            setDirectAuthCheck(true);
+          } else {
+            console.log('🛡️ Route Guard: Invalid auth data in localStorage');
+            setDirectAuthCheck(false);
+          }
+        } else {
+          // Check sessionStorage as backup
+          const backupState = sessionStorage.getItem('org_auth_state');
+          if (backupState) {
+            const parsedState = JSON.parse(backupState);
+            if (parsedState.isAuthenticated && parsedState.userData) {
+              console.log('🛡️ Route Guard: Found valid auth in sessionStorage backup');
+              setDirectAuthCheck(true);
+            } else {
+              setDirectAuthCheck(false);
+            }
+          } else {
+            setDirectAuthCheck(false);
+          }
+        }
+      } catch (err) {
+        console.error('🛡️ Route Guard: Error checking direct auth:', err);
+        setDirectAuthCheck(false);
+      } finally {
+        setDirectCheckDone(true);
+      }
+    }
+  }, [isAuthenticated, directCheckDone]);
+
+  // Show loading spinner while authentication is being initialized
+  if (isLoading || !isInitialized) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="bg-white p-8 rounded-lg shadow-md">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            <p className="text-gray-600 text-lg font-medium">Verifying authentication...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Either use the context's isAuthenticated or our direct check
+  if (!isAuthenticated && !directAuthCheck) {
+    console.log('🛡️ Route Guard: Redirecting to login page');
     return <Navigate to="/organization/login" replace />;
   }
 

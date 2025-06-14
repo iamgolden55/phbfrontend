@@ -21,26 +21,26 @@ const OrganizationVerificationForm: React.FC<OrganizationVerificationFormProps> 
 
   // Handle successful navigation after verification
   useEffect(() => {
-    // Check localStorage first for auth data
+    // Don't interfere with verification process
+    if (needsVerification && currentEmail) {
+      console.log('🔐 OTP verification page active for:', currentEmail);
+      return; // Stay on verification page
+    }
+
+    // Only redirect if we're actually authenticated
     const authData = localStorage.getItem('organizationAuth');
-    
-    if (authData) {
+    if (authData && !needsVerification) {
       try {
-        // Check if we have valid auth data
         const parsed = JSON.parse(authData);
         if (parsed.userData && parsed.tokens) {
-          console.log('Found valid auth data, redirecting to dashboard');
-          navigateToDashboard();
-          return;
+          console.log('🔐 Found valid auth data, redirecting to dashboard');
+          setTimeout(() => {
+            navigateToDashboard();
+          }, 100);
         }
       } catch (e) {
         console.error('Error parsing auth data:', e);
       }
-    }
-
-    // If we're authenticated but the component is still showing, redirect to dashboard
-    if (!needsVerification && currentEmail === null) {
-      navigateToDashboard();
     }
   }, [needsVerification, currentEmail, navigateToDashboard]);
 
@@ -77,7 +77,9 @@ const OrganizationVerificationForm: React.FC<OrganizationVerificationFormProps> 
     }
   };
 
-  if (!currentEmail) {
+  // Don't render if we shouldn't be in verification mode
+  if (!needsVerification || !currentEmail) {
+    console.log('🔐 Verification form should not render:', { needsVerification, currentEmail });
     return null;
   }
 

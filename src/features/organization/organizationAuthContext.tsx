@@ -5,6 +5,7 @@ interface OrganizationAuthContextType {
   userData: UserData | null;
   error: string | null;
   isLoading: boolean;
+  isInitialized: boolean;
   needsVerification: boolean;
   currentEmail: string | null;
   login: (email: string, password: string, hospital_code: string) => Promise<void>;
@@ -70,66 +71,150 @@ export interface OrganizationRegistrationData {
 const OrganizationAuthContext = createContext<OrganizationAuthContextType | undefined>(undefined);
 
 export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    // Check localStorage immediately to prevent auth flash
-    const storedAuth = localStorage.getItem('organizationAuth');
-    if (storedAuth) {
-      try {
-        const authData = JSON.parse(storedAuth);
-        return !!(authData.userData && authData.tokens);
-      } catch {
-        return false;
-      }
-    }
-    return false;
-  });
-  const [userData, setUserData] = useState<UserData | null>(() => {
-    // Initialize userData from localStorage if available
-    const storedAuth = localStorage.getItem('organizationAuth');
-    if (storedAuth) {
-      try {
-        const authData = JSON.parse(storedAuth);
-        return authData.userData || null;
-      } catch {
-        return null;
-      }
-    }
-    return null;
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true); // Start with loading true
   const [needsVerification, setNeedsVerification] = useState<boolean>(false);
   const [currentEmail, setCurrentEmail] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
   // Check if user is already logged in on mount or if OTP verification is in progress
   useEffect(() => {
-    // First check for stored auth in localStorage (fully authenticated user)
-    const storedAuth = localStorage.getItem('organizationAuth');
-    if (storedAuth) {
-      try {
-        const authData = JSON.parse(storedAuth);
-        if (authData.userData && authData.tokens) {
-          setIsAuthenticated(true);
-          setUserData(authData.userData);
-          // Clear any verification state if we're already authenticated
-          sessionStorage.removeItem('org_auth_email');
-          sessionStorage.removeItem('org_auth_needs_verification');
-        }
-      } catch (err) {
-        localStorage.removeItem('organizationAuth');
-      }
-    } else {
-      // If not fully authenticated, check if we're in the middle of OTP verification
-      const storedEmail = sessionStorage.getItem('org_auth_email');
-      const needsVerify = sessionStorage.getItem('org_auth_needs_verification');
+    const initializeAuth = async () => {
+      console.log('🔐 === AUTH INITIALIZATION STARTING ===');
       
-      if (storedEmail && needsVerify === 'true') {
-        console.log('Resuming OTP verification for email:', storedEmail);
-        setCurrentEmail(storedEmail);
-        setNeedsVerification(true);
+      // Prevent multiple initializations
+      if (isInitialized) {
+        console.log('🔐 Auth already initialized, skipping...');
+        return;
       }
-    }
-  }, []);
+
+      try {
+        setIsLoading(true);
+        
+        // Debug: Check what's in localStorage
+        const storedAuth = localStorage.getItem('organizationAuth');
+        console.log('🔐 Raw localStorage content:', storedAuth ? 'EXISTS' : 'NULL');
+        
+        if (storedAuth) {
+          console.log('🔐 Found stored auth, attempting to parse...');
+          try {
+            const authData = JSON.parse(storedAuth);
+            console.log('🔐 Parsed auth data structure:', {
+              hasUserData: !!authData.userData,
+              hasTokens: !!authData.tokens,
+              userRole: authData.userData?.role,
+              userEmail: authData.userData?.email,
+              hospitalId: authData.userData?.hospital?.id
+            });
+            
+            if (authData.userData && authData.tokens) {
+              console.log('🔐 ✅ RESTORING USER SESSION FROM LOCALSTORAGE');
+              
+              // IMPORTANT: Ensure we set these values SYNCHRONOUSLY to avoid race conditions
+              // This ensures the auth state is immediately available to route guards
+              setIsAuthenticated(true);
+              setUserData(authData.userData);
+              setNeedsVerification(false);
+              setCurrentEmail(null);
+              
+              // Only clear session storage if we're fully authenticated
+              sessionStorage.removeItem('org_auth_email');
+              sessionStorage.removeItem('org_auth_needs_verification');
+              
+              // Persist the auth state in a more reliable storage method
+              // This is a fallback in case localStorage is cleared or corrupted
+              try {
+                sessionStorage.setItem('org_auth_initialized', 'true');
+                sessionStorage.setItem('org_auth_state', JSON.stringify({
+                  isAuthenticated: true,
+                  userData: authData.userData
+                }));
+              } catch (err) {
+                console.warn('🔐 Failed to set backup session storage:', err);
+              }
+              
+              setIsInitialized(true);
+              setIsLoading(false);
+              console.log('🔐 ✅ USER RESTORED SUCCESSFULLY');
+              return;
+            } else {
+              console.warn('🔐 ⚠️ Invalid auth data structure:', {
+                userDataExists: !!authData.userData,
+                tokensExist: !!authData.tokens
+              });
+            }
+          } catch (err) {
+            console.warn('🔐 ❌ Failed to parse auth data:', err);
+          }
+        } else {
+          // Check backup storage in session storage
+          try {
+            const backupState = sessionStorage.getItem('org_auth_state');
+            if (backupState) {
+              const parsedState = JSON.parse(backupState);
+              if (parsedState.isAuthenticated && parsedState.userData) {
+                console.log('🔐 Recovering from backup session storage');
+                setIsAuthenticated(true);
+                setUserData(parsedState.userData);
+                setNeedsVerification(false);
+                setCurrentEmail(null);
+                setIsInitialized(true);
+                setIsLoading(false);
+                
+                // Restore localStorage for future refreshes
+                localStorage.setItem('organizationAuth', JSON.stringify({
+                  userData: parsedState.userData,
+                  tokens: { access: 'recovered-token', refresh: 'recovered-refresh' }
+                }));
+                
+                console.log('🔐 ✅ USER RESTORED FROM BACKUP');
+                return;
+              }
+            }
+          } catch (err) {
+            console.warn('🔐 Failed to check backup session storage:', err);
+          }
+          
+          console.log('🔐 No stored auth found in localStorage');
+        }
+
+        // If not fully authenticated, check if we're in the middle of OTP verification
+        const storedEmail = sessionStorage.getItem('org_auth_email');
+        const needsVerify = sessionStorage.getItem('org_auth_needs_verification');
+        
+        if (storedEmail && needsVerify === 'true') {
+          console.log('🔐 Resuming OTP verification for email:', storedEmail);
+          setCurrentEmail(storedEmail);
+          setNeedsVerification(true);
+          setIsAuthenticated(false);
+          setUserData(null);
+        } else {
+          // No auth data and no verification in progress
+          console.log('🔐 No existing auth found, user needs to login');
+          setIsAuthenticated(false);
+          setUserData(null);
+          setNeedsVerification(false);
+          setCurrentEmail(null);
+        }
+      } catch (error) {
+        console.error('🔐 ❌ Auth initialization error:', error);
+        setError('Failed to initialize authentication');
+        setIsAuthenticated(false);
+        setUserData(null);
+        setNeedsVerification(false);
+        setCurrentEmail(null);
+      } finally {
+        setIsInitialized(true);
+        setIsLoading(false);
+        console.log('🔐 === AUTH INITIALIZATION COMPLETE ===');
+      }
+    };
+
+    // Run immediately on mount, with no dependencies, to minimize synchronization issues
+    initializeAuth();
+  }, []); // Empty dependency array - only run once, no re-initialization
 
   const login = async (email: string, password: string, hospital_code: string): Promise<void> => {
     setIsLoading(true);
@@ -255,10 +340,53 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
   };
 
   const logout = (): void => {
+    console.log('🔐 Logging out user...');
+    // Clear all auth-related storage
     localStorage.removeItem('organizationAuth');
+    sessionStorage.removeItem('org_auth_email');
+    sessionStorage.removeItem('org_auth_needs_verification');
+    sessionStorage.removeItem('org_auth_timestamp');
+    
+    // Also clear backup auth state
+    sessionStorage.removeItem('org_auth_initialized');
+    sessionStorage.removeItem('org_auth_state');
+    
     setIsAuthenticated(false);
     setUserData(null);
+    setNeedsVerification(false);
+    setCurrentEmail(null);
+    setError(null);
   };
+
+  // Add token validation function
+  const validateToken = React.useCallback(async () => {
+    const storedAuth = localStorage.getItem('organizationAuth');
+    if (!storedAuth) return false;
+
+    try {
+      const authData = JSON.parse(storedAuth);
+      if (!authData.userData || !authData.tokens?.access) {
+        return false;
+      }
+
+      // TODO: Add actual token validation against backend
+      // For now, just check if the token exists and userData is valid
+      return !!(authData.userData.id && authData.userData.email && authData.userData.role);
+    } catch (error) {
+      console.error('🔐 Token validation error:', error);
+      return false;
+    }
+  }, []);
+
+  // Prevent automatic logout on page refresh
+  const refreshTokenIfNeeded = React.useCallback(async () => {
+    const isValid = await validateToken();
+    if (!isValid && isAuthenticated) {
+      console.warn('🔐 Invalid token detected, but not auto-logging out');
+      // Don't automatically log out - let user try to use the app
+      // They'll get proper error messages if APIs fail
+    }
+  }, [validateToken, isAuthenticated]);
 
   const clearError = (): void => {
     setError(null);
@@ -277,8 +405,9 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
     setError(null);
     
     try {
-      console.log('Verifying 2FA for email:', email);
-      console.log('Making 2FA verification request for email:', email);
+      console.log('🔐 === 2FA VERIFICATION STARTING ===');
+      console.log('🔐 Verifying 2FA for email:', email);
+      
       const response = await fetch('http://127.0.0.1:8000/api/hospitals/admin/verify-2fa/', {
         method: 'POST',
         headers: {
@@ -291,14 +420,12 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
         })
       });
 
-      // Important: Only parse the response JSON once
       const data = await response.json();
-      console.log('2FA verification raw response:', data);
+      console.log('🔐 2FA verification response:', data);
       
       if (!response.ok) {
         throw new Error(data.message || 'Verification failed');
       }
-      console.log('2FA verification response:', data);
       
       if (!data.user_data || !data.tokens) {
         throw new Error('Invalid response from server');
@@ -310,41 +437,52 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
         tokens: data.tokens
       };
       
+      console.log('🔐 Storing auth data to localStorage:', {
+        hasUserData: !!authData.userData,
+        hasTokens: !!authData.tokens,
+        userRole: authData.userData?.role,
+        hospitalId: authData.userData?.hospital?.id
+      });
+      
+      // Store in localStorage for primary persistence
+      localStorage.setItem('organizationAuth', JSON.stringify(authData));
+      
+      // ALSO store in sessionStorage as a backup mechanism
+      try {
+        sessionStorage.setItem('org_auth_initialized', 'true');
+        sessionStorage.setItem('org_auth_state', JSON.stringify({
+          isAuthenticated: true,
+          userData: data.user_data
+        }));
+      } catch (err) {
+        console.warn('🔐 Failed to set backup session storage:', err);
+      }
+      
+      // Verify it was stored correctly
+      const storedCheck = localStorage.getItem('organizationAuth');
+      console.log('🔐 Verification - localStorage write successful:', !!storedCheck);
+      
       // Clear the verification state from sessionStorage
-      sessionStorage.removeItem('org_auth_email');
-      sessionStorage.removeItem('org_auth_needs_verification');
-      
-      localStorage.setItem('organizationAuth', JSON.stringify(authData));
-      
-      // Ensure we're correctly updating the state with verified user data
-      console.log('Setting authenticated user data:', data.user_data);
-      
-      // First, update React state
-      setUserData(data.user_data);
-      setIsAuthenticated(true);
-      
-      // Then update localStorage with the auth data to ensure persistence
-      localStorage.setItem('organizationAuth', JSON.stringify(authData));
-      
-      // Important: Clear all verification flags and data
-      setNeedsVerification(false);
-      setCurrentEmail(null);
-      
-      // Clear verification data from sessionStorage only
       sessionStorage.removeItem('org_auth_email');
       sessionStorage.removeItem('org_auth_needs_verification');
       sessionStorage.removeItem('org_auth_timestamp');
       
-      console.log('Authentication successful, state updated');
+      // Update React state - IMPORTANT: Do this in the right order
+      // Set these values SYNCHRONOUSLY to avoid race conditions
+      setUserData(data.user_data);
+      setIsAuthenticated(true);
+      setNeedsVerification(false);
+      setCurrentEmail(null);
       
-      // Navigation will be handled by the component that called verify2FA
-      // This prevents the full page reload issue
+      console.log('🔐 ✅ AUTHENTICATION SUCCESSFUL, USER LOGGED IN');
+      console.log('🔐 === 2FA VERIFICATION COMPLETE ===');
+      
     } catch (err) {
       if (err instanceof Error) {
-        console.error('2FA verification error:', err.message);
+        console.error('🔐 ❌ 2FA verification error:', err.message);
         setError(err.message);
       } else {
-        console.error('Unexpected 2FA verification error');
+        console.error('🔐 ❌ Unexpected 2FA verification error');
         setError('An unexpected error occurred during verification');
       }
       throw err;
@@ -510,6 +648,7 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
     userData,
     error,
     isLoading,
+    isInitialized,
     needsVerification,
     currentEmail,
     login,

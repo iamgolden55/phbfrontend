@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useOrganizationAuth } from './organizationAuthContext';
 import OrganizationVerificationForm from './OrganizationVerificationForm';
+import AuthDebugInfo from './AuthDebugInfo';
 
 interface OrganizationLoginFormProps {
   redirectPath?: string;
@@ -31,11 +32,17 @@ const OrganizationLoginForm: React.FC<OrganizationLoginFormProps> = ({ redirectP
 
   // Show verification form when needed
   if (needsVerification) {
-    return <OrganizationVerificationForm redirectPath={redirectPath} />;
+    return (
+      <>
+        <OrganizationVerificationForm redirectPath={redirectPath} />
+      </>
+    );
   }
 
   return (
-    <div className="bg-white py-8 px-6 shadow rounded-lg sm:px-10">
+    <>
+      
+      <div className="bg-white py-8 px-6 shadow rounded-lg sm:px-10">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Organization Sign In</h2>
 
       {error && (
@@ -145,6 +152,7 @@ const OrganizationLoginForm: React.FC<OrganizationLoginFormProps> = ({ redirectP
         </ul>
       </div>
     </div>
+    </>
   );
 };
 

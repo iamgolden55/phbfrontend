@@ -154,7 +154,7 @@ const HelpPage: React.FC = () => {
             </div>
 
             <div>
-              <h3 className="font-medium text-lg text-gray-900">How can I find my PHB number?</h3>
+              <h3 className="font-medium text-lg text-gray-900">How can I Find my HPN number?</h3>
               <p className="text-gray-600 mt-1">
                 Your PHB number is a 10-digit number shown at the top of any letter from the PHB. It's also available in your PHB account under "Account Settings" &gt; "Personal Details".
               </p>
