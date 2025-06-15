@@ -81,6 +81,7 @@ import BetterSleepTechniquesPage from './pages/live-well/sleep/BetterSleepTechni
 import CalorieCalculatorPage from './pages/tools/CalorieCalculatorPage';
 import OlderPeoplePage from './pages/care-and-support/OlderPeoplePage';
 import DementiaPage from './pages/care-and-support/DementiaPage';
+import FindServicesPage from './pages/FindServicesPage';
 import HospitalDischargePage from './pages/care-and-support/HospitalDischargePage';
 import CarersPage from './pages/care-and-support/CarersPage';
 import EndOfLifePage from './pages/care-and-support/EndOfLifePage';
@@ -682,6 +683,7 @@ function App() {
                 <Route path="about" element={<AboutPHBPage />} />
                 <Route path="elara-ai" element={<ElaraAIPage />} />
                 <Route path="phb-services" element={<PHBServicesPage />} />
+                <Route path="find-services" element={<FindServicesPage />} />
                 <Route path="find-pharmacy" element={<FindPharmacyPage />} />
                 <Route path="medical-ai-demo" element={<MedicalAIDemoPage />} />
                 <Route path="link-validator" element={<LinkValidatorPage />} />
