@@ -74,6 +74,20 @@ import MentalWellbeingPage from './pages/live-well/MentalWellbeingPage';
 import SleepPage from './pages/live-well/SleepPage';
 import QuitSmokingPage from './pages/live-well/QuitSmokingPage';
 import LiveWellSexualHealthPage from './pages/live-well/SexualHealthPage';
+import HealthyWeightPage from './pages/live-well/HealthyWeightPage';
+import FiveWeekWorkoutPlanPage from './pages/live-well/exercise/FiveWeekWorkoutPlanPage';
+import BudgetMealPlanningPage from './pages/live-well/healthy-eating/BudgetMealPlanningPage';
+import BetterSleepTechniquesPage from './pages/live-well/sleep/BetterSleepTechniquesPage';
+import CalorieCalculatorPage from './pages/tools/CalorieCalculatorPage';
+import OlderPeoplePage from './pages/care-and-support/OlderPeoplePage';
+import DementiaPage from './pages/care-and-support/DementiaPage';
+import HospitalDischargePage from './pages/care-and-support/HospitalDischargePage';
+import CarersPage from './pages/care-and-support/CarersPage';
+import EndOfLifePage from './pages/care-and-support/EndOfLifePage';
+import DisabilitiesPage from './pages/care-and-support/DisabilitiesPage';
+import AssessmentPage from './pages/care-and-support/AssessmentPage';
+import CarersAssessmentPage from './pages/care-and-support/CarersAssessmentPage';
+import FinancialHelpPage from './pages/care-and-support/FinancialHelpPage';
 import BehavioralSupportPage from './pages/live-well/quit-smoking/BehavioralSupportPage';
 import NicotineReplacementPage from './pages/live-well/quit-smoking/NicotineReplacementPage';
 import PrescriptionMedicationsPage from './pages/live-well/quit-smoking/PrescriptionMedicationsPage';
@@ -411,10 +425,14 @@ function App() {
                 {/* Live Well Subroutes */}
                 <Route path="live-well/healthy-eating" element={<HealthyEatingPage />} />
                 <Route path="live-well/healthy-eating/meal-plans" element={<MealPlansPage />} />
+                <Route path="live-well/healthy-eating/budget-meal-planning" element={<BudgetMealPlanningPage />} />
                 <Route path="live-well/exercise" element={<ExercisePage />} />
+                <Route path="live-well/exercise/5-week-workout-plan" element={<FiveWeekWorkoutPlanPage />} />
                 <Route path="live-well/mental-wellbeing" element={<MentalWellbeingPage />} />
                 <Route path="live-well/sleep" element={<SleepPage />} />
+                <Route path="live-well/sleep/better-sleep-techniques" element={<BetterSleepTechniquesPage />} />
                 <Route path="live-well/sexual-health" element={<LiveWellSexualHealthPage />} />
+                <Route path="live-well/healthy-weight" element={<HealthyWeightPage />} />
                 <Route path="live-well/quit-smoking" element={<QuitSmokingPage />} />
                 <Route path="live-well/quit-smoking/behavioral-support" element={<BehavioralSupportPage />} />
                 <Route path="live-well/quit-smoking/nicotine-replacement" element={<NicotineReplacementPage />} />
@@ -441,6 +459,15 @@ function App() {
                 <Route path="mental-health/self-harm" element={<SelfHarmPage />} />
                 <Route path="mental-health/eating-disorders" element={<EatingDisordersPage />} />
                 <Route path="care-and-support" element={<CareAndSupportPage />} />
+                <Route path="care-and-support/older-people" element={<OlderPeoplePage />} />
+                <Route path="care-and-support/dementia" element={<DementiaPage />} />
+            <Route path="care-and-support/hospital-discharge" element={<HospitalDischargePage />} />
+            <Route path="care-and-support/carers" element={<CarersPage />} />
+            <Route path="care-and-support/end-of-life" element={<EndOfLifePage />} />
+            <Route path="care-and-support/disabilities" element={<DisabilitiesPage />} />
+            <Route path="care-and-support/assessment" element={<AssessmentPage />} />
+            <Route path="care-and-support/carers-assessment" element={<CarersAssessmentPage />} />
+            <Route path="care-and-support/financial-help" element={<FinancialHelpPage />} />
 
                 {/* Help Routes */}
                 <Route path="help" element={<HelpPage />} /> {/* New Help Route */}
@@ -506,6 +533,7 @@ function App() {
 
                 {/* Tools */}
                 <Route path="tools/bmi-calculator" element={<BMICalculatorPage />} />
+                <Route path="tools/calorie-calculator" element={<CalorieCalculatorPage />} />
                 <Route path="tools/due-date-calculator" element={<DueDateCalculatorPage />} />
                 <Route path="tools/kick-counter" element={<KickCounterPage />} />
                 <Route path="tools/contraction-timer" element={<ContractionTimerPage />} />

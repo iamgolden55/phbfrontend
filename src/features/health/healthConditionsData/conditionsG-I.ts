@@ -5,6 +5,146 @@ import { HealthCondition } from '../healthConditionsData';
  */
 export const conditionsGtoI: HealthCondition[] = [
   {
+    id: 'high-blood-pressure',
+    name: 'High Blood Pressure (Hypertension)',
+    description: 'A common condition where the long-term force of blood against artery walls is high enough to potentially cause health problems.[1] Blood pressure is determined by the amount of blood the heart pumps and the resistance to blood flow in the arteries.[2] Hypertension typically develops over many years and often has no symptoms, but it can silently damage blood vessels and organs, particularly the heart, brain, kidneys, and eyes.[3] It is one of the most important preventable causes of premature morbidity and mortality worldwide.[4]',
+    category: 'heart-and-circulation',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Hypertension',
+    symptoms: [
+      'Often asymptomatic ("silent killer")',
+      'Headaches (particularly in the morning)',
+      'Shortness of breath',
+      'Nosebleeds',
+      'Visual changes',
+      'Chest pain',
+      'Dizziness',
+      'Facial flushing',
+      'Blood in urine',
+      'Palpitations'
+    ],
+    causes: [
+      'Essential/primary hypertension (no identifiable cause, develops gradually)',
+      'Secondary hypertension (caused by underlying conditions)',
+      'Age (risk increases with age)',
+      'Family history and genetic factors',
+      'Obesity and excess weight',
+      'Physical inactivity',
+      'High sodium (salt) intake',
+      'Low potassium intake',
+      'Excessive alcohol consumption',
+      'Tobacco use',
+      'Chronic stress',
+      'Certain medications (NSAIDs, decongestants, birth control pills)',
+      'Chronic kidney disease',
+      'Sleep apnea',
+      'Thyroid or adrenal disorders'
+    ],
+    treatments: [
+      'Lifestyle modifications (diet, exercise, stress management)',
+      'Diuretics (water pills)',
+      'ACE inhibitors',
+      'Angiotensin II receptor blockers (ARBs)',
+      'Calcium channel blockers',
+      'Beta-blockers',
+      'Renin inhibitors',
+      'Alpha blockers',
+      'Alpha-2 receptor agonists',
+      'Central agonists',
+      'Peripheral adrenergic inhibitors',
+      'Vasodilators',
+      'Combined alpha and beta-blockers',
+      'Regular blood pressure monitoring',
+      'Treatment of underlying causes for secondary hypertension'
+    ],
+    preventions: [
+      'Maintaining a healthy weight',
+      'DASH diet (Dietary Approaches to Stop Hypertension)',
+      'Reducing sodium intake (less than 2,300 mg a day)',
+      'Increasing potassium intake (if kidney function is normal)',
+      'Regular physical activity (150 minutes moderate exercise weekly)',
+      'Limiting alcohol consumption',
+      'Quitting smoking',
+      'Managing stress',
+      'Regular blood pressure checks',
+      'Adequate sleep',
+      'Reducing caffeine intake'
+    ],
+    relatedConditions: [
+      'heart-disease',
+      'stroke',
+      'kidney-disease',
+      'metabolic-syndrome',
+      'heart-failure',
+      'diabetes',
+      'vision-loss'
+    ],
+    commonQuestions: [
+      {
+        question: 'What is considered high blood pressure?',
+        answer: 'Blood pressure is measured using two numbers: systolic pressure (top number) and diastolic pressure (bottom number). Normal blood pressure is below 120/80 mm Hg. Elevated blood pressure is systolic 120-129 and diastolic less than 80. Stage 1 hypertension is systolic 130-139 or diastolic 80-89. Stage 2 hypertension is systolic 140 or higher or diastolic 90 or higher. Hypertensive crisis (requiring immediate medical attention) is systolic over 180 and/or diastolic over 120.'
+      },
+      {
+        question: 'Why is high blood pressure called the "silent killer"?',
+        answer: 'High blood pressure is often called the "silent killer" because it frequently has no noticeable symptoms, yet it can lead to serious health problems like heart attack, stroke, heart failure, and kidney disease. Many people have high blood pressure for years without knowing it, as the condition damages blood vessels and organs gradually over time. This is why regular blood pressure screening is essential, even when feeling well.'
+      },
+      {
+        question: 'Can high blood pressure be cured?',
+        answer: 'Essential or primary hypertension, which accounts for about 95% of cases, cannot be cured but can be effectively managed with lifestyle changes and medication. Secondary hypertension, which is caused by an underlying condition, may be resolved if the underlying cause is treated successfully. For most people with high blood pressure, it is a lifelong condition requiring ongoing management to maintain healthy blood pressure levels and prevent complications.'
+      }
+    ],
+    emergencySigns: [
+      'Severely elevated blood pressure (above 180/120 mm Hg)',
+      'Severe headache',
+      'Severe anxiety',
+      'Shortness of breath',
+      'Nosebleeds',
+      'Severe chest pain',
+      'Vision problems',
+      'Blood in the urine',
+      'Confusion',
+      'Seizures'
+    ],
+    prevalence: 'Hypertension affects approximately 1.13 billion people worldwide, with an estimated prevalence of 30-45% in adults. In many countries, 1 in 4 men and 1 in 5 women have high blood pressure, though many are undiagnosed.', 
+    affectedGroups: [
+      'Adults over 65 years',
+      'Black people (higher prevalence and severity)',
+      'Men (until age 65, then women have higher rates)',
+      'People with family history of hypertension',
+      'Individuals with obesity or overweight',
+      'People with unhealthy lifestyle habits',
+      'Individuals with chronic conditions like diabetes or kidney disease',
+      'Pregnant women (gestational hypertension)',
+      'People living in low and middle-income countries'
+    ],
+    references: [
+      {
+        id: '1',
+        text: 'Whelton PK, Carey RM, Aronow WS, et al. (2018). "2017 ACC/AHA/AAPA/ABC/ACPM/AGS/APhA/ASH/ASPC/NMA/PCNA Guideline for the Prevention, Detection, Evaluation, and Management of High Blood Pressure in Adults". Journal of the American College of Cardiology. 71 (19): e127–e248.',
+        url: 'https://doi.org/10.1016/j.jacc.2017.11.006'
+      },
+      {
+        id: '2',
+        text: 'Mills KT, Stefanescu A, He J. (2020). "The global epidemiology of hypertension". Nature Reviews Nephrology. 16 (4): 223–237.',
+        url: 'https://doi.org/10.1038/s41581-019-0244-2'
+      },
+      {
+        id: '3',
+        text: 'Unger T, Borghi C, Charchar F, et al. (2020). "2020 International Society of Hypertension Global Hypertension Practice Guidelines". Hypertension. 75 (6): 1334–1357.',
+        url: 'https://doi.org/10.1161/HYPERTENSIONAHA.120.15026'
+      },
+      {
+        id: '4',
+        text: 'World Health Organization (2023). "Hypertension". Fact Sheets.',
+        url: 'https://www.who.int/news-room/fact-sheets/detail/hypertension'
+      },
+      {
+        id: '5',
+        text: 'National Heart, Lung, and Blood Institute (2022). "High Blood Pressure". Health Topics.',
+        url: 'https://www.nhlbi.nih.gov/health/high-blood-pressure'
+      }
+    ]
+  },
+  {
     id: 'influenza',
     name: 'Influenza (Flu)',
     description: 'A highly contagious respiratory illness caused by influenza viruses that infect the nose, throat, and sometimes the lungs.[1] The disease is characterized by sudden onset of fever, muscle aches, headache, malaise, cough, and other respiratory symptoms.[2] Influenza can cause mild to severe illness, and at times can lead to death, particularly in high-risk groups such as the elderly, young children, and people with certain health conditions.[3] The virus spreads primarily through respiratory droplets when infected people cough, sneeze, or talk.[4]',

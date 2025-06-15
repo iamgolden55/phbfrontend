@@ -1,7 +1,22 @@
 import { SearchResultItem } from '../components/SearchResults';
+import { HealthCondition, healthConditions } from '../features/health/healthConditionsData';
 
-// Enhanced mock data for search results - this would be replaced with actual data fetching in a real implementation
-const searchData: SearchResultItem[] = [
+/**
+ * Convert a HealthCondition to a SearchResultItem
+ */
+function healthConditionToSearchResult(condition: HealthCondition): SearchResultItem {
+  return {
+    title: condition.name,
+    description: condition.description,
+    url: `/health-a-z/${condition.id}`,
+    category: 'Health A-Z',
+    concepts: [condition.category, ...(condition.subcategory ? [condition.subcategory] : [])],
+    symptoms: condition.symptoms
+  };
+}
+
+// Non-health condition search data - other content types like Live Well, Programs, etc.
+const nonHealthConditionData: SearchResultItem[] = [
   {
     title: "Healthy Eating",
     description: "Advice on maintaining a balanced diet, understanding food groups, and making healthier food choices.",
@@ -306,11 +321,11 @@ const commonMisspellings: { [key: string]: string } = {
 function generateTypos() {
   const additionalTypos: { [key: string]: string } = {};
 
-  // Process each keyword from searchData
-  searchData.forEach(item => {
+  // Process each keyword from nonHealthConditionData
+  nonHealthConditionData.forEach(item => {
     const words = item.title.toLowerCase().split(' ');
 
-    words.forEach(word => {
+    words.forEach((word: string) => {
       if (word.length > 3) { // Only process words longer than 3 characters
         // Common typo patterns
 
@@ -400,32 +415,33 @@ function levenshteinDistance(a: string, b: string): number {
  * Find closest matches to a search term using fuzzy matching
  *
  * @param searchTerm The term to search for
+ * @param items Array of search items to check against
  * @param maxDistance Maximum edit distance to consider a match
- * @returns Array of potential matches
+ * @returns Array of matching search result items
  */
-function findFuzzyMatches(searchTerm: string, maxDistance = 2): string[] {
+function findFuzzyMatches(searchTerm: string, items: SearchResultItem[], maxDistance = 2): SearchResultItem[] {
   const normalizedTerm = searchTerm.toLowerCase().trim();
-  const results: string[] = [];
+  const results: SearchResultItem[] = [];
 
   // Check direct matches in titles
-  searchData.forEach(item => {
+  items.forEach(item => {
     const title = item.title.toLowerCase();
     // Check if the search term is contained in the title
     if (title.includes(normalizedTerm)) {
-      results.push(item.title);
+      results.push(item);
     } else {
       // Check if any word in the title is close to the search term
       const words = title.split(' ');
       for (const word of words) {
         if (word.length > 2 && levenshteinDistance(word, normalizedTerm) <= maxDistance) {
-          results.push(item.title);
+          results.push(item);
           break;
         }
       }
     }
   });
 
-  return Array.from(new Set(results));
+  return results;
 }
 
 /**
@@ -491,126 +507,201 @@ function extractSymptoms(query: string): string[] {
 /**
  * Calculate a relevance score for a search result item based on how well it matches
  * the extracted concepts and symptoms from a query
+ * 
+ * @param item The search result item to score
+ * @param extractedSymptoms Array of extracted symptoms from the query
+ * @param rawQuery The original search query (normalized)
+ * @returns A numerical relevance score
  */
-function calculateRelevanceScore(item: SearchResultItem, extractedSymptoms: string[]): number {
+function calculateRelevanceScore(item: SearchResultItem, extractedSymptoms: string[], rawQuery: string): number {
   let score = 0;
+  const normalizedQuery = rawQuery.toLowerCase().trim();
+  
+  // Direct title match is highest priority
+  if (item.title.toLowerCase().includes(normalizedQuery)) {
+    score += 30;
+    
+    // Exact title match gets even higher score
+    if (item.title.toLowerCase() === normalizedQuery) {
+      score += 20;
+    }
+  }
+  
+  // Category match is high priority (e.g., "heart-and-circulation" for "heart" searches)
+  if (item.category && item.category.toLowerCase().includes(normalizedQuery)) {
+    score += 25;
+  }
+  
+  // Description match is medium-high priority
+  if (item.description && item.description.toLowerCase().includes(normalizedQuery)) {
+    score += 15;
+  }
 
-  // Get all the concepts and symptoms for this item
-  const itemConcepts = [...(item.concepts || []), ...(item.symptoms || [])];
+  // Base score for having concepts/symptoms that match
+  if (item.concepts && item.concepts.some(concept => 
+    extractedSymptoms.some(symptom => concept.toLowerCase().includes(symptom))
+  )) {
+    score += 5;
+  }
 
-  // Check each extracted symptom against this item's concepts and symptoms
-  for (const symptom of extractedSymptoms) {
-    // Direct match
-    if (itemConcepts.includes(symptom)) {
-      score += 10; // High score for direct matches
-    } else {
-      // Check for partial matches
-      for (const concept of itemConcepts) {
-        if (concept.includes(symptom) || symptom.includes(concept)) {
-          score += 5; // Medium score for partial matches
+  if (item.symptoms && item.symptoms.some(itemSymptom => 
+    extractedSymptoms.some(symptom => itemSymptom.toLowerCase().includes(symptom))
+  )) {
+    score += 10; // Symptoms are more specific, so higher score
+  }
+
+  // Additional score for each matching concept/symptom
+  if (item.concepts) {
+    for (const concept of item.concepts) {
+      // Check against raw query
+      if (concept.toLowerCase().includes(normalizedQuery)) {
+        score += 8;
+      }
+      
+      // Check against extracted symptoms
+      for (const symptom of extractedSymptoms) {
+        if (concept.toLowerCase().includes(symptom)) {
+          score += 1;
         }
       }
     }
   }
 
+  if (item.symptoms) {
+    for (const itemSymptom of item.symptoms) {
+      // Check against raw query
+      if (itemSymptom.toLowerCase().includes(normalizedQuery)) {
+        score += 12;
+      }
+      
+      // Check against extracted symptoms
+      for (const symptom of extractedSymptoms) {
+        if (itemSymptom.toLowerCase().includes(symptom)) {
+          score += 2;
+        }
+      }
+    }
+  }
+  
   return score;
 }
 
 /**
  * Search for content across the app based on a search term
- *
+ * 
  * @param searchTerm The term to search for
  * @returns Promise that resolves to array of search results
  */
-export const searchContent = async (searchTerm: string): Promise<SearchResultItem[]> => {
-  // Simulate API delay
+export async function searchContent(searchTerm: string): Promise<SearchResultItem[]> {
+  // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 300));
 
   if (!searchTerm || searchTerm.trim().length < 2) {
     return [];
   }
 
-  // Try to correct misspelled search term
-  const correctedTerm = correctSpelling(searchTerm);
-  const normalizedSearchTerm = correctedTerm.toLowerCase().trim();
+  const query = searchTerm.toLowerCase().trim();
+  
+  // Check for common misspellings and correct them
+  const correctedQuery = correctSpelling(query);
+  
+  // Extract potential symptoms or health concepts from the query
+  const extractedSymptoms = extractSymptoms(correctedQuery);
+  
+  // Convert health conditions to search result format
+  const healthConditionResults: SearchResultItem[] = healthConditions.map(healthConditionToSearchResult);
+  
+  // Combine all searchable content
+  const allSearchableContent: SearchResultItem[] = [...nonHealthConditionData, ...healthConditionResults];
+  
+  // First try exact matches
+  let results = allSearchableContent.filter(item => {
+    // Check title
+    if (item.title.toLowerCase().includes(correctedQuery)) {
+      return true;
+    }
+    
+    // Check description
+    if (item.description.toLowerCase().includes(correctedQuery)) {
+      return true;
+    }
+    
+    // Check concepts
+    if (item.concepts && item.concepts.some(concept => 
+      concept.toLowerCase().includes(correctedQuery)
+    )) {
+      return true;
+    }
+    
+    // Check symptoms
+    if (item.symptoms && item.symptoms.some(symptom => 
+      symptom.toLowerCase().includes(correctedQuery)
+    )) {
+      return true;
+    }
+    
+    return false;
+  });
 
-  // Extract symptoms/concepts from the search query
-  const extractedSymptoms = extractSymptoms(normalizedSearchTerm);
+  // If no exact matches, try fuzzy matching
+  if (results.length === 0) {
+    const fuzzyMatches = findFuzzyMatches(correctedQuery, allSearchableContent);
+    results = [...fuzzyMatches];
+    
+    // Add a note about fuzzy matching if we found any matches
+    if (results.length > 0) {
+      results[0] = {
+        ...results[0],
+        description: `Showing similar results for "${searchTerm}". ${results[0].description}`
+      };
+    }
+  }
 
-  // First, look for exact matches in title or description
-  let exactMatches = searchData.filter(item =>
-    item.title.toLowerCase().includes(normalizedSearchTerm) ||
-    item.description.toLowerCase().includes(normalizedSearchTerm)
-  );
-
-  // Next, try to find matches based on extracted symptoms and concepts
-  let conceptMatches: SearchResultItem[] = [];
+  // If we have extracted symptoms/concepts, add relevant results
   if (extractedSymptoms.length > 0) {
-    conceptMatches = searchData.filter(item => {
-      const itemConcepts = [...(item.concepts || []), ...(item.symptoms || [])];
-      return extractedSymptoms.some(symptom =>
-        itemConcepts.some(concept =>
-          concept.includes(symptom) || symptom.includes(concept)
-        )
+    const symptomResults = allSearchableContent.filter(item => {
+      // Skip items already in results
+      if (results.includes(item)) {
+        return false;
+      }
+      
+      // Check if any extracted symptoms match this item's concepts or symptoms
+      return (
+        (item.concepts && item.concepts.some(concept => 
+          extractedSymptoms.some(symptom => concept.toLowerCase().includes(symptom))
+        )) ||
+        (item.symptoms && item.symptoms.some(itemSymptom => 
+          extractedSymptoms.some(symptom => itemSymptom.toLowerCase().includes(symptom))
+        ))
       );
     });
-
-    // Filter out duplicates
-    conceptMatches = conceptMatches.filter(item =>
-      !exactMatches.some(exactItem => exactItem.url === item.url)
-    );
-
-    // Sort concept matches by relevance
-    conceptMatches.sort((a, b) =>
-      calculateRelevanceScore(b, extractedSymptoms) - calculateRelevanceScore(a, extractedSymptoms)
-    );
-  }
-
-  // If we have exact matches, add concept matches at the end
-  if (exactMatches.length > 0) {
-    // Add a note about spelling correction if we corrected something
-    if (correctedTerm !== searchTerm.toLowerCase().trim() && exactMatches.length > 0) {
-      exactMatches[0] = {
-        ...exactMatches[0],
-        description: `Showing results for "${correctedTerm}" instead of "${searchTerm}". ${exactMatches[0].description}`
-      };
+    
+    // Add symptom results and add a notice about the search interpretation if this was a natural language query
+    if (symptomResults.length > 0) {
+      results = [...results, ...symptomResults];
+      
+      // If we have no other results, add a note about the symptom interpretation
+      if (results.length > 0 && symptomResults.includes(results[0])) {
+        results[0] = {
+          ...results[0],
+          description: `Showing results related to "${extractedSymptoms.join(', ')}". ${results[0].description}`
+        };
+      }
     }
-
-    // Combine exact matches with concept matches
-    return [...exactMatches, ...conceptMatches];
   }
 
-  // If we have concept matches but no exact matches, use them as primary results
-  if (conceptMatches.length > 0) {
-    // Add a notice about the search interpretation if this was a natural language query
-    if (extractedSymptoms.length > 0) {
-      conceptMatches[0] = {
-        ...conceptMatches[0],
-        description: `Showing results related to "${extractedSymptoms.join(', ')}". ${conceptMatches[0].description}`
-      };
-    }
-    return conceptMatches;
-  }
+  // Calculate relevance scores for sorting
+  const scoredResults = results.map(item => ({
+    item,
+    score: calculateRelevanceScore(item, extractedSymptoms, correctedQuery)
+  }));
+  
+  // Sort by relevance score (highest first)
+  scoredResults.sort((a, b) => b.score - a.score);
 
-  // As a last resort, try fuzzy matching
-  const fuzzyMatches = findFuzzyMatches(normalizedSearchTerm);
-  const fuzzyResults = searchData.filter(item =>
-    fuzzyMatches.includes(item.title)
-  );
-
-  // If we found fuzzy matches, return those
-  if (fuzzyResults.length > 0) {
-    // Add a note about fuzzy matching
-    fuzzyResults[0] = {
-      ...fuzzyResults[0],
-      description: `Showing similar results for "${searchTerm}". ${fuzzyResults[0].description}`
-    };
-    return fuzzyResults;
-  }
-
-  // If no matches found, return empty array
-  return [];
-};
+  // Return sorted results
+  return scoredResults.map(result => result.item);
+}
 
 /**
  * Get search suggestions based on a partial search term
@@ -629,35 +720,63 @@ export const getSearchSuggestions = async (partialTerm: string): Promise<string[
 
   // Extract symptoms from the query
   const extractedSymptoms = extractSymptoms(normalizedTerm);
+  
+  // Convert health conditions to search result format
+  const healthConditionResults: SearchResultItem[] = healthConditions.map(healthConditionToSearchResult);
+  
+  // Combine all searchable content
+  const allSearchableContent: SearchResultItem[] = [...nonHealthConditionData, ...healthConditionResults];
 
   // Start with title matches
-  let matchingTitles = searchData
-    .filter(item => item.title.toLowerCase().includes(normalizedTerm))
-    .map(item => item.title);
+  let matchingTitles = allSearchableContent
+    .filter((item: SearchResultItem) => item.title.toLowerCase().includes(normalizedTerm))
+    .map((item: SearchResultItem) => item.title);
 
   // Add suggestions based on extracted symptoms
   if (extractedSymptoms.length > 0 && matchingTitles.length < 5) {
-    const symptomRelatedItems = searchData
-      .filter(item => {
-        const itemConcepts = [...(item.concepts || []), ...(item.symptoms || [])];
-        return extractedSymptoms.some(symptom =>
-          itemConcepts.some(concept => concept.includes(symptom) || symptom === concept)
-        );
-      })
-      .map(item => item.title)
-      .filter(title => !matchingTitles.includes(title));
-
-    matchingTitles = [...matchingTitles, ...symptomRelatedItems];
+    const symptomRelatedItems = allSearchableContent
+      .filter((item: SearchResultItem) => 
+        item.symptoms && 
+        item.symptoms.some((symptom: string) => 
+          extractedSymptoms.some((extractedSymptom: string) => 
+            symptom.toLowerCase().includes(extractedSymptom)
+          )
+        ) && 
+        !matchingTitles.includes(item.title)
+      )
+      .map((item: SearchResultItem) => item.title);
+    
+    // Add symptom-related titles up to a max of 5 total suggestions
+    matchingTitles = [...matchingTitles, ...symptomRelatedItems].slice(0, 5);
   }
 
-  // If we don't have enough suggestions, try fuzzy matching
+  // If we still have fewer than 5 suggestions, add concept matches
+  if (matchingTitles.length < 5) {
+    const conceptMatches = allSearchableContent
+      .filter((item: SearchResultItem) => 
+        item.concepts && 
+        item.concepts.some((concept: string) => 
+          concept.toLowerCase().includes(normalizedTerm)
+        ) && 
+        !matchingTitles.includes(item.title)
+      )
+      .map((item: SearchResultItem) => item.title);
+    
+    // Add concept-related titles up to a max of 5 total suggestions
+    matchingTitles = [...matchingTitles, ...conceptMatches].slice(0, 5);
+  }
+  
+  // If we still don't have enough suggestions, try fuzzy matching
   if (matchingTitles.length < 3) {
-    const fuzzyMatches = findFuzzyMatches(normalizedTerm)
-      .filter(match => !matchingTitles.includes(match));
-
-    matchingTitles = [...matchingTitles, ...fuzzyMatches];
+    const fuzzyMatches = findFuzzyMatches(normalizedTerm, allSearchableContent);
+    const fuzzyTitles = fuzzyMatches
+      .map((item: SearchResultItem) => item.title)
+      .filter((title: string) => !matchingTitles.includes(title));
+    
+    // Add fuzzy matches up to a max of 5 total suggestions
+    matchingTitles = [...matchingTitles, ...fuzzyTitles].slice(0, 5);
   }
 
-  // Return unique suggestions
+  // Return unique suggestions (up to 5)
   return Array.from(new Set(matchingTitles)).slice(0, 5);
 };

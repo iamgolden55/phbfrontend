@@ -97,14 +97,18 @@ const SearchModal: React.FC<SearchModalProps> = ({
   const textColor = isDarkMode ? 'text-white' : 'text-gray-900';
   const placeholderColor = isDarkMode ? 'placeholder-white/50' : 'placeholder-gray-400';
 
+  if (!isOpen) {
+    return null;
+  }
+  
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-hidden">
       <div 
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         onClick={onClose}
       />
       
-      <div className="relative w-full max-w-4xl mx-4 mt-8">
+      <div className="relative w-full max-w-4xl mx-4 mt-8 md:mt-16 max-h-[90vh] overflow-hidden">
         <div className={`rounded-3xl shadow-2xl backdrop-blur-xl border overflow-hidden ${modalBg} ${isProfessionalView ? 'bg-blue-900/95 border-blue-700/50' : ''}`}>
           
           {/* Header */}

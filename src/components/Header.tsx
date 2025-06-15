@@ -4,6 +4,7 @@ import PHBLogo from './PHBLogo';
 import { useAuth } from '../features/auth/authContext';
 import { useProfessionalAuth } from '../features/professional/professionalAuthContext';
 import CompactSearchBar from './CompactSearchBar';
+import SearchModal from './SearchModal';
 import ViewToggle from './ViewToggle';
 
 // Create a custom hook for dark mode
@@ -34,7 +35,7 @@ const useDarkMode = () => {
 const Header: React.FC = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showCookieBanner, setShowCookieBanner] = useState(true);
-  const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   
   const { user, isAuthenticated, logout, isDoctor } = useAuth();
   const { professionalUser } = useProfessionalAuth();
@@ -136,6 +137,8 @@ const Header: React.FC = () => {
                 isDarkMode={isDarkMode}
                 isProfessionalView={isProfessionalView}
                 className="w-full max-w-md"
+                isModalOpen={isSearchModalOpen}
+                setIsModalOpen={setIsSearchModalOpen}
               />
             </div>
 
@@ -165,7 +168,7 @@ const Header: React.FC = () => {
                     ? 'text-white hover:text-blue-200' 
                     : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
                 } transition-colors`}
-                onClick={() => setShowMobileSearch(!showMobileSearch)}
+                onClick={() => setIsSearchModalOpen(true)}
                 aria-label="Search"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -226,41 +229,13 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Search Bar */}
-      {showMobileSearch && (
-        <div className={`md:hidden border-b ${
-          isDarkMode ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-white'
-        } ${isProfessionalView ? 'bg-blue-800' : ''}`}>
-          <div className="phb-container py-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className={`font-semibold ${
-                isProfessionalView 
-                  ? 'text-white'
-                  : (isDarkMode ? 'text-white' : 'text-gray-900')
-              }`}>
-                Search PHB
-              </h3>
-              <button
-                onClick={() => setShowMobileSearch(false)}
-                className={`${
-                  isProfessionalView 
-                    ? 'text-white hover:text-blue-200'
-                    : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-                } transition-colors`}
-              >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <CompactSearchBar 
-              isDarkMode={isDarkMode}
-              isProfessionalView={isProfessionalView}
-              className="w-full"
-            />
-          </div>
-        </div>
-      )}
+      {/* Global Search Modal (shared between mobile and desktop) */}
+      <SearchModal 
+        isOpen={isSearchModalOpen}
+        onClose={() => setIsSearchModalOpen(false)}
+        isDarkMode={isDarkMode}
+        isProfessionalView={isProfessionalView}
+      />
 
       {/* Mobile menu */}
       {showMobileMenu && (
