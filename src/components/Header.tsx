@@ -5,7 +5,7 @@ import { useAuth } from '../features/auth/authContext';
 import { useProfessionalAuth } from '../features/professional/professionalAuthContext';
 import CompactSearchBar from './CompactSearchBar';
 import SearchModal from './SearchModal';
-import ViewToggle from './ViewToggle';
+import EnhancedViewToggle from './EnhancedViewToggle';
 
 // Create a custom hook for dark mode
 const useDarkMode = () => {
@@ -176,8 +176,8 @@ const Header: React.FC = () => {
                 </svg>
               </button>
 
-              {/* View Toggle for Doctors */}
-              {isAuthenticated && isDoctor && <ViewToggle />}
+              {/* Enhanced View Toggle for Doctors */}
+              {isAuthenticated && isDoctor && <EnhancedViewToggle compact={true} className="ml-1" />}
 
               {/* Login/Account button */}
               {isAuthenticated ? (

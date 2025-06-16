@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { useAuth } from '../../features/auth/authContext';
 import { fetchAppointments } from '../../features/professional/appointmentsService';
+import EnhancedViewToggle from '../../components/EnhancedViewToggle';
 
 // Define appointment type based on the API response
 interface Appointment {
@@ -104,39 +105,14 @@ const AccountAppointmentsPage: React.FC = () => {
         {/* Toggle for doctors to switch appointment view */}
         {isDoctor && (
           <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
                 <h3 className="font-medium text-blue-800">Doctor Access</h3>
                 <p className="text-sm text-blue-600">
                   You can view appointments as a doctor or as a patient
                 </p>
               </div>
-              <div className="flex items-center">
-                <span className={`mr-2 text-sm ${!viewAsDoctor ? 'font-medium' : ''}`}>
-                  Patient
-                </span>
-                <button
-                  onClick={toggleDoctorView}
-                  className="relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  style={{ 
-                    backgroundColor: viewAsDoctor ? '#1E40AF' : '#9CA3AF',
-                  }}
-                  aria-pressed={viewAsDoctor}
-                >
-                  <span className="sr-only">
-                    {viewAsDoctor ? 'View as patient' : 'View as doctor'}
-                  </span>
-                  <span
-                    className={`
-                      ${viewAsDoctor ? 'translate-x-6' : 'translate-x-1'}
-                      inline-block w-4 h-4 transform bg-white rounded-full transition-transform
-                    `}
-                  />
-                </button>
-                <span className={`ml-2 text-sm ${viewAsDoctor ? 'font-medium' : ''}`}>
-                  Doctor
-                </span>
-              </div>
+              <EnhancedViewToggle />
             </div>
           </div>
         )}
