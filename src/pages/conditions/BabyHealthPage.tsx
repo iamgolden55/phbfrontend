@@ -108,32 +108,32 @@ const BabyHealthPage: React.FC = () => {
   const commonConditions = [
     {
       title: 'Colic',
-      path: '/conditions/baby/colic',
+      path: '/health-a-z/colic',
       description: 'Excessive, frequent crying in a baby who appears to be healthy'
     },
     {
       title: 'Cradle cap',
-      path: '/conditions/baby/cradle-cap',
+      path: '/health-a-z/cradle-cap',
       description: 'Yellow, crusty patches on a baby\'s scalp'
     },
     {
       title: 'Nappy rash',
-      path: '/conditions/baby/nappy-rash',
+      path: '/health-a-z/nappy-rash',
       description: 'Red, painful rash in the nappy area'
     },
     {
       title: 'Reflux',
-      path: '/conditions/baby/reflux',
+      path: '/health-a-z/reflux',
       description: 'When a baby brings up milk during or after feeding'
     },
     {
       title: 'Jaundice',
-      path: '/conditions/baby/jaundice',
+      path: '/health-a-z/jaundice',
       description: 'Yellowing of a baby\'s skin and the whites of their eyes'
     },
     {
       title: 'Thrush',
-      path: '/conditions/baby/thrush',
+      path: '/health-a-z/thrush',
       description: 'White patches in a baby\'s mouth or nappy rash that won\'t clear up'
     }
   ];

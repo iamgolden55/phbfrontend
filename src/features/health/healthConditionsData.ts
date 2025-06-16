@@ -173,6 +173,7 @@ import conditionsUtoZ from './healthConditionsData/conditionsU-Z';
 import additionalCommonConditions from './healthConditionsData/additionalCommonConditions';
 import additionalConditions from './healthConditionsData/additionalConditions';
 import popularConditions from './healthConditionsData/popularConditions';
+import babyConditions from './healthConditionsData/babyConditions';
 
 // Combine all conditions into one array
 export const healthConditions: HealthCondition[] = [
@@ -186,5 +187,6 @@ export const healthConditions: HealthCondition[] = [
   ...conditionsUtoZ,
   ...additionalCommonConditions,
   ...additionalConditions,
-  ...popularConditions
+  ...popularConditions,
+  ...babyConditions
 ];

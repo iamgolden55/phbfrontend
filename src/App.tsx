@@ -63,6 +63,7 @@ import MentalWellbeingAssessment from './pages/tools/assessments/MentalWellbeing
 import HomePage from './pages/HomePage';
 import HealthAZPage from './pages/HealthAZPage';
 import HealthConditionPage from './pages/HealthConditionPage';
+import ConditionsPage from './pages/ConditionsPage';
 import MedicinesAZPage from './pages/MedicinesAZPage';
 import MedicineDetailPage from './pages/MedicineDetailPage';
 import LiveWellPage from './pages/LiveWellPage';
@@ -424,6 +425,7 @@ function App() {
               {/* Main layout routes */}
               <Route path="/" element={<MainLayout />}>
                 <Route index element={<HomePage />} />
+                <Route path="conditions" element={<ConditionsPage />} />
                 <Route path="health-assessment-tools" element={<HealthAssessmentToolsPage />} /> {/* New route */}
                 <Route path="health-assessment-tools/calculate-your-bmi" element={<HealthAssessmentBMICalculatorPage />} />
                 <Route path="health-a-z" element={<HealthAZPage />} />
