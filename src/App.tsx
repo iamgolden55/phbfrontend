@@ -81,6 +81,7 @@ import BetterSleepTechniquesPage from './pages/live-well/sleep/BetterSleepTechni
 import CalorieCalculatorPage from './pages/tools/CalorieCalculatorPage';
 import OlderPeoplePage from './pages/care-and-support/OlderPeoplePage';
 import DementiaPage from './pages/care-and-support/DementiaPage';
+import CarersBenefitsPage from './pages/care-and-support/CarersBenefitsPage';
 import FindServicesPage from './pages/FindServicesPage';
 import HospitalDischargePage from './pages/care-and-support/HospitalDischargePage';
 import CarersPage from './pages/care-and-support/CarersPage';
@@ -184,6 +185,14 @@ import GHICPage from './pages/using-the-phb/healthcare-abroad/GHICPage';
 import WomensHealthPage from './pages/womens-health/WomensHealthPage';
 import ContraceptionPage from './pages/contraception/ContraceptionPage';
 import BabyHealthPage from './pages/conditions/BabyHealthPage';
+import NewbornPage from './pages/conditions/baby/NewbornPage';
+import FeedingPage from './pages/conditions/baby/FeedingPage';
+import BabySleepPage from './pages/conditions/baby/SleepPage';
+import CryingPage from './pages/conditions/baby/CryingPage';
+import DevelopmentPage from './pages/conditions/baby/DevelopmentPage';
+import IllnessPage from './pages/conditions/baby/IllnessPage';
+import SafetyPage from './pages/conditions/baby/SafetyPage';
+import SkinPage from './pages/conditions/baby/SkinPage';
 
 // Women's Health Pages
 import PeriodsPage from './pages/womens-health/PeriodsPage';
@@ -462,6 +471,7 @@ function App() {
                 <Route path="care-and-support" element={<CareAndSupportPage />} />
                 <Route path="care-and-support/older-people" element={<OlderPeoplePage />} />
                 <Route path="care-and-support/dementia" element={<DementiaPage />} />
+                <Route path="care-and-support/carers-benefits" element={<CarersBenefitsPage />} />
             <Route path="care-and-support/hospital-discharge" element={<HospitalDischargePage />} />
             <Route path="care-and-support/carers" element={<CarersPage />} />
             <Route path="care-and-support/end-of-life" element={<EndOfLifePage />} />
@@ -556,6 +566,14 @@ function App() {
                 <Route path="using-the-phb/healthcare-abroad" element={<HealthcareAbroadPage />} />
                 <Route path="using-the-phb/healthcare-abroad/nigerian-travel-health" element={<GHICPage />} />
                 <Route path="conditions/baby" element={<BabyHealthPage />} />
+                <Route path="conditions/baby/newborn" element={<NewbornPage />} />
+                <Route path="conditions/baby/feeding" element={<FeedingPage />} />
+                <Route path="conditions/baby/sleep" element={<BabySleepPage />} />
+                <Route path="conditions/baby/crying" element={<CryingPage />} />
+                <Route path="conditions/baby/development" element={<DevelopmentPage />} />
+                <Route path="conditions/baby/illness" element={<IllnessPage />} />
+                <Route path="conditions/baby/safety" element={<SafetyPage />} />
+                <Route path="conditions/baby/skin" element={<SkinPage />} />
 
                 {/* Account and Health Dashboard - Protected Routes */}
                 <Route path="account" element={
