@@ -194,6 +194,7 @@ import DevelopmentPage from './pages/conditions/baby/DevelopmentPage';
 import IllnessPage from './pages/conditions/baby/IllnessPage';
 import SafetyPage from './pages/conditions/baby/SafetyPage';
 import SkinPage from './pages/conditions/baby/SkinPage';
+import HealthChecksPage from './pages/conditions/baby/HealthChecksPage';
 
 // Women's Health Pages
 import PeriodsPage from './pages/womens-health/PeriodsPage';
@@ -576,6 +577,7 @@ function App() {
                 <Route path="conditions/baby/illness" element={<IllnessPage />} />
                 <Route path="conditions/baby/safety" element={<SafetyPage />} />
                 <Route path="conditions/baby/skin" element={<SkinPage />} />
+                <Route path="conditions/baby/health-checks" element={<HealthChecksPage />} />
 
                 {/* Account and Health Dashboard - Protected Routes */}
                 <Route path="account" element={
