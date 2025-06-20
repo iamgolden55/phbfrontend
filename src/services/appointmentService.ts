@@ -22,6 +22,20 @@ export interface AppointmentsResponse {
   total_count: number;
 }
 
+export interface ConflictCheckResponse {
+  has_conflict: boolean;
+  conflict_details?: {
+    existing_appointment_id: string;
+    department: string;
+    date: string;
+    time: string;
+    status: string;
+    formatted_date: string;
+    formatted_time: string;
+  };
+  message: string;
+}
+
 export const AppointmentService = {
   async getAppointments(filters?: {
     status?: string;
@@ -63,6 +77,49 @@ export const AppointmentService = {
       return await response.json();
     } catch (error) {
       console.error('Error fetching appointments:', error);
+      throw error;
+    }
+  },
+
+  async checkAppointmentConflict({
+    department,
+    date,
+    time = '00:00'
+  }: {
+    department: number;
+    date: string; // YYYY-MM-DD format
+    time?: string; // HH:MM format
+  }): Promise<ConflictCheckResponse> {
+    const authData = getAuthData();
+    const token = authData.token;
+    
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
+    const queryParams = new URLSearchParams({
+      department: department.toString(),
+      date,
+      time
+    });
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/appointments/check-conflict/?${queryParams.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to check appointment conflicts');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error checking appointment conflict:', error);
       throw error;
     }
   },

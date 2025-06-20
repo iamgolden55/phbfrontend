@@ -4,6 +4,10 @@ import AccountHealthLayout from '../../layouts/AccountHealthLayout';
 import { useAuth } from '../auth/authContext';
 import { createApiUrl } from '../../utils/config';
 import BodyMapSearch from '../search/BodyMapSearch';
+import PaymentModal from '../../components/modals/PaymentModal';
+import PaymentConfirmation from '../../components/modals/PaymentConfirmation';
+import { calculateAppointmentPrice, getAppointmentTypeDescription, PaymentService } from '../../services/paymentService';
+import { AppointmentService } from '../../services/appointmentService';
 
 interface SelectedSymptom {
   bodyPartId: string;
@@ -251,6 +255,53 @@ const BookAppointment: React.FC = () => {
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [dateTimeError, setDateTimeError] = useState<string | null>(null);
+
+  // Payment states
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showPaymentConfirmation, setShowPaymentConfirmation] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<'success' | 'failed' | 'processing'>('processing');
+  const [paymentData, setPaymentData] = useState<any>(null);
+  const [appointmentPayload, setAppointmentPayload] = useState<any>(null);
+  const [paymentModalData, setPaymentModalData] = useState<any>(null); // 🎯 ADD THIS STATE!
+  
+  // Payment system status states
+  const [paymentsEnabled, setPaymentsEnabled] = useState<boolean>(true);
+  const [freeAppointments, setFreeAppointments] = useState<boolean>(false);
+  const [paymentStatusLoading, setPaymentStatusLoading] = useState<boolean>(true);
+  
+  // 🛡️ DUPLICATE PREVENTION STATES
+  const [processedPaymentReferences, setProcessedPaymentReferences] = useState<Set<string>>(new Set());
+  const [isCreatingAppointment, setIsCreatingAppointment] = useState(false);
+  
+  // 🛡️ CONFLICT CHECK STATES
+  const [isCheckingConflict, setIsCheckingConflict] = useState(false);
+  const [conflictError, setConflictError] = useState<string | null>(null);
+
+  // Check payment system status on component mount
+  useEffect(() => {
+    const checkPaymentStatus = async () => {
+      try {
+        setPaymentStatusLoading(true);
+        const paymentStatus = await PaymentService.getPaymentStatus();
+        
+        console.log('💰 Payment system status:', paymentStatus);
+        
+        setPaymentsEnabled(paymentStatus.payments_enabled);
+        setFreeAppointments(paymentStatus.free_appointments);
+      } catch (error) {
+        console.error('Failed to check payment status:', error);
+        // Default to payments enabled on error
+        setPaymentsEnabled(true);
+        setFreeAppointments(false);
+      } finally {
+        setPaymentStatusLoading(false);
+      }
+    };
+
+    if (isAuthenticated) {
+      checkPaymentStatus();
+    }
+  }, [isAuthenticated]);
 
   // Fetch departments on component mount
   useEffect(() => {
@@ -601,7 +652,6 @@ const BookAppointment: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setSubmissionError(null);
 
     try {
@@ -632,10 +682,13 @@ const BookAppointment: React.FC = () => {
         throw new Error('Could not parse the selected time. Please try selecting a different time slot.');
       }
 
-      // Format date and time properly with timezone
-      const { startHour, startMinute } = parsedTime;
-      const datePart = formData.preferredDate;
-      const appointmentDateTime = `${datePart}T${String(startHour).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}:00Z`;
+      // 🔍 DEBUG: Log appointment date creation
+      console.log('🔍 APPOINTMENT DATE DEBUG:');
+      console.log('- Selected date:', formData.preferredDate);
+      console.log('- Selected time slot:', formData.preferredTimeSlot);
+      console.log('- Parsed time:', parsedTime);
+      console.log('- Date explicitly selected:', formData.dateExplicitlySelected);
+      console.log('- Time explicitly selected:', formData.timeExplicitlySelected);
 
       // Ensure we have valid hospital ID from user profile
       if (!primaryHospital?.id) {
@@ -647,12 +700,12 @@ const BookAppointment: React.FC = () => {
         throw new Error('Invalid hospital ID. Please check your profile settings.');
       }
 
-      // Get department ID using the mapping function
+      // Get department ID and name for payment
       let departmentId: number | null = null;
+      let departmentName = 'General Medicine';
       
       if (formData.selectedSymptoms.length > 1) {
         // For multiple symptoms, find the most appropriate department
-        // First try to find a common department among all symptoms
         const allDepartments = new Map<string, number>();
         
         // Count department occurrences across all symptoms
@@ -675,6 +728,7 @@ const BookAppointment: React.FC = () => {
             d.name.toLowerCase() === mostCommonDeptName
           );
           departmentId = mostCommonDept?.id || null;
+          departmentName = mostCommonDept?.name || 'General Medicine';
         }
         
         // If no department found or still null, try General Medicine as fallback
@@ -683,20 +737,41 @@ const BookAppointment: React.FC = () => {
             d.name.toLowerCase() === 'general medicine'
           );
           departmentId = generalMedicineDept?.id || null;
+          departmentName = generalMedicineDept?.name || 'General Medicine';
         }
         
         // If still no department, use the first department as last resort
         if (!departmentId && departments.length > 0) {
           departmentId = departments[0].id;
+          departmentName = departments[0].name;
         }
       } else if (formData.selectedSymptoms.length === 1) {
         // For single symptom, use the standard mapping
         departmentId = getDepartmentForBodyPart(formData.selectedSymptoms[0].bodyPartId, departments);
+        const dept = departments.find(d => d.id === departmentId);
+        departmentName = dept?.name || 'General Medicine';
       }
 
       if (!departmentId) {
         throw new Error('Could not determine appropriate department. Please try again.');
       }
+
+      // Check hospital registration before proceeding
+      console.log(`Checking registration for hospital ID: ${hospitalId}`);
+      const isRegistered = await checkHospitalRegistration(hospitalId);
+      
+      if (!isRegistered) {
+        throw new Error('You must be registered with this hospital before booking an appointment. Please go to your profile and register with the hospital first.');
+      }
+
+      // Format date and time properly with timezone
+      const { startHour, startMinute } = parsedTime;
+      const datePart = formData.preferredDate;
+      const appointmentDateTime = `${datePart}T${String(startHour).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}:00Z`;
+
+      // 🔍 DEBUG: Log final appointment datetime
+      console.log('🔍 FINAL APPOINTMENT DATETIME:', appointmentDateTime);
+      console.log('🔍 PARSED AS DATE:', new Date(appointmentDateTime).toLocaleString());
 
       // Map urgency levels to priority
       const priorityMapping: { [key: string]: string } = {
@@ -710,7 +785,7 @@ const BookAppointment: React.FC = () => {
         ? `${formData.selectedSymptoms[0].bodyPartName} - ${formData.selectedSymptoms[0].symptomName}`
         : 'General consultation';
 
-      // Construct the base payload
+      // Construct the appointment payload (to be sent AFTER payment)
       const basePayload = {
         hospital: hospitalId,
         department: Number(departmentId),
@@ -721,7 +796,7 @@ const BookAppointment: React.FC = () => {
       };
 
       // Add symptoms_data if we have symptoms
-      const requestBody = formData.selectedSymptoms.length > 0 
+      const appointmentRequestBody = formData.selectedSymptoms.length > 0 
         ? {
             ...basePayload,
             symptoms_data: formData.selectedSymptoms.map(symptom => ({
@@ -733,91 +808,211 @@ const BookAppointment: React.FC = () => {
           }
         : basePayload;
 
-      // Debug log the final payload
-      console.log('Appointment request payload:', JSON.stringify(requestBody, null, 2));
+      // Store appointment payload for AFTER payment success
+      setAppointmentPayload(appointmentRequestBody);
 
-      // Check hospital registration before submitting
-      console.log(`Checking registration for hospital ID: ${hospitalId}`);
-      const isRegistered = await checkHospitalRegistration(hospitalId);
+      // 🔍 DEBUG: Log final appointment payload
+      console.log('🔍 APPOINTMENT PAYLOAD TO BE SENT AFTER PAYMENT:');
+      console.log('- Full payload:', appointmentRequestBody);
+      console.log('- Appointment date field:', appointmentRequestBody.appointment_date);
+      console.log('- Hospital ID:', appointmentRequestBody.hospital);
+      console.log('- Department ID:', appointmentRequestBody.department);
+
+      console.log('🚀 Initializing payment BEFORE creating appointment...');
+
+      // Step 1: Initialize payment through backend FIRST (NO APPOINTMENT YET!)
+      const paymentDataForModal = {
+        // 🎯 NO appointmentId YET - we'll create appointment AFTER payment!
+        urgency: formData.urgency as 'routine' | 'soon' | 'urgent',
+        department: departmentName,
+        patientEmail: user?.email || '',
+        patientName: user?.full_name || user?.first_name + ' ' + user?.last_name || 'Patient',
+        appointmentDate: appointmentDateTime, // ✅ Use ISO format for backend
+        appointmentTime: formData.preferredTimeSlot,
+        symptoms: formData.selectedSymptoms,
+        // 🚀 PAYMENT-FIRST: Include booking details for backend
+        departmentId: departmentId,
+        hospitalId: hospitalId,
+        chiefComplaint: primaryComplaint,
+        priority: priorityMapping[formData.urgency] || "normal",
+        // ✅ Add additional booking details needed by backend
+        appointmentType: "consultation",
+        medicalHistory: formData.additionalNotes || '',
+        allergies: '',
+        currentMedications: '',
+        duration: 30,
+        isInsuranceBased: false,
+        insuranceDetails: {}
+      };
+
+      console.log('🚀 Initializing payment without appointment (payment-first approach)...');
       
-      if (!isRegistered) {
-        throw new Error('You must be registered with this hospital before booking an appointment. Please go to your profile and register with the hospital first.');
-      }
-
-      // Submit appointment to API
-      const response = await fetch(createApiUrl('api/appointments/'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem(AUTH_TOKEN_KEY)}`,
-        },
-        body: JSON.stringify(requestBody)
-      });
-
-      // Get the complete response for debugging
-      const responseText = await response.text();
-      console.log('API Response:', responseText);
+      // 🔥 INITIALIZE PAYMENT WITHOUT APPOINTMENT ID!
+      const paymentInitResult = await PaymentService.initializePayment(paymentDataForModal);
       
-      let appointmentData;
-      try {
-        appointmentData = JSON.parse(responseText);
-      } catch (e) {
-        console.error('Failed to parse API response:', e);
-        console.log('Raw response:', responseText);
-        throw new Error('Received invalid response from server. Please try again.');
+      if (paymentInitResult.status !== 'success' || !paymentInitResult.data) {
+        throw new Error(paymentInitResult.message || 'Failed to initialize payment');
       }
 
-      if (!response.ok) {
-        // Try to extract detailed error information
-        if (appointmentData.errors && typeof appointmentData.errors === 'object') {
-          const errorDetails = Object.entries(appointmentData.errors)
-            .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
-            .join('; ');
-          throw new Error(`Validation failed: ${errorDetails}`);
-        } else if (appointmentData.error && appointmentData.error.includes('Patient must be registered with the hospital')) {
-          throw new Error('You must be registered with this hospital before booking an appointment. Please go to your profile and register with the hospital first.');
-        } else if (appointmentData.error && typeof appointmentData.error === 'object') {
-          const errorDetails = Object.entries(appointmentData.error)
-            .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
-            .join('; ');
-          throw new Error(`Error: ${errorDetails}`);
-        } else if (appointmentData.message) {
-          throw new Error(appointmentData.message);
-        } else if (appointmentData.detail) {
-          throw new Error(appointmentData.detail);
-        } else if (typeof appointmentData === 'string') {
-          throw new Error(appointmentData);
-        } else {
-          throw new Error(`Failed to create appointment (${response.status}). Please try again.`);
-        }
+      console.log('✅ Payment initialized (no appointment created yet):', paymentInitResult.data);
+
+      // Check if payment was waived (payments disabled)
+      if (paymentInitResult.isPaymentWaived) {
+        console.log('🎉 Payment waived - appointment created successfully!');
+        
+        // Skip payment modal and go directly to confirmation
+        setPaymentData({
+          reference: 'waived-payment',
+          status: 'completed',
+          amount: 0,
+          currency: 'NGN',
+          transaction: 'free-appointment'
+        });
+        setPaymentStatus('success');
+        setShowPaymentConfirmation(true);
+        return;
       }
 
-      // Success! Navigate to confirmation page with details
-      navigate('/account/appointments/confirmation', {
-        state: {
-          appointmentDetails: {
-            selectedSymptoms: formData.selectedSymptoms,
-            preferredLanguage: formData.preferredLanguage,
-            urgency: formData.urgency,
-            appointmentId: appointmentData.id || 'pending',
-            departmentName: appointmentData.department?.name || 
-                           (formData.selectedSymptoms.length === 1 ? 
-                           departments.find(d => d.id === departmentId)?.name : 
-                           'General Medicine'),
-            location: appointmentData.location || 'PHB Virtual Care',
-            dateConfirmed: formData.preferredDate,
-            timeConfirmed: formData.preferredTimeSlot,
-            additionalNotes: formData.additionalNotes
-          }
-        }
-      });
+      // Calculate amount and appointment type
+      const amount = calculateAppointmentPrice(paymentDataForModal);
+      const appointmentType = getAppointmentTypeDescription(paymentDataForModal);
+
+      // Show payment modal with all the appointment details
+      const appointmentDataForPayment = {
+        amount,
+        currency: 'NGN',
+        appointmentType,
+        patientEmail: paymentDataForModal.patientEmail,
+        patientName: paymentDataForModal.patientName,
+        appointmentDate: new Date(formData.preferredDate).toLocaleDateString('en-GB', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        }),
+        appointmentTime: formData.preferredTimeSlot,
+        department: departmentName,
+        // 🎯 ADD BACKEND PAYMENT REFERENCE!
+        paymentReference: paymentInitResult.data.reference
+      };
+
+      console.log('Showing payment modal with backend reference:', appointmentDataForPayment);
+      setPaymentModalData(appointmentDataForPayment); // 🎯 STORE THE PAYMENT DATA!
+      setShowPaymentModal(true);
+
     } catch (error: any) {
-      console.error('Error submitting appointment:', error);
-      setSubmissionError(error.message || 'Failed to create appointment. Please try again.');
-    } finally {
-      setIsSubmitting(false);
+      console.error('Error preparing appointment:', error);
+      setSubmissionError(error.message || 'Failed to prepare appointment. Please try again.');
     }
+  };
+
+  // Handle successful payment - PAYMENT-FIRST APPROACH!
+  const handlePaymentSuccess = async (transactionData: any) => {
+    setShowPaymentModal(false);
+    setPaymentData(transactionData);
+    setShowPaymentConfirmation(true);
+
+    // 🛡️ PREVENT DUPLICATE PROCESSING
+    const paymentReference = transactionData.reference || transactionData.trans;
+    
+    if (!paymentReference) {
+      console.error('❌ No payment reference found in transaction data:', transactionData);
+      setPaymentStatus('failed');
+      setSubmissionError('Payment successful but missing reference. Please contact support.');
+      return;
+    }
+
+    if (processedPaymentReferences.has(paymentReference)) {
+      console.log('🛡️ Payment reference already processed, skipping duplicate:', paymentReference);
+      setPaymentStatus('success');
+      return;
+    }
+
+    if (isCreatingAppointment) {
+      console.log('⚠️ Appointment creation already in progress, skipping duplicate request');
+      return;
+    }
+
+    try {
+      setIsCreatingAppointment(true);
+      
+      // Mark this payment reference as processed
+      setProcessedPaymentReferences(prev => new Set(prev).add(paymentReference));
+      
+      console.log('💳 Payment successful! Using payment-first approach:', transactionData);
+      console.log('🔍 Payment reference being processed:', paymentReference);
+      
+      // 🚀 PAYMENT-FIRST APPROACH: Appointment already created during payment!
+      // We just need to verify the backend created it successfully by checking the transaction data
+      
+      if (transactionData.status === 'completed' || transactionData.status === 'successful') {
+        console.log('✅ Payment completed successfully - appointment already created by backend!');
+        console.log('✅ Transaction data:', transactionData);
+        
+        setPaymentStatus('success');
+        console.log('🎉 Payment-first flow successful: Payment processed and appointment created by backend!');
+      } else {
+        // Handle unexpected payment status
+        console.warn('⚠️ Unexpected payment status:', transactionData.status);
+        setPaymentStatus('success'); // Still proceed as payment verification succeeded
+      }
+      
+    } catch (error: any) {
+      console.error('💥 Payment success handling failed:', error);
+      console.error('💥 Error message:', error.message);
+      console.error('💥 Error stack:', error.stack);
+      
+      // Remove the payment reference from processed set on error so it can be retried
+      setProcessedPaymentReferences(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(paymentReference);
+        return newSet;
+      });
+      
+      setPaymentStatus('failed');
+      setSubmissionError('Payment processing failed. Please contact support with your payment reference: ' + paymentReference);
+    } finally {
+      setIsCreatingAppointment(false);
+    }
+  };
+
+  // Handle payment failure
+  const handlePaymentError = (error: string) => {
+    setShowPaymentModal(false);
+    setPaymentStatus('failed');
+    setShowPaymentConfirmation(true);
+    setSubmissionError(error);
+  };
+
+  // Handle payment retry
+  const handlePaymentRetry = () => {
+    setShowPaymentConfirmation(false);
+    setShowPaymentModal(true);
+    setSubmissionError(null);
+    
+    // ✅ Reset payment states for retry
+    setPaymentStatus('processing');
+    setPaymentData(null);
+    
+    console.log('🔄 User initiated payment retry');
+  };
+
+  // Handle going to appointments after success
+  const handleGoToAppointments = () => {
+    navigate('/account/appointments');
+  };
+
+  // Close payment confirmation
+  const handleClosePaymentConfirmation = () => {
+    setShowPaymentConfirmation(false);
+    if (paymentStatus === 'success') {
+      // Navigate to appointments page on success
+      navigate('/account/appointments');
+    }
+    // Reset states
+    setPaymentData(null);
+    setAppointmentPayload(null);
+    setPaymentModalData(null); // 🎯 RESET PAYMENT MODAL DATA!
   };
 
   // Helper function for error messages
@@ -992,6 +1187,25 @@ const BookAppointment: React.FC = () => {
     <AccountHealthLayout title="Book an Appointment">
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <h2 className="text-2xl font-bold mb-6">Book an Appointment</h2>
+
+        {/* Free Appointments Notice */}
+        {!paymentStatusLoading && freeAppointments && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center">
+              <svg className="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <div>
+                <h3 className="text-sm font-medium text-green-800">
+                  Free Appointments Available!
+                </h3>
+                <p className="text-sm text-green-700 mt-1">
+                  All appointments are currently free of charge. Complete your booking without any payment required.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="mb-8">
           <div className="relative">
@@ -1471,7 +1685,7 @@ const BookAppointment: React.FC = () => {
                         Processing...
                       </>
                     ) : (
-                      "Submit Appointment Request"
+                      freeAppointments ? "Book Free Appointment" : "Proceed to Payment"
                     )}
                   </button>
                 </div>
@@ -1498,6 +1712,52 @@ const BookAppointment: React.FC = () => {
           </ol>
         </div>
       </div>
+
+      {/* Payment Modal */}
+      {showPaymentModal && paymentModalData && (
+        <PaymentModal
+          isOpen={showPaymentModal}
+          onClose={() => setShowPaymentModal(false)}
+          onPaymentSuccess={handlePaymentSuccess}
+          onPaymentError={handlePaymentError}
+          appointmentData={paymentModalData} // 🎯 USE THE STORED DATA WITH BACKEND REFERENCE!
+        />
+      )}
+
+      {/* Payment Confirmation Modal */}
+      {showPaymentConfirmation && (
+        <PaymentConfirmation
+          isOpen={showPaymentConfirmation}
+          onClose={handleClosePaymentConfirmation}
+          status={paymentStatus}
+          paymentData={paymentData ? {
+            transactionId: paymentData.id || paymentData.trans || '',
+            reference: paymentData.reference || '',
+            amount: paymentData.amount || 0,
+            currency: 'NGN',
+            paymentMethod: 'card',
+            paidAt: paymentData.paid_at || new Date().toISOString()
+          } : undefined}
+          appointmentData={paymentData?.appointmentData ? {
+            appointmentId: paymentData.appointmentData.id?.toString() || '',
+            appointmentType: getAppointmentTypeDescription({
+              urgency: formData.urgency as 'routine' | 'soon' | 'urgent',
+              department: departments.find(d => d.id === appointmentPayload?.department)?.name || 'General Medicine',
+              patientEmail: user?.email || '',
+              patientName: user?.full_name || user?.first_name + ' ' + user?.last_name || 'Patient',
+              appointmentDate: formData.preferredDate,
+              appointmentTime: formData.preferredTimeSlot,
+              symptoms: formData.selectedSymptoms
+            }),
+            department: departments.find(d => d.id === appointmentPayload?.department)?.name || 'General Medicine',
+            date: formData.preferredDate,
+            time: formData.preferredTimeSlot,
+            patientName: user?.full_name || user?.first_name + ' ' + user?.last_name || 'Patient'
+          } : undefined}
+          onRetry={handlePaymentRetry}
+          onGoToAppointments={handleGoToAppointments}
+        />
+      )}
     </AccountHealthLayout>
   );
 };

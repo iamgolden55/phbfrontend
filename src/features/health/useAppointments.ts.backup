@@ -40,19 +40,34 @@ export function useAppointments(view: 'upcoming' | 'past' | 'all' = 'upcoming') 
         });
         if (!response.ok) throw new Error(`Failed to fetch appointments: ${response.status}`);
         const data = await response.json();
-        const formattedAppointments = Array.isArray(data) ? data.map((apt: any) => ({
-          id: apt.id || apt.appointment_id || '',
-          date: apt.date || (apt.appointment_date ? apt.appointment_date.split('T')[0] : ''),
-          time: apt.time || (apt.appointment_date ? new Date(apt.appointment_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''),
-          duration: apt.duration || '30 min',
-          type: apt.appointment_type?.includes('video') ? 'video' : 
-                apt.appointment_type?.includes('phone') ? 'phone' : 'in-person',
-          provider: apt.doctor_full_name || apt.doctor_name || 'Doctor',
-          speciality: apt.department_name || apt.specialty || 'General',
-          location: apt.location || apt.hospital_name || 'PHB Medical Center',
-          status: apt.status || 'scheduled',
-          reason: apt.chief_complaint || apt.reason || '',
-        })) : [];
+        
+        // 🔍 DEBUG: Log appointments API response
+        console.log('🔍 APPOINTMENTS API DEBUG:');
+        console.log('- API URL:', createApiUrl(`api/appointments/${queryParams}`));
+        console.log('- Response status:', response.status);
+        console.log('- Raw API data:', data);
+        console.log('- Data type:', typeof data);
+        console.log('- Is array:', Array.isArray(data));
+        console.log('- Data length:', Array.isArray(data) ? data.length : 'N/A');
+        
+        const formattedAppointments = Array.isArray(data) ? data.map((apt: any) => {
+          console.log('🔍 Processing appointment:', apt);
+          return {
+            id: apt.id || apt.appointment_id || '',
+            date: apt.date || (apt.appointment_date ? apt.appointment_date.split('T')[0] : ''),
+            time: apt.time || (apt.appointment_date ? new Date(apt.appointment_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''),
+            duration: apt.duration || '30 min',
+            type: apt.appointment_type?.includes('video') ? 'video' : 
+                  apt.appointment_type?.includes('phone') ? 'phone' : 'in-person',
+            provider: apt.doctor_full_name || apt.doctor_name || 'Doctor',
+            speciality: apt.department_name || apt.specialty || 'General',
+            location: apt.location || apt.hospital_name || 'PHB Medical Center',
+            status: apt.status || 'scheduled',
+            reason: apt.chief_complaint || apt.reason || '',
+          };
+        }) : [];
+        
+        console.log('🔍 FORMATTED APPOINTMENTS:', formattedAppointments);
         setAppointments(formattedAppointments);
       } catch (err: any) {
         setError(err.message || 'Failed to load appointments. Please try again later.');

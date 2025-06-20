@@ -1,6 +1,25 @@
-# PHB Website Frontend (phb-website)
+# PHB Hospital System - Frontend
 
-This repository contains the frontend code for the Public Health Bureau (PHB) website, a comprehensive platform designed to provide health information, services, and tools for the public and healthcare professionals.
+[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![React](https://img.shields.io/badge/React-18+-blue.svg)](https://reactjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://typescriptlang.org)
+[![Vite](https://img.shields.io/badge/Vite-4+-green.svg)](https://vitejs.dev)
+
+## ⚖️ **IMPORTANT: NON-COMMERCIAL LICENSE**
+
+**This software is licensed under CC BY-NC-SA 4.0 - Commercial use is strictly prohibited.**
+
+- ✅ **Educational and personal use allowed**
+- ✅ **Must provide attribution to Golden/PHB**
+- ✅ **Must share improvements under same license**
+- ❌ **NO commercial use without explicit written permission**
+- ⚖️ **Violations subject to legal action and damages**
+
+For commercial licensing inquiries, contact the copyright holder.
+
+## 🏥 About PHB Hospital System Frontend
+
+Advanced hospital management frontend built with React and TypeScript, featuring comprehensive patient care interfaces, medical records management, appointment scheduling, and payment integration.
 
 ## Overview
 
@@ -45,9 +64,9 @@ The PHB website aims to be a central hub for accessing reliable health informati
 *   **Build Tool:** Vite
 *   **Styling:** Tailwind CSS
 *   **Routing:** React Router DOM
-*   **State Management:** React Context API (implied)
+*   **State Management:** React Context API
 *   **Linting:** ESLint
-*   **Package Management:** Likely `npm` (due to `package-lock.json`) or `bun` (used in `predeploy` script)
+*   **Package Management:** npm/bun
 
 ## Getting Started
 
@@ -101,6 +120,10 @@ The PHB website aims to be a central hub for accessing reliable health informati
 
 This project is configured for deployment on Netlify. The `netlify.toml` file likely contains build settings, and the `deploy` script uses the Netlify CLI. Pushing to the configured branch on GitHub might also trigger automatic deployments if Netlify integration is set up.
 
-## Contributing
+## 📄 License
 
-*(Optional: Add guidelines for contributing if this is an open project)*
+Copyright (c) 2025 Golden (Public Health Bureau)
+
+This project is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. See the [LICENSE](LICENSE) file for details.
+
+**Commercial use is strictly prohibited.** Contact the copyright holder for commercial licensing.

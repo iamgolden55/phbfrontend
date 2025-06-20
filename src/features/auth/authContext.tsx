@@ -148,6 +148,12 @@ async function apiRequest<T>(
 ): Promise<T> {
   // Ensure exactly one slash between base URL and endpoint
   const url = `${API_BASE_URL.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
+  
+  // 🐛 DEBUG: Log the actual URL being called
+  console.log('🔗 API_BASE_URL:', API_BASE_URL);
+  console.log('🔗 Final URL:', url);
+  console.log('🔗 Method:', method);
+  
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',

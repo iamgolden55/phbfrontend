@@ -71,22 +71,86 @@ export const useAppointments = (viewType: AppointmentViewType = 'upcoming') => {
     getAppointments();
   }, [viewType, user]);
 
-  // Filter appointments based on the view type
-  const filteredAppointments = appointments.filter(appointment => {
-    const appointmentDate = new Date(appointment.date);
-    const now = new Date();
-
-    if (viewType === 'upcoming') {
-      return appointmentDate >= now && appointment.status !== 'cancelled';
-    } else if (viewType === 'past') {
-      return appointmentDate < now || appointment.status === 'completed';
-    } else {
-      return true; // 'all' view
+  // Utility function to create a sortable datetime from appointment
+  const getAppointmentDateTime = (appointment: Appointment): Date => {
+    try {
+      // Handle different date formats that might come from the API
+      let dateTime: Date;
+      
+      if (appointment.date.includes('T')) {
+        // ISO format date
+        dateTime = new Date(appointment.date);
+      } else {
+        // Date and time are separate, combine them
+        const datePart = appointment.date;
+        const timePart = appointment.time || '00:00';
+        
+        // Handle different time formats
+        let timeFormatted = timePart;
+        if (timePart.includes('AM') || timePart.includes('PM')) {
+          // 12-hour format, convert to 24-hour for proper Date parsing
+          timeFormatted = timePart;
+        } else if (timePart.length === 5 && timePart.includes(':')) {
+          // Already in 24-hour format like "09:00"
+          timeFormatted = timePart;
+        }
+        
+        dateTime = new Date(`${datePart} ${timeFormatted}`);
+      }
+      
+      // If date is invalid, use a far future date to put it at the end
+      return isNaN(dateTime.getTime()) ? new Date('2099-12-31') : dateTime;
+    } catch (error) {
+      console.warn('Error parsing appointment date/time:', appointment, error);
+      return new Date('2099-12-31');
     }
-  });
+  };
+
+  // Filter and sort appointments based on the view type
+  const filteredAndSortedAppointments = appointments
+    .filter(appointment => {
+      const appointmentDate = getAppointmentDateTime(appointment);
+      const now = new Date();
+
+      if (viewType === 'upcoming') {
+        return appointmentDate >= now && appointment.status !== 'cancelled';
+      } else if (viewType === 'past') {
+        return appointmentDate < now || appointment.status === 'completed';
+      } else {
+        return true; // 'all' view
+      }
+    })
+    .sort((a, b) => {
+      const dateA = getAppointmentDateTime(a);
+      const dateB = getAppointmentDateTime(b);
+      
+      if (viewType === 'upcoming') {
+        // For upcoming appointments: earliest first
+        return dateA.getTime() - dateB.getTime();
+      } else if (viewType === 'past') {
+        // For past appointments: most recent first
+        return dateB.getTime() - dateA.getTime();
+      } else {
+        // For 'all' view: upcoming first (chronological), then past (reverse chronological)
+        const now = new Date();
+        const aIsUpcoming = dateA >= now && a.status !== 'cancelled';
+        const bIsUpcoming = dateB >= now && b.status !== 'cancelled';
+        
+        if (aIsUpcoming && !bIsUpcoming) return -1; // a comes first
+        if (!aIsUpcoming && bIsUpcoming) return 1;  // b comes first
+        
+        if (aIsUpcoming && bIsUpcoming) {
+          // Both upcoming: earliest first
+          return dateA.getTime() - dateB.getTime();
+        } else {
+          // Both past: most recent first
+          return dateB.getTime() - dateA.getTime();
+        }
+      }
+    });
 
   return {
-    appointments: filteredAppointments,
+    appointments: filteredAndSortedAppointments,
     loading,
     error,
   };
