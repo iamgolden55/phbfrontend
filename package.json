@@ -15,6 +15,8 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@fluentui/react-components": "^9.66.3",
+    "@fluentui/react-icons": "^2.0.304",
     "@heroicons/react": "^2.2.0",
     "@mui/icons-material": "^7.1.1",
     "@mui/material": "^7.1.1",
@@ -27,6 +29,7 @@
     "cornerstone-core": "^2.6.1",
     "date-fns": "^4.1.0",
     "dicom-parser": "^1.8.21",
+    "framer-motion": "^12.19.1",
     "glob": "^11.0.2",
     "lodash": "^4.17.21",
     "lucide-react": "^0.511.0",

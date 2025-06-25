@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import MainLayout from './layouts/MainLayout';
 import ProfessionalLayout from './layouts/ProfessionalLayout';
 import OrganizationLayout from './layouts/OrganizationLayout';
+import FluentOrganizationLayout from './layouts/FluentOrganizationLayout';
 
 // Components
 import ScrollToTop from './components/ScrollToTop';
@@ -18,6 +19,7 @@ import AppointmentConfirmation from './features/health/AppointmentConfirmation';
 
 // Organization Pages
 import OrganizationDashboardPage from './pages/organization/OrganizationDashboardPage';
+import FluentDashboardPage from './pages/organization/FluentDashboardPage';
 import OrganizationLoginPage from './pages/organization/OrganizationLoginPage';
 import OrganizationRegisterPage from './pages/organization/OrganizationRegisterPage';
 import PatientAdmissionsPage from './pages/organization/PatientAdmissionsPage';
@@ -358,10 +360,10 @@ function App() {
               <Route path="hospital-admin/reset-password/complete" element={<HospitalAdminPasswordResetCompletePage />} />
 
               {/* Organization layout routes */}
-              <Route path="/organization" element={<OrganizationLayout />}>
+              <Route path="/organization" element={<FluentOrganizationLayout />}>
                 <Route path="dashboard" element={
                   <OrganizationRouteGuard>
-                    <OrganizationDashboardPage />
+                    <FluentDashboardPage />
                   </OrganizationRouteGuard>
                 } />
                 <Route path="user-registrations" element={
@@ -415,6 +417,7 @@ function App() {
                   </OrganizationRouteGuard>
                 } />
               </Route>
+
 
               {/* Test pages for debugging */}
               <Route path="test" element={<TestPage />} />

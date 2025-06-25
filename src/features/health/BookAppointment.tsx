@@ -669,11 +669,11 @@ const BookAppointment: React.FC = () => {
         throw new Error('Please select at least one symptom for your appointment');
       }
 
-      // Validate symptom descriptions
-      const incompleteSymptoms = formData.selectedSymptoms.filter(s => !s.description || s.description.trim() === '');
-      if (incompleteSymptoms.length > 0) {
-        throw new Error('Please provide descriptions for all selected symptoms');
-      }
+      // Validate symptom descriptions (optional - allow empty descriptions)
+      // const incompleteSymptoms = formData.selectedSymptoms.filter(s => !s.description || s.description.trim() === '');
+      // if (incompleteSymptoms.length > 0) {
+      //   throw new Error('Please provide descriptions for all selected symptoms');
+      // }
 
       // Parse the time slot
       const parsedTime = parseTimeSlot(formData.preferredTimeSlot);
@@ -1155,8 +1155,8 @@ const BookAppointment: React.FC = () => {
   const validateCurrentStep = (): boolean => {
     switch (currentStep) {
       case 1:
+        // Only require symptoms, language and urgency - descriptions are optional
         return formData.selectedSymptoms.length > 0 && 
-          formData.selectedSymptoms.every(s => s.description.trim() !== '') && 
           !!formData.preferredLanguage && 
           !!formData.urgency;
       case 2:
@@ -1291,7 +1291,7 @@ const BookAppointment: React.FC = () => {
                               value={symptom.description}
                               onChange={(e) => handleSymptomDescriptionChange(index, e.target.value)}
                               className="mt-2 w-full p-2 text-sm border border-gray-300 rounded"
-                              placeholder="Please explain your health concern in full detail, including its onset, progression, and any potentially relevant information."
+                              placeholder="Optional: Describe your symptoms in more detail (e.g., when did it start, severity, any patterns)"
                               rows={2}
                             />
                           </div>

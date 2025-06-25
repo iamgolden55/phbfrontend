@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { Tab, Tabs, Box, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, InputLabel, Select, MenuItem } from '@mui/material';
 import MedicalRecordsTab from '../../features/medical/MedicalRecordsTab';
+import MedicalAccessTab from '../../features/professional/MedicalAccessTab';
 import { 
   fetchDoctorAppointmentDetails, 
   updateAppointmentStatus, 
@@ -1019,7 +1020,8 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
             scrollButtons="auto"
           >
             <Tab label="Appointment Details" {...a11yProps(0)} />
-            <Tab label="Medical Records" {...a11yProps(1)} disabled={!appointmentDetails?.patient_id} />
+            <Tab label="Patient Medical Records" {...a11yProps(1)} disabled={!appointmentDetails?.patient_id} />
+            <Tab label="Medical Access" {...a11yProps(2)} disabled={!appointmentDetails?.patient_id} />
           </Tabs>
         </Box>
         
@@ -1154,6 +1156,23 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
             <Box sx={{ p: 3, textAlign: 'center' }}>
               <Typography variant="body1" color="text.secondary">
                 No patient information available to view medical records.
+              </Typography>
+            </Box>
+          )}
+        </TabPanel>
+        
+        {/* Medical Access Tab */}
+        <TabPanel value={tabValue} index={2}>
+          {appointmentDetails?.patient_id ? (
+            <MedicalAccessTab 
+              patientId={appointmentDetails.patient_id} 
+              patientName={appointmentDetails.patient_name}
+              appointmentId={appointmentId || ''}
+            />
+          ) : (
+            <Box sx={{ p: 3, textAlign: 'center' }}>
+              <Typography variant="body1" color="text.secondary">
+                No patient information available for medical access management.
               </Typography>
             </Box>
           )}

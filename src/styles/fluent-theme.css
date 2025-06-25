@@ -1,0 +1,171 @@
+/* Fluent UI Theme CSS Variables and Global Styles */
+
+/* Import Segoe UI Variable font if available */
+@font-face {
+  font-family: 'Segoe UI Variable';
+  src: local('Segoe UI Variable Display'), local('Segoe UI Variable'), local('Segoe UI');
+  font-weight: 100 900;
+}
+
+/* CSS Custom Properties for Fluent Design */
+:root {
+  /* Typography */
+  --fluent-font-family: 'Segoe UI Variable', 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica', sans-serif;
+  
+  /* Depth (Shadows) */
+  --fluent-shadow-2: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108);
+  --fluent-shadow-4: 0 3.2px 7.2px 0 rgba(0, 0, 0, 0.132), 0 0.6px 1.8px 0 rgba(0, 0, 0, 0.108);
+  --fluent-shadow-8: 0 6.4px 14.4px 0 rgba(0, 0, 0, 0.132), 0 1.2px 3.6px 0 rgba(0, 0, 0, 0.108);
+  --fluent-shadow-16: 0 12.8px 28.8px 0 rgba(0, 0, 0, 0.132), 0 2.4px 7.2px 0 rgba(0, 0, 0, 0.108);
+  --fluent-shadow-28: 0 22.4px 50.4px 0 rgba(0, 0, 0, 0.132), 0 4.2px 12.6px 0 rgba(0, 0, 0, 0.108);
+  
+  /* Animations */
+  --fluent-duration-ultra-fast: 50ms;
+  --fluent-duration-faster: 100ms;
+  --fluent-duration-fast: 150ms;
+  --fluent-duration-normal: 200ms;
+  --fluent-duration-slow: 300ms;
+  --fluent-duration-slower: 400ms;
+  --fluent-duration-ultra-slow: 500ms;
+  
+  --fluent-easing-accelerate: cubic-bezier(0.9, 0.1, 1, 0.2);
+  --fluent-easing-decelerate: cubic-bezier(0.1, 0.9, 0.2, 1);
+  --fluent-easing-ease: cubic-bezier(0.33, 0, 0.67, 1);
+}
+
+/* Global Styles */
+body {
+  font-family: var(--fluent-font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Acrylic Material Effect */
+.fluent-acrylic {
+  background-color: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px) saturate(125%);
+  -webkit-backdrop-filter: blur(20px) saturate(125%);
+}
+
+.dark-theme .fluent-acrylic {
+  background-color: rgba(32, 31, 30, 0.6);
+}
+
+/* Reveal Highlight Effect */
+.fluent-reveal {
+  position: relative;
+  overflow: hidden;
+}
+
+.fluent-reveal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 50%
+  );
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.fluent-reveal:hover::before {
+  opacity: 1;
+}
+
+/* Animations */
+@keyframes fluent-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fluent-slide-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fluent-scale-in {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Utility Classes */
+.fluent-animate-fade-in {
+  animation: fluent-fade-in var(--fluent-duration-normal) var(--fluent-easing-decelerate);
+}
+
+.fluent-animate-slide-in {
+  animation: fluent-slide-in var(--fluent-duration-slow) var(--fluent-easing-decelerate);
+}
+
+.fluent-animate-scale-in {
+  animation: fluent-scale-in var(--fluent-duration-normal) var(--fluent-easing-ease);
+}
+
+/* Loading Shimmer Effect */
+.fluent-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.05) 25%,
+    rgba(0, 0, 0, 0.1) 50%,
+    rgba(0, 0, 0, 0.05) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Focus Visible Styles */
+.fluent-focus-visible:focus-visible {
+  outline: 2px solid var(--colorBrandStroke1);
+  outline-offset: 2px;
+}
+
+/* Responsive Navigation Rail */
+@media (max-width: 768px) {
+  .mobile-menu-button {
+    display: flex !important;
+  }
+  
+  .mobile-overlay {
+    display: block !important;
+  }
+}

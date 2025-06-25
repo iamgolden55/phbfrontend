@@ -1,3 +1,6 @@
+/* Import Fluent UI theme styles - must come before tailwind */
+@import './styles/fluent-theme.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
