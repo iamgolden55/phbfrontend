@@ -387,6 +387,284 @@ export const conditionsStoT: HealthCondition[] = [
       'Women during pregnancy and postpartum period',
       'Individuals in geographic areas with iodine deficiency'
     ]
+  },
+  {
+    id: 'stroke',
+    name: 'Stroke',
+    description: 'A medical emergency that occurs when blood flow to part of the brain is interrupted or reduced, preventing brain tissue from getting oxygen and nutrients.[1] Brain cells begin to die within minutes of a stroke, making rapid treatment crucial.[2] There are two main types: ischemic stroke (caused by blocked blood flow) and hemorrhagic stroke (caused by bleeding in the brain).[3] Stroke is a leading cause of death and disability worldwide, but many strokes are preventable and treatable.[4]',
+    category: 'brain-and-nerves',
+    subcategory: 'cerebrovascular-disease',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Stroke',
+    symptoms: [
+      'Sudden numbness or weakness of face, arm, or leg (especially on one side)',
+      'Sudden confusion or trouble speaking or understanding speech',
+      'Sudden trouble seeing in one or both eyes',
+      'Sudden trouble walking, dizziness, loss of balance or coordination',
+      'Sudden severe headache with no known cause',
+      'Facial drooping (one side of face droops or is numb)',
+      'Arm weakness (one arm drifts downward when both arms are raised)',
+      'Speech difficulty (slurred speech, strange words, or inability to speak)',
+      'Time is critical (note the time symptoms first appeared)',
+      'Additional symptoms: nausea, vomiting, difficulty swallowing'
+    ],
+    causes: [
+      'Ischemic stroke (87% of strokes):',
+      'Blood clots blocking arteries to the brain',
+      'Atherosclerosis (fatty deposits in arteries)',
+      'Atrial fibrillation and other heart rhythm disorders',
+      'Heart disease',
+      'Hemorrhagic stroke (13% of strokes):',
+      'High blood pressure',
+      'Brain aneurysms',
+      'Arteriovenous malformations (AVMs)',
+      'Head trauma',
+      'Blood-thinning medications',
+      'Cocaine or other stimulant use'
+    ],
+    treatments: [
+      'Emergency treatment (within 3-4.5 hours for ischemic stroke):',
+      'Tissue plasminogen activator (tPA) to dissolve clots',
+      'Mechanical thrombectomy to remove large clots',
+      'Blood pressure management',
+      'Monitoring and supportive care',
+      'Post-stroke rehabilitation:',
+      'Physical therapy',
+      'Occupational therapy',
+      'Speech and language therapy',
+      'Medications to prevent future strokes:',
+      'Antiplatelet drugs (aspirin, clopidogrel)',
+      'Anticoagulants (for atrial fibrillation)',
+      'Blood pressure medications',
+      'Cholesterol-lowering drugs (statins)'
+    ],
+    preventions: [
+      'Control high blood pressure',
+      'Manage diabetes',
+      'Quit smoking and avoid secondhand smoke',
+      'Maintain healthy cholesterol levels',
+      'Maintain a healthy weight',
+      'Exercise regularly',
+      'Eat a healthy diet (low sodium, rich in fruits and vegetables)',
+      'Limit alcohol consumption',
+      'Treat atrial fibrillation and other heart conditions',
+      'Manage stress',
+      'Take medications as prescribed',
+      'Know family history and stroke risk factors'
+    ],
+    relatedConditions: [
+      'high-blood-pressure',
+      'atrial-fibrillation',
+      'heart-disease',
+      'diabetes',
+      'high-cholesterol',
+      'transient-ischemic-attack',
+      'carotid-artery-disease',
+      'peripheral-artery-disease',
+      'sleep-apnea'
+    ],
+    commonQuestions: [
+      {
+        question: 'What is the difference between a stroke and a TIA (mini-stroke)?',
+        answer: 'A transient ischemic attack (TIA) is often called a "mini-stroke" because it produces stroke-like symptoms but no lasting damage. TIA symptoms typically last only a few minutes to hours and then completely resolve. However, TIAs are serious warning signs that a full stroke may occur soon—about one-third of people who have a TIA will have a stroke within a year if untreated. Both TIAs and strokes require immediate medical attention and have the same underlying causes.'
+      },
+      {
+        question: 'Can you recover from a stroke?',
+        answer: 'Recovery from stroke varies greatly depending on the location and extent of brain damage, how quickly treatment was received, age, and overall health. Many stroke survivors do recover significantly, especially with prompt treatment and comprehensive rehabilitation. The brain has remarkable ability to form new connections (neuroplasticity), allowing other areas to take over some functions of damaged areas. Recovery is often greatest in the first few months but can continue for years with proper therapy and support.'
+      },
+      {
+        question: 'How can I recognize if someone is having a stroke?',
+        answer: 'Use the FAST acronym: Face (ask the person to smile - does one side droop?), Arms (ask the person to raise both arms - does one drift down?), Speech (ask the person to repeat a phrase - is speech slurred or strange?), Time (if any of these signs are present, note the time and call emergency services immediately). Additional signs include sudden severe headache, sudden trouble seeing, or sudden trouble walking. Remember: time is brain - every minute counts in stroke treatment.'
+      }
+    ],
+    emergencySigns: [
+      'Any sudden onset of stroke symptoms (FAST signs)',
+      'Sudden severe headache unlike any experienced before',
+      'Sudden loss of consciousness',
+      'Sudden onset of severe dizziness or falling',
+      'Sudden vision loss',
+      'Sudden inability to speak or understand',
+      'Sudden weakness or numbness on one side of body',
+      'All stroke symptoms require immediate emergency care - call 911'
+    ],
+    prevalence: 'Stroke affects approximately 15 million people worldwide each year, with 5 million deaths and 5 million permanently disabled. In the United States, someone has a stroke every 40 seconds, and someone dies from stroke every 3 minutes and 14 seconds. About 795,000 Americans have a stroke each year.',
+    affectedGroups: [
+      'Adults over 55 (risk doubles every decade after 55)',
+      'Men (higher risk at younger ages)',
+      'Women (higher lifetime risk, more likely to die from stroke)',
+      'African Americans, Hispanics, and Native Americans (higher rates)',
+      'People with high blood pressure',
+      'Those with diabetes',
+      'People with heart disease or atrial fibrillation',
+      'Individuals with family history of stroke',
+      'Smokers',
+      'People with high cholesterol'
+    ],
+    references: [
+      {
+        id: '1',
+        text: 'American Stroke Association (2023). "About Stroke".',
+        url: 'https://www.stroke.org/en/about-stroke'
+      },
+      {
+        id: '2',
+        text: 'World Health Organization (2023). "Stroke, Cerebrovascular accident Fact Sheet".',
+        url: 'https://www.who.int/news-room/fact-sheets/detail/stroke-cerebrovascular-accident'
+      },
+      {
+        id: '3',
+        text: 'Powers WJ, Rabinstein AA, Ackerson T, et al. (2019). "Guidelines for the Early Management of Patients With Acute Ischemic Stroke". Stroke. 50 (12): e344-e418.',
+        url: 'https://doi.org/10.1161/STR.0000000000000211'
+      },
+      {
+        id: '4',
+        text: 'Centers for Disease Control and Prevention (2023). "Stroke Facts".',
+        url: 'https://www.cdc.gov/stroke/facts.htm'
+      }
+    ]
+  },
+  {
+    id: 'tuberculosis',
+    name: 'Tuberculosis (TB)',
+    description: 'A potentially serious infectious disease that mainly affects the lungs, caused by bacteria called Mycobacterium tuberculosis.[1] TB can also affect other parts of the body including the kidneys, spine, and brain.[2] There are two forms: latent TB infection (inactive bacteria that cause no symptoms) and active TB disease (bacteria multiply and cause symptoms).[3] TB is spread through the air when people with active lung TB cough, speak, or sneeze.[4]',
+    category: 'infectious-diseases',
+    subcategory: 'bacterial-respiratory-infections',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Tuberculosis',
+    symptoms: [
+      'Pulmonary TB (lung TB):',
+      'Bad cough that lasts 3 weeks or longer',
+      'Coughing up blood or phlegm',
+      'Chest pain',
+      'Weakness or fatigue',
+      'Weight loss',
+      'No appetite',
+      'Chills',
+      'Fever',
+      'Sweating at night',
+      'Extrapulmonary TB (outside lungs):',
+      'Symptoms depend on the part of body affected',
+      'Back pain (spinal TB)',
+      'Blood in urine (kidney TB)',
+      'Confusion (brain TB)',
+      'Abdominal pain (abdominal TB)'
+    ],
+    causes: [
+      'Infection with Mycobacterium tuberculosis bacteria',
+      'Spread through airborne droplets from infected person',
+      'Risk factors for infection:',
+      'Close contact with someone with active TB',
+      'Living or working in crowded conditions',
+      'Poor ventilation',
+      'Risk factors for developing active disease:',
+      'HIV infection',
+      'Diabetes',
+      'Severe kidney disease',
+      'Cancer',
+      'Organ transplant',
+      'Immunosuppressive medications',
+      'Substance abuse',
+      'Malnutrition',
+      'Very young or old age'
+    ],
+    treatments: [
+      'Active TB disease:',
+      'Multiple antibiotics for 6-9 months',
+      'First-line drugs: isoniazid, rifampin, pyrazinamide, ethambutol',
+      'Directly Observed Therapy (DOT) often recommended',
+      'Latent TB infection:',
+      'Treatment to prevent progression to active disease',
+      'Isoniazid for 9 months, OR',
+      'Rifampin for 4 months, OR',
+      'Isoniazid and rifapentine for 3 months',
+      'Drug-resistant TB:',
+      'Second-line drugs',
+      'Treatment duration 18-24 months',
+      'Close monitoring required',
+      'Isolation during infectious period'
+    ],
+    preventions: [
+      'Identify and treat latent TB infection',
+      'Early detection and treatment of active TB',
+      'Infection control measures in healthcare facilities',
+      'Good ventilation in living and working spaces',
+      'Cover mouth and nose when coughing or sneezing',
+      'BCG vaccine (used in some countries, limited effectiveness)',
+      'HIV testing and treatment',
+      'Screening of high-risk populations',
+      'Contact investigation around TB cases',
+      'Nutritional support and general health measures'
+    ],
+    relatedConditions: [
+      'hiv-aids',
+      'pneumonia',
+      'lung-cancer',
+      'chronic-obstructive-pulmonary-disease',
+      'diabetes',
+      'malnutrition',
+      'silicosis',
+      'chronic-kidney-disease',
+      'immunodeficiency-disorders'
+    ],
+    commonQuestions: [
+      {
+        question: 'What is the difference between latent TB and active TB?',
+        answer: 'Latent TB infection means you have TB bacteria in your body, but your immune system keeps them inactive. You have no symptoms, don\'t feel sick, and can\'t spread TB to others. However, the bacteria can become active later if your immune system weakens. Active TB disease means the bacteria are multiplying and causing symptoms. You feel sick and can spread TB to others. About 5-10% of people with latent TB will develop active TB if not treated.'
+      },
+      {
+        question: 'Is tuberculosis contagious?',
+        answer: 'Only people with active TB disease in their lungs or throat can spread TB bacteria to others through the air when they cough, speak, sneeze, or sing. People with latent TB infection cannot spread TB. TB is not spread by shaking hands, sharing food or drinks, touching bed linens or toilet seats, or kissing. You\'re most likely to catch TB from someone you live or work with rather than from a stranger.'
+      },
+      {
+        question: 'How long does TB treatment take?',
+        answer: 'Treatment for active TB typically takes 6-9 months and involves taking multiple antibiotics daily. It\'s crucial to take all medications exactly as prescribed, even when you start feeling better. Stopping treatment early or missing doses can lead to drug-resistant TB, which is much harder to treat. Treatment for latent TB infection is shorter, typically 3-9 months depending on the medication regimen. Your doctor will monitor your progress with regular check-ups and tests.'
+      }
+    ],
+    emergencySigns: [
+      'Difficulty breathing or shortness of breath',
+      'Chest pain',
+      'Coughing up blood',
+      'High fever',
+      'Severe weight loss',
+      'Confusion or altered mental state',
+      'Signs of drug reaction (severe rash, liver problems)',
+      'Worsening symptoms despite treatment'
+    ],
+    prevalence: 'TB is one of the top 10 causes of death worldwide and the leading cause of death from a single infectious agent. In 2022, an estimated 10.6 million people fell ill with TB and 1.3 million people died from TB. About one-quarter of the world\'s population is estimated to have latent TB infection.',
+    affectedGroups: [
+      'People living with HIV (28 times higher risk)',
+      'People with diabetes',
+      'Individuals with compromised immune systems',
+      'Smokers and people with lung disease',
+      'People experiencing homelessness',
+      'Those born in countries with high TB rates',
+      'Healthcare workers',
+      'People in correctional facilities',
+      'Individuals using alcohol or illicit drugs',
+      'Children under 5 years old',
+      'Elderly people',
+      'People with malnutrition'
+    ],
+    references: [
+      {
+        id: '1',
+        text: 'World Health Organization (2023). "Tuberculosis Fact Sheet".',
+        url: 'https://www.who.int/news-room/fact-sheets/detail/tuberculosis'
+      },
+      {
+        id: '2',
+        text: 'Centers for Disease Control and Prevention (2023). "Tuberculosis (TB)".',
+        url: 'https://www.cdc.gov/tb/'
+      },
+      {
+        id: '3',
+        text: 'Pai M, Behr MA, Dowdy D, et al. (2016). "Tuberculosis". Nature Reviews Disease Primers. 2: 16076.',
+        url: 'https://doi.org/10.1038/nrdp.2016.76'
+      },
+      {
+        id: '4',
+        text: 'American Thoracic Society, CDC, Infectious Diseases Society of America (2016). "Treatment of Tuberculosis". MMWR Recommendations and Reports. 52 (RR-11): 1-77.',
+        url: 'https://www.cdc.gov/mmwr/preview/mmwrhtml/rr5211a1.htm'
+      }
+    ]
   }
 ];
 

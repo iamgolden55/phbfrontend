@@ -2678,124 +2678,6 @@ export const conditionsAtoC: HealthCondition[] = [
       }
     ]
   },
-  {
-    id: 'asthma',
-    name: 'Asthma',
-    description: 'A chronic inflammatory disease of the airways characterized by recurrent episodes of wheezing, shortness of breath, chest tightness, and coughing.[1][2] Symptoms are typically worse at night and in the early morning, or in response to exercise or cold air.[3] Asthma is caused by a combination of complex environmental and genetic factors that influence both its severity and responsiveness to treatment.[4]',
-    category: 'respiratory',
-    wikipediaUrl: 'https://en.wikipedia.org/wiki/Asthma',
-    symptoms: [
-      'Wheezing (whistling sound during breathing)',
-      'Shortness of breath',
-      'Chest tightness or pain',
-      'Coughing, especially at night or early morning',
-      'Difficulty sleeping due to breathing problems',
-      'Increased mucus production',
-      'Fatigue',
-      'Symptoms that worsen with exercise, cold air, or allergens'
-    ],
-    causes: [
-      'Genetic predisposition',
-      'Allergies (dust mites, pet dander, pollen)',
-      'Air pollution and irritants',
-      'Respiratory infections',
-      'Exercise (exercise-induced asthma)',
-      'Cold air',
-      'Stress and strong emotions',
-      'Certain medications (beta-blockers, aspirin)',
-      'Occupational exposures to irritants or allergens',
-      'Smoking and secondhand smoke'
-    ],
-    treatments: [
-      'Quick-relief medications (short-acting beta agonists)',
-      'Long-term control medications (inhaled corticosteroids)',
-      'Long-acting beta agonists in combination with inhaled corticosteroids',
-      'Leukotriene modifiers',
-      'Anticholinergics',
-      'Biologics (for severe asthma)',
-      'Allergen immunotherapy',
-      'Bronchial thermoplasty (for severe cases)'
-    ],
-    preventions: [
-      'Identifying and avoiding personal triggers',
-      'Regular use of prescribed controller medications',
-      'Maintaining good overall health',
-      'Getting vaccinated against influenza and pneumonia',
-      'Managing allergies',
-      'Using air purifiers and reducing household allergens',
-      'Avoiding tobacco smoke and air pollution',
-      'Creating an asthma action plan with a healthcare provider'
-    ],
-    relatedConditions: [
-      'allergic-rhinitis',
-      'sinusitis',
-      'gastroesophageal-reflux-disease',
-      'obstructive-sleep-apnea',
-      'eczema',
-      'copd',
-      'bronchiectasis'
-    ],
-    references: [
-      {
-        id: '1',
-        text: 'Global Initiative for Asthma. (2023). "Global Strategy for Asthma Management and Prevention."',
-        url: 'https://ginasthma.org/gina-reports/'
-      },
-      {
-        id: '2',
-        text: 'Dharmage SC, Perret JL, Custovic A (2019). "Epidemiology of Asthma in Children and Adults". Frontiers in Pediatrics. 7: 246.',
-        url: 'https://doi.org/10.3389/fped.2019.00246'
-      },
-      {
-        id: '3',
-        text: 'Papi A, Brightling C, Pedersen SE, Reddel HK (2018). "Asthma". Lancet. 391 (10122): 783–800.',
-        url: 'https://doi.org/10.1016/S0140-6736(17)33311-1'
-      },
-      {
-        id: '4',
-        text: 'Subbarao P, Mandhane PJ, Sears MR (2009). "Asthma: epidemiology, etiology and risk factors". CMAJ. 181 (9): E181-90.',
-        url: 'https://doi.org/10.1503/cmaj.080612'
-      },
-      {
-        id: '5',
-        text: 'Holgate ST, Wenzel S, Postma DS, et al. (2015). "Asthma". Nature Reviews Disease Primers. 1: 15025.',
-        url: 'https://doi.org/10.1038/nrdp.2015.25'
-      }
-    ],
-    commonQuestions: [
-      {
-        question: 'Can asthma be cured?',
-        answer: 'Currently, there is no cure for asthma. However, with proper treatment and management, most people with asthma can control their symptoms and lead normal, active lives. Treatment focuses on controlling symptoms and preventing asthma attacks through medication, avoiding triggers, and following an asthma action plan.'
-      },
-      {
-        question: 'Is asthma always linked to allergies?',
-        answer: 'Not all asthma is linked to allergies. While allergic asthma (triggered by allergens like pollen, pet dander, or dust mites) is the most common type, non-allergic asthma can be triggered by factors such as exercise, cold air, respiratory infections, stress, or certain medications. Some people have mixed asthma with both allergic and non-allergic triggers.'
-      },
-      {
-        question: 'Can adults develop asthma, or does it only start in childhood?',
-        answer: 'Asthma can develop at any age, including in adulthood. While many cases begin in childhood, adult-onset asthma is common and may be triggered by respiratory infections, workplace irritants, hormonal changes, or even developing later in life without clear causes. Adult-onset asthma tends to be more persistent and may require different management approaches than childhood asthma.'
-      }
-    ],
-    emergencySigns: [
-      'Severe shortness of breath where speaking is difficult',
-      'Breathing that gets worse despite using a rescue inhaler',
-      'Shortness of breath when doing minimal activity',
-      'Blue-tinged lips or fingernails (cyanosis)',
-      'Rapid breathing and pulse',
-      'Confusion or drowsiness',
-      'Severe anxiety due to breathing difficulty'
-    ],
-    prevalence: 'Asthma affects approximately 300 million people worldwide. In the United States, about 25 million people have asthma, including 5-10% of children.',
-    affectedGroups: [
-      'Children, especially boys (before puberty)',
-      'Adult women (after puberty)',
-      'People with allergies or family history of allergies or asthma',
-      'People in urban areas with high levels of air pollution',
-      'People exposed to occupational triggers',
-      'Smokers and those exposed to secondhand smoke',
-      'Individuals who had respiratory infections in early childhood'
-    ]
-  },
 
   {
     id: 'atrial-fibrillation',
@@ -3612,9 +3494,272 @@ export const conditionsAtoC: HealthCondition[] = [
         url: 'https://doi.org/10.1093/eurheartj/ehz859'
       }
     ]
+  },
+  {
+    id: 'asthma',
+    name: 'Asthma',
+    description: 'A respiratory condition characterized by inflammation and narrowing of the airways that carry air to and from the lungs.[1] During an asthma attack, the airways become swollen, the muscles around them tighten, and thick mucus is produced, making it difficult to breathe.[2] Asthma symptoms and triggers vary from person to person, and the condition can range from mild to severe.[3] While there is no cure for asthma, it can be effectively managed with proper treatment.[4]',
+    category: 'respiratory',
+    subcategory: 'chronic-respiratory-conditions',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Asthma',
+    symptoms: [
+      'Shortness of breath',
+      'Chest tightness or pain',
+      'Wheezing when exhaling (common in children)',
+      'Trouble sleeping caused by shortness of breath, coughing or wheezing',
+      'Coughing or wheezing attacks worsened by respiratory viruses',
+      'Difficulty talking due to breathlessness',
+      'Anxiety or panic caused by difficulty breathing',
+      'Fatigue during physical activity',
+      'Signs of worsening asthma: more frequent symptoms, increased difficulty breathing, more frequent use of quick-relief inhaler'
+    ],
+    causes: [
+      'Genetic predisposition (family history of asthma or allergies)',
+      'Environmental allergens (pollen, dust mites, pet dander, mold)',
+      'Irritants (smoke, strong odors, chemical fumes, air pollution)',
+      'Respiratory infections (particularly in early childhood)',
+      'Physical activity (exercise-induced asthma)',
+      'Weather changes (cold air, humidity)',
+      'Strong emotions and stress',
+      'Certain medications (aspirin, beta-blockers)',
+      'Food additives (sulfites)',
+      'Gastroesophageal reflux disease (GERD)',
+      'Hormonal changes (menstrual periods, pregnancy)',
+      'Occupational triggers (chemicals, dust, gases)'
+    ],
+    treatments: [
+      'Quick-relief medications (rescue inhalers):',
+      'Short-acting beta agonists (albuterol, levalbuterol)',
+      'Anticholinergics (ipratropium)',
+      'Long-term control medications:',
+      'Inhaled corticosteroids (fluticasone, budesonide)',
+      'Long-acting beta agonists (salmeterol, formoterol)',
+      'Leukotriene modifiers (montelukast, zafirlukast)',
+      'Mast cell stabilizers (cromolyn sodium)',
+      'Theophylline',
+      'Biologic medications for severe asthma (omalizumab, mepolizumab)',
+      'Allergy treatment (immunotherapy)',
+      'Bronchial thermoplasty for severe asthma',
+      'Asthma action plan and education'
+    ],
+    preventions: [
+      'Identify and avoid personal triggers',
+      'Take medications as prescribed, even when feeling well',
+      'Monitor breathing and symptoms',
+      'Get vaccinated for influenza and pneumonia',
+      'Maintain a healthy weight',
+      'Exercise regularly (with proper medication if needed)',
+      'Manage stress and strong emotions',
+      'Use air conditioning to reduce exposure to outdoor allergens',
+      'Keep humidity levels between 30-50%',
+      'Use allergen-proof bedding',
+      'Clean regularly to reduce dust mites and pet dander',
+      'Avoid smoking and secondhand smoke'
+    ],
+    relatedConditions: [
+      'allergies',
+      'eczema',
+      'hay-fever',
+      'sinusitis',
+      'gastroesophageal-reflux-disease',
+      'sleep-apnea',
+      'anxiety',
+      'depression',
+      'chronic-obstructive-pulmonary-disease'
+    ],
+    commonQuestions: [
+      {
+        question: 'Can asthma be outgrown?',
+        answer: 'Some children with asthma may experience fewer symptoms as they get older, and their asthma may appear to "go away." However, the underlying tendency toward asthma often remains. Many people who had childhood asthma find their symptoms return in adulthood, especially during times of stress, illness, or exposure to new triggers. Adults who develop asthma typically have it for life, though symptoms can often be well-controlled with proper treatment.'
+      },
+      {
+        question: 'Is it safe to exercise with asthma?',
+        answer: 'Yes, most people with asthma can exercise safely and should be encouraged to stay active. Regular exercise can actually improve lung function and overall health. The key is working with your healthcare provider to develop an exercise plan and ensure your asthma is well-controlled. This may include using a rescue inhaler before exercise, warming up properly, choosing appropriate activities, and avoiding triggers like cold air or high pollen counts when exercising outdoors.'
+      },
+      {
+        question: 'What should I do during an asthma attack?',
+        answer: 'During an asthma attack: 1) Stay calm and sit upright, 2) Use your rescue inhaler (usually albuterol) immediately, 3) Take slow, steady breaths, 4) If symptoms don\'t improve within 15-20 minutes or worsen, seek emergency medical care, 5) Continue using your rescue inhaler as directed until help arrives. Severe symptoms like inability to speak in full sentences, blue lips or face, or severe shortness of breath require immediate emergency care.'
+      }
+    ],
+    emergencySigns: [
+      'Severe shortness of breath or wheezing',
+      'Coughing that won\'t stop',
+      'Very rapid breathing',
+      'Chest pain or pressure',
+      'Tightened neck and chest muscles',
+      'Difficulty talking due to breathlessness',
+      'Feelings of anxiety or panic',
+      'Pale, sweaty face',
+      'Blue lips or fingernails',
+      'Rescue medications not providing relief'
+    ],
+    prevalence: 'Asthma affects an estimated 262 million people worldwide and caused 455,000 deaths in 2019. In the United States, about 1 in 13 people have asthma, including about 25 million Americans. Asthma is one of the most common chronic diseases among children.',
+    affectedGroups: [
+      'Children (asthma is the most common chronic disease in children)',
+      'People with family history of asthma or allergies',
+      'Individuals with allergic conditions (eczema, hay fever)',
+      'People exposed to secondhand smoke',
+      'Those living in urban areas with higher pollution',
+      'Certain ethnic groups (Puerto Ricans, African Americans have higher rates)',
+      'People with obesity',
+      'Those in certain occupations with chemical exposure'
+    ],
+    references: [
+      {
+        id: '1',
+        text: 'Global Initiative for Asthma (2023). "Global Strategy for Asthma Management and Prevention".',
+        url: 'https://ginasthma.org/'
+      },
+      {
+        id: '2',
+        text: 'National Heart, Lung, and Blood Institute (2023). "Asthma".',
+        url: 'https://www.nhlbi.nih.gov/health/asthma'
+      },
+      {
+        id: '3',
+        text: 'World Health Organization (2023). "Asthma Fact Sheet".',
+        url: 'https://www.who.int/news-room/fact-sheets/detail/asthma'
+      },
+      {
+        id: '4',
+        text: 'Centers for Disease Control and Prevention (2023). "Asthma".',
+        url: 'https://www.cdc.gov/asthma/default.htm'
+      }
+    ]
+  },
+  {
+    id: 'anxiety',
+    name: 'Anxiety Disorders',
+    description: 'A group of mental health conditions characterized by excessive fear, worry, and related behavioral changes.[1] Anxiety disorders involve more than temporary worry or fear and can interfere with daily activities such as job performance, schoolwork, and relationships.[2] There are several types of anxiety disorders including generalized anxiety disorder, panic disorder, social anxiety disorder, and specific phobias.[3] While anxiety is a normal human emotion, anxiety disorders involve persistent, excessive anxiety that is disproportionate to the situation.[4]',
+    category: 'mental-health',
+    subcategory: 'anxiety-disorders',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Anxiety_disorder',
+    symptoms: [
+      'Excessive worry or fear',
+      'Restlessness or feeling on edge',
+      'Being easily fatigued',
+      'Difficulty concentrating',
+      'Irritability',
+      'Muscle tension',
+      'Sleep disturbances',
+      'Rapid heartbeat',
+      'Sweating',
+      'Trembling or shaking',
+      'Shortness of breath',
+      'Nausea or stomach problems',
+      'Dizziness',
+      'Avoidance of anxiety-triggering situations',
+      'Panic attacks (in panic disorder)'
+    ],
+    causes: [
+      'Genetic factors (family history of anxiety or mental health conditions)',
+      'Brain chemistry imbalances (neurotransmitters)',
+      'Environmental stressors (trauma, abuse, significant life changes)',
+      'Medical conditions (heart disease, diabetes, thyroid problems)',
+      'Substance use (alcohol, caffeine, drugs)',
+      'Medications (certain stimulants, corticosteroids)',
+      'Personality factors (shyness, low self-esteem)',
+      'Other mental health disorders (depression)',
+      'Chronic medical conditions',
+      'Major life events or ongoing stress'
+    ],
+    treatments: [
+      'Psychotherapy:',
+      'Cognitive Behavioral Therapy (CBT)',
+      'Exposure therapy',
+      'Acceptance and Commitment Therapy (ACT)',
+      'Dialectical Behavior Therapy (DBT)',
+      'Medications:',
+      'Selective serotonin reuptake inhibitors (SSRIs)',
+      'Serotonin-norepinephrine reuptake inhibitors (SNRIs)',
+      'Benzodiazepines (short-term use)',
+      'Beta-blockers (for physical symptoms)',
+      'Buspirone',
+      'Lifestyle interventions:',
+      'Regular exercise',
+      'Stress management techniques',
+      'Mindfulness and meditation',
+      'Support groups'
+    ],
+    preventions: [
+      'Stay physically active',
+      'Avoid alcohol and recreational drugs',
+      'Limit caffeine intake',
+      'Practice stress management and relaxation techniques',
+      'Get adequate sleep',
+      'Maintain social connections',
+      'Eat a healthy, balanced diet',
+      'Learn about your condition and triggers',
+      'Stick to treatment plans',
+      'Seek help early if symptoms develop'
+    ],
+    relatedConditions: [
+      'depression',
+      'panic-disorder',
+      'post-traumatic-stress-disorder',
+      'obsessive-compulsive-disorder',
+      'substance-use-disorders',
+      'eating-disorders',
+      'sleep-disorders',
+      'attention-deficit-hyperactivity-disorder',
+      'chronic-pain'
+    ],
+    commonQuestions: [
+      {
+        question: 'What is the difference between normal anxiety and an anxiety disorder?',
+        answer: 'Normal anxiety is a temporary response to stressful situations and tends to be proportionate to the situation. It typically goes away once the stressor is removed. Anxiety disorders involve persistent, excessive worry that is disproportionate to the situation and interferes with daily life. The anxiety lasts for months, is difficult to control, and causes significant distress or impairment in social, work, or other important areas of functioning.'
+      },
+      {
+        question: 'Can anxiety disorders be cured?',
+        answer: 'While anxiety disorders are typically chronic conditions, they are highly treatable. Many people with anxiety disorders can achieve significant symptom relief and improved quality of life with appropriate treatment. Some people may experience periods of remission where symptoms are minimal or absent. The goal of treatment is usually to manage symptoms effectively rather than to "cure" the condition completely.'
+      },
+      {
+        question: 'How long does treatment for anxiety take?',
+        answer: 'The length of treatment varies depending on the type and severity of the anxiety disorder, the treatment approach, and individual factors. Some people notice improvement within weeks of starting treatment, while others may need several months. Psychotherapy typically involves 12-20 sessions for many anxiety disorders, though some people benefit from longer-term therapy. Medication effects can be seen within weeks to months. Many people continue treatment as needed to maintain their progress.'
+      }
+    ],
+    emergencySigns: [
+      'Thoughts of self-harm or suicide',
+      'Severe panic attacks that don\'t respond to usual coping strategies',
+      'Complete inability to function in daily life',
+      'Symptoms that suddenly worsen significantly',
+      'Substance abuse as a way to cope with anxiety',
+      'Physical symptoms that could indicate a medical emergency (chest pain, difficulty breathing)'
+    ],
+    prevalence: 'Anxiety disorders are among the most common mental health conditions worldwide. In the United States, anxiety disorders affect about 40 million adults (18.1%) each year. Globally, an estimated 301 million people had an anxiety disorder in 2019.',
+    affectedGroups: [
+      'Women (twice as likely as men to be affected)',
+      'Adults aged 30-44 (highest prevalence)',
+      'People with family history of anxiety or mental health conditions',
+      'Individuals who experienced childhood trauma or abuse',
+      'Those with chronic medical conditions',
+      'People with other mental health disorders',
+      'Individuals under significant life stress',
+      'Those with substance use problems'
+    ],
+    references: [
+      {
+        id: '1',
+        text: 'American Psychiatric Association (2022). "Diagnostic and Statistical Manual of Mental Disorders, 5th Edition, Text Revision (DSM-5-TR)".',
+        url: 'https://www.psychiatry.org/psychiatrists/practice/dsm'
+      },
+      {
+        id: '2',
+        text: 'National Institute of Mental Health (2023). "Anxiety Disorders".',
+        url: 'https://www.nimh.nih.gov/health/topics/anxiety-disorders'
+      },
+      {
+        id: '3',
+        text: 'World Health Organization (2022). "Mental disorders Fact Sheet".',
+        url: 'https://www.who.int/news-room/fact-sheets/detail/mental-disorders'
+      },
+      {
+        id: '4',
+        text: 'Anxiety and Depression Association of America (2023). "Anxiety Disorders".',
+        url: 'https://adaa.org/understanding-anxiety'
+      }
+    ]
   }
 ];
-
-
 
 export default conditionsAtoC;

@@ -712,6 +712,408 @@ export const conditionsGtoI: HealthCondition[] = [
         url: 'https://doi.org/10.1177/2050640617731968'
       }
     ]
+  },
+  {
+    id: 'hiv-aids',
+    name: 'HIV/AIDS',
+    description: 'Human Immunodeficiency Virus (HIV) is a virus that attacks the body\'s immune system, specifically CD4 cells (T cells), which help the immune system fight off infections.[1] If left untreated, HIV can lead to Acquired Immunodeficiency Syndrome (AIDS), the late stage of HIV infection that occurs when the body\'s immune system is badly damaged because of the virus.[2] With proper medical care, HIV can be controlled and people with HIV can live long, healthy lives and protect their partners.[3]',
+    category: 'infectious-diseases',
+    subcategory: 'viral-infections',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/HIV/AIDS',
+    symptoms: [
+      'Early HIV infection (acute HIV syndrome):',
+      'Fever',
+      'Headache',
+      'Muscle aches and joint pain',
+      'Rash',
+      'Sore throat and painful mouth sores',
+      'Swollen lymph glands, mainly on the neck',
+      'Diarrhea',
+      'Weight loss',
+      'Cough',
+      'Night sweats',
+      'Chronic HIV infection (often asymptomatic for years):',
+      'Persistent swollen lymph nodes',
+      'Later stages/AIDS:',
+      'Recurring fever',
+      'Chronic diarrhea',
+      'Persistent white spots or unusual lesions on tongue or in mouth',
+      'Persistent, unexplained fatigue',
+      'Skin rashes or bumps',
+      'Rapid weight loss',
+      'Opportunistic infections'
+    ],
+    causes: [
+      'HIV transmission through:',
+      'Unprotected sexual contact (vaginal, anal, or oral sex)',
+      'Sharing needles, syringes, or other drug injection equipment',
+      'Mother-to-child transmission during pregnancy, childbirth, or breastfeeding',
+      'Blood transfusions (very rare in countries with blood screening)',
+      'Occupational exposure in healthcare settings',
+      'Sharing tattoo or body piercing equipment'
+    ],
+    treatments: [
+      'Antiretroviral therapy (ART):',
+      'Combination of HIV medicines taken daily',
+      'Integrase strand transfer inhibitors (INSTIs)',
+      'Non-nucleoside reverse transcriptase inhibitors (NNRTIs)',
+      'Nucleoside reverse transcriptase inhibitors (NRTIs)',
+      'Protease inhibitors (PIs)',
+      'Entry or fusion inhibitors',
+      'Treatment of opportunistic infections',
+      'Regular monitoring of CD4 count and viral load',
+      'Preventive medications for opportunistic infections',
+      'Supportive care for symptoms',
+      'Mental health support and counseling'
+    ],
+    preventions: [
+      'Pre-exposure prophylaxis (PrEP) for high-risk individuals',
+      'Post-exposure prophylaxis (PEP) after potential exposure',
+      'Safe sex practices (condom use, limiting number of partners)',
+      'Never sharing needles, syringes, or other drug equipment',
+      'Regular HIV testing',
+      'Treating other sexually transmitted infections',
+      'Male circumcision (reduces risk in heterosexual men)',
+      'Avoiding sharing personal items that may have blood',
+      'Safe blood transfusion practices',
+      'Treatment as prevention (undetectable = untransmittable)'
+    ],
+    relatedConditions: [
+      'opportunistic-infections',
+      'pneumocystis-pneumonia',
+      'kaposi-sarcoma',
+      'tuberculosis',
+      'hepatitis-b',
+      'hepatitis-c',
+      'cytomegalovirus',
+      'toxoplasmosis',
+      'candidiasis'
+    ],
+    commonQuestions: [
+      {
+        question: 'Can HIV be cured?',
+        answer: 'Currently, there is no cure for HIV, but it can be effectively treated and controlled with antiretroviral therapy (ART). When taken consistently, ART can reduce the amount of HIV in the blood to undetectable levels. People with undetectable viral loads cannot transmit HIV to their sexual partners (undetectable = untransmittable or U=U). With proper treatment, people with HIV can live nearly normal lifespans.'
+      },
+      {
+        question: 'How is HIV transmitted?',
+        answer: 'HIV is transmitted through specific body fluids: blood, semen, pre-seminal fluid, rectal fluids, vaginal fluids, and breast milk. The most common ways HIV spreads are through unprotected sex and sharing needles. HIV is NOT transmitted through saliva, tears, sweat, casual contact like hugging or shaking hands, sharing food or drinks, or through insect bites.'
+      },
+      {
+        question: 'What does it mean to have an undetectable viral load?',
+        answer: 'An undetectable viral load means that the amount of HIV in the blood is so low that standard laboratory tests cannot detect it. This is achieved through consistent use of antiretroviral therapy (ART). People with undetectable viral loads cannot transmit HIV to their sexual partners and have greatly improved health outcomes. However, HIV is still present in the body and treatment must continue.'
+      }
+    ],
+    emergencySigns: [
+      'Severe, persistent fever',
+      'Difficulty breathing or shortness of breath',
+      'Persistent cough with blood',
+      'Severe headache with neck stiffness',
+      'Persistent vomiting or diarrhea causing dehydration',
+      'Confusion or altered mental state',
+      'Severe abdominal pain',
+      'Signs of severe infection',
+      'Unusual bleeding or bruising'
+    ],
+    prevalence: 'Globally, an estimated 38.4 million people were living with HIV at the end of 2021. Sub-Saharan Africa is most severely affected, accounting for about two-thirds of people living with HIV worldwide. In the United States, more than 1.2 million people are living with HIV.',
+    affectedGroups: [
+      'Men who have sex with men (MSM)',
+      'People who inject drugs',
+      'Sex workers and their clients',
+      'Transgender people',
+      'People in certain geographic regions (Sub-Saharan Africa)',
+      'Young women in high-prevalence areas',
+      'People with multiple sexual partners',
+      'Individuals with other sexually transmitted infections'
+    ],
+    references: [
+      {
+        id: '1',
+        text: 'Centers for Disease Control and Prevention (2023). "HIV Basics". National Center for HIV/AIDS, Viral Hepatitis, STD, and TB Prevention.',
+        url: 'https://www.cdc.gov/hiv/basics/index.html'
+      },
+      {
+        id: '2',
+        text: 'World Health Organization (2023). "HIV/AIDS Fact Sheet".',
+        url: 'https://www.who.int/news-room/fact-sheets/detail/hiv-aids'
+      },
+      {
+        id: '3',
+        text: 'UNAIDS (2022). "Global HIV & AIDS statistics — Fact sheet".',
+        url: 'https://www.unaids.org/en/resources/fact-sheet'
+      }
+    ]
+  },
+  {
+    id: 'heart-disease',
+    name: 'Heart Disease (Coronary Artery Disease)',
+    description: 'Heart disease, also known as coronary artery disease (CAD), is the leading cause of death worldwide.[1] It occurs when the coronary arteries that supply blood to the heart muscle become narrowed or blocked by fatty deposits called plaque.[2] This reduces blood flow to the heart, which can cause chest pain (angina), heart attacks, and other serious complications.[3] The disease develops over many years and may not cause symptoms until a significant blockage occurs.[4]',
+    category: 'heart-and-circulation',
+    subcategory: 'cardiovascular-disease',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Coronary_artery_disease',
+    symptoms: [
+      'Chest pain or discomfort (angina):',
+      'Pressure, squeezing, fullness, or pain in center of chest',
+      'Pain may spread to arms, neck, jaw, or back',
+      'Shortness of breath',
+      'Heart palpitations',
+      'Weakness or dizziness',
+      'Nausea',
+      'Sweating',
+      'Fatigue, especially with exertion',
+      'Swelling in legs, ankles, or feet',
+      'Irregular heartbeat',
+      'Some people have no symptoms (silent ischemia)'
+    ],
+    causes: [
+      'Atherosclerosis (plaque buildup in arteries)',
+      'High blood pressure',
+      'High cholesterol levels',
+      'Smoking and tobacco use',
+      'Diabetes',
+      'Obesity',
+      'Physical inactivity',
+      'Unhealthy diet high in saturated fats, trans fats, and sodium',
+      'Excessive alcohol consumption',
+      'Stress',
+      'Age (risk increases with age)',
+      'Family history of heart disease',
+      'Gender (men at higher risk at younger ages)'
+    ],
+    treatments: [
+      'Lifestyle modifications:',
+      'Heart-healthy diet (Mediterranean diet, DASH diet)',
+      'Regular physical activity',
+      'Smoking cessation',
+      'Weight management',
+      'Stress reduction',
+      'Medications:',
+      'Cholesterol-lowering drugs (statins)',
+      'Blood pressure medications (ACE inhibitors, beta-blockers)',
+      'Antiplatelet drugs (aspirin, clopidogrel)',
+      'Nitrates for chest pain',
+      'Procedures:',
+      'Angioplasty and stent placement',
+      'Coronary artery bypass surgery (CABG)',
+      'Cardiac rehabilitation programs'
+    ],
+    preventions: [
+      'Maintain a healthy diet low in saturated and trans fats',
+      'Exercise regularly (at least 150 minutes moderate activity per week)',
+      'Don\'t smoke and avoid secondhand smoke',
+      'Maintain a healthy weight',
+      'Manage stress effectively',
+      'Control blood pressure',
+      'Manage cholesterol levels',
+      'Control diabetes if present',
+      'Limit alcohol consumption',
+      'Get adequate sleep',
+      'Regular health screenings and checkups'
+    ],
+    relatedConditions: [
+      'high-blood-pressure',
+      'high-cholesterol',
+      'diabetes',
+      'stroke',
+      'heart-failure',
+      'arrhythmia',
+      'peripheral-artery-disease',
+      'metabolic-syndrome'
+    ],
+    commonQuestions: [
+      {
+        question: 'What is the difference between a heart attack and angina?',
+        answer: 'Angina is chest pain caused by reduced blood flow to the heart muscle, typically triggered by physical activity or stress, and usually relieved by rest or medication. A heart attack occurs when blood flow to part of the heart muscle is completely blocked, causing permanent damage to that area of the heart. Heart attack pain is typically more severe, lasts longer, and doesn\'t improve with rest. Heart attacks are medical emergencies requiring immediate treatment.'
+      },
+      {
+        question: 'Can heart disease be reversed?',
+        answer: 'While heart disease cannot be completely "reversed," its progression can be slowed, stopped, or in some cases, improved through aggressive lifestyle changes and medical treatment. Studies have shown that comprehensive lifestyle programs including very low-fat diets, regular exercise, stress management, and smoking cessation can help reduce plaque buildup and improve heart function. Medications like statins can also help stabilize plaque and reduce cardiovascular risk.'
+      },
+      {
+        question: 'At what age should I start worrying about heart disease?',
+        answer: 'Heart disease prevention should start early, ideally in childhood with healthy lifestyle habits. Risk factors can begin accumulating in the 20s and 30s. Men typically develop heart disease 7-10 years earlier than women, with risk increasing significantly after age 45 for men and after menopause for women. However, people with risk factors like diabetes, high blood pressure, or family history may need to be concerned earlier. Regular health screenings should begin by age 20.'
+      }
+    ],
+    emergencySigns: [
+      'Severe chest pain or pressure',
+      'Pain radiating to arms, back, neck, jaw, or stomach',
+      'Shortness of breath',
+      'Cold sweats',
+      'Nausea or vomiting',
+      'Lightheadedness or sudden dizziness',
+      'Rapid or irregular heartbeat',
+      'Loss of consciousness',
+      'Symptoms lasting more than a few minutes or getting worse'
+    ],
+    prevalence: 'Heart disease is the leading cause of death globally, responsible for approximately 17.9 million deaths annually. In the United States, about 655,000 Americans die from heart disease each year—that\'s 1 in every 5 deaths. About 18.2 million adults aged 20 and older have coronary artery disease.',
+    affectedGroups: [
+      'Men (higher risk at younger ages)',
+      'Women after menopause',
+      'People with diabetes',
+      'Individuals with high blood pressure or cholesterol',
+      'Smokers',
+      'People with family history of heart disease',
+      'Those who are overweight or obese',
+      'People with sedentary lifestyles',
+      'Individuals under chronic stress'
+    ],
+    references: [
+      {
+        id: '1',
+        text: 'World Health Organization (2023). "Cardiovascular diseases (CVDs) Fact Sheet".',
+        url: 'https://www.who.int/news-room/fact-sheets/detail/cardiovascular-diseases-(cvds)'
+      },
+      {
+        id: '2',
+        text: 'American Heart Association (2023). "Coronary Artery Disease".',
+        url: 'https://www.heart.org/en/health-topics/consumer-healthcare/what-is-cardiovascular-disease/coronary-artery-disease'
+      },
+      {
+        id: '3',
+        text: 'Centers for Disease Control and Prevention (2023). "Heart Disease Facts".',
+        url: 'https://www.cdc.gov/heartdisease/facts.htm'
+      }
+    ]
+  },
+  {
+    id: 'hepatitis-b-c',
+    name: 'Hepatitis B & C',
+    description: 'Viral infections that cause inflammation of the liver.[1] Hepatitis B and C are the most common forms of viral hepatitis and can cause both acute and chronic infection.[2] While Hepatitis B can be prevented with vaccination, there is currently no vaccine for Hepatitis C.[3] Both infections can lead to serious liver complications including cirrhosis, liver failure, and liver cancer if left untreated.[4]',
+    category: 'infectious-diseases',
+    subcategory: 'viral-liver-infections',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Hepatitis_B',
+    symptoms: [
+      'Acute Hepatitis (both B & C):',
+      'Fatigue',
+      'Nausea and vomiting',
+      'Abdominal pain',
+      'Dark urine',
+      'Clay-colored bowel movements',
+      'Joint pain',
+      'Jaundice (yellowing of skin and eyes)',
+      'Chronic Hepatitis (often asymptomatic until liver damage occurs):',
+      'Persistent fatigue',
+      'Mild abdominal discomfort',
+      'Advanced disease symptoms:',
+      'Ascites (fluid accumulation in abdomen)',
+      'Swelling in legs',
+      'Confusion',
+      'Easy bruising and bleeding'
+    ],
+    causes: [
+      'Hepatitis B transmission:',
+      'Blood-to-blood contact',
+      'Sexual contact with infected person',
+      'Mother-to-child during birth',
+      'Sharing needles or drug equipment',
+      'Sharing personal items (razors, toothbrushes)',
+      'Hepatitis C transmission:',
+      'Blood-to-blood contact (most common)',
+      'Sharing needles or drug equipment',
+      'Blood transfusions before 1992',
+      'Healthcare exposure (needlestick injuries)',
+      'Sexual transmission (less common than Hepatitis B)',
+      'Mother-to-child transmission (uncommon)'
+    ],
+    treatments: [
+      'Hepatitis B:',
+      'Acute: Supportive care, rest, adequate nutrition',
+      'Chronic: Antiviral medications (tenofovir, entecavir)',
+      'Regular monitoring of liver function',
+      'Hepatitis C:',
+      'Direct-acting antivirals (DAAs) - cure rate >95%',
+      'Sofosbuvir/velpatasvir, glecaprevir/pibrentasvir',
+      'Treatment duration: 8-12 weeks typically',
+      'General management:',
+      'Avoid alcohol and hepatotoxic drugs',
+      'Hepatitis A and B vaccination (if not immune)',
+      'Regular monitoring for liver cancer',
+      'Liver transplant for end-stage disease'
+    ],
+    preventions: [
+      'Hepatitis B prevention:',
+      'Hepatitis B vaccination (most effective prevention)',
+      'Safe sex practices',
+      'Never share needles or drug equipment',
+      'Use standard precautions in healthcare settings',
+      'Screen blood donations',
+      'Hepatitis C prevention:',
+      'Never share needles, syringes, or drug equipment',
+      'Use standard precautions in healthcare settings',
+      'Safe sex practices (especially with multiple partners)',
+      'Avoid sharing personal items that may have blood',
+      'General prevention:',
+      'Practice good hygiene',
+      'Get tested if at risk'
+    ],
+    relatedConditions: [
+      'liver-cirrhosis',
+      'liver-cancer',
+      'liver-failure',
+      'hepatitis-a',
+      'hepatitis-d',
+      'alcoholic-liver-disease',
+      'non-alcoholic-fatty-liver-disease',
+      'hiv-aids',
+      'autoimmune-hepatitis'
+    ],
+    commonQuestions: [
+      {
+        question: 'What is the difference between Hepatitis B and Hepatitis C?',
+        answer: 'Both are viral infections that affect the liver, but they differ in several ways. Hepatitis B has a vaccine for prevention, while Hepatitis C does not. Hepatitis B is more commonly transmitted through sexual contact and from mother to child, while Hepatitis C is primarily transmitted through blood contact. Hepatitis C has highly effective cure rates (>95%) with direct-acting antivirals, while Hepatitis B is generally managed as a chronic condition with antiviral therapy. Both can cause serious liver complications if untreated.'
+      },
+      {
+        question: 'Can Hepatitis B and C be cured?',
+        answer: 'Hepatitis C can be cured in more than 95% of cases with direct-acting antiviral medications taken for 8-12 weeks. Hepatitis B is more challenging - while acute Hepatitis B may resolve on its own, chronic Hepatitis B cannot be cured but can be effectively managed with antiviral medications to suppress the virus and prevent liver damage. Some people with chronic Hepatitis B may achieve "functional cure" where the virus becomes undetectable, but this is less common than with Hepatitis C.'
+      },
+      {
+        question: 'How long can you have Hepatitis without knowing it?',
+        answer: 'Many people with chronic Hepatitis B or C have no symptoms for years or even decades. Hepatitis C is often called a "silent" infection because 70-80% of people have no symptoms during the acute phase, and chronic infection can remain asymptomatic until significant liver damage occurs. Similarly, chronic Hepatitis B may be asymptomatic for many years. This is why screening is important for people at risk, as early detection and treatment can prevent serious complications.'
+      }
+    ],
+    emergencySigns: [
+      'Severe abdominal pain',
+      'Persistent vomiting',
+      'Signs of liver failure: confusion, severe fatigue, yellowing of skin/eyes',
+      'Signs of gastrointestinal bleeding: black tarry stools, vomiting blood',
+      'Swelling in abdomen or legs',
+      'High fever with hepatitis symptoms',
+      'Severe dehydration'
+    ],
+    prevalence: 'Globally, an estimated 296 million people live with chronic Hepatitis B and 58 million with Hepatitis C. Hepatitis B caused approximately 820,000 deaths in 2019, while Hepatitis C caused about 290,000 deaths. In the United States, about 2.4 million people live with Hepatitis C and 880,000 with Hepatitis B.',
+    affectedGroups: [
+      'People who inject drugs',
+      'Healthcare workers',
+      'People born in countries with high Hepatitis B prevalence',
+      'Men who have sex with men',
+      'People with HIV',
+      'Household contacts of infected individuals',
+      'People on hemodialysis',
+      'Recipients of blood transfusions before 1992 (Hepatitis C)',
+      'People born from 1945-1965 (baby boomers) for Hepatitis C',
+      'People with multiple sexual partners'
+    ],
+    references: [
+      {
+        id: '1',
+        text: 'World Health Organization (2023). "Hepatitis B Fact Sheet".',
+        url: 'https://www.who.int/news-room/fact-sheets/detail/hepatitis-b'
+      },
+      {
+        id: '2',
+        text: 'World Health Organization (2023). "Hepatitis C Fact Sheet".',
+        url: 'https://www.who.int/news-room/fact-sheets/detail/hepatitis-c'
+      },
+      {
+        id: '3',
+        text: 'Centers for Disease Control and Prevention (2023). "Viral Hepatitis".',
+        url: 'https://www.cdc.gov/hepatitis/'
+      },
+      {
+        id: '4',
+        text: 'American Association for the Study of Liver Diseases (2023). "HCV Guidance: Recommendations for Testing, Managing, and Treating Hepatitis C".',
+        url: 'https://www.hcvguidelines.org/'
+      }
+    ]
   }
 ];
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../features/auth/authContext';
 import { Link, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import WomensHealthHub from '../features/womens-health/WomensHealthHub';
 
 const AccountPage: React.FC = () => {
   const { user, isAuthenticated, logout, hasPrimaryHospital, primaryHospital, checkPrimaryHospital } = useAuth();
@@ -323,6 +324,9 @@ const AccountPage: React.FC = () => {
                     View medical records
                   </Link>
                 </div>
+
+                {/* Women's Health Hub */}
+                <WomensHealthHub />
               </div>
 
               <Link

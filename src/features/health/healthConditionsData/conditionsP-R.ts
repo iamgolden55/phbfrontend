@@ -432,6 +432,142 @@ export const conditionsPtoR: HealthCondition[] = [
         url: 'https://doi.org/10.1002/acr.24596'
       }
     ]
+  },
+  {
+    id: 'pneumonia',
+    name: 'Pneumonia',
+    description: 'An infection that inflames the air sacs (alveoli) in one or both lungs, which may fill with fluid or pus.[1] Pneumonia can range from mild to life-threatening and can be caused by bacteria, viruses, fungi, or other microorganisms.[2] It is particularly dangerous for infants, young children, people over 65, and individuals with compromised immune systems or chronic health conditions.[3] Pneumonia is a leading cause of hospitalization and death worldwide.[4]',
+    category: 'respiratory',
+    subcategory: 'respiratory-infections',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Pneumonia',
+    symptoms: [
+      'Cough that may produce phlegm (sputum)',
+      'Fever and chills',
+      'Shortness of breath',
+      'Chest pain when breathing or coughing',
+      'Fatigue',
+      'Nausea, vomiting, or diarrhea',
+      'Confusion (especially in older adults)',
+      'Lower than normal body temperature (in older adults or people with weak immune systems)',
+      'Rapid breathing',
+      'Sweating',
+      'Headache',
+      'Loss of appetite',
+      'Sharp or stabbing chest pain'
+    ],
+    causes: [
+      'Bacterial infections (Streptococcus pneumoniae most common)',
+      'Viral infections (influenza, COVID-19, respiratory syncytial virus)',
+      'Fungal infections (more common in immunocompromised individuals)',
+      'Mycoplasma bacteria (atypical pneumonia)',
+      'Aspiration of food, drink, vomit, or saliva into lungs',
+      'Hospital-acquired infections',
+      'Healthcare-associated infections',
+      'Community-acquired infections',
+      'Weakened immune system',
+      'Chronic lung diseases'
+    ],
+    treatments: [
+      'Bacterial pneumonia:',
+      'Antibiotics (amoxicillin, azithromycin, fluoroquinolones)',
+      'Viral pneumonia:',
+      'Supportive care (rest, fluids)',
+      'Antiviral medications in some cases',
+      'Fungal pneumonia:',
+      'Antifungal medications',
+      'General supportive care:',
+      'Pain relievers and fever reducers',
+      'Cough medicine (use cautiously)',
+      'Increased fluid intake',
+      'Rest',
+      'Oxygen therapy (for severe cases)',
+      'Hospitalization (for severe cases)',
+      'Mechanical ventilation (for respiratory failure)'
+    ],
+    preventions: [
+      'Pneumonia vaccines (pneumococcal and influenza vaccines)',
+      'Good hygiene practices (frequent handwashing)',
+      'Avoid smoking and limit alcohol consumption',
+      'Maintain a healthy lifestyle and immune system',
+      'Get adequate sleep',
+      'Manage chronic conditions (diabetes, heart disease)',
+      'Avoid close contact with sick individuals',
+      'Practice good oral hygiene',
+      'Stay up to date with other vaccinations',
+      'Avoid aspiration by eating carefully (especially for elderly)'
+    ],
+    relatedConditions: [
+      'influenza',
+      'covid-19',
+      'bronchitis',
+      'tuberculosis',
+      'lung-abscess',
+      'pleural-effusion',
+      'respiratory-failure',
+      'sepsis',
+      'chronic-obstructive-pulmonary-disease',
+      'asthma'
+    ],
+    commonQuestions: [
+      {
+        question: 'How is pneumonia diagnosed?',
+        answer: 'Pneumonia is typically diagnosed through a combination of physical examination, chest X-rays, and sometimes additional tests. Your doctor will listen to your lungs with a stethoscope to check for abnormal sounds. A chest X-ray can show areas of inflammation in the lungs. Additional tests may include blood tests to check for infection, sputum tests to identify the causative organism, CT scans for complex cases, and pulse oximetry to measure blood oxygen levels.'
+      },
+      {
+        question: 'Is pneumonia contagious?',
+        answer: 'Pneumonia itself is not contagious, but the germs that cause pneumonia can be. Bacterial and viral pneumonia can spread through respiratory droplets when an infected person coughs or sneezes. However, not everyone exposed to these germs will develop pneumonia—it depends on factors like immune system strength and overall health. Fungal pneumonia is typically not contagious between people.'
+      },
+      {
+        question: 'How long does it take to recover from pneumonia?',
+        answer: 'Recovery time varies depending on the type of pneumonia, your age, and overall health. Most people start feeling better within 1-3 days of starting treatment, but it may take 1-2 weeks to feel completely normal. For bacterial pneumonia with antibiotic treatment, symptoms often improve within 48-72 hours. Viral pneumonia may take longer to resolve. Older adults, young children, and those with chronic conditions may take longer to recover—sometimes several weeks.'
+      }
+    ],
+    emergencySigns: [
+      'Difficulty breathing or shortness of breath at rest',
+      'Chest pain',
+      'Coughing up blood',
+      'High fever (over 102°F/39°C)',
+      'Persistent fever despite treatment',
+      'Confusion or changes in mental awareness',
+      'Nausea and vomiting that prevents keeping fluids down',
+      'Blue tint to lips or fingernails (cyanosis)',
+      'Rapid pulse',
+      'Extreme fatigue'
+    ],
+    prevalence: 'Pneumonia affects approximately 450 million people globally each year and results in about 4 million deaths annually. It is the leading infectious cause of death in children worldwide. In the United States, pneumonia affects about 1 million adults each year.',
+    affectedGroups: [
+      'Adults over 65 years of age',
+      'Children under 2 years of age',
+      'People with chronic medical conditions (asthma, COPD, heart disease, diabetes)',
+      'Individuals with weakened immune systems',
+      'Smokers',
+      'People who abuse alcohol',
+      'Hospitalized patients',
+      'Those living in nursing homes or long-term care facilities',
+      'People with swallowing disorders'
+    ],
+    references: [
+      {
+        id: '1',
+        text: 'World Health Organization (2023). "Pneumonia Fact Sheet".',
+        url: 'https://www.who.int/news-room/fact-sheets/detail/pneumonia'
+      },
+      {
+        id: '2',
+        text: 'Centers for Disease Control and Prevention (2023). "Pneumonia".',
+        url: 'https://www.cdc.gov/pneumonia/index.html'
+      },
+      {
+        id: '3',
+        text: 'Metlay JP, Waterer GW, Long AC, et al. (2019). "Diagnosis and Treatment of Adults with Community-acquired Pneumonia". American Journal of Respiratory and Critical Care Medicine. 200 (7): e45-e67.',
+        url: 'https://doi.org/10.1164/rccm.201908-1581ST'
+      },
+      {
+        id: '4',
+        text: 'Torres A, Cillóniz C, Niederman MS, et al. (2021). "Pneumonia". Nature Reviews Disease Primers. 7 (1): 25.',
+        url: 'https://doi.org/10.1038/s41572-021-00259-0'
+      }
+    ]
   }
 ];
 

@@ -35,6 +35,7 @@ import AnalyticsPage from './pages/organization/AnalyticsPage';
 import EmergencyPage from './pages/organization/EmergencyPage';
 import UserRegistrationsPage from './pages/organization/UserRegistrationsPage';
 import AppointmentsPage from './pages/organization/AppointmentsPage';
+import ClinicalGuidelinesManagementPage from './pages/organization/ClinicalGuidelinesManagementPage';
 import { OrganizationAuthProvider } from './features/organization/organizationAuthContext';
 import ForgotPasswordPage from './pages/ForgotPasswordPage'; // Add this import
 import ResetPasswordPage from './pages/ResetPasswordPage'; // Add this import
@@ -51,6 +52,13 @@ import HealthRecordsPage from './pages/account/HealthRecordsPage';
 import RequestPrescriptionPage from './pages/account/RequestPrescriptionPage';
 import NominatedPharmacyPage from './pages/account/NominatedPharmacyPage';
 import LinkPHBPage from './pages/account/LinkPHBPage'; // Add the import with other account page imports
+import WomensHealthDashboardEnhanced from './pages/account/WomensHealthDashboardEnhanced';
+import DailyHealthLog from './pages/account/womens-health/DailyHealthLog';
+import CycleCalendar from './pages/account/womens-health/CycleCalendar';
+import PregnancyTracker from './pages/account/womens-health/PregnancyTracker';
+import PregnancyJourneyEnhanced from './pages/account/womens-health/PregnancyJourneyEnhanced';
+import FertilityTracker from './pages/account/womens-health/FertilityTracker';
+import HealthGoals from './pages/account/womens-health/HealthGoals';
 
 // Tool Pages
 import HealthAssessmentsPage from './pages/tools/HealthAssessmentsPage';
@@ -416,6 +424,11 @@ function App() {
                     <AppointmentsPage />
                   </OrganizationRouteGuard>
                 } />
+                <Route path="clinical-guidelines" element={
+                  <OrganizationRouteGuard>
+                    <ClinicalGuidelinesManagementPage />
+                  </OrganizationRouteGuard>
+                } />
               </Route>
 
 
@@ -622,6 +635,41 @@ function App() {
                     <HealthRecordsPage />
                   </ProtectedRoute>
                 } />
+                <Route path="account/womens-health" element={
+                  <ProtectedRoute>
+                    <WomensHealthDashboardEnhanced />
+                  </ProtectedRoute>
+                } />
+                <Route path="account/womens-health/daily-log" element={
+                  <ProtectedRoute>
+                    <DailyHealthLog />
+                  </ProtectedRoute>
+                } />
+                <Route path="account/womens-health/cycle-calendar" element={
+                  <ProtectedRoute>
+                    <CycleCalendar />
+                  </ProtectedRoute>
+                } />
+                <Route path="account/womens-health/pregnancy/tracker" element={
+                  <ProtectedRoute>
+                    <PregnancyTracker />
+                  </ProtectedRoute>
+                } />
+                <Route path="account/womens-health/pregnancy/journey" element={
+                  <ProtectedRoute>
+                    <PregnancyJourneyEnhanced />
+                  </ProtectedRoute>
+                } />
+                <Route path="account/womens-health/fertility" element={
+                  <ProtectedRoute>
+                    <FertilityTracker />
+                  </ProtectedRoute>
+                } />
+                <Route path="account/womens-health/goals" element={
+                  <ProtectedRoute>
+                    <HealthGoals />
+                  </ProtectedRoute>
+                } />
                 <Route path="account/request-prescription" element={
                   <ProtectedRoute>
                     <RequestPrescriptionPage />
@@ -732,8 +780,7 @@ function App() {
                 <Route path="appointments/:appointmentId" element={<ProfessionalAppointmentDetailPage />} />
                 <Route path="calculators" element={<ProfessionalCalculatorsPage />} />
                 <Route path="guidelines" element={<ClinicalGuidelinesPage />} />
-                <Route path="doctor-resources" element={<DoctorResourcesPage />} />
-                <Route path="resources" element={<ProfessionalResourcesPage />} />
+                <Route path="resources" element={<DoctorResourcesPage />} />
                 <Route path="patients" element={<PatientManagementPage />} />
                 <Route path="research" element={<ProfessionalResearchPage />} />
                 <Route path="forum" element={<ProfessionalForumPage />} />

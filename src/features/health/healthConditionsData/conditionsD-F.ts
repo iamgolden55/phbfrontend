@@ -237,89 +237,6 @@ export const conditionsDtoF: HealthCondition[] = [
     ]
   },
   {
-    id: 'depression',
-    name: 'Depression',
-    description: 'A common and serious mental health disorder that negatively affects how you feel, think, and act, causing persistent feelings of sadness and loss of interest in activities.',
-    category: 'mental-health',
-    subcategory: 'mood-disorders',
-    symptoms: [
-      'Persistent sad, anxious, or "empty" mood',
-      'Loss of interest or pleasure in hobbies and activities',
-      'Fatigue and decreased energy',
-      'Insomnia, early-morning awakening, or oversleeping',
-      'Appetite and/or weight changes',
-      'Thoughts of death or suicide, or suicide attempts',
-      'Restlessness or irritability',
-      'Difficulty concentrating, remembering, or making decisions',
-      'Physical symptoms that don\'t respond to treatment (headaches, digestive disorders, pain)'
-    ],
-    causes: [
-      'Brain chemistry imbalances',
-      'Genetic factors',
-      'Biological differences in brain structure',
-      'Hormonal changes',
-      'Early childhood trauma or abuse',
-      'Medical conditions',
-      'Certain medications',
-      'Substance use disorders'
-    ],
-    treatments: [
-      'Medications (antidepressants)',
-      'Psychotherapy (talk therapy)',
-      'Cognitive Behavioral Therapy (CBT)',
-      'Interpersonal therapy',
-      'Electroconvulsive therapy (ECT) for severe cases',
-      'Transcranial magnetic stimulation (TMS)',
-      'Lifestyle changes',
-      'Support groups'
-    ],
-    preventions: [
-      'Stress management techniques',
-      'Regular physical activity',
-      'Adequate sleep',
-      'Nutritious diet',
-      'Avoiding alcohol and recreational drugs',
-      'Maintaining social connections',
-      'Seeking help early for mental health concerns'
-    ],
-    relatedConditions: [
-      'anxiety-disorders',
-      'bipolar-disorder',
-      'seasonal-affective-disorder',
-      'post-traumatic-stress-disorder',
-      'substance-use-disorders'
-    ],
-    commonQuestions: [
-      {
-        question: 'Is depression just sadness?',
-        answer: 'No, depression is much more than just feeling sad. It\'s a serious medical condition that affects how a person thinks, feels, and functions. While sadness is a normal human emotion that passes with time, depression is persistent and can significantly interfere with daily activities, relationships, and overall quality of life.'
-      },
-      {
-        question: 'How long does depression treatment take to work?',
-        answer: 'The timeline varies by individual and treatment type. Antidepressants typically take 2-4 weeks to show initial effects and 6-8 weeks for full benefits. Psychotherapy may show gradual improvement over several weeks or months. For some, a combination of treatments works best. Recovery is often a process rather than a sudden improvement.'
-      },
-      {
-        question: 'Can depression come back after treatment?',
-        answer: 'Yes, depression can recur. About 50% of people who recover from a first episode of depression may experience additional episodes. However, with ongoing treatment and proper management strategies, the risk of recurrence can be significantly reduced. Many people learn to recognize early warning signs and seek help promptly to prevent full relapses.'
-      }
-    ],
-    emergencySigns: [
-      'Suicidal thoughts or behaviors',
-      'Psychotic symptoms (hallucinations or delusions)',
-      'Inability to care for oneself (not eating, bathing, etc.)',
-      'Severe impairment in daily functioning'
-    ],
-    prevalence: 'Depression affects approximately 264 million people worldwide. In the United States, about 7% of adults experience major depressive disorder in a given year.',
-    affectedGroups: [
-      'Women (1.5-2 times more likely than men)',
-      'Young adults ages 18-25',
-      'People with chronic health conditions',
-      'Those with family history of depression',
-      'People who have experienced trauma or major life stressors',
-      'Individuals with certain personality traits (low self-esteem, overly dependent, pessimistic)'
-    ]
-  },
-  {
     id: 'ebola-virus-disease',
     name: 'Ebola Virus Disease',
     description: 'A rare but severe, often fatal illness in humans caused by Ebola virus infection, characterized by fever, severe internal bleeding, and organ failure.',
@@ -715,118 +632,6 @@ export const conditionsDtoF: HealthCondition[] = [
     ]
   },
   {
-    id: 'diabetes',
-    name: 'Diabetes Mellitus',
-    description: 'A group of metabolic disorders characterized by high blood sugar levels over a prolonged period due to problems with insulin secretion, insulin action, or both.[1] Insulin, a hormone produced by the pancreas, regulates blood glucose by helping cells absorb glucose from the bloodstream for energy.[2] In diabetes, this process is impaired, leading to chronic high blood sugar that can cause serious health complications.[3] The main types include Type 1 (autoimmune), Type 2 (insulin resistance), and gestational diabetes (during pregnancy).[4]',
-    category: 'endocrine-system',
-    wikipediaUrl: 'https://en.wikipedia.org/wiki/Diabetes_mellitus',
-    symptoms: [
-      'Increased thirst and urination',
-      'Extreme hunger',
-      'Unexplained weight loss',
-      'Fatigue',
-      'Blurred vision',
-      'Slow-healing sores',
-      'Frequent infections',
-      'Numbness or tingling in the hands or feet',
-      'Areas of darkened skin, usually in the armpits and neck'
-    ],
-    causes: [
-      'Type 1: Immune system attacks and destroys insulin-producing cells',
-      'Type 2: Cells become resistant to insulin action and pancreas fails to produce enough insulin',
-      'Gestational: Hormone changes during pregnancy affect insulin action',
-      'Genetic predisposition',
-      'Environmental factors',
-      'Obesity and physical inactivity (for Type 2)',
-      'Other medical conditions or medications'
-    ],
-    treatments: [
-      'Insulin therapy (especially for Type 1)',
-      'Oral or injectable medications',
-      'Blood sugar monitoring',
-      'Healthy eating',
-      'Regular physical activity',
-      'Weight management',
-      'Pancreas transplantation (rare, severe cases)',
-      'Bariatric surgery (for some Type 2 cases with obesity)'
-    ],
-    preventions: [
-      'Type 1 cannot currently be prevented',
-      'Type 2 and gestational:',
-      'Maintaining a healthy weight',
-      'Eating a balanced diet rich in fruits, vegetables, and whole grains',
-      'Regular physical activity',
-      'Avoiding tobacco use',
-      'Limiting alcohol consumption',
-      'Managing blood pressure and cholesterol levels'
-    ],
-    relatedConditions: [
-      'obesity',
-      'heart-disease',
-      'kidney-disease',
-      'neuropathy',
-      'retinopathy',
-      'hypertension',
-      'metabolic-syndrome'
-    ],
-    commonQuestions: [
-      {
-        question: 'What\'s the difference between Type 1 and Type 2 diabetes?',
-        answer: 'Type 1 diabetes is an autoimmune condition where the body attacks insulin-producing cells, typically appearing in childhood or adolescence and requiring insulin therapy. Type 2 diabetes develops when cells become resistant to insulin and the pancreas can\'t make enough insulin to overcome this resistance, usually appearing in adults and often related to lifestyle factors like obesity and inactivity.'
-      },
-      {
-        question: 'Can diabetes be cured?',
-        answer: 'Currently, there is no cure for diabetes. Type 1 diabetes requires lifelong insulin therapy. Type 2 diabetes can sometimes be managed through diet, exercise, and weight loss to the point where medication is no longer needed, but the underlying condition remains. Research for cures continues, including artificial pancreas technology and immunotherapy.'
-      },
-      {
-        question: 'How does diabetes affect daily life?',
-        answer: 'Living with diabetes requires daily management including monitoring blood sugar levels, taking medications or insulin, planning meals, staying physically active, and attending regular medical appointments. While it requires attention and care, most people with diabetes can lead full, active lives by maintaining good control of their condition.'
-      }
-    ],
-    emergencySigns: [
-      'Very high blood sugar (hyperglycemia) with symptoms like extreme thirst, frequent urination, dry mouth, weakness, confusion',
-      'Very low blood sugar (hypoglycemia) with symptoms like shakiness, nervousness, sweating, irritability, confusion, rapid heartbeat',
-      'Diabetic ketoacidosis: nausea, vomiting, stomach pain, fruity breath odor, difficulty breathing, confusion',
-      'Hyperosmolar hyperglycemic state: extreme thirst, dry mouth, fever, drowsiness, confusion, vision loss'
-    ],
-    prevalence: 'Diabetes affects approximately 463 million adults worldwide (1 in 11), with Type 2 accounting for about 90% of cases. In the United States, over 34 million people have diabetes (10.5% of the population).',
-    affectedGroups: [
-      'Type 1: Children and young adults (though can occur at any age)',
-      'Type 2: Adults over 45, but increasingly seen in children and teenagers',
-      'People with family history of diabetes',
-      'Certain ethnic groups (higher rates in African Americans, Hispanics, Native Americans, Asian Americans, Pacific Islanders)',
-      'People who are overweight or obese',
-      'Women who had gestational diabetes or gave birth to babies weighing over 9 pounds'
-    ],
-    references: [
-      {
-        id: '1',
-        text: 'American Diabetes Association. (2022). "Standards of Medical Care in Diabetes—2022". Diabetes Care. 45 (Supplement 1): S1-S264.',
-        url: 'https://doi.org/10.2337/dc22-Sint'
-      },
-      {
-        id: '2',
-        text: 'Skyler JS, Bakris GL, Bonifacio E, et al. (2017). "Differentiation of Diabetes by Pathophysiology, Natural History, and Prognosis". Diabetes. 66 (2): 241-255.',
-        url: 'https://doi.org/10.2337/db16-0806'
-      },
-      {
-        id: '3',
-        text: 'Zheng Y, Ley SH, Hu FB. (2018). "Global aetiology and epidemiology of type 2 diabetes mellitus and its complications". Nature Reviews Endocrinology. 14 (2): 88-98.',
-        url: 'https://doi.org/10.1038/nrendo.2017.151'
-      },
-      {
-        id: '4',
-        text: 'International Diabetes Federation. (2021). "IDF Diabetes Atlas, 10th edition".',
-        url: 'https://diabetesatlas.org/'
-      },
-      {
-        id: '5',
-        text: 'Atkinson MA, Eisenbarth GS, Michels AW. (2014). "Type 1 diabetes". Lancet. 383 (9911): 69-82.',
-        url: 'https://doi.org/10.1016/S0140-6736(13)60591-7'
-      }
-    ]
-  },
-  {
     id: 'eczema',
     name: 'Eczema (Atopic Dermatitis)',
     description: 'A chronic inflammatory skin condition characterized by intense itching, redness, and a dry, scaly rash.[1] The most common form is atopic dermatitis, which often begins in infancy or childhood and can persist into adulthood.[2] This condition typically follows a relapsing and remitting course with flares triggered by various environmental and physiological factors.[3] Eczema is often associated with other atopic conditions such as asthma and allergic rhinitis, and is thought to result from a complex interaction between genetic, immunologic, and environmental factors.[4]',
@@ -1011,6 +816,283 @@ export const conditionsDtoF: HealthCondition[] = [
       'People with family history of fibromyalgia',
       'Those with other rheumatic conditions like rheumatoid arthritis or lupus',
       'Individuals who have experienced physical or emotional trauma'
+    ]
+  },
+  {
+    id: 'diabetes',
+    name: 'Diabetes (Type 1 & Type 2)',
+    description: 'Diabetes is a group of metabolic disorders characterized by persistently high blood glucose (blood sugar) levels.[1] Type 1 diabetes occurs when the body cannot produce insulin, while Type 2 diabetes occurs when the body cannot effectively use the insulin it produces or doesn\'t produce enough insulin.[2] Without proper management, diabetes can lead to serious complications affecting the heart, blood vessels, eyes, kidneys, and nerves.[3] It is one of the leading causes of death and disability worldwide.[4]',
+    category: 'endocrine-system',
+    subcategory: 'metabolic-disorders',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Diabetes',
+    symptoms: [
+      'Frequent urination (polyuria)',
+      'Excessive thirst (polydipsia)',
+      'Extreme hunger (polyphagia)',
+      'Unexplained weight loss (more common in Type 1)',
+      'Increased fatigue',
+      'Irritability',
+      'Blurred vision',
+      'Slow-healing cuts and bruises',
+      'Frequent infections (skin, gum, bladder, vaginal)',
+      'Numbness or tingling in hands or feet',
+      'Type 1 specific: Ketoacidosis (diabetic coma)',
+      'Type 2 specific: Areas of darkened skin (acanthosis nigricans)'
+    ],
+    causes: [
+      'Type 1 Diabetes:',
+      'Autoimmune destruction of insulin-producing beta cells',
+      'Genetic predisposition',
+      'Environmental triggers (viruses, stress)',
+      'Type 2 Diabetes:',
+      'Insulin resistance',
+      'Genetics and family history',
+      'Obesity and excess abdominal fat',
+      'Physical inactivity',
+      'Age (risk increases after 45)',
+      'Race/ethnicity (higher risk in certain populations)',
+      'Gestational diabetes history',
+      'Polycystic ovary syndrome (PCOS)',
+      'High blood pressure',
+      'Abnormal cholesterol levels'
+    ],
+    treatments: [
+      'Type 1 Diabetes:',
+      'Insulin therapy (multiple daily injections or insulin pump)',
+      'Blood glucose monitoring',
+      'Carbohydrate counting',
+      'Regular physical activity',
+      'Healthy diet',
+      'Type 2 Diabetes:',
+      'Lifestyle modifications (diet and exercise)',
+      'Metformin (first-line medication)',
+      'Other diabetes medications (sulfonylureas, DPP-4 inhibitors, SGLT2 inhibitors)',
+      'Insulin therapy (if needed)',
+      'Blood pressure and cholesterol management',
+      'Regular health screenings',
+      'Diabetes education and support'
+    ],
+    preventions: [
+      'Type 1 prevention: Not currently preventable',
+      'Type 2 prevention:',
+      'Maintain a healthy weight',
+      'Eat a balanced, nutritious diet',
+      'Stay physically active (at least 150 minutes per week)',
+      'Limit refined sugars and processed foods',
+      'Don\'t smoke',
+      'Limit alcohol consumption',
+      'Manage stress effectively',
+      'Get adequate sleep',
+      'Regular health checkups and blood sugar testing',
+      'Manage blood pressure and cholesterol'
+    ],
+    relatedConditions: [
+      'heart-disease',
+      'stroke',
+      'kidney-disease',
+      'diabetic-retinopathy',
+      'diabetic-neuropathy',
+      'peripheral-artery-disease',
+      'high-blood-pressure',
+      'high-cholesterol',
+      'metabolic-syndrome',
+      'depression'
+    ],
+    commonQuestions: [
+      {
+        question: 'What is the difference between Type 1 and Type 2 diabetes?',
+        answer: 'Type 1 diabetes is an autoimmune condition where the body\'s immune system attacks and destroys insulin-producing cells in the pancreas, requiring lifelong insulin replacement. It typically develops in children and young adults but can occur at any age. Type 2 diabetes occurs when the body becomes resistant to insulin or doesn\'t produce enough insulin. It usually develops in adults over 40, though it\'s increasingly seen in younger people due to rising obesity rates. Type 2 can often be managed with lifestyle changes and medications, while Type 1 always requires insulin.'
+      },
+      {
+        question: 'Can diabetes be cured?',
+        answer: 'Type 1 diabetes cannot currently be cured and requires lifelong insulin therapy. Type 2 diabetes cannot technically be "cured," but it can go into remission where blood sugar levels return to normal without diabetes medications. This is most achievable through significant weight loss, intensive lifestyle changes, and sometimes bariatric surgery. However, the underlying tendency toward diabetes often remains, and blood sugar levels need ongoing monitoring.'
+      },
+      {
+        question: 'What are the long-term complications of diabetes?',
+        answer: 'Diabetes can cause serious complications over time if blood sugar levels are not well controlled. These include cardiovascular disease (heart attack, stroke), kidney disease (diabetic nephropathy), eye problems (diabetic retinopathy, which can lead to blindness), nerve damage (diabetic neuropathy), foot problems (which can lead to amputation), skin conditions, hearing impairment, and increased risk of infections. The good news is that maintaining good blood sugar control significantly reduces the risk of these complications.'
+      }
+    ],
+    emergencySigns: [
+      'Diabetic ketoacidosis (Type 1): High blood sugar, ketones in urine, vomiting, abdominal pain, difficulty breathing',
+      'Hyperosmolar hyperglycemic state (Type 2): Very high blood sugar, severe dehydration, confusion',
+      'Severe hypoglycemia: Blood sugar below 70 mg/dL, confusion, shakiness, sweating, loss of consciousness',
+      'Signs of diabetic coma',
+      'Persistent vomiting and inability to keep fluids down',
+      'Blood sugar over 400 mg/dL',
+      'Signs of severe dehydration',
+      'Chest pain or difficulty breathing'
+    ],
+    prevalence: 'Globally, an estimated 537 million adults (20-79 years) are living with diabetes in 2021, and this number is projected to rise to 643 million by 2030. Type 2 diabetes accounts for approximately 90-95% of all diabetes cases. In the United States, about 11.3% of the population has diabetes.',
+    affectedGroups: [
+      'Type 1: Children, adolescents, and young adults (can occur at any age)',
+      'Type 2: Adults over 45 (though increasingly affecting younger people)',
+      'People with family history of diabetes',
+      'Certain ethnic groups (African American, Hispanic/Latino, Native American, Asian American, Pacific Islander)',
+      'People who are overweight or obese',
+      'Those with sedentary lifestyles',
+      'Women who had gestational diabetes',
+      'People with polycystic ovary syndrome (PCOS)',
+      'Individuals with prediabetes'
+    ],
+    references: [
+      {
+        id: '1',
+        text: 'World Health Organization (2023). "Diabetes Fact Sheet".',
+        url: 'https://www.who.int/news-room/fact-sheets/detail/diabetes'
+      },
+      {
+        id: '2',
+        text: 'American Diabetes Association (2023). "Classification and Diagnosis of Diabetes: Standards of Medical Care in Diabetes—2023". Diabetes Care. 46 (Supplement_1): S19-S40.',
+        url: 'https://doi.org/10.2337/dc23-S002'
+      },
+      {
+        id: '3',
+        text: 'Centers for Disease Control and Prevention (2023). "Diabetes Basics".',
+        url: 'https://www.cdc.gov/diabetes/basics/index.html'
+      },
+      {
+        id: '4',
+        text: 'International Diabetes Federation (2021). "IDF Diabetes Atlas, 10th Edition".',
+        url: 'https://diabetesatlas.org/'
+      }
+    ]
+  },
+  {
+    id: 'depression',
+    name: 'Depression (Major Depressive Disorder)',
+    description: 'A common and serious mental health condition that negatively affects how you feel, think, and act.[1] Depression is characterized by persistent feelings of sadness, hopelessness, and loss of interest or pleasure in activities that were once enjoyable.[2] It is more than just feeling sad or going through a rough patch—it requires understanding and medical care.[3] Depression affects people of all ages and backgrounds and is one of the leading causes of disability worldwide.[4]',
+    category: 'mental-health',
+    subcategory: 'mood-disorders',
+    wikipediaUrl: 'https://en.wikipedia.org/wiki/Major_depressive_disorder',
+    symptoms: [
+      'Persistent sad, anxious, or "empty" mood',
+      'Loss of interest or pleasure in activities once enjoyed',
+      'Feelings of hopelessness, worthlessness, or guilt',
+      'Irritability or restlessness',
+      'Fatigue or decreased energy',
+      'Difficulty concentrating, remembering, or making decisions',
+      'Changes in appetite or weight',
+      'Sleep disturbances (insomnia or oversleeping)',
+      'Physical symptoms (headaches, digestive problems, chronic pain)',
+      'Thoughts of death or suicide',
+      'Social withdrawal',
+      'Decreased performance at work or school'
+    ],
+    causes: [
+      'Genetic factors (family history of depression)',
+      'Brain chemistry imbalances (neurotransmitters)',
+      'Hormonal changes (thyroid, pregnancy, menopause)',
+      'Life events (trauma, loss, major changes)',
+      'Medical conditions (chronic illness, chronic pain)',
+      'Medications (some blood pressure drugs, sleeping pills)',
+      'Substance abuse (alcohol, drugs)',
+      'Personality traits (low self-esteem, pessimism)',
+      'Other mental health disorders',
+      'Seasonal changes (seasonal affective disorder)'
+    ],
+    treatments: [
+      'Psychotherapy:',
+      'Cognitive Behavioral Therapy (CBT)',
+      'Interpersonal Therapy (IPT)',
+      'Dialectical Behavior Therapy (DBT)',
+      'Psychodynamic therapy',
+      'Medications:',
+      'Selective serotonin reuptake inhibitors (SSRIs)',
+      'Serotonin-norepinephrine reuptake inhibitors (SNRIs)',
+      'Tricyclic antidepressants',
+      'Monoamine oxidase inhibitors (MAOIs)',
+      'Atypical antidepressants',
+      'Other treatments:',
+      'Electroconvulsive therapy (ECT) for severe cases',
+      'Transcranial magnetic stimulation (TMS)',
+      'Light therapy (for seasonal depression)',
+      'Lifestyle changes and self-care'
+    ],
+    preventions: [
+      'Maintain social connections and relationships',
+      'Regular physical exercise',
+      'Adequate sleep (7-9 hours per night)',
+      'Stress management techniques',
+      'Healthy diet',
+      'Limit alcohol and avoid drugs',
+      'Practice mindfulness and meditation',
+      'Engage in meaningful activities',
+      'Seek help early if symptoms develop',
+      'Manage chronic medical conditions',
+      'Learn coping skills',
+      'Build resilience through support systems'
+    ],
+    relatedConditions: [
+      'anxiety',
+      'bipolar-disorder',
+      'post-traumatic-stress-disorder',
+      'obsessive-compulsive-disorder',
+      'substance-use-disorders',
+      'eating-disorders',
+      'chronic-pain',
+      'heart-disease',
+      'diabetes',
+      'sleep-disorders'
+    ],
+    commonQuestions: [
+      {
+        question: 'What is the difference between sadness and depression?',
+        answer: 'Sadness is a normal human emotion that everyone experiences in response to loss, disappointment, or difficult situations. It is usually temporary and improves with time. Depression, on the other hand, is a mental health condition characterized by persistent feelings of sadness, hopelessness, and loss of interest that last for at least two weeks and significantly interfere with daily functioning. Depression also involves physical symptoms, changes in thinking patterns, and may include thoughts of death or suicide.'
+      },
+      {
+        question: 'How long does depression treatment take?',
+        answer: 'The length of depression treatment varies greatly depending on the individual, severity of symptoms, type of treatment, and other factors. Some people may start feeling better within a few weeks of starting treatment, while others may need several months. Antidepressant medications typically take 4-6 weeks to show full effects. Psychotherapy often involves 12-20 sessions but can be longer for complex cases. Many people continue treatment for 6-12 months after feeling better to prevent relapse.'
+      },
+      {
+        question: 'Can depression be cured?',
+        answer: 'While there is no definitive "cure" for depression, it is highly treatable. Most people with depression can achieve significant improvement in their symptoms and quality of life with appropriate treatment. Many people experience full remission of symptoms and go on to live fulfilling lives. However, depression can be a recurring condition, so ongoing monitoring and sometimes continued treatment are important to prevent relapse.'
+      }
+    ],
+    emergencySigns: [
+      'Thoughts of suicide or self-harm',
+      'Plans or preparations for suicide',
+      'Talking about wanting to die',
+      'Severe hopelessness',
+      'Sudden mood improvement after severe depression (may indicate suicide risk)',
+      'Giving away possessions',
+      'Saying goodbye to loved ones',
+      'Complete inability to function',
+      'Psychotic symptoms (hallucinations, delusions)'
+    ],
+    prevalence: 'Depression affects more than 280 million people worldwide, making it one of the leading causes of disability. In the United States, an estimated 21 million adults (8.4%) had at least one major depressive episode in 2020. Depression is more common in women than men.',
+    affectedGroups: [
+      'Women (nearly twice as likely as men)',
+      'Adults aged 18-25 (highest rates)',
+      'People with family history of depression',
+      'Those with chronic medical conditions',
+      'Individuals who experienced trauma or abuse',
+      'People with other mental health disorders',
+      'Those under significant stress',
+      'Individuals with substance use problems',
+      'People in certain professions (healthcare, caregiving)',
+      'LGBTQ+ individuals (higher rates due to societal stressors)'
+    ],
+    references: [
+      {
+        id: '1',
+        text: 'American Psychiatric Association (2022). "Diagnostic and Statistical Manual of Mental Disorders, 5th Edition, Text Revision (DSM-5-TR)".',
+        url: 'https://www.psychiatry.org/psychiatrists/practice/dsm'
+      },
+      {
+        id: '2',
+        text: 'World Health Organization (2023). "Depression Fact Sheet".',
+        url: 'https://www.who.int/news-room/fact-sheets/detail/depression'
+      },
+      {
+        id: '3',
+        text: 'National Institute of Mental Health (2023). "Depression".',
+        url: 'https://www.nimh.nih.gov/health/topics/depression'
+      },
+      {
+        id: '4',
+        text: 'American Psychological Association (2023). "Depression".',
+        url: 'https://www.apa.org/topics/depression'
+      }
     ]
   }
 ];

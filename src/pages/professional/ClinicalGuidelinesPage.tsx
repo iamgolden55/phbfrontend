@@ -1,254 +1,333 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
+import { useProfessionalAuth } from '../../features/professional/professionalAuthContext';
+import guidelinesService, { ClinicalGuideline } from '../../services/guidelinesService';
+import MarkdownRenderer from '../../components/guidelines/MarkdownRenderer';
+import { 
+  Search, 
+  Download, 
+  Eye, 
+  Bookmark, 
+  Calendar, 
+  Tag, 
+  Users, 
+  FileText,
+  AlertCircle,
+  BookOpen,
+  Heart,
+  Star
+} from 'lucide-react';
 
-interface Guideline {
-  id: number;
-  title: string;
+interface GuidelineFilter {
   category: string;
-  lastUpdated: string;
-  summary: string;
-  content?: string;
+  specialty: string;
+  priority: string;
+  search: string;
 }
 
 const ClinicalGuidelinesPage: React.FC = () => {
-  // State for selected guideline and search term
-  const [selectedGuidelineId, setSelectedGuidelineId] = useState<number | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const { user, isAuthenticated } = useProfessionalAuth();
+  const [guidelines, setGuidelines] = useState<ClinicalGuideline[]>([]);
+  const [bookmarkedGuidelines, setBookmarkedGuidelines] = useState<ClinicalGuideline[]>([]);
+  const [selectedGuideline, setSelectedGuideline] = useState<ClinicalGuideline | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'all' | 'bookmarked'>('all');
+  const [filters, setFilters] = useState<GuidelineFilter>({
+    category: '',
+    specialty: '',
+    priority: '',
+    search: ''
+  });
 
-  // Dummy data for guidelines
-  const guidelines: Guideline[] = [
-    {
-      id: 1,
-      title: 'Hypertension Management in Adults',
-      category: 'Cardiovascular',
-      lastUpdated: 'May 15, 2023',
-      summary: 'Updated guidelines for the management of hypertension in adults.',
-      content: `
-        <h3>Summary</h3>
-        <p>These guidelines provide evidence-based recommendations for the diagnosis and management of hypertension in adults.</p>
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadGuidelines();
+      loadBookmarkedGuidelines();
+    }
+  }, [isAuthenticated, filters]);
 
-        <h3>Key Recommendations</h3>
-        <ul>
-          <li>Confirm hypertension diagnosis with ambulatory or home blood pressure monitoring</li>
-          <li>Initiate lifestyle modifications for all patients</li>
-          <li>Consider pharmacological treatment for patients with blood pressure consistently ≥140/90 mmHg</li>
-          <li>First-line medications include ACE inhibitors, ARBs, calcium channel blockers, and thiazide diuretics</li>
-          <li>Target blood pressure should be <140/90 mmHg for most adults, with consideration for <130/80 mmHg in higher risk patients</li>
-        </ul>
+  const loadGuidelines = async () => {
+    try {
+      setLoading(true);
+      const filterParams = Object.fromEntries(
+        Object.entries(filters).filter(([_, value]) => value !== '')
+      );
+      // Only show published guidelines to professionals
+      filterParams.is_published = true;
+      const data = await guidelinesService.getGuidelines(filterParams);
+      setGuidelines(data);
+      setError(null);
+    } catch (err) {
+      setError('Failed to load clinical guidelines');
+      console.error('Error loading guidelines:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        <h3>Lifestyle Modifications</h3>
-        <ul>
-          <li>Reduce dietary sodium intake to <2.3g/day</li>
-          <li>Follow DASH diet rich in fruits, vegetables, and low-fat dairy products</li>
-          <li>Regular physical activity (150 minutes of moderate-intensity exercise per week)</li>
-          <li>Limit alcohol consumption</li>
-          <li>Maintain healthy weight (BMI 18.5-24.9)</li>
-        </ul>
+  const loadBookmarkedGuidelines = async () => {
+    try {
+      const bookmarked = await guidelinesService.getBookmarkedGuidelines();
+      setBookmarkedGuidelines(bookmarked);
+    } catch (err) {
+      console.error('Error loading bookmarked guidelines:', err);
+    }
+  };
 
-        <h3>Monitoring and Follow-up</h3>
-        <p>Patients should be evaluated for medication efficacy and adverse effects within 2-4 weeks of starting treatment. Blood pressure targets should be achieved within 3 months, with adjustments to medication regimens as needed.</p>
-      `
-    },
-    {
-      id: 2,
-      title: 'Type 2 Diabetes Screening and Management',
-      category: 'Endocrinology',
-      lastUpdated: 'April 10, 2023',
-      summary: 'Guidelines for screening, diagnosis, and management of type 2 diabetes.',
-      content: `
-        <h3>Summary</h3>
-        <p>These guidelines provide evidence-based recommendations for the screening, diagnosis, and management of type 2 diabetes.</p>
+  const handleBookmarkToggle = async (guideline: ClinicalGuideline) => {
+    try {
+      if (guideline.is_bookmarked) {
+        await guidelinesService.removeBookmark(guideline.guideline_id);
+      } else {
+        await guidelinesService.toggleBookmark(guideline.guideline_id);
+      }
+      
+      // Refresh both lists
+      loadGuidelines();
+      loadBookmarkedGuidelines();
+      
+      // Update selected guideline if it's the same one
+      if (selectedGuideline?.id === guideline.id) {
+        setSelectedGuideline({
+          ...guideline,
+          is_bookmarked: !guideline.is_bookmarked
+        });
+      }
+    } catch (err) {
+      console.error('Error toggling bookmark:', err);
+    }
+  };
 
-        <h3>Screening Recommendations</h3>
-        <ul>
-          <li>Screen adults aged 35-70 years with overweight or obesity (BMI ≥25)</li>
-          <li>Consider earlier screening for high-risk populations (family history, gestational diabetes history, etc.)</li>
-          <li>Screening tests include fasting plasma glucose, 2-hour plasma glucose after OGTT, or HbA1c</li>
-        </ul>
+  const handleDownloadGuideline = async (guideline: ClinicalGuideline) => {
+    try {
+      const blob = await guidelinesService.downloadGuideline(guideline.guideline_id);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${guideline.title}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error('Error downloading guideline:', err);
+    }
+  };
 
-        <h3>Diagnostic Criteria</h3>
-        <ul>
-          <li>Fasting plasma glucose ≥7.0 mmol/L (126 mg/dL)</li>
-          <li>2-hour plasma glucose ≥11.1 mmol/L (200 mg/dL) during OGTT</li>
-          <li>HbA1c ≥6.5% (48 mmol/mol)</li>
-          <li>Random plasma glucose ≥11.1 mmol/L (200 mg/dL) with symptoms</li>
-        </ul>
+  const getStatusBadge = (guideline: ClinicalGuideline) => {
+    if (guideline.is_expired) {
+      return <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">Expired</span>;
+    } else if (!guideline.is_effective) {
+      return <span className="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">Not Yet Effective</span>;
+    } else {
+      return <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Active</span>;
+    }
+  };
 
-        <h3>Management</h3>
-        <ul>
-          <li>Lifestyle modifications (diet, exercise, weight management)</li>
-          <li>Metformin as first-line pharmacological therapy</li>
-          <li>Consider early combination therapy in patients with HbA1c ≥9%</li>
-          <li>Target HbA1c <7% for most patients, with individualization based on comorbidities</li>
-        </ul>
-      `
-    },
-    {
-      id: 3,
-      title: 'Asthma Management in Children and Adolescents',
-      category: 'Respiratory',
-      lastUpdated: 'March 5, 2023',
-      summary: 'Updated guidelines for the diagnosis and management of asthma in pediatric patients.',
-      content: `
-        <h3>Summary</h3>
-        <p>These guidelines provide evidence-based recommendations for the diagnosis and management of asthma in children and adolescents.</p>
+  const getPriorityBadge = (priority: string) => {
+    const colors = {
+      critical: 'bg-red-100 text-red-800 border-red-200',
+      high: 'bg-orange-100 text-orange-800 border-orange-200',
+      medium: 'bg-blue-100 text-blue-800 border-blue-200',
+      low: 'bg-gray-100 text-gray-800 border-gray-200'
+    };
+    
+    return (
+      <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full border ${colors[priority as keyof typeof colors] || colors.medium}`}>
+        {priority === 'critical' && <AlertCircle className="w-3 h-3 mr-1" />}
+        {priority.charAt(0).toUpperCase() + priority.slice(1)}
+      </span>
+    );
+  };
 
-        <h3>Diagnosis</h3>
-        <ul>
-          <li>Diagnosis based on history of respiratory symptoms and evidence of variable airflow limitation</li>
-          <li>Consider alternative diagnoses, especially in children under 5 years</li>
-          <li>Spirometry recommended for children ≥5 years to confirm diagnosis</li>
-        </ul>
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
 
-        <h3>Classification of Severity</h3>
-        <ul>
-          <li>Intermittent: Symptoms <2 days/week, nocturnal symptoms <2 times/month</li>
-          <li>Mild persistent: Symptoms >2 days/week but not daily, nocturnal symptoms 3-4 times/month</li>
-          <li>Moderate persistent: Daily symptoms, nocturnal symptoms >1 time/week</li>
-          <li>Severe persistent: Symptoms throughout the day, frequent nocturnal symptoms</li>
-        </ul>
+  const currentGuidelines = activeTab === 'all' ? guidelines : bookmarkedGuidelines;
 
-        <h3>Treatment</h3>
-        <ul>
-          <li>Step-wise approach based on age and asthma severity</li>
-          <li>Inhaled corticosteroids are the cornerstone of controller therapy</li>
-          <li>Short-acting beta-agonists for quick relief</li>
-          <li>Regular follow-up to adjust therapy based on symptom control</li>
-        </ul>
-      `
-    },
-    {
-      id: 4,
-      title: 'Antibiotic Stewardship in Primary Care',
-      category: 'Infectious Disease',
-      lastUpdated: 'February 20, 2023',
-      summary: 'Guidelines for appropriate antibiotic prescribing in primary care settings.',
-      content: `
-        <h3>Summary</h3>
-        <p>These guidelines provide recommendations for appropriate antibiotic prescribing in primary care to reduce antimicrobial resistance.</p>
-
-        <h3>Key Principles</h3>
-        <ul>
-          <li>Prescribe antibiotics only when clinically indicated</li>
-          <li>Use narrow-spectrum antibiotics when appropriate</li>
-          <li>Consider delayed prescribing strategies for uncertain indications</li>
-          <li>Educate patients about appropriate antibiotic use and antimicrobial resistance</li>
-        </ul>
-
-        <h3>Common Infections and Recommendations</h3>
-        <h4>Acute Pharyngitis</h4>
-        <ul>
-          <li>Use clinical criteria or rapid antigen detection test to identify Group A Streptococcus</li>
-          <li>Penicillin V remains first-line therapy for Group A Streptococcal pharyngitis</li>
-        </ul>
-
-        <h4>Acute Bronchitis</h4>
-        <ul>
-          <li>Antibiotics not routinely recommended for uncomplicated acute bronchitis</li>
-          <li>Focus on symptom management and patient education</li>
-        </ul>
-
-        <h4>Acute Otitis Media</h4>
-        <ul>
-          <li>Consider watchful waiting for mild cases in children ≥2 years</li>
-          <li>Amoxicillin remains first-line therapy when antibiotics are indicated</li>
-        </ul>
-      `
-    },
-    {
-      id: 5,
-      title: 'Depression Screening and Management',
-      category: 'Mental Health',
-      lastUpdated: 'January 15, 2023',
-      summary: 'Guidelines for screening, diagnosis, and management of depression in primary care settings.',
-      content: `
-        <h3>Summary</h3>
-        <p>These guidelines provide recommendations for depression screening, diagnosis, and management in primary care.</p>
-
-        <h3>Screening</h3>
-        <ul>
-          <li>Screen all adults for depression using validated tools (PHQ-9, Beck Depression Inventory, etc.)</li>
-          <li>Particular focus on high-risk populations (postpartum women, chronic medical conditions, etc.)</li>
-          <li>Positive screens require comprehensive assessment to confirm diagnosis</li>
-        </ul>
-
-        <h3>Diagnosis</h3>
-        <ul>
-          <li>Diagnosis based on DSM-5 criteria</li>
-          <li>Evaluate for suicidality, psychosis, and comorbid conditions</li>
-          <li>Rule out medical conditions that can mimic depression</li>
-        </ul>
-
-        <h3>Treatment</h3>
-        <ul>
-          <li>Mild depression: Psychoeducation, support, monitoring, consider psychotherapy</li>
-          <li>Moderate-severe depression: Pharmacotherapy, psychotherapy, or combination</li>
-          <li>First-line antidepressants include SSRIs</li>
-          <li>Regular follow-up to assess response and adjust treatment</li>
-        </ul>
-      `
-    },
-  ];
-
-  // Filter guidelines based on search term
-  const filteredGuidelines = guidelines.filter(
-    guideline =>
-      guideline.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      guideline.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      guideline.summary.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Find selected guideline
-  const selectedGuideline = guidelines.find(g => g.id === selectedGuidelineId);
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="mx-auto h-12 w-12 text-red-500 mb-4" />
+          <h1 className="text-xl font-semibold text-gray-900 mb-2">Access Denied</h1>
+          <p className="text-gray-600">Please log in as a medical professional to access clinical guidelines.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gray-50 p-6">
       <Helmet>
-        <title>Clinical Guidelines | PHB Professional</title>
+        <title>Clinical Guidelines - PHB Hospital System</title>
+        <meta name="description" content="Access clinical guidelines and medical protocols" />
       </Helmet>
 
-      <h1 className="text-3xl font-bold text-blue-800 mb-6">Clinical Guidelines</h1>
-
-      {/* Search and filter */}
+      {/* Header */}
       <div className="mb-8">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search guidelines..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <span className="material-icons absolute left-3 top-2.5 text-gray-400">search</span>
-            </div>
-          </div>
+        <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+          <FileText className="mr-3 h-8 w-8 text-blue-600" />
+          Clinical Guidelines
+        </h1>
+        <p className="text-gray-600 mt-2">Access evidence-based clinical protocols and medical guidelines</p>
+      </div>
+
+      {/* Tabs */}
+      <div className="mb-6">
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex space-x-8">
+            <button
+              onClick={() => setActiveTab('all')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'all'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <FileText className="inline-block w-4 h-4 mr-2" />
+              All Guidelines ({guidelines.length})
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab('bookmarked');
+                loadBookmarkedGuidelines(); // Refresh bookmarks when switching to tab
+              }}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'bookmarked'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <BookOpen className="inline-block w-4 h-4 mr-2" />
+              Bookmarked ({bookmarkedGuidelines.length})
+            </button>
+          </nav>
         </div>
       </div>
 
+      {/* Filters */}
+      {activeTab === 'all' && (
+        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+          <div className="flex items-center space-x-4 flex-wrap">
+            <div className="flex items-center space-x-2">
+              <Search className="h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search guidelines..."
+                className="border rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={filters.search}
+                onChange={(e) => setFilters({...filters, search: e.target.value})}
+              />
+            </div>
+            
+            <select
+              className="border rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={filters.category}
+              onChange={(e) => setFilters({...filters, category: e.target.value})}
+            >
+              <option value="">All Categories</option>
+              <option value="emergency">Emergency Protocols</option>
+              <option value="surgery">Surgical Procedures</option>
+              <option value="medication">Medication Guidelines</option>
+              <option value="diagnosis">Diagnostic Protocols</option>
+              <option value="treatment">Treatment Plans</option>
+              <option value="prevention">Preventive Care</option>
+              <option value="infection_control">Infection Control</option>
+              <option value="patient_safety">Patient Safety</option>
+            </select>
+            
+            <select
+              className="border rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={filters.priority}
+              onChange={(e) => setFilters({...filters, priority: e.target.value})}
+            >
+              <option value="">All Priorities</option>
+              <option value="critical">Critical</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+        </div>
+      )}
+
+      {/* Error Display */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+          <div className="flex">
+            <AlertCircle className="h-5 w-5 text-red-400" />
+            <div className="ml-3">
+              <p className="text-sm text-red-800">{error}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Guidelines List */}
-        <div className={`lg:col-span-1 ${selectedGuidelineId ? 'hidden lg:block' : ''}`}>
+        <div className={`lg:col-span-1 ${selectedGuideline ? 'hidden lg:block' : ''}`}>
           <div className="bg-white p-4 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-blue-800 mb-4">Available Guidelines</h2>
+            <h2 className="text-xl font-semibold text-blue-800 mb-4">
+              {activeTab === 'all' ? 'Available Guidelines' : 'Bookmarked Guidelines'}
+            </h2>
 
-            {filteredGuidelines.length === 0 ? (
-              <p className="text-gray-500">No guidelines found matching your search.</p>
+            {loading ? (
+              <div className="text-center py-8">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <p className="mt-2 text-gray-600">Loading guidelines...</p>
+              </div>
+            ) : currentGuidelines.length === 0 ? (
+              <div className="text-center py-8">
+                <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                <p className="text-gray-500">
+                  {activeTab === 'all' ? 'No guidelines found matching your criteria.' : 'No bookmarked guidelines found.'}
+                </p>
+              </div>
             ) : (
               <ul className="divide-y divide-gray-200">
-                {filteredGuidelines.map(guideline => (
+                {currentGuidelines.map(guideline => (
                   <li key={guideline.id} className="py-3">
-                    <button
-                      onClick={() => setSelectedGuidelineId(guideline.id)}
-                      className={`w-full text-left hover:bg-blue-50 p-2 rounded transition ${
-                        selectedGuidelineId === guideline.id ? 'bg-blue-50' : ''
+                    <div
+                      className={`cursor-pointer hover:bg-blue-50 p-3 rounded transition ${
+                        selectedGuideline?.id === guideline.id ? 'bg-blue-50 border border-blue-200' : ''
                       }`}
+                      onClick={() => setSelectedGuideline(guideline)}
                     >
-                      <h3 className="font-medium text-blue-700">{guideline.title}</h3>
-                      <p className="text-sm text-gray-500">Category: {guideline.category}</p>
-                      <p className="text-sm text-gray-500">Updated: {guideline.lastUpdated}</p>
-                    </button>
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-medium text-blue-700 text-sm">{guideline.title}</h3>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleBookmarkToggle(guideline);
+                          }}
+                          className={`ml-2 ${guideline.is_bookmarked ? 'text-yellow-500' : 'text-gray-400 hover:text-yellow-500'}`}
+                        >
+                          {guideline.is_bookmarked ? <Star className="h-4 w-4 fill-current" /> : <Star className="h-4 w-4" />}
+                        </button>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                          {guideline.category.replace('_', ' ')}
+                        </span>
+                        {getPriorityBadge(guideline.priority)}
+                        {getStatusBadge(guideline)}
+                      </div>
+                      
+                      <p className="text-xs text-gray-500">
+                        Updated: {formatDate(guideline.updated_at)}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {guideline.access_count} views • v{guideline.version}
+                      </p>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -257,48 +336,157 @@ const ClinicalGuidelinesPage: React.FC = () => {
         </div>
 
         {/* Guideline Detail */}
-        <div className={`lg:col-span-2 ${selectedGuidelineId ? '' : 'hidden lg:block'}`}>
+        <div className={`lg:col-span-2 ${selectedGuideline ? '' : 'hidden lg:block'}`}>
           {selectedGuideline ? (
             <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="flex justify-between items-start mb-4">
-                <h2 className="text-2xl font-bold text-blue-800">{selectedGuideline.title}</h2>
-                <button
-                  onClick={() => setSelectedGuidelineId(null)}
-                  className="lg:hidden bg-gray-200 p-2 rounded-full hover:bg-gray-300 transition"
-                >
-                  <span className="material-icons">close</span>
-                </button>
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-blue-800 mb-2">{selectedGuideline.title}</h2>
+                  <p className="text-gray-600">{selectedGuideline.description}</p>
+                </div>
+                <div className="flex items-center space-x-2 ml-4">
+                  <button
+                    onClick={() => handleBookmarkToggle(selectedGuideline)}
+                    className={`p-2 rounded-full ${selectedGuideline.is_bookmarked ? 'text-yellow-500 bg-yellow-50' : 'text-gray-400 hover:text-yellow-500 hover:bg-yellow-50'}`}
+                  >
+                    {selectedGuideline.is_bookmarked ? <Star className="h-5 w-5 fill-current" /> : <Star className="h-5 w-5" />}
+                  </button>
+                  <button
+                    onClick={() => setSelectedGuideline(null)}
+                    className="lg:hidden p-2 rounded-full hover:bg-gray-100"
+                  >
+                    ×
+                  </button>
+                </div>
               </div>
 
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
-                  {selectedGuideline.category}
-                </span>
-                <span className="bg-gray-100 text-gray-800 text-sm px-3 py-1 rounded-full">
-                  Last updated: {selectedGuideline.lastUpdated}
-                </span>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                  <Tag className="h-5 w-5 mx-auto text-gray-600 mb-1" />
+                  <p className="text-xs text-gray-600">Category</p>
+                  <p className="text-sm font-medium">{selectedGuideline.category.replace('_', ' ')}</p>
+                </div>
+                
+                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                  <Calendar className="h-5 w-5 mx-auto text-gray-600 mb-1" />
+                  <p className="text-xs text-gray-600">Effective Date</p>
+                  <p className="text-sm font-medium">{formatDate(selectedGuideline.effective_date)}</p>
+                </div>
+                
+                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                  <Eye className="h-5 w-5 mx-auto text-gray-600 mb-1" />
+                  <p className="text-xs text-gray-600">Access Count</p>
+                  <p className="text-sm font-medium">{selectedGuideline.access_count}</p>
+                </div>
+                
+                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                  <FileText className="h-5 w-5 mx-auto text-gray-600 mb-1" />
+                  <p className="text-xs text-gray-600">Version</p>
+                  <p className="text-sm font-medium">{selectedGuideline.version}</p>
+                </div>
               </div>
 
-              <p className="text-gray-700 mb-6">{selectedGuideline.summary}</p>
+              <div className="mb-6">
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {getPriorityBadge(selectedGuideline.priority)}
+                  {getStatusBadge(selectedGuideline)}
+                  {selectedGuideline.specialty && (
+                    <span className="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded-full">
+                      {selectedGuideline.specialty}
+                    </span>
+                  )}
+                </div>
 
-              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: selectedGuideline.content || '' }} />
+                {selectedGuideline.target_roles.length > 0 && (
+                  <div className="mb-4">
+                    <div className="flex items-center mb-2">
+                      <Users className="h-4 w-4 mr-2 text-gray-600" />
+                      <span className="text-sm font-medium text-gray-700">Target Roles:</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {selectedGuideline.target_roles.map((role) => (
+                        <span
+                          key={role}
+                          className="px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded"
+                        >
+                          {role.replace('_', ' ')}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-              <div className="mt-6 pt-4 border-t border-gray-200">
+                {selectedGuideline.keywords.length > 0 && (
+                  <div className="mb-4">
+                    <span className="text-sm font-medium text-gray-700 mb-2 block">Keywords:</span>
+                    <div className="flex flex-wrap gap-1">
+                      {selectedGuideline.keywords.map((keyword, index) => (
+                        <span
+                          key={index}
+                          className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded"
+                        >
+                          #{keyword}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Content Display */}
+              {selectedGuideline.content_type === 'text' && selectedGuideline.text_content ? (
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-3">Content</h3>
+                  <div className="bg-gray-50 p-6 rounded-lg">
+                    <MarkdownRenderer content={selectedGuideline.text_content} />
+                  </div>
+                </div>
+              ) : selectedGuideline.content_type === 'pdf' && selectedGuideline.file_path ? (
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-3">Document</h3>
+                  <div className="bg-blue-50 border border-blue-200 p-6 rounded-lg text-center">
+                    <FileText className="mx-auto h-12 w-12 text-blue-600 mb-3" />
+                    <p className="text-blue-800 font-medium mb-2">PDF Document Available</p>
+                    <p className="text-blue-600 text-sm mb-4">
+                      This guideline is available as a downloadable PDF document.
+                    </p>
+                    <button
+                      onClick={() => handleDownloadGuideline(selectedGuideline)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center mx-auto transition-colors"
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download PDF
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="pt-4 border-t border-gray-200">
                 <div className="flex justify-between items-center">
-                  <button className="text-blue-600 hover:text-blue-800 flex items-center gap-1">
-                    <span className="material-icons text-sm">download</span> Download PDF
-                  </button>
-                  <button className="text-blue-600 hover:text-blue-800 flex items-center gap-1">
-                    <span className="material-icons text-sm">print</span> Print
-                  </button>
+                  <div className="flex space-x-4">
+                    {/* Additional download button for file-based guidelines */}
+                    {selectedGuideline.content_type === 'pdf' && selectedGuideline.file_path && (
+                      <button
+                        onClick={() => handleDownloadGuideline(selectedGuideline)}
+                        className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 transition-colors"
+                      >
+                        <Download className="h-4 w-4" />
+                        <span>Download Document</span>
+                      </button>
+                    )}
+                  </div>
+                  
+                  <div className="text-sm text-gray-500">
+                    Created by: {selectedGuideline.created_by_name}
+                  </div>
                 </div>
               </div>
             </div>
           ) : (
             <div className="bg-white p-6 rounded-lg shadow-md text-center">
-              <span className="material-icons text-gray-400 text-5xl mb-2">description</span>
-              <h3 className="text-xl font-medium text-gray-600">Select a guideline to view details</h3>
-              <p className="text-gray-500 mt-2">Choose from the list on the left to view the full clinical guideline.</p>
+              <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+              <h3 className="text-xl font-medium text-gray-600 mb-2">Select a guideline to view details</h3>
+              <p className="text-gray-500">Choose from the list on the left to view the full clinical guideline.</p>
             </div>
           )}
         </div>

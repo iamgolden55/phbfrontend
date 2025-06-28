@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Constraint Fix Test - PHB</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #d63384;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-button {
+            background: linear-gradient(135deg, #d63384, #dc3545);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 10px 10px 10px 0;
+            transition: all 0.3s ease;
+        }
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(214, 51, 132, 0.3);
+        }
+        .test-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .log-container {
+            background: #212529;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            padding: 20px;
+            border-radius: 8px;
+            height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+            white-space: pre-wrap;
+        }
+        .fix-info {
+            background: #d1ecf1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #17a2b8;
+        }
+        .test-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            margin-bottom: 20px;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .warning { color: #ffc107; }
+        .info { color: #17a2b8; }
+        .highlight { color: #ffd700; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Database Constraint Fix Test</h1>
+        
+        <div class="fix-info">
+            <h3>🎯 Testing UPDATE-OR-CREATE Fix (No CORS Issues!)</h3>
+            <p><strong>Running from PHB domain:</strong> No authentication issues</p>
+            <p><strong>Auto-detects token:</strong> Uses your current login session</p>
+            <p><strong>Expected Results:</strong></p>
+            <ul>
+                <li>First submission: CREATE new log (HTTP 201)</li>
+                <li>Second submission: UPDATE existing log (HTTP 200)</li>
+                <li>No constraint violations</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>🚀 Quick Tests</h3>
+            <button class="test-button" onclick="runCompleteTest()">🔄 Run Complete Test Workflow</button>
+            <button class="test-button" onclick="testCreateOnly()">1️⃣ Test CREATE Only</button>
+            <button class="test-button" onclick="testUpdateOnly()">2️⃣ Test UPDATE Only</button>
+            <button class="test-button" onclick="checkDashboard()">📊 Check Dashboard</button>
+            <button class="test-button" onclick="clearLog()">🗑️ Clear Log</button>
+        </div>
+
+        <div id="log-container" class="log-container">
+            Database Constraint Fix Test - Running from PHB Domain
+            Auto-detecting authentication...
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+        const TODAY = new Date().toISOString().split('T')[0];
+
+        function log(message, type = 'info') {
+            const logContainer = document.getElementById('log-container');
+            const timestamp = new Date().toLocaleTimeString();
+            const typeColors = {
+                success: '#28a745',
+                error: '#dc3545', 
+                warning: '#ffc107',
+                info: '#17a2b8',
+                highlight: '#ffd700'
+            };
+            
+            const color = typeColors[type] || typeColors.info;
+            logContainer.innerHTML += `<span style="color: ${color};">[${timestamp}] ${message}</span>\n`;
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log-container').innerHTML = 'Database Constraint Fix Test - Running from PHB Domain\nReady to test...\n\n';
+        }
+
+        function getAuthHeaders() {
+            // Try multiple token keys
+            const tokenKeys = ['phb_auth_token', 'phb_token', 'authToken'];
+            let token = null;
+            
+            for (const key of tokenKeys) {
+                token = localStorage.getItem(key);
+                if (token) {
+                    log(`🔑 Found token with key: ${key}`, 'success');
+                    break;
+                }
+            }
+            
+            if (!token) {
+                throw new Error('No authentication token found. Please make sure you\'re logged in.');
+            }
+            
+            return {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            };
+        }
+
+        async function makeHealthLogRequest(data, testName) {
+            log(`🎯 ${testName}`, 'highlight');
+            log(`📤 Sending health log for ${data.date}...`, 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/womens-health/logs/`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(data)
+                });
+
+                const responseData = await response.json();
+                
+                if (response.ok) {
+                    const action = responseData.action || 'processed';
+                    const statusCode = response.status;
+                    
+                    if (action === 'created') {
+                        log(`✅ NEW LOG CREATED (HTTP ${statusCode})`, 'success');
+                    } else if (action === 'updated') {
+                        log(`🔄 EXISTING LOG UPDATED (HTTP ${statusCode})`, 'highlight');
+                    }
+                    
+                    log(`📝 ${responseData.message}`, 'info');
+                    log(`📊 Log ID: ${responseData.log.id}`, 'info');
+                    return true;
+                } else {
+                    log(`❌ Failed: HTTP ${response.status}`, 'error');
+                    log(`💬 ${responseData.message || 'Unknown error'}`, 'error');
+                    return false;
+                }
+                
+            } catch (error) {
+                log(`💥 Network error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function checkDashboard() {
+            log('📊 Checking dashboard count...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/womens-health/dashboard/`, {
+                    method: 'GET',
+                    headers: getAuthHeaders()
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const count = data.dashboard?.recent_health_logs?.length || 0;
+                    log(`✅ Dashboard shows ${count} health logs`, 'success');
+                } else {
+                    log(`❌ Dashboard check failed: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`💥 Dashboard error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateOnly() {
+            const testData = {
+                date: TODAY,
+                symptoms: ['test_create_' + Date.now(), 'fatigue'],
+                mood: 'good',
+                energy_level: 'high',
+                sleep_duration_hours: 8,
+                sleep_quality: 'good',
+                exercise_performed: true,
+                exercise_duration_minutes: 30,
+                water_intake_liters: 2.5,
+                water_goal_met: true,
+                daily_notes: 'Test CREATE operation',
+                data_completeness_score: 90
+            };
+
+            await makeHealthLogRequest(testData, 'Testing CREATE Operation');
+        }
+
+        async function testUpdateOnly() {
+            const testData = {
+                date: TODAY,
+                symptoms: ['test_update_' + Date.now(), 'headache', 'nausea'],
+                mood: 'excellent',
+                energy_level: 'very_high',
+                sleep_duration_hours: 9,
+                sleep_quality: 'excellent',
+                exercise_performed: true,
+                exercise_duration_minutes: 45,
+                water_intake_liters: 3.0,
+                water_goal_met: true,
+                daily_notes: 'Test UPDATE operation - should update existing log',
+                data_completeness_score: 95
+            };
+
+            await makeHealthLogRequest(testData, 'Testing UPDATE Operation');
+        }
+
+        async function runCompleteTest() {
+            log('🚀 RUNNING COMPLETE DATABASE CONSTRAINT FIX TEST', 'highlight');
+            log('=' .repeat(60), 'info');
+            
+            // Initial dashboard check
+            await checkDashboard();
+            
+            log('\n🎯 Phase 1: CREATE Operation', 'highlight');
+            await testCreateOnly();
+            
+            // Wait a moment
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            log('\n🎯 Phase 2: UPDATE Operation (same date)', 'highlight');
+            await testUpdateOnly();
+            
+            // Final dashboard check
+            setTimeout(async () => {
+                log('\n📊 Final dashboard verification...', 'highlight');
+                await checkDashboard();
+                
+                log('\n🎉 TEST COMPLETE!', 'success');
+                log('✅ If you see CREATE followed by UPDATE, the fix is working!', 'success');
+                log('✅ No constraint violations should have occurred', 'success');
+            }, 2000);
+        }
+
+        // Auto-run on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                log('🔧 Database Constraint Fix Test Tool Loaded', 'success');
+                log('🌐 Running from PHB domain - no CORS issues', 'success');
+                log('🎯 Ready to test UPDATE-OR-CREATE functionality', 'info');
+                
+                // Check authentication
+                try {
+                    getAuthHeaders();
+                    log('🔑 Authentication token detected', 'success');
+                    log('💡 Click "Run Complete Test Workflow" to begin', 'info');
+                } catch (error) {
+                    log('❌ No authentication found - please log in first', 'error');
+                }
+                log('', 'info');
+            }, 500);
+        });
+    </script>
+</body>
+</html>
