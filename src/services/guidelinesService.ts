@@ -90,26 +90,34 @@ export interface GuidelineCategory {
   count: number;
 }
 
-// Helper function to get auth token (same pattern as working services)
+// Helper function to get auth token (fixed to prioritize doctor auth correctly)
 const getAuthToken = (): string | null => {
   let token = null;
   
-  // Try organization auth first (for hospital admins)
-  const organizationAuth = localStorage.getItem('organizationAuth');
-  if (organizationAuth) {
-    try {
-      const authData = JSON.parse(organizationAuth);
-      token = authData.tokens?.access;
-    } catch (e) {
-      console.error('Failed to parse organization auth data:', e);
+  // First priority: Standard auth token (for doctors and other medical staff)
+  token = localStorage.getItem('phb_auth_token');
+  
+  // Second priority: Professional token (alternative doctor auth)
+  if (!token) {
+    token = localStorage.getItem('phb_professional_token');
+  }
+  
+  // Third priority: Organization auth (for hospital admins)
+  if (!token) {
+    const organizationAuth = localStorage.getItem('organizationAuth');
+    if (organizationAuth) {
+      try {
+        const authData = JSON.parse(organizationAuth);
+        token = authData.tokens?.access;
+      } catch (e) {
+        console.error('Failed to parse organization auth data:', e);
+      }
     }
   }
   
-  // Fallback to other token types if organization auth not available
+  // Final fallback: Legacy token key
   if (!token) {
-    const professionalToken = localStorage.getItem('phb_professional_token');
-    const regularToken = localStorage.getItem('phb_token');
-    token = professionalToken || regularToken;
+    token = localStorage.getItem('phb_token');
   }
   
   return token;
