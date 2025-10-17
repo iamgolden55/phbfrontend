@@ -30,7 +30,7 @@ const AppointmentsPage: React.FC = () => {
           throw new Error('Invalid auth data');
         }
 
-        const response = await fetch(`${API_BASE_URL}api/hospitals/departments/`, {
+        const response = await fetch(`${API_BASE_URL}/api/hospitals/departments/`, {
           headers: {
             'Authorization': `Bearer ${authData.tokens.access}`,
             'Content-Type': 'application/json',

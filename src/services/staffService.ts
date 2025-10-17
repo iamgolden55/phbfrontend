@@ -87,7 +87,7 @@ export const StaffService = {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}api/staff/`, {
+      const response = await fetch(`${API_BASE_URL}/api/staff/`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -117,7 +117,7 @@ export const StaffService = {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}api/staff/availability/`, {
+      const response = await fetch(`${API_BASE_URL}/api/staff/availability/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -149,7 +149,7 @@ export const StaffService = {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}api/staff/`, {
+      const response = await fetch(`${API_BASE_URL}/api/staff/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -179,7 +179,7 @@ export const StaffService = {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}api/hospitals/departments/?hospital_id=${hospitalId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/hospitals/departments/?hospital_id=${hospitalId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

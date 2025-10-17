@@ -149,7 +149,7 @@ const WardManagementPage: React.FC = () => {
           throw new Error('Invalid auth data');
         }
 
-        const response = await fetch(`${API_BASE_URL}api/hospitals/departments/`, {
+        const response = await fetch(`${API_BASE_URL}/api/hospitals/departments/`, {
           headers: {
             'Authorization': `Bearer ${authData.tokens.access}`,
             'Content-Type': 'application/json',
@@ -210,7 +210,7 @@ const WardManagementPage: React.FC = () => {
         throw new Error('Invalid auth data');
       }
 
-      const response = await fetch(`${API_BASE_URL}api/hospitals/departments/create/`, {
+      const response = await fetch(`${API_BASE_URL}/api/hospitals/departments/create/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${authData.tokens.access}`,
@@ -257,7 +257,7 @@ const WardManagementPage: React.FC = () => {
         // Refresh departments list
         const fetchDepartments = async () => {
           try {
-            const response = await fetch(`${API_BASE_URL}api/hospitals/departments/?hospital=${userData?.hospital?.id}`, {
+            const response = await fetch(`${API_BASE_URL}/api/hospitals/departments/?hospital=${userData?.hospital?.id}`, {
               headers: {
                 'Authorization': `Bearer ${authData.tokens.access}`,
                 'Content-Type': 'application/json',
@@ -320,7 +320,7 @@ const WardManagementPage: React.FC = () => {
 
         // Using the same API base URL as the auth context
         // Build URL with query parameters
-        const url = new URL(`${API_BASE_URL}api/hospitals/departments/`);
+        const url = new URL(`${API_BASE_URL}/api/hospitals/departments/`);
         url.searchParams.append('hospital', String(userData?.hospital?.id || ''));
 
         const response = await fetch(url.toString(), {

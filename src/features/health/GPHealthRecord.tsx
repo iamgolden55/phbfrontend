@@ -198,7 +198,7 @@ const GPHealthRecord: React.FC = () => {
         throw new Error('No authentication token found');
       }
       
-      const response = await fetch(`${API_BASE_URL}api/appointments/${appointmentId}/summary/`, {
+      const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/summary/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

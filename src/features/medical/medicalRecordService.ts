@@ -214,7 +214,7 @@ export async function fetchMedicalRecords(patientId: string, accessToken?: strin
     }
     
     // First, try to get the medical record ID for the patient
-    const recordsResponse = await fetch(`${API_BASE_URL}api/patient/medical-record/`, {
+    const recordsResponse = await fetch(`${API_BASE_URL}/api/patient/medical-record/`, {
       method: 'GET',
       headers,
     });

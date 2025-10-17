@@ -156,7 +156,7 @@ export const useDepartmentStats = (): UseDepartmentStatsReturn => {
       console.log('🛏️ Found hospital ID:', hospitalId);
       
       // Use the createApiUrl utility to ensure proper URL construction
-      const apiUrl = `${API_BASE_URL}api/hospitals/departments/?hospital=${hospitalId}`;
+      const apiUrl = `${API_BASE_URL}/api/hospitals/departments/?hospital=${hospitalId}`;
       
       console.log('🛏️ Fetching department stats for hospital:', hospitalId);
       console.log('🛏️ Full API URL:', apiUrl);

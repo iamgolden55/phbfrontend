@@ -86,7 +86,7 @@ export async function fetchDoctorAppointments(filters?: {
       queryParams = `?${params.toString()}`;
     }
     
-    const response = await fetch(`${API_BASE_URL}api/department-pending-appointments/${queryParams}`, {
+    const response = await fetch(`${API_BASE_URL}/api/department-pending-appointments/${queryParams}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -178,7 +178,7 @@ export async function fetchDoctorAppointmentDetails(appointmentId: string) {
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}api/doctor-appointments/${appointmentId}/`, {
+    const response = await fetch(`${API_BASE_URL}/api/doctor-appointments/${appointmentId}/`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -900,7 +900,7 @@ export async function fetchHospitals() {
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}api/hospitals/`, {
+    const response = await fetch(`${API_BASE_URL}/api/hospitals/`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -933,7 +933,7 @@ export async function fetchDepartments(hospitalId: number) {
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}api/departments/${hospitalId}/`, {
+    const response = await fetch(`${API_BASE_URL}/api/departments/${hospitalId}/`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
