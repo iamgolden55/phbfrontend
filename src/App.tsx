@@ -235,6 +235,10 @@ import ImplantPage from './pages/contraception/ImplantPage';
 import InjectionPage from './pages/contraception/InjectionPage';
 import IUDPage from './pages/contraception/IUDPage';
 import HowToBookPage from './pages/help/appointments/HowToBookPage';
+import ManagingAppointmentsPage from './pages/help/appointments/ManagingAppointmentsPage';
+import AppointmentTypesPage from './pages/help/appointments/AppointmentTypesPage';
+import PrepareForAppointmentPage from './pages/help/appointments/PrepareForAppointmentPage';
+import TechnicalIssuesPage from './pages/help/appointments/TechnicalIssuesPage';
 import HelpPage from './pages/help/HelpPage'; // New import for HelpPage
 import HowToRequestPage from './pages/help/prescriptions/HowToRequestPage';
 import UrgentRequestsPage from './pages/help/prescriptions/UrgentRequestsPage';
@@ -247,6 +251,9 @@ import StressPage from './pages/mental-health/StressPage';
 import PTSDPage from './pages/mental-health/PTSDPage';
 import SelfHarmPage from './pages/mental-health/SelfHarmPage';
 import EatingDisordersPage from './pages/mental-health/EatingDisordersPage';
+
+// Services Pages
+import TalkingTherapiesPage from './pages/services/TalkingTherapiesPage';
 
 // New import for Research Publications Page
 import ResearchPublicationsPage from './pages/ResearchPublicationsPage';
@@ -487,6 +494,9 @@ function App() {
                 <Route path="mental-health/ptsd" element={<PTSDPage />} />
                 <Route path="mental-health/self-harm" element={<SelfHarmPage />} />
                 <Route path="mental-health/eating-disorders" element={<EatingDisordersPage />} />
+
+                {/* Services Routes */}
+                <Route path="services/talking-therapies" element={<TalkingTherapiesPage />} />
                 <Route path="care-and-support" element={<CareAndSupportPage />} />
                 <Route path="care-and-support/older-people" element={<OlderPeoplePage />} />
                 <Route path="care-and-support/dementia" element={<DementiaPage />} />
@@ -502,6 +512,10 @@ function App() {
                 {/* Help Routes */}
                 <Route path="help" element={<HelpPage />} /> {/* New Help Route */}
                 <Route path="help/appointments/how-to-book" element={<HowToBookPage />} />
+                <Route path="help/appointments/managing" element={<ManagingAppointmentsPage />} />
+                <Route path="help/appointments/types" element={<AppointmentTypesPage />} />
+                <Route path="help/appointments/prepare" element={<PrepareForAppointmentPage />} />
+                <Route path="help/appointments/technical-issues" element={<TechnicalIssuesPage />} />
                 <Route path="help/prescriptions/how-to-request" element={<HowToRequestPage />} />
                 <Route path="help/prescriptions/urgent-requests" element={<UrgentRequestsPage />} />
                 <Route path="help/prescriptions/how-nominations-work" element={<HowNominationsWorkPage />} />
