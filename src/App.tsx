@@ -68,6 +68,12 @@ import HealthAssessmentToolsPage from './pages/HealthAssessmentToolsPage'; // Ne
 // Assessment Pages
 import HealthCheckAssessment from './pages/tools/assessments/HealthCheckAssessment';
 import MentalWellbeingAssessment from './pages/tools/assessments/MentalWellbeingAssessment';
+import HeartDiseaseRiskAssessment from './pages/tools/assessments/HeartDiseaseRiskAssessment';
+import DiabetesRiskAssessment from './pages/tools/assessments/DiabetesRiskAssessment';
+import SleepQualityAssessment from './pages/tools/assessments/SleepQualityAssessment';
+import NutritionAssessment from './pages/tools/assessments/NutritionAssessment';
+import DepressionScreeningAssessment from './pages/tools/assessments/DepressionScreeningAssessment';
+import AnxietyScreeningAssessment from './pages/tools/assessments/AnxietyScreeningAssessment';
 
 // Pages
 import HomePage from './pages/HomePage';
@@ -587,6 +593,12 @@ function App() {
                 {/* Health Assessment Routes */}
                 <Route path="tools/health-assessments/health-check" element={<HealthCheckAssessment />} />
                 <Route path="tools/health-assessments/mental-wellbeing" element={<MentalWellbeingAssessment />} />
+                <Route path="tools/health-assessments/heart-disease-risk" element={<HeartDiseaseRiskAssessment />} />
+                <Route path="tools/health-assessments/diabetes-risk" element={<DiabetesRiskAssessment />} />
+                <Route path="tools/health-assessments/sleep-quality" element={<SleepQualityAssessment />} />
+                <Route path="tools/health-assessments/nutrition" element={<NutritionAssessment />} />
+                <Route path="tools/health-assessments/depression-screening" element={<DepressionScreeningAssessment />} />
+                <Route path="tools/health-assessments/anxiety-screening" element={<AnxietyScreeningAssessment />} />
 
                 {/* New Routes for Vaccinations and Health Pages */}
                 <Route path="vaccinations" element={<VaccinationsPage />} />
