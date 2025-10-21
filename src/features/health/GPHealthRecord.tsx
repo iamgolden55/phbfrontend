@@ -118,19 +118,14 @@ const GPHealthRecord: React.FC = () => {
   const fetchUserAppointments = async () => {
     setIsLoadingAppointments(true);
     setAppointmentsError(null);
-    
+
     try {
-      const token = localStorage.getItem('phb_auth_token');
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-      
       // Fetch appointments from the regular API endpoint
       const response = await fetch(createApiUrl('api/appointments/'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'include', // Send cookies with request
       });
       
       if (!response.ok) {
@@ -188,21 +183,16 @@ const GPHealthRecord: React.FC = () => {
   // Fetch detailed summary for a specific appointment
   const fetchAppointmentSummary = async (appointmentId?: string) => {
     if (!appointmentId) return;
-    
+
     setIsFetchingSummary(true);
     setSummaryError(null);
-    
+
     try {
-      const token = localStorage.getItem('phb_auth_token');
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-      
       const response = await fetch(`${API_BASE_URL}/api/appointments/${appointmentId}/summary/`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'include', // Send cookies with request
       });
       
       if (!response.ok) {

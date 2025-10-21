@@ -4,14 +4,15 @@ import { API_BASE_URL } from '../../utils/config';
  * Complete medical records access flow with double authentication
  */
 class MedicalRecordsService {
-  private jwtToken: string | null = null;
+  // JWT tokens are now in httpOnly cookies - no need to store in class
+  // Only store the special medical access token which is a short-lived secondary token
   private medAccessToken: string | null = null;
 
   constructor() {
-    // Try to load tokens from localStorage on initialization
-    this.jwtToken = localStorage.getItem('phb_auth_token');
+    // Try to load medical access token from localStorage on initialization
+    // NOTE: JWT tokens are in httpOnly cookies and will be sent automatically
     this.medAccessToken = localStorage.getItem('med_access_token');
-    
+
     // Log config info
     console.log('MedicalRecordsService initialized');
     console.log('API_BASE_URL:', API_BASE_URL);
@@ -145,34 +146,19 @@ class MedicalRecordsService {
   async requestMedicalRecordsOtp() {
     try {
       console.log('Starting requestMedicalRecordsOtp');
-      // Verify we have JWT token
-      if (!this.jwtToken) {
-        // Try to get from localStorage
-        this.jwtToken = localStorage.getItem('phb_auth_token');
-        console.log('JWT token from localStorage:', this.jwtToken ? 'Found' : 'Not found');
-        
-        if (!this.jwtToken) {
-          console.log('No JWT token available, aborting request');
-          return {
-            status: 'error',
-            message: 'You must be logged in to access medical records'
-          };
-        }
-      }
-      
+      // JWT tokens are now in httpOnly cookies - they'll be sent automatically
+
       const apiUrl = this.getApiUrl('patient/medical-record/request-otp/');
       console.log('Requesting OTP from:', apiUrl);
-      
+
       const headers = {
-        'Authorization': `Bearer ${this.jwtToken}`,
         'Content-Type': 'application/json',
       };
-      
+
       console.log('Request headers:', {
-        Authorization: 'Bearer [TOKEN HIDDEN]',
         'Content-Type': 'application/json'
       });
-      
+
       // Use this try-catch to specifically catch CORS errors
       try {
         console.log('Sending OTP request...');
@@ -180,9 +166,8 @@ class MedicalRecordsService {
           method: 'POST',
           headers: headers,
           body: JSON.stringify({}), // Empty body is fine
-          // Add this to help with CORS troubleshooting
           mode: 'cors',
-          credentials: 'same-origin'
+          credentials: 'include' // Send cookies with request
         });
         
         console.log('Request OTP response status:', response.status);
@@ -278,34 +263,22 @@ class MedicalRecordsService {
         };
       }
       
-      // Verify we have JWT token
-      if (!this.jwtToken) {
-        // Try to get from localStorage
-        this.jwtToken = localStorage.getItem('phb_auth_token');
-        
-        if (!this.jwtToken) {
-          return {
-            status: 'error',
-            message: 'You must be logged in to access medical records'
-          };
-        }
-      }
-      
+      // JWT tokens are now in httpOnly cookies - they'll be sent automatically
+
       const apiUrl = this.getApiUrl('patient/medical-record/verify-otp/');
       console.log('Verifying OTP at:', apiUrl);
-      
+
       const headers = {
-        'Authorization': `Bearer ${this.jwtToken}`,
         'Content-Type': 'application/json',
       };
-      
+
       try {
         const response = await fetch(apiUrl, {
           method: 'POST',
           headers: headers,
           body: JSON.stringify({ otp }),
           mode: 'cors',
-          credentials: 'same-origin'
+          credentials: 'include' // Send cookies with request
         });
         
         console.log('Verify OTP response status:', response.status);
@@ -411,23 +384,8 @@ class MedicalRecordsService {
   async getMedicalRecords() {
     try {
       console.log('Starting getMedicalRecords request');
-      
-      // First check if we have JWT token
-      if (!this.jwtToken) {
-        // Try to get from localStorage
-        this.jwtToken = localStorage.getItem('phb_auth_token');
-        console.log('JWT token from localStorage:', this.jwtToken ? 'Found' : 'Not found');
-        
-        if (!this.jwtToken) {
-          console.log('No JWT token available, aborting request');
-          return {
-            status: 'error',
-            code: 'AUTH_REQUIRED',
-            message: 'You must be logged in to access medical records'
-          };
-        }
-      }
-      
+
+      // JWT tokens are now in httpOnly cookies - they'll be sent automatically
       // Check if we have a stored med_access_token
       if (!this.medAccessToken) {
         // Try to get from localStorage
@@ -467,29 +425,28 @@ class MedicalRecordsService {
         }
       }
       
-      // Now fetch the medical records with both tokens
+      // Now fetch the medical records
+      // JWT will be sent automatically via cookies
+      // Only need to include the special medical access token header
       const apiUrl = this.getApiUrl('patient/medical-record/');
       console.log('Fetching medical records from:', apiUrl);
-      
+
       const headers = {
-        'Authorization': `Bearer ${this.jwtToken}`,
         'X-Med-Access-Token': this.medAccessToken
       };
-      
+
       console.log('Request headers:', {
-        Authorization: 'Bearer [TOKEN HIDDEN]', 
         'X-Med-Access-Token': '[TOKEN HIDDEN]'
       });
-      
+
       // Use this try-catch to specifically catch CORS errors
       try {
         console.log('Sending fetch request...');
         const response = await fetch(apiUrl, {
           method: 'GET',
           headers: headers,
-          // Add this to help with CORS troubleshooting
           mode: 'cors',
-          credentials: 'same-origin'
+          credentials: 'include' // Send cookies with request
         });
         
         console.log('Response received:', {
@@ -658,19 +615,8 @@ class MedicalRecordsService {
   async getDoctorInteractions() {
     try {
       console.log('Starting getDoctorInteractions');
-      // Verify we have JWT token
-      if (!this.jwtToken) {
-        // Try to get from localStorage
-        this.jwtToken = localStorage.getItem('phb_auth_token');
-        
-        if (!this.jwtToken) {
-          return {
-            status: 'error',
-            message: 'You must be logged in to access medical records'
-          };
-        }
-      }
-      
+      // JWT tokens are now in httpOnly cookies - they'll be sent automatically
+
       // IMPORTANT: For summary endpoint, we don't need the med access token
       // This endpoint doesn't require OTP verification according to backend
       
@@ -733,19 +679,19 @@ class MedicalRecordsService {
       // Use the correct endpoint per backend documentation
       const apiUrl = this.getApiUrl('patient/medical-record/summary/');
       console.log('Fetching doctor interactions from summary endpoint:', apiUrl);
-      
+
       const headers = {
-        'Authorization': `Bearer ${this.jwtToken}`,
         'Content-Type': 'application/json'
         // No Med-Access-Token needed for this endpoint
+        // JWT will be sent automatically via cookies
       };
-      
+
       try {
         const response = await fetch(apiUrl, {
           method: 'GET',
           headers: headers,
           mode: 'cors',
-          credentials: 'same-origin'
+          credentials: 'include' // Send cookies with request
         });
         
         console.log('Doctor interactions response status:', response.status);

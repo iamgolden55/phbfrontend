@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { API_BASE_URL, createApiUrl } from '../utils/config';
+import { useOrganizationAuth } from '../features/organization/organizationAuthContext';
 
 // 🛏️ BED MAGIC HOOK! ✨
 // This hook fetches real department data from the enhanced API endpoint
@@ -107,6 +108,7 @@ export interface UseDepartmentStatsReturn {
 }
 
 export const useDepartmentStats = (): UseDepartmentStatsReturn => {
+  const { userData, isLoading: authLoading } = useOrganizationAuth();
   const [departments, setDepartments] = useState<DepartmentData[]>([]);
   const [stats, setStats] = useState<DepartmentStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -117,57 +119,33 @@ export const useDepartmentStats = (): UseDepartmentStatsReturn => {
       setLoading(true);
       setError(null);
 
-      // Get token from localStorage (same as useRegistrationStats)
-      let authToken = null;
-      const organizationAuth = localStorage.getItem('organizationAuth');
-      if (organizationAuth) {
-        try {
-          const authData = JSON.parse(organizationAuth);
-          authToken = authData.tokens?.access;
-          console.log('🛏️ BED MAGIC - Token found:', authToken ? 'Yes' : 'No');
-        } catch (e) {
-          console.error('🛏️ BED MAGIC - Failed to parse organization auth data:', e);
-        }
-      }
-
-      if (!authToken) {
-        throw new Error('No authentication token available');
-      }
-
-      // Get auth data from localStorage
-      const authData = JSON.parse(localStorage.getItem('organizationAuth') || '{}');
-      console.log('🛏️ Full auth data structure:', JSON.stringify(authData, null, 2));
-      
-      // The userData should be directly accessible from authData
-      const userData = authData?.userData;
-      console.log('🛏️ User data from auth:', userData);
-      
-      // Get hospital ID from the user data structure
+      // Get hospital ID from organizationAuthContext
       const hospitalId = userData?.hospital?.id;
-      
-      console.log('🛏️ Looking for hospital ID in:', userData?.hospital);
-      console.log('🛏️ Available userData keys:', userData ? Object.keys(userData) : 'No userData');
-      
+
+      console.log('🛏️ === BED STATS DEBUG ===');
+      console.log('🛏️ Auth loading:', authLoading);
+      console.log('🛏️ UserData:', userData);
+      console.log('🛏️ Hospital data:', userData?.hospital);
+      console.log('🛏️ Hospital ID from context:', hospitalId);
+
       if (!hospitalId) {
-        console.error('🛏️ No hospital ID found. Full userData structure:', JSON.stringify(userData, null, 2));
-        throw new Error(`No hospital ID found. User role: ${userData?.role}, Hospital data: ${JSON.stringify(userData?.hospital)}`);
+        console.error('🛏️ ❌ No hospital ID found in context');
+        console.error('🛏️ UserData structure:', JSON.stringify(userData, null, 2));
+        throw new Error('No hospital ID found');
       }
-      
-      console.log('🛏️ Found hospital ID:', hospitalId);
       
       // Use the createApiUrl utility to ensure proper URL construction
       const apiUrl = `${API_BASE_URL}/api/hospitals/departments/?hospital=${hospitalId}`;
       
       console.log('🛏️ Fetching department stats for hospital:', hospitalId);
       console.log('🛏️ Full API URL:', apiUrl);
-      console.log('🛏️ Auth Token Available:', !!authToken);
-      
+
       const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`,
         },
+        credentials: 'include', // Send cookies with request
       });
 
       console.log('🛏️ Response Status:', response.status);
@@ -330,29 +308,15 @@ export const useDepartmentStats = (): UseDepartmentStatsReturn => {
   };
 
   useEffect(() => {
-    // Check if we have auth token in localStorage before making the API call
-    const organizationAuth = localStorage.getItem('organizationAuth');
-    if (organizationAuth) {
-      try {
-        const authData = JSON.parse(organizationAuth);
-        if (authData.tokens?.access) {
-          fetchDepartmentStats();
-        } else {
-          console.log('🛏️ No access token found in localStorage');
-          setError('No authentication token available');
-          setLoading(false);
-        }
-      } catch (e) {
-        console.error('🛏️ Failed to parse organization auth data:', e);
-        setError('Authentication data corrupted');
-        setLoading(false);
-      }
+    // Fetch department stats when userData with hospital ID is available
+    // Wait for auth to finish loading and userData to be populated
+    if (!authLoading && userData?.hospital?.id) {
+      console.log('🛏️ ✅ Conditions met, fetching department stats...');
+      fetchDepartmentStats();
     } else {
-      console.log('🛏️ No organization auth data in localStorage');
-      setError('Not authenticated');
-      setLoading(false);
+      console.log('🛏️ ⏳ Waiting for auth... authLoading:', authLoading, 'hospitalId:', userData?.hospital?.id);
     }
-  }, []);
+  }, [authLoading, userData?.hospital?.id]);
 
   const refetch = () => {
     fetchDepartmentStats();

@@ -139,21 +139,11 @@ const WardManagementPage: React.FC = () => {
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
-        const storedAuth = localStorage.getItem('organizationAuth');
-        if (!storedAuth) {
-          throw new Error('Not authenticated');
-        }
-
-        const authData = JSON.parse(storedAuth);
-        if (!authData.tokens) {
-          throw new Error('Invalid auth data');
-        }
-
         const response = await fetch(`${API_BASE_URL}/api/hospitals/departments/`, {
           headers: {
-            'Authorization': `Bearer ${authData.tokens.access}`,
             'Content-Type': 'application/json',
           },
+          credentials: 'include', // Send cookies with request
         });
 
         if (!response.ok) {
@@ -198,24 +188,14 @@ const WardManagementPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
-      const storedAuth = localStorage.getItem('organizationAuth');
-      if (!storedAuth) {
-        throw new Error('Not authenticated');
-      }
-
-      const authData = JSON.parse(storedAuth);
-      if (!authData.tokens) {
-        throw new Error('Invalid auth data');
-      }
-
       const response = await fetch(`${API_BASE_URL}/api/hospitals/departments/create/`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${authData.tokens.access}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
         body: JSON.stringify({
           ...departmentForm,
           hospital: userData?.hospital?.id
@@ -259,9 +239,9 @@ const WardManagementPage: React.FC = () => {
           try {
             const response = await fetch(`${API_BASE_URL}/api/hospitals/departments/?hospital=${userData?.hospital?.id}`, {
               headers: {
-                'Authorization': `Bearer ${authData.tokens.access}`,
                 'Content-Type': 'application/json',
               },
+              credentials: 'include', // Send cookies with request
             });
             const data = await response.json();
             if (data.status === 'success') {
@@ -307,17 +287,6 @@ const WardManagementPage: React.FC = () => {
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
-        // Get auth data from localStorage
-        const storedAuth = localStorage.getItem('organizationAuth');
-        if (!storedAuth) {
-          throw new Error('Not authenticated');
-        }
-
-        const authData = JSON.parse(storedAuth);
-        if (!authData.userData || !authData.tokens) {
-          throw new Error('Invalid auth data');
-        }
-
         // Using the same API base URL as the auth context
         // Build URL with query parameters
         const url = new URL(`${API_BASE_URL}/api/hospitals/departments/`);
@@ -326,9 +295,9 @@ const WardManagementPage: React.FC = () => {
         const response = await fetch(url.toString(), {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${authData.tokens.access}`,
             'Content-Type': 'application/json',
           },
+          credentials: 'include', // Send cookies with request
         });
 
         console.log('response', response);

@@ -65,27 +65,14 @@ export const useAdmissionData = (): AdmissionStats => {
 
   const fetchAdmissions = async (): Promise<AdmissionData[]> => {
     try {
-      // Get token from organization auth context
-      let token = null;
-      const organizationAuth = localStorage.getItem('organizationAuth');
-      if (organizationAuth) {
-        try {
-          const authData = JSON.parse(organizationAuth);
-          token = authData.tokens?.access;
-          console.log('🔑 Admission Data - Token found:', token ? 'Yes' : 'No');
-        } catch (e) {
-          console.error('Failed to parse organization auth data:', e);
-        }
-      }
-
       const apiUrl = `${API_BASE_URL}/api/admissions/`;
       console.log('🌐 Admission Data API URL:', apiUrl);
 
       const response = await fetch(apiUrl, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
       });
 
       console.log('📡 Admission Data Response:', response.status, response.ok);

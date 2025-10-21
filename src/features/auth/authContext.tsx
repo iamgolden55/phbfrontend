@@ -98,7 +98,7 @@ interface AuthContextType {
   isNewUser: boolean;
   needsOnboarding: boolean;
   completeOnboarding: () => Promise<{ success: boolean; message: string }>;
-  login: (email: string, password: string, captchaToken?: string, captchaAnswer?: string) => Promise<void>;
+  login: (email: string, password: string, captchaToken?: string, captchaAnswer?: string, rememberMe?: boolean) => Promise<void>;
   logout: () => Promise<void>;
   register: (
     data: RegisterData
@@ -137,42 +137,71 @@ interface AuthContextType {
 // Create the context with a default value
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const AUTH_TOKEN_KEY = 'phb_auth_token'; // Key for storing token in localStorage
+/**
+ * Authentication Token Storage
+ *
+ * CURRENT IMPLEMENTATION (httpOnly Cookies):
+ * - JWT tokens are stored in httpOnly cookies (set by backend)
+ * - Cookies are automatically sent with requests (credentials: 'include')
+ * - Inaccessible to JavaScript code (XSS protection)
+ * - SameSite=Lax prevents CSRF attacks
+ *
+ * SECURITY BENEFITS:
+ * - httpOnly flag prevents JavaScript access (XSS protection)
+ * - Automatic token refresh via cookie-based endpoint
+ * - Secure flag ensures HTTPS-only transmission in production
+ * - Backwards compatible with Authorization header during migration
+ *
+ * @see {@link https://owasp.org/www-community/attacks/xss/ XSS Attack Information}
+ * @see {@link thoughts/shared/research/2025-10-18-cookie-usage.md Cookie Research}
+ * @see {@link thoughts/shared/plans/2025-10-18-httponly-cookie-migration.md Migration Plan}
+ */
 
-// Helper function for making API calls
+// Helper function for making API calls with cookie-based authentication
 async function apiRequest<T>(
   endpoint: string,
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' = 'GET',
   body?: any,
-  token?: string | null
+  _legacyToken?: string | null // Kept for backwards compatibility, not used
 ): Promise<T> {
   // Ensure exactly one slash between base URL and endpoint
   const url = `${API_BASE_URL.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
-  
+
   // 🐛 DEBUG: Log the actual URL being called
   console.log('🔗 API_BASE_URL:', API_BASE_URL);
   console.log('🔗 Final URL:', url);
   console.log('🔗 Method:', method);
-  
+
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
+
+  // NOTE: Authorization header no longer needed - cookies sent automatically
+  // Backend's JWTCookieAuthentication checks cookies first, then falls back to headers
 
   const config: RequestInit = {
     method,
     headers,
+    credentials: 'include', // CRITICAL: Send cookies with every request
   };
 
   if (body) {
     config.body = JSON.stringify(body);
   }
 
+  // 🐛 DEBUG: Log cookies being sent
+  console.log('🍪 Document.cookie:', document.cookie);
+  console.log('🍪 Sending request with credentials: include');
+
   try {
     const response = await fetch(url, config);
+
+    // 🐛 DEBUG: Log response headers
+    console.log('📥 Response headers:');
+    response.headers.forEach((value, key) => {
+      console.log(`  ${key}: ${value}`);
+    });
 
     // Handle cases where the response might be empty (e.g., 204 No Content)
     if (response.status === 204) {
@@ -209,6 +238,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [otpVerificationRequired, setOtpVerificationRequired] = useState<boolean>(false);
   const [isNewUser, setIsNewUser] = useState<boolean>(false);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
+  const [pendingRememberMe, setPendingRememberMe] = useState<boolean>(false);
   // New state variables for hospital functionality
   const [primaryHospital, setPrimaryHospital] = useState<Hospital | null>(null);
   const [hasPrimaryHospital, setHasPrimaryHospital] = useState<boolean>(false);
@@ -216,6 +246,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [captchaRequired, setCaptchaRequired] = useState(false);
   const [captchaChallenge, setCaptchaChallenge] = useState('');
   const [captchaToken, setCaptchaToken] = useState('');
+
+  // Token refresh state - track when we last authenticated
+  const [lastAuthTime, setLastAuthTime] = useState<number | null>(null);
+  const refreshTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Add a reference to track the last API call time and parameters
   const lastApiCall = useRef<{
@@ -245,16 +279,113 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return false; // Should not throttle
   };
 
-  // Check for existing token on initial load
+  // Function to refresh access token using refresh token from cookies
+  const refreshAccessToken = useCallback(async (): Promise<boolean> => {
+    try {
+      console.log('🔄 Attempting to refresh access token...');
+
+      // Call the cookie-based token refresh endpoint
+      const response = await apiRequest<{
+        status?: string;
+        message?: string;
+        tokens?: {
+          access?: string;
+          refresh?: string;
+        }
+      }>(
+        '/api/token/refresh/',
+        'POST'
+      );
+
+      if (response.status === 'success') {
+        console.log('✅ Token refresh successful');
+        // Update last auth time to reset the refresh timer
+        setLastAuthTime(Date.now());
+        return true;
+      } else {
+        console.warn('⚠️ Token refresh failed:', response.message);
+        return false;
+      }
+    } catch (err: any) {
+      console.error('❌ Token refresh error:', err);
+
+      // If refresh fails with 401, user needs to login again
+      if (err.status === 401 || err.status === 403) {
+        console.log('🔒 Refresh token expired - logging out user');
+
+        // Check if this is right after an intentional logout
+        const logoutFlag = sessionStorage.getItem('phb_logout_flag');
+        if (logoutFlag !== 'true') {
+          // Only show error if this isn't an intentional logout
+          setError("Your session has expired. Please log in again.");
+        }
+
+        setUser(null);
+        setPrimaryHospital(null);
+        setHasPrimaryHospital(false);
+      }
+
+      return false;
+    }
+  }, []);
+
+  // Setup automatic token refresh timer
+  const setupTokenRefreshTimer = useCallback(() => {
+    // Clear any existing timer
+    if (refreshTimerRef.current) {
+      clearTimeout(refreshTimerRef.current);
+      refreshTimerRef.current = null;
+    }
+
+    // Set timer to refresh 5 minutes before expiry (25 minutes from now)
+    // Access tokens expire in 30 minutes
+    const REFRESH_INTERVAL = 25 * 60 * 1000; // 25 minutes in milliseconds
+
+    console.log('⏰ Setting up token refresh timer (will refresh in 25 minutes)');
+
+    refreshTimerRef.current = setTimeout(async () => {
+      console.log('⏰ Token refresh timer triggered');
+      const success = await refreshAccessToken();
+
+      if (success) {
+        // If refresh successful, setup next refresh
+        setupTokenRefreshTimer();
+      }
+    }, REFRESH_INTERVAL);
+  }, [refreshAccessToken]);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (refreshTimerRef.current) {
+        clearTimeout(refreshTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Check for existing authentication on initial load
+  // NOTE: No need to check localStorage - cookies are sent automatically
   const checkAuthStatus = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
 
-    if (token) {
-      try {
-        // Assuming '/api/profile/' endpoint can fetch user profile via GET
-        const userData = await apiRequest<User>('/api/profile/', 'GET', undefined, token);
+    // Check if this is right after an intentional logout
+    const logoutFlag = sessionStorage.getItem('phb_logout_flag');
+    if (logoutFlag === 'true') {
+      console.log('🔐 Clean logout detected, skipping auth check');
+      sessionStorage.removeItem('phb_logout_flag');
+      setUser(null);
+      setPrimaryHospital(null);
+      setHasPrimaryHospital(false);
+      setError(null); // Clear any error messages from logout
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      // Cookies are sent automatically with credentials: 'include'
+      // If user has valid cookies, profile will be returned
+      const userData = await apiRequest<User>('/api/profile/', 'GET');
         
         // Log the user data and onboarding status
         console.log("User profile data from API:", userData);
@@ -295,18 +426,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
         
         setUser(userDataWithRole);
-        
+
+        // Setup automatic token refresh timer
+        setLastAuthTime(Date.now());
+        setupTokenRefreshTimer();
+
         // Check if user has a primary hospital after successful authentication
         // But only if we haven't already loaded this information
         if (!hasPrimaryHospital && !primaryHospital) {
           try {
             const hospitalData = await apiRequest<PrimaryHospitalResponse>(
-              '/api/user/has-primary-hospital/', 
-              'GET', 
-              undefined, 
-              token
+              '/api/user/has-primary-hospital/',
+              'GET'
             );
-            
+
             // Only update if values have changed to prevent re-renders
             const hasPrimaryChanged = hospitalData.has_primary !== hasPrimaryHospital;
             const hospitalChanged = JSON.stringify(hospitalData.primary_hospital) !== JSON.stringify(primaryHospital);
@@ -322,47 +455,52 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           }
         }
       } catch (err: any) {
-        console.error('Token validation failed:', err);
-        localStorage.removeItem(AUTH_TOKEN_KEY); // Remove invalid token
+        console.error('Authentication check failed:', err);
+        // Cookies are invalid or expired - clear user state
+        // Backend will clear cookies on 401/403 responses
         setUser(null);
         setPrimaryHospital(null);
         setHasPrimaryHospital(false);
+        // Clear refresh timer
+        if (refreshTimerRef.current) {
+          clearTimeout(refreshTimerRef.current);
+          refreshTimerRef.current = null;
+        }
         // Optionally set an error message if needed
         if (err.status === 401 || err.status === 403) {
           setError("Your session has expired. Please log in again.");
         }
       }
-    } else {
-      setUser(null); // Ensure user is null if no token
-      setPrimaryHospital(null);
-      setHasPrimaryHospital(false);
-    }
     setIsLoading(false);
-  }, [hasPrimaryHospital, primaryHospital]); // Add these as dependencies
+  }, [hasPrimaryHospital, primaryHospital, setupTokenRefreshTimer]); // Add these as dependencies
 
   useEffect(() => {
     checkAuthStatus();
   }, [checkAuthStatus]); // Run once on mount
 
-  const handleAuthSuccess = (userData: User, token: string) => {
+  const handleAuthSuccess = (userData: User) => {
       console.log("Auth success with user data:", userData);
       console.log("has_completed_onboarding value:", userData.has_completed_onboarding);
       console.log("User role received:", userData.role);
-      
+
       // Make sure the role field is preserved in the user data
       const updatedUserData = {
         ...userData,
         role: userData.role // Explicitly preserve the role field
       };
-      
+
       setUser(updatedUserData);
-      localStorage.setItem(AUTH_TOKEN_KEY, token);
+      // NOTE: No need to store tokens - they're in httpOnly cookies set by backend
       setOtpVerificationRequired(false);
       setPendingEmail(null);
       setError(null);
       setOtpError(null);
       setIsLoading(false);
-      
+
+      // Setup automatic token refresh timer
+      setLastAuthTime(Date.now());
+      setupTokenRefreshTimer();
+
       // Debug log after setting user
       setTimeout(() => {
         console.log("User state after handleAuthSuccess:", user);
@@ -371,13 +509,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   // Login function
-  const login = async (email: string, password: string, captchaToken?: string, captchaAnswer?: string) => {
+  const login = async (email: string, password: string, captchaToken?: string, captchaAnswer?: string, rememberMe?: boolean) => {
     setError(null);
     setOtpError(null);
     setIsLoading(true);
     setOtpVerificationRequired(false); // Reset OTP state
     setPendingEmail(null);
-    
+
     // Reset CAPTCHA state if not being used in this request
     if (!captchaToken) {
       setCaptchaRequired(false);
@@ -389,11 +527,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // Prepare login payload
       // Using 'email' field as required by the backend
       const loginPayload: any = { email, password };
-      
+
       // Add CAPTCHA data if provided
       if (captchaToken && captchaAnswer) {
         loginPayload.captcha_token = captchaToken;
         loginPayload.captcha_answer = captchaAnswer;
+      }
+
+      // Add remember_me flag if provided (extends cookie lifetime to 30 days)
+      if (rememberMe) {
+        loginPayload.remember_me = true;
       }
       
       // Make API request to the login endpoint
@@ -427,30 +570,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (response.otpRequired || response.require_otp || (response.status === 'pending')) {
         setOtpVerificationRequired(true);
         setPendingEmail(email);
+        setPendingRememberMe(rememberMe || false); // Store rememberMe for OTP verification
         setUser(null);
-        localStorage.removeItem(AUTH_TOKEN_KEY);
         setError(response.message || "OTP verification required."); // Show message if available
       }
-      // Check 2: Direct login success with user and token
-      else if (response.user && response.token) {
-        handleAuthSuccess(response.user, response.token);
-        
+      // Check 2: Direct login success with user data
+      // NOTE: Tokens are in cookies, so we only need user data from response
+      else if (response.user) {
+        handleAuthSuccess(response.user);
+
         // Check if user has a primary hospital after successful login
         // Only if we haven't already loaded this information
         if (!hasPrimaryHospital && !primaryHospital) {
           try {
-            const token = response.token;
             const hospitalData = await apiRequest<PrimaryHospitalResponse>(
-              '/api/user/has-primary-hospital/', 
-              'GET', 
-              undefined, 
-              token
+              '/api/user/has-primary-hospital/',
+              'GET'
             );
-            
+
             // Only update if values have changed
             const hasPrimaryChanged = hospitalData.has_primary !== hasPrimaryHospital;
             const hospitalChanged = JSON.stringify(hospitalData.primary_hospital) !== JSON.stringify(primaryHospital);
-            
+
             if (hasPrimaryChanged || hospitalChanged) {
               setHasPrimaryHospital(hospitalData.has_primary);
               setPrimaryHospital(hospitalData.primary_hospital || null);
@@ -461,19 +602,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           }
         }
       }
-      // Check 3: Successful response but no token -> Assume OTP required (common pattern)
-      else if (!response.token) { // If response is OK (implied by being here) but no token
-        console.log("Login successful, but no token received. Assuming OTP is required.");
+      // Check 3: No user data in response -> Assume OTP required (common pattern)
+      else {
+        console.log("Login successful, but no user data received. Assuming OTP is required.");
         setOtpVerificationRequired(true);
         setPendingEmail(email);
+        setPendingRememberMe(rememberMe || false); // Store rememberMe for OTP verification
         setUser(null);
-        localStorage.removeItem(AUTH_TOKEN_KEY);
         setError(response.message || "OTP verification required."); // Show message if available
-      }
-      // Check 4: Unexpected response structure
-      else {
-        console.error("Unexpected response structure during login:", response);
-        throw new Error("Invalid response from server during login.");
       }
 
     } catch (err: any) {
@@ -501,7 +637,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // Handle other errors
       setError(err.message || 'Login failed. Please check your credentials.');
       setUser(null);
-      localStorage.removeItem(AUTH_TOKEN_KEY);
+      // NOTE: Cookies are cleared by backend on error responses
     } finally {
       setIsLoading(false);
     }
@@ -530,13 +666,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
          setError(response.message || "Registration successful. You can now log in."); // Use error state for feedback
       }
        setUser(null); // User needs to verify or log in
-       localStorage.removeItem(AUTH_TOKEN_KEY);
+       // NOTE: No tokens in localStorage - cookies handled by backend
 
     } catch (err: any) {
       console.error("Registration failed:", err);
       setError(err.message || 'Registration failed. Please try again.');
        setUser(null);
-       localStorage.removeItem(AUTH_TOKEN_KEY);
+       // NOTE: Cookies cleared by backend on error
     } finally {
       setIsLoading(false);
     }
@@ -555,36 +691,44 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setIsLoading(true);
 
       try {
+          // Prepare OTP verification payload
+          const otpPayload: any = { email: verificationEmail, otp };
+
+          // Add remember_me flag if it was set during login
+          if (pendingRememberMe) {
+            otpPayload.remember_me = true;
+          }
+
           // Assuming '/api/verify-login-otp/' endpoint
           // Expect nested tokens and user_data based on console log
-          const response = await apiRequest<{ tokens?: { access?: string; refresh?: string }; user_data?: User; message?: string }>('/api/verify-login-otp/', 'POST', { email: verificationEmail, otp });
+          const response = await apiRequest<{ tokens?: { access?: string; refresh?: string }; user_data?: User; message?: string }>('/api/verify-login-otp/', 'POST', otpPayload);
 
           console.log("Response from /api/verify-login-otp/:", response); // Keep logging for now
 
-          // Check for nested access token and user data
-          if (response.tokens && response.tokens.access && response.user_data) {
-               const accessToken = response.tokens.access;
+          // Check for user data in response
+          // NOTE: Tokens are in httpOnly cookies, we only need user data
+          if (response.user_data) {
                const userData = response.user_data;
 
-               // Store the token and update user state directly
-               // No need for separate /api/profile call here
-               handleAuthSuccess(userData, accessToken);
+               // Update user state - cookies are already set by backend
+               handleAuthSuccess(userData);
+
+               // Clear pending remember me flag after successful verification
+               setPendingRememberMe(false);
 
                // Check if user has a primary hospital after successful OTP verification
                // Only if we haven't already loaded this information
                if (!hasPrimaryHospital && !primaryHospital) {
                  try {
                    const hospitalData = await apiRequest<PrimaryHospitalResponse>(
-                     '/api/user/has-primary-hospital/', 
-                     'GET', 
-                     undefined, 
-                     accessToken
+                     '/api/user/has-primary-hospital/',
+                     'GET'
                    );
-                   
+
                    // Only update if values have changed
                    const hasPrimaryChanged = hospitalData.has_primary !== hasPrimaryHospital;
                    const hospitalChanged = JSON.stringify(hospitalData.primary_hospital) !== JSON.stringify(primaryHospital);
-                   
+
                    if (hasPrimaryChanged || hospitalChanged) {
                      setHasPrimaryHospital(hospitalData.has_primary);
                      setPrimaryHospital(hospitalData.primary_hospital || null);
@@ -596,7 +740,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                }
           } else {
                // If structure is not as expected
-               console.error("OTP verification response missing expected structure (tokens.access or user_data):", response);
+               console.error("OTP verification response missing user_data:", response);
                throw new Error(response.message || "Invalid response structure from server during OTP verification.");
           }
 
@@ -604,7 +748,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           console.error("OTP Verification failed:", err);
           setOtpError(err.message || 'Invalid or expired OTP. Please try again.');
           setUser(null); // Ensure user is not set on failure
-          localStorage.removeItem(AUTH_TOKEN_KEY);
+          setPendingRememberMe(false); // Clear remember me flag on error
+          // NOTE: Cookies cleared by backend on error
       } finally {
           setIsLoading(false);
       }
@@ -643,29 +788,44 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Logout function
   const logout = async () => {
-    // Clear auth token
-    localStorage.removeItem(AUTH_TOKEN_KEY);
-    
-    // Also clear professional auth if present
-    localStorage.removeItem('phb_professional_user');
-    
-    // Clear user data and related state
+    try {
+      // Set flag to indicate this is an intentional logout (not session expiry)
+      sessionStorage.setItem('phb_logout_flag', 'true');
+
+      // Call backend logout to blacklist tokens and clear cookies
+      await apiRequest('/api/logout/', 'POST');
+      console.log('Logout request successful - cookies cleared by backend');
+    } catch (err) {
+      console.error('Error during logout API call:', err);
+      // Continue with local cleanup even if API call fails
+    }
+
+    // Clear error state explicitly to prevent "session expired" message
+    setError(null);
+    setOtpError(null);
+
+    // Clear local user state
     setUser(null);
     setPrimaryHospital(null);
     setHasPrimaryHospital(false);
-    
-    // Add additional logout logic if needed
-    // Clear any other stored tokens or user data
+
+    // Clear pending authentication data
+    setPendingEmail(null);
+    setPendingRememberMe(false);
+    setOtpVerificationRequired(false);
+
+    // Clear any non-auth localStorage items
+    // NOTE: phb_professional_user and phb_view_preference are not tokens,
+    // they're app preferences and can stay in localStorage
     localStorage.removeItem('phb_view_preference');
-    
-    try {
-      // Make a logout request to the API if needed
-      await apiRequest('/api/logout/', 'POST');
-    } catch (err) {
-      console.error('Error during logout:', err);
-      // We still want to clear the local state even if the API call fails
+    localStorage.removeItem('phb_onboarding_completed');
+
+    // Clear the refresh timer
+    if (refreshTimerRef.current) {
+      clearTimeout(refreshTimerRef.current);
+      refreshTimerRef.current = null;
     }
-    
+
     // Resolve the promise
     return Promise.resolve();
   };
@@ -695,10 +855,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.log("Sending request to /api/onboarding/update/ with:", requestBody);
       
       const response = await apiRequest<{success?: boolean; message?: string; user?: User}>(
-        `/api/onboarding/update/`, 
-        'POST', 
-        requestBody, 
-        localStorage.getItem(AUTH_TOKEN_KEY)
+        `/api/onboarding/update/`,
+        'POST',
+        requestBody
       );
       
       console.log("Response from /api/onboarding/update/:", response);
@@ -727,7 +886,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (!user) throw new Error("User not authenticated");
       setIsLoading(true);
       setError(null);
-      const token = localStorage.getItem(AUTH_TOKEN_KEY);
       
       // Create a copy of data for safe manipulation
       const updateData: Record<string, any> = { ...data };
@@ -834,7 +992,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       try {
           // Use PATCH instead of PUT for partial updates
-          const updatedUserData = await apiRequest<User>('/api/profile/', 'PATCH', updateData, token);
+          const updatedUserData = await apiRequest<User>('/api/profile/', 'PATCH', updateData);
           
           // Update local user state with the new data
           setUser(prevUser => {
@@ -858,7 +1016,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (!user) throw new Error("User not authenticated");
       setIsLoading(true);
       setError(null);
-      const token = localStorage.getItem(AUTH_TOKEN_KEY);
       try {
           // Assuming endpoint like '/api/users/contact-preferences' - COMMENTED OUT
           // This might be part of the /api/profile/ update
@@ -883,17 +1040,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
        if (!user) throw new Error("User not authenticated");
        setIsLoading(true);
        setError(null);
-       const token = localStorage.getItem(AUTH_TOKEN_KEY);
        try {
            const response = await apiRequest<{ message: string }>(
                '/api/password/change/',
-               'POST', 
-               { 
+               'POST',
+               {
                    current_password: currentPassword,
                    new_password: newPassword,
                    confirm_password: confirmPassword
-               }, 
-               token
+               }
            );
            
            return { success: true, message: response.message || "Password changed successfully! 🎉" };
@@ -955,14 +1110,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     
     setIsLoading(true);
     setError(null);
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
-    
+
     try {
       const response = await apiRequest<PrimaryHospitalResponse>(
-        '/api/user/has-primary-hospital/', 
-        'GET', 
-        undefined, 
-        token
+        '/api/user/has-primary-hospital/',
+        'GET'
       );
       
       // Only update state if the values have actually changed
@@ -1003,8 +1155,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     
     setIsLoading(true);
     setError(null);
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
-    
+
     try {
       // Update to handle the enhanced API response structure
       const response = await apiRequest<{
@@ -1016,10 +1167,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           radius_km: number;
         }
       }>(
-        `${endpoint}?latitude=${latitude}&longitude=${longitude}&radius=${radius}`, 
-        'GET', 
-        undefined, 
-        token
+        `${endpoint}?latitude=${latitude}&longitude=${longitude}&radius=${radius}`,
+        'GET'
       );
       
       // Return the full response object to allow displaying the message
@@ -1048,18 +1197,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     
     setIsLoading(true);
     setError(null);
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
-    
+
     try {
       // Update to handle the enhanced API response structure
       const response = await apiRequest<{
         hospitals: Hospital[];
         message?: string;
       }>(
-        endpoint, 
-        'GET', 
-        undefined, 
-        token
+        endpoint,
+        'GET'
       );
       
       // Return just the hospitals array
@@ -1079,14 +1225,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (!user) throw new Error("User not authenticated");
     setIsLoading(true);
     setError(null);
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
-    
+
     try {
       const response = await apiRequest<{ message: string; data: any }>(
-        '/api/hospitals/register/', 
-        'POST', 
-        { hospital: hospitalId, is_primary: isPrimary }, 
-        token
+        '/api/hospitals/register/',
+        'POST',
+        { hospital: hospitalId, is_primary: isPrimary }
       );
       
       // If this is set as the primary hospital and registration was successful

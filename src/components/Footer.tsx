@@ -44,7 +44,7 @@ const Footer: React.FC = () => {
     { text: 'Give us feedback', isExternal: true, path: 'mailto:publichealthbureau@hotmail.com?subject=PHB Website Feedback&body=Please share your feedback about the PHB website here. What did you like? What could be improved?' },
     { text: 'Accessibility statement', path: '/about#accessibility' },
     { text: 'Our policies', path: '/about#policies' },
-    { text: 'Cookies', path: '/about#cookies' },
+    { text: 'Data Storage & Cookies', path: '/about#cookies' },
   ];
 
   return (

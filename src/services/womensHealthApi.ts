@@ -573,17 +573,6 @@ export interface DashboardData {
 class WomensHealthApiService {
   private baseURL = '/api/womens-health';
 
-  private getAuthHeaders() {
-    const token = localStorage.getItem('phb_auth_token');
-    if (!token) {
-      throw new Error('Authentication required');
-    }
-    return {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    };
-  }
-
   private async handleResponse(response: Response) {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ message: 'Failed to process request' }));
@@ -596,7 +585,10 @@ class WomensHealthApiService {
   async getVerificationStatus(): Promise<{ success: boolean; status: VerificationStatus }> {
     const response = await fetch(`${API_BASE_URL}${this.baseURL}/verification/`, {
       method: 'GET',
-      headers: this.getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Send cookies with request
     });
     return this.handleResponse(response);
   }
@@ -604,7 +596,10 @@ class WomensHealthApiService {
   async requestVerification(): Promise<VerificationResponse> {
     const response = await fetch(`${API_BASE_URL}${this.baseURL}/verification/`, {
       method: 'POST',
-      headers: this.getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Send cookies with request
     });
     return this.handleResponse(response);
   }
@@ -612,7 +607,10 @@ class WomensHealthApiService {
   async verifyOTP(otp: string): Promise<OTPVerificationResponse> {
     const response = await fetch(`${API_BASE_URL}${this.baseURL}/verification/verify/`, {
       method: 'POST',
-      headers: this.getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Send cookies with request
       body: JSON.stringify({ otp }),
     });
     return this.handleResponse(response);
@@ -622,7 +620,10 @@ class WomensHealthApiService {
   async getDashboardData(): Promise<{ success: boolean; dashboard: DashboardData }> {
     const response = await fetch(`${API_BASE_URL}${this.baseURL}/dashboard/`, {
       method: 'GET',
-      headers: this.getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Send cookies with request
     });
     return this.handleResponse(response);
   }
@@ -631,7 +632,10 @@ class WomensHealthApiService {
   async getProfile(): Promise<{ success: boolean; profile: WomensHealthProfile }> {
     const response = await fetch(`${API_BASE_URL}${this.baseURL}/profile/`, {
       method: 'GET',
-      headers: this.getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Send cookies with request
     });
     return this.handleResponse(response);
   }
@@ -639,7 +643,10 @@ class WomensHealthApiService {
   async createProfile(profileData: Partial<WomensHealthProfile>): Promise<{ success: boolean; profile: WomensHealthProfile; message: string }> {
     const response = await fetch(`${API_BASE_URL}${this.baseURL}/profile/`, {
       method: 'POST',
-      headers: this.getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Send cookies with request
       body: JSON.stringify(profileData),
     });
     return this.handleResponse(response);
@@ -648,7 +655,10 @@ class WomensHealthApiService {
   async updateProfile(profileData: Partial<WomensHealthProfile>): Promise<{ success: boolean; profile: WomensHealthProfile; message: string }> {
     const response = await fetch(`${API_BASE_URL}${this.baseURL}/profile/`, {
       method: 'PUT',
-      headers: this.getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Send cookies with request
       body: JSON.stringify(profileData),
     });
     return this.handleResponse(response);
@@ -659,7 +669,10 @@ class WomensHealthApiService {
     const queryParams = new URLSearchParams({ limit: limit.toString(), offset: offset.toString() });
     const response = await fetch(`${API_BASE_URL}${this.baseURL}/cycles/?${queryParams}`, {
       method: 'GET',
-      headers: this.getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Send cookies with request
     });
     return this.handleResponse(response);
   }
@@ -667,7 +680,10 @@ class WomensHealthApiService {
   async createCycle(cycleData: Partial<MenstrualCycle>): Promise<{ success: boolean; cycle: MenstrualCycle; message: string }> {
     const response = await fetch(`${API_BASE_URL}${this.baseURL}/cycles/`, {
       method: 'POST',
-      headers: this.getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Send cookies with request
       body: JSON.stringify(cycleData),
     });
     return this.handleResponse(response);
@@ -676,7 +692,10 @@ class WomensHealthApiService {
   async deleteCycle(cycleId: number): Promise<{ success: boolean; message: string }> {
     const response = await fetch(`${API_BASE_URL}${this.baseURL}/cycles/${cycleId}/`, {
       method: 'DELETE',
-      headers: this.getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Send cookies with request
     });
     return this.handleResponse(response);
   }
@@ -685,7 +704,10 @@ class WomensHealthApiService {
   async getPregnancyRecord(): Promise<{ success: boolean; pregnancy_record: PregnancyRecord }> {
     const response = await fetch(`${API_BASE_URL}${this.baseURL}/pregnancy/`, {
       method: 'GET',
-      headers: this.getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Send cookies with request
     });
     return this.handleResponse(response);
   }
@@ -693,7 +715,10 @@ class WomensHealthApiService {
   async createPregnancyRecord(pregnancyData: Partial<PregnancyRecord>): Promise<{ success: boolean; pregnancy_record: PregnancyRecord; message: string }> {
     const response = await fetch(`${API_BASE_URL}${this.baseURL}/pregnancy/`, {
       method: 'POST',
-      headers: this.getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Send cookies with request
       body: JSON.stringify(pregnancyData),
     });
     return this.handleResponse(response);
@@ -704,10 +729,13 @@ class WomensHealthApiService {
     const queryParams = new URLSearchParams();
     if (startDate) queryParams.append('start_date', startDate);
     if (endDate) queryParams.append('end_date', endDate);
-    
+
     const response = await fetch(`${API_BASE_URL}${this.baseURL}/fertility/?${queryParams}`, {
       method: 'GET',
-      headers: this.getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Send cookies with request
     });
     return this.handleResponse(response);
   }
@@ -715,7 +743,10 @@ class WomensHealthApiService {
   async addFertilityEntry(fertilityData: Partial<FertilityTracking>): Promise<{ success: boolean; tracking: FertilityTracking; message: string }> {
     const response = await fetch(`${API_BASE_URL}${this.baseURL}/fertility/`, {
       method: 'POST',
-      headers: this.getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Send cookies with request
       body: JSON.stringify(fertilityData),
     });
     return this.handleResponse(response);
@@ -725,10 +756,13 @@ class WomensHealthApiService {
   async getHealthGoals(status?: string): Promise<{ success: boolean; goals: HealthGoal[]; total_count: number }> {
     const queryParams = new URLSearchParams();
     if (status) queryParams.append('status', status);
-    
+
     const response = await fetch(`${API_BASE_URL}${this.baseURL}/goals/?${queryParams}`, {
       method: 'GET',
-      headers: this.getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Send cookies with request
     });
     return this.handleResponse(response);
   }
@@ -736,7 +770,10 @@ class WomensHealthApiService {
   async createHealthGoal(goalData: Partial<HealthGoal>): Promise<{ success: boolean; goal: HealthGoal; message: string }> {
     const response = await fetch(`${API_BASE_URL}${this.baseURL}/goals/`, {
       method: 'POST',
-      headers: this.getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Send cookies with request
       body: JSON.stringify(goalData),
     });
     return this.handleResponse(response);
@@ -745,7 +782,10 @@ class WomensHealthApiService {
   async updateHealthGoal(goalId: string, goalData: Partial<HealthGoal>): Promise<{ success: boolean; goal: HealthGoal; message: string }> {
     const response = await fetch(`${API_BASE_URL}${this.baseURL}/goals/${goalId}/`, {
       method: 'PUT',
-      headers: this.getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Send cookies with request
       body: JSON.stringify(goalData),
     });
     return this.handleResponse(response);
@@ -756,10 +796,13 @@ class WomensHealthApiService {
     const queryParams = new URLSearchParams();
     if (startDate) queryParams.append('start_date', startDate);
     if (endDate) queryParams.append('end_date', endDate);
-    
+
     const response = await fetch(`${API_BASE_URL}${this.baseURL}/logs/?${queryParams}`, {
       method: 'GET',
-      headers: this.getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Send cookies with request
     });
     return this.handleResponse(response);
   }
@@ -767,17 +810,20 @@ class WomensHealthApiService {
   async createHealthLog(logData: Partial<DailyHealthLog>): Promise<{ success: boolean; log: DailyHealthLog; message: string; action?: string }> {
     console.log('🚀 womensHealthApi.createHealthLog() called with:', logData);
     console.log('📡 Making POST request to:', `${API_BASE_URL}${this.baseURL}/logs/`);
-    
+
     const response = await fetch(`${API_BASE_URL}${this.baseURL}/logs/`, {
       method: 'POST',
-      headers: this.getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Send cookies with request
       body: JSON.stringify(logData),
     });
-    
+
     console.log('📨 API Response status:', response.status);
     const result = await this.handleResponse(response);
     console.log('📊 API Response data:', result);
-    
+
     return result;
   }
 }

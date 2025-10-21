@@ -34,9 +34,9 @@ const useDarkMode = () => {
 
 const Header: React.FC = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [showCookieBanner, setShowCookieBanner] = useState(true);
+  const [showDataStorageBanner, setShowDataStorageBanner] = useState(true);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  
+
   const { user, isAuthenticated, logout, isDoctor } = useAuth();
   const { professionalUser } = useProfessionalAuth();
   const { isDarkMode } = useDarkMode();
@@ -45,18 +45,25 @@ const Header: React.FC = () => {
   // Check if we're in professional view
   const isProfessionalView = location.pathname.includes('/professional');
 
-  // Check if the cookie consent has been saved previously
+  // Check if the data storage consent has been saved previously
   useEffect(() => {
-    const cookieConsent = localStorage.getItem('cookie-consent');
-    if (cookieConsent) {
-      setShowCookieBanner(false);
+    const dataStorageConsent = localStorage.getItem('data-storage-consent');
+    if (dataStorageConsent) {
+      setShowDataStorageBanner(false);
     }
   }, []);
 
-  const handleCookieConsent = (consent: boolean) => {
-    // Save the user's cookie preference
-    localStorage.setItem('cookie-consent', consent ? 'accepted' : 'declined');
-    setShowCookieBanner(false);
+  const handleDataStorageConsent = (accepted: boolean) => {
+    const consent = accepted ? 'accepted' : 'declined';
+    localStorage.setItem('data-storage-consent', consent);
+
+    // Also store timestamp for auditing
+    localStorage.setItem('data-storage-consent-timestamp', new Date().toISOString());
+
+    // Keep legacy key for backwards compatibility during transition
+    localStorage.setItem('cookie-consent', consent);
+
+    setShowDataStorageBanner(false);
   };
 
   // Navigation items - Regular view
@@ -83,35 +90,44 @@ const Header: React.FC = () => {
 
   return (
     <header className={`sticky top-0 z-40 w-full transition-colors duration-300 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
-      {/* Cookie banner */}
-      {showCookieBanner && (
-        <div className={`${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} p-4 border-b border-gray-700/10`}>
+      {/* Data Storage banner */}
+      {showDataStorageBanner && (
+        <div className={`${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-900 text-white'} p-4 shadow-lg`}>
           <div className="phb-container">
-            <h2 className="text-lg font-bold mb-2">Cookies on the PHB website</h2>
-            <p className="mb-2">We've put some small files called cookies on your device to make our site work.</p>
-            <p className="mb-2">
-              We'd also like to use analytics cookies. These collect feedback and send information about how our site is
-              used to services called Adobe Analytics, Adobe Target, Qualtrics Feedback and Google Analytics. We use this
-              information to improve our site.
-            </p>
-            <p className="mb-4">
-              Let us know if this is OK. We'll use a cookie to save your choice. You can{' '}
-              <a href="#" className={`${isDarkMode ? 'text-blue-400' : 'text-blue-600'} underline hover:text-blue-800`}>read more about our cookies</a>{' '}
-              before you choose.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <button
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors"
-                onClick={() => handleCookieConsent(true)}
-              >
-                I'm OK with analytics cookies
-              </button>
-              <button
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition-colors"
-                onClick={() => handleCookieConsent(false)}
-              >
-                Do not use analytics cookies
-              </button>
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="flex-1">
+                <p className="text-sm md:text-base font-medium mb-1">
+                  📦 Data Storage Notice
+                </p>
+                <p className="text-xs md:text-sm text-gray-300">
+                  PHB stores authentication tokens and preferences in your browser's localStorage to provide our services.
+                  We do not use tracking cookies. By continuing, you consent to this data storage.{' '}
+                  <a
+                    href="/about#cookies"
+                    className="underline hover:text-blue-400 transition-colors"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Learn more about our data storage practices
+                  </a>
+                </p>
+              </div>
+              <div className="flex gap-3 shrink-0">
+                <button
+                  onClick={() => handleDataStorageConsent(true)}
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-sm font-medium transition-colors shadow-md"
+                  aria-label="Accept data storage"
+                >
+                  Accept
+                </button>
+                <button
+                  onClick={() => handleDataStorageConsent(false)}
+                  className="px-6 py-2 bg-gray-700 hover:bg-gray-600 rounded-md text-sm font-medium transition-colors shadow-md"
+                  aria-label="Decline data storage"
+                >
+                  Decline
+                </button>
+              </div>
             </div>
           </div>
         </div>

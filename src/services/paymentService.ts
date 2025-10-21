@@ -2,7 +2,6 @@
 // Currently using mocks, will connect to PHB backend later
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-const AUTH_TOKEN_KEY = 'phb_auth_token';
 
 export interface PaymentData {
   appointmentId?: number; // Added for backend integration
@@ -67,11 +66,6 @@ export interface PaymentStatusResponse {
   free_appointments: boolean;
 }
 
-// Helper function to get auth token
-const getAuthToken = (): string | null => {
-  return localStorage.getItem(AUTH_TOKEN_KEY);
-};
-
 // Helper function to map backend payment status to frontend format
 const mapBackendStatusToFrontend = (backendStatus: string): 'pending' | 'processing' | 'completed' | 'failed' | 'refunded' => {
   const statusMap: Record<string, 'pending' | 'processing' | 'completed' | 'failed' | 'refunded'> = {
@@ -106,15 +100,11 @@ async function apiRequest<T>(
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
-  
-  const authToken = getAuthToken();
-  if (authToken) {
-    headers['Authorization'] = `Bearer ${authToken}`;
-  }
 
   const config: RequestInit = {
     method,
     headers,
+    credentials: 'include', // Send cookies with request
   };
 
   if (body) {

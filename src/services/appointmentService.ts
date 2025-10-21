@@ -1,5 +1,3 @@
-import { getAuthData } from './staffService';
-
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 export interface Appointment {
@@ -44,13 +42,6 @@ export const AppointmentService = {
     date_from?: string;
     date_to?: string;
   }): Promise<AppointmentsResponse> {
-    const authData = getAuthData();
-    const token = authData.token;
-    
-    if (!token) {
-      throw new Error('Authentication required');
-    }
-
     // Build query string from filters
     const queryParams = new URLSearchParams();
     if (filters) {
@@ -65,9 +56,9 @@ export const AppointmentService = {
       const response = await fetch(`${API_BASE_URL}/api/hospitals/appointments/?${queryParams.toString()}`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
       });
       if (!response.ok) {
         const errorData = await response.json();
@@ -90,13 +81,6 @@ export const AppointmentService = {
     date: string; // YYYY-MM-DD format
     time?: string; // HH:MM format
   }): Promise<ConflictCheckResponse> {
-    const authData = getAuthData();
-    const token = authData.token;
-    
-    if (!token) {
-      throw new Error('Authentication required');
-    }
-
     const queryParams = new URLSearchParams({
       department: department.toString(),
       date,
@@ -107,9 +91,9 @@ export const AppointmentService = {
       const response = await fetch(`${API_BASE_URL}/api/appointments/check-conflict/?${queryParams.toString()}`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
       });
       
       if (!response.ok) {

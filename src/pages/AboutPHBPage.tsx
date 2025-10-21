@@ -736,175 +736,233 @@ const AboutPHBPage: React.FC = () => {
             </section>
 
             <section id="cookies" className="mb-12">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Cookie Policy</h2>
+              <h3 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-100">
+                Data Storage & Cookies Policy
+              </h3>
 
-              <p className="mb-4">
-                This Cookie Policy explains how PHB Health Systems Ltd uses cookies and similar tracking technologies when you visit
-                our website and use our platform. By continuing to use our services, you consent to our use of cookies as described
-                in this policy.
-              </p>
+              <div className="space-y-4 text-gray-700 dark:text-gray-300">
+                <p>
+                  This section explains how PHB stores data on your device to provide our healthcare services.
+                  We use a combination of <strong>browser localStorage</strong> and <strong>backend cookies</strong> for different purposes.
+                </p>
 
-              <h3 className="text-xl font-semibold mb-3">What Are Cookies?</h3>
-              <p className="mb-4">
-                Cookies are small text files that are stored on your device (computer, tablet, or mobile) when you visit a website.
-                They help websites remember your preferences, improve your experience, and provide analytics about how the site is used.
-              </p>
-
-              <h3 className="text-xl font-semibold mb-3">Types of Cookies We Use</h3>
-
-              <div className="space-y-4 mb-6">
-                <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
-                  <h4 className="font-bold text-lg mb-2">1. Essential Cookies (Strictly Necessary)</h4>
-                  <p className="text-sm mb-2">
-                    These cookies are required for the platform to function properly and cannot be disabled without affecting
-                    core functionality.
+                {/* localStorage Usage Section */}
+                <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
+                  <h4 className="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-100">
+                    Browser localStorage (Client-Side Storage)
+                  </h4>
+                  <p className="mb-3">
+                    PHB currently stores authentication tokens and user preferences in your browser's localStorage.
+                    This is JavaScript-accessible storage that persists until manually cleared.
                   </p>
-                  <p className="text-sm font-semibold mb-1">Used for:</p>
-                  <ul className="list-disc pl-6 space-y-1 text-sm">
-                    <li>User authentication and session management</li>
-                    <li>Security features and fraud prevention</li>
-                    <li>Load balancing and platform performance</li>
-                    <li>Storing your preferences and settings</li>
+
+                  <h5 className="font-semibold mt-3 mb-2">What We Store in localStorage:</h5>
+                  <ul className="list-disc list-inside space-y-2 ml-4">
+                    <li>
+                      <strong>Authentication Tokens</strong>:
+                      <ul className="list-circle list-inside ml-6 mt-1">
+                        <li><code>phb_auth_token</code> - Regular user JWT token</li>
+                        <li><code>phb_professional_token</code> - Medical professional JWT token</li>
+                        <li><code>phb_organization_token</code> - Organization admin JWT token</li>
+                        <li><code>medical_record_token</code> - Temporary medical records access token</li>
+                      </ul>
+                    </li>
+                    <li>
+                      <strong>User Preferences</strong>:
+                      <ul className="list-circle list-inside ml-6 mt-1">
+                        <li><code>phb_view_preference</code> - Doctor/patient view toggle</li>
+                        <li><code>phb_onboarding_completed</code> - Onboarding completion flag</li>
+                        <li><code>cookie-consent</code> - Data storage consent preference</li>
+                      </ul>
+                    </li>
+                    <li>
+                      <strong>Women's Health Data</strong> (if you use these features):
+                      <ul className="list-circle list-inside ml-6 mt-1">
+                        <li><code>cycles</code> - Menstrual cycle tracking data</li>
+                        <li><code>contractions</code> - Contraction timer data</li>
+                        <li><code>pregnancyDueDate</code> - Pregnancy due date</li>
+                        <li><code>birthPlan</code> - Birth plan information</li>
+                      </ul>
+                    </li>
                   </ul>
-                  <p className="text-sm mt-2 text-gray-600">
-                    <strong>Cookie names:</strong> phb_token, phb_professional_token, phb_organization_token, session_id
+
+                  <div className="bg-yellow-100 dark:bg-yellow-800 p-3 rounded mt-4">
+                    <h5 className="font-semibold mb-2 flex items-center">
+                      <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
+                      </svg>
+                      Security Notice
+                    </h5>
+                    <p className="text-sm">
+                      <strong>Important</strong>: localStorage data is accessible to JavaScript code running on our site.
+                      While we implement security measures to protect against Cross-Site Scripting (XSS) attacks,
+                      localStorage does not offer the same protection as httpOnly cookies.
+                    </p>
+                    <p className="text-sm mt-2">
+                      We are actively working on migrating to httpOnly cookies for enhanced security.
+                      This will make authentication tokens inaccessible to JavaScript, providing better protection against XSS attacks.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Backend Cookies Section */}
+                <div className="bg-green-50 dark:bg-green-900 p-4 rounded-lg mt-4">
+                  <h4 className="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-100">
+                    Backend Cookies (Server-Set HTTP Cookies)
+                  </h4>
+                  <p className="mb-3">
+                    Our backend server sets minimal cookies for security and session management:
+                  </p>
+
+                  <table className="w-full border-collapse mt-2">
+                    <thead>
+                      <tr className="bg-gray-100 dark:bg-gray-800">
+                        <th className="border border-gray-300 dark:border-gray-600 p-2 text-left">Cookie Name</th>
+                        <th className="border border-gray-300 dark:border-gray-600 p-2 text-left">Purpose</th>
+                        <th className="border border-gray-300 dark:border-gray-600 p-2 text-left">Duration</th>
+                        <th className="border border-gray-300 dark:border-gray-600 p-2 text-left">Security</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="border border-gray-300 dark:border-gray-600 p-2"><code>sessionid</code></td>
+                        <td className="border border-gray-300 dark:border-gray-600 p-2">Django session management (admin only)</td>
+                        <td className="border border-gray-300 dark:border-gray-600 p-2">Session (deleted when browser closes)</td>
+                        <td className="border border-gray-300 dark:border-gray-600 p-2">Secure, HttpOnly, SameSite</td>
+                      </tr>
+                      <tr>
+                        <td className="border border-gray-300 dark:border-gray-600 p-2"><code>csrftoken</code></td>
+                        <td className="border border-gray-300 dark:border-gray-600 p-2">Cross-Site Request Forgery protection</td>
+                        <td className="border border-gray-300 dark:border-gray-600 p-2">1 year</td>
+                        <td className="border border-gray-300 dark:border-gray-600 p-2">Secure, SameSite</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <p className="mt-3 text-sm">
+                    <strong>Note</strong>: These backend cookies are NOT used for regular user authentication.
+                    User authentication uses JWT tokens stored in localStorage and sent via Authorization headers.
                   </p>
                 </div>
 
-                <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
-                  <h4 className="font-bold text-lg mb-2">2. Functional Cookies</h4>
-                  <p className="text-sm mb-2">
-                    These cookies enable enhanced functionality and personalization based on your interactions with the platform.
+                {/* Third-Party Services */}
+                <div className="mt-4">
+                  <h4 className="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-100">
+                    Third-Party Services
+                  </h4>
+                  <p>
+                    We integrate with third-party services that may set their own cookies:
                   </p>
-                  <p className="text-sm font-semibold mb-1">Used for:</p>
-                  <ul className="list-disc pl-6 space-y-1 text-sm">
-                    <li>Remembering your language and regional preferences</li>
-                    <li>Saving your dashboard customizations</li>
-                    <li>Storing view toggle preferences (patient/professional views)</li>
-                    <li>Remembering form inputs to improve user experience</li>
+                  <ul className="list-disc list-inside ml-4 mt-2 space-y-1">
+                    <li><strong>Paystack</strong>: Payment processing (may set cookies during checkout)</li>
+                    <li><strong>Google reCAPTCHA</strong>: Bot protection (sets cookies for verification)</li>
                   </ul>
-                  <p className="text-sm mt-2 text-gray-600">
-                    <strong>Retention:</strong> Up to 12 months
+                  <p className="mt-2 text-sm">
+                    Please refer to these services' privacy policies for information about their cookie usage.
                   </p>
                 </div>
 
-                <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
-                  <h4 className="font-bold text-lg mb-2">3. Analytics Cookies</h4>
-                  <p className="text-sm mb-2">
-                    These cookies help us understand how visitors interact with our platform, allowing us to improve services
-                    and user experience.
+                {/* Managing Your Data */}
+                <div className="mt-4">
+                  <h4 className="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-100">
+                    Managing Your Stored Data
+                  </h4>
+
+                  <h5 className="font-semibold mt-3 mb-2">Clearing localStorage Data:</h5>
+                  <p className="mb-2">To clear PHB data from your browser:</p>
+                  <ol className="list-decimal list-inside ml-4 space-y-2">
+                    <li>
+                      <strong>Use PHB Logout</strong>: Click "Logout" in your account menu.
+                      This clears authentication tokens but preserves preferences.
+                    </li>
+                    <li>
+                      <strong>Browser Settings</strong>:
+                      <ul className="list-disc list-inside ml-6 mt-1">
+                        <li><strong>Chrome/Edge</strong>: Settings → Privacy → Clear browsing data → Cookies and site data</li>
+                        <li><strong>Firefox</strong>: Settings → Privacy & Security → Cookies and Site Data → Clear Data</li>
+                        <li><strong>Safari</strong>: Settings → Privacy → Manage Website Data → Remove for phb.com</li>
+                      </ul>
+                    </li>
+                    <li>
+                      <strong>Developer Console</strong> (Advanced):
+                      <ul className="list-disc list-inside ml-6 mt-1">
+                        <li>Press F12 to open Developer Tools</li>
+                        <li>Go to "Application" or "Storage" tab</li>
+                        <li>Expand "Local Storage"</li>
+                        <li>Select your PHB domain and clear individual items</li>
+                      </ul>
+                    </li>
+                  </ol>
+
+                  <h5 className="font-semibold mt-4 mb-2">Impact of Clearing Data:</h5>
+                  <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded">
+                    <ul className="list-disc list-inside space-y-1">
+                      <li>✅ You will be logged out</li>
+                      <li>✅ Preferences will be reset to defaults</li>
+                      <li>✅ Women's health tracking data will be lost (unless synced to server)</li>
+                      <li>✅ You can log back in with your credentials</li>
+                      <li>✅ Server-stored data (appointments, medical records) remains safe</li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Legal Compliance */}
+                <div className="mt-4">
+                  <h4 className="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-100">
+                    Your Rights Under NDPR
+                  </h4>
+                  <p className="mb-2">
+                    Under the Nigeria Data Protection Regulation (NDPR), you have the right to:
                   </p>
-                  <p className="text-sm font-semibold mb-1">Used for:</p>
-                  <ul className="list-disc pl-6 space-y-1 text-sm">
-                    <li>Tracking page views and navigation patterns</li>
-                    <li>Analyzing feature usage and engagement metrics</li>
-                    <li>Identifying technical issues and performance bottlenecks</li>
-                    <li>Understanding user demographics (anonymized)</li>
+                  <ul className="list-disc list-inside ml-4 space-y-1">
+                    <li>Know what data is stored about you</li>
+                    <li>Access your stored data</li>
+                    <li>Request correction of inaccurate data</li>
+                    <li>Request deletion of your data (right to be forgotten)</li>
+                    <li>Withdraw consent for data processing</li>
+                    <li>Port your data to another service</li>
                   </ul>
-                  <p className="text-sm mt-2 text-gray-600">
-                    <strong>Third-party services:</strong> [PLACEHOLDER: Google Analytics, Mixpanel, etc.]<br/>
-                    <strong>Data anonymization:</strong> IP addresses are anonymized
+                  <p className="mt-2">
+                    To exercise these rights, contact us at{' '}
+                    <a href="mailto:privacy@phb.com" className="text-blue-600 dark:text-blue-400 hover:underline">
+                      privacy@phb.com
+                    </a>
                   </p>
                 </div>
 
-                <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
-                  <h4 className="font-bold text-lg mb-2">4. Performance Cookies</h4>
-                  <p className="text-sm mb-2">
-                    These cookies collect information about how you use our platform to help us optimize performance.
+                {/* Future Enhancements */}
+                <div className="bg-purple-50 dark:bg-purple-900 p-4 rounded-lg mt-4">
+                  <h4 className="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-100">
+                    🔒 Upcoming Security Enhancements
+                  </h4>
+                  <p className="mb-2">
+                    We are committed to continuously improving our security. Planned enhancements include:
                   </p>
-                  <p className="text-sm font-semibold mb-1">Used for:</p>
-                  <ul className="list-disc pl-6 space-y-1 text-sm">
-                    <li>Monitoring page load times and response speeds</li>
-                    <li>Identifying and fixing technical errors</li>
-                    <li>Testing new features and improvements</li>
-                    <li>Load balancing across servers</li>
+                  <ul className="list-disc list-inside ml-4 space-y-1">
+                    <li><strong>HttpOnly Cookie Migration</strong>: Moving JWT tokens to httpOnly cookies for XSS protection</li>
+                    <li><strong>Content Security Policy</strong>: Additional XSS prevention measures</li>
+                    <li><strong>Refresh Token Rotation</strong>: Automatic token refresh without re-login</li>
+                    <li><strong>Multi-Factor Authentication</strong>: Enhanced account security options</li>
                   </ul>
+                  <p className="mt-2 text-sm">
+                    This policy will be updated when these enhancements are implemented.
+                  </p>
                 </div>
 
-                <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
-                  <h4 className="font-bold text-lg mb-2">5. Third-Party Cookies</h4>
-                  <p className="text-sm mb-2">
-                    Some features on our platform use services provided by third parties, which may set their own cookies.
+                {/* Contact */}
+                <div className="mt-4 pt-4 border-t border-gray-300 dark:border-gray-600">
+                  <p className="text-sm">
+                    <strong>Questions about data storage?</strong><br />
+                    Contact our Data Protection Officer at{' '}
+                    <a href="mailto:dpo@phb.com" className="text-blue-600 dark:text-blue-400 hover:underline">
+                      dpo@phb.com
+                    </a>
                   </p>
-                  <p className="text-sm font-semibold mb-1">Third-party services include:</p>
-                  <ul className="list-disc pl-6 space-y-1 text-sm">
-                    <li><strong>Paystack:</strong> Payment processing and transaction security</li>
-                    <li><strong>[PLACEHOLDER: CDN Provider]:</strong> Content delivery and performance optimization</li>
-                    <li><strong>[PLACEHOLDER: Analytics Provider]:</strong> Usage analytics and insights</li>
-                    <li><strong>[PLACEHOLDER: Support Tools]:</strong> Customer support chat features</li>
-                  </ul>
                   <p className="text-sm mt-2">
-                    These third parties have their own privacy policies and cookie policies. We recommend reviewing them:
+                    <strong>Last Updated</strong>: October 18, 2025<br />
+                    <strong>Version</strong>: 2.0 (Updated to reflect localStorage implementation)
                   </p>
-                  <ul className="list-disc pl-6 space-y-1 text-sm mt-1">
-                    <li>Paystack Privacy Policy: https://paystack.com/privacy</li>
-                  </ul>
                 </div>
-              </div>
-
-              <h3 className="text-xl font-semibold mb-3">Cookie Duration</h3>
-              <div className="bg-gray-50 p-5 rounded-lg mb-6">
-                <p className="mb-3">Cookies are set for different durations:</p>
-                <ul className="list-disc pl-6 space-y-2 text-sm">
-                  <li><strong>Session Cookies:</strong> Temporary cookies deleted when you close your browser</li>
-                  <li><strong>Persistent Cookies:</strong> Remain on your device for a set period (up to 12 months) or until manually deleted</li>
-                </ul>
-              </div>
-
-              <h3 className="text-xl font-semibold mb-3">How to Control Cookies</h3>
-              <p className="mb-4">You have several options to manage or disable cookies:</p>
-
-              <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-[#005eb8] mb-6">
-                <h4 className="font-semibold mb-3">Browser Settings</h4>
-                <p className="text-sm mb-2">Most browsers allow you to control cookies through settings:</p>
-                <ul className="list-disc pl-6 space-y-1 text-sm">
-                  <li><strong>Chrome:</strong> Settings → Privacy and Security → Cookies</li>
-                  <li><strong>Firefox:</strong> Options → Privacy & Security → Cookies and Site Data</li>
-                  <li><strong>Safari:</strong> Preferences → Privacy → Cookies and Website Data</li>
-                  <li><strong>Edge:</strong> Settings → Privacy & Security → Cookies</li>
-                </ul>
-
-                <h4 className="font-semibold mb-2 mt-4">Platform Cookie Preferences</h4>
-                <p className="text-sm mb-2">
-                  You can manage non-essential cookies through our cookie preference center:
-                </p>
-                <a href="#" className="text-[#005eb8] underline text-sm">Manage Cookie Preferences</a>
-              </div>
-
-              <h3 className="text-xl font-semibold mb-3">Impact of Disabling Cookies</h3>
-              <div className="bg-yellow-50 p-5 rounded-lg border-l-4 border-yellow-500 mb-6">
-                <p className="font-semibold mb-2">Please Note:</p>
-                <p className="text-sm mb-2">
-                  Disabling cookies may affect your experience on our platform. Specifically:
-                </p>
-                <ul className="list-disc pl-6 space-y-1 text-sm">
-                  <li>You may not be able to log in or access your account</li>
-                  <li>Personalized features and preferences will not work</li>
-                  <li>Some interactive features may be unavailable</li>
-                  <li>Platform performance may be degraded</li>
-                </ul>
-              </div>
-
-              <h3 className="text-xl font-semibold mb-3">Updates to This Policy</h3>
-              <p className="mb-4">
-                We may update this Cookie Policy from time to time to reflect changes in our practices or legal requirements.
-                We will notify you of significant changes through the platform or via email. The "Last Updated" date at the
-                bottom indicates when the policy was last revised.
-              </p>
-
-              <h3 className="text-xl font-semibold mb-3">Contact Us</h3>
-              <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-[#005eb8]">
-                <p className="mb-4">If you have questions about our use of cookies, please contact us:</p>
-                <ul className="space-y-2">
-                  <li><strong>Email:</strong> privacy@phbhealthsystems.com</li>
-                  <li><strong>Phone:</strong> [PLACEHOLDER: Contact Number]</li>
-                  <li><strong>Address:</strong> [PLACEHOLDER: Registered Office Address], Nigeria</li>
-                </ul>
-              </div>
-
-              <div className="mt-6 text-sm text-gray-600">
-                <p><strong>Last Updated:</strong> January 2025</p>
-                <p><strong>Company Registration:</strong> PHB Health Systems Ltd (RC: 8663073)</p>
               </div>
             </section>
 

@@ -36,20 +36,6 @@ const PatientHPNSearch: React.FC<PatientHPNSearchProps> = ({
   
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
-  // Get auth token
-  const getAuthToken = () => {
-    const organizationAuth = localStorage.getItem('organizationAuth');
-    if (organizationAuth) {
-      try {
-        const authData = JSON.parse(organizationAuth);
-        return authData.tokens?.access;
-      } catch (e) {
-        console.error('Failed to parse organization auth data:', e);
-      }
-    }
-    return null;
-  };
-
   // Format HPN as user types (XXX XXX XXX XXXX)
   const formatHPN = (value: string) => {
     // Remove all non-alphanumeric characters
@@ -74,16 +60,15 @@ const PatientHPNSearch: React.FC<PatientHPNSearchProps> = ({
     setError(null);
 
     try {
-      const token = getAuthToken();
       const cleanQuery = query.replace(/\s/g, '');
-      
+
       const response = await fetch(
         `${API_BASE_URL}/api/patients/search/?hpn=${cleanQuery}`,
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
+          credentials: 'include', // Send cookies with request
         }
       );
 

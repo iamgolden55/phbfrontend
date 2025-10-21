@@ -1,7 +1,5 @@
 import { API_BASE_URL } from '../../utils/config';
 
-const AUTH_TOKEN_KEY = 'phb_auth_token';
-
 // Check if API_BASE_URL ends with a slash to avoid double slashes
 const fixApiUrl = (endpoint: string): string => {
   // If API_BASE_URL ends with a slash and endpoint starts with a slash,
@@ -77,19 +75,13 @@ export interface Notification {
  * @returns Promise that resolves to the patient's prescriptions
  */
 export async function fetchPatientPrescriptions(): Promise<ApiPrescriptionsResponse> {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   try {
     const response = await fetch(fixApiUrl('/api/prescriptions/'), {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Send cookies with request
     });
     
     if (!response.ok) {
@@ -112,19 +104,13 @@ export async function fetchPatientPrescriptions(): Promise<ApiPrescriptionsRespo
  * @returns Promise that resolves to the created prescription request
  */
 export async function requestNewPrescription(prescriptionRequest: PrescriptionRequest) {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   try {
     const response = await fetch(fixApiUrl('/api/prescriptions/request/'), {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Send cookies with request
       body: JSON.stringify(prescriptionRequest),
     });
     
@@ -148,19 +134,13 @@ export async function requestNewPrescription(prescriptionRequest: PrescriptionRe
  * @returns Promise that resolves to the ordered prescription
  */
 export async function orderPrescription(prescriptionId: string) {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   try {
     const response = await fetch(fixApiUrl(`/api/prescriptions/${prescriptionId}/order/`), {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Send cookies with request
     });
     
     if (!response.ok) {
@@ -172,9 +152,9 @@ export async function orderPrescription(prescriptionId: string) {
           const updateResponse = await fetch(fixApiUrl(`/api/prescriptions/${prescriptionId}/update-status/`), {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
             },
+            credentials: 'include', // Send cookies with request
             body: JSON.stringify({ status: 'collected' }),
           });
           
@@ -215,19 +195,13 @@ export async function orderPrescription(prescriptionId: string) {
  * @returns Promise that resolves to the prescription details
  */
 export async function fetchPrescriptionDetails(prescriptionId: string): Promise<PrescriptionDetails> {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   try {
     const response = await fetch(fixApiUrl(`/api/prescriptions/${prescriptionId}/`), {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Send cookies with request
     });
     
     if (!response.ok) {
@@ -250,20 +224,14 @@ export async function fetchPrescriptionDetails(prescriptionId: string): Promise<
  * @returns Promise that resolves to the completed prescription
  */
 export async function completePrescription(prescriptionId: string) {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   try {
     // Try the complete endpoint
     const response = await fetch(fixApiUrl(`/api/prescriptions/${prescriptionId}/complete/`), {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Send cookies with request
     });
     
     if (!response.ok) {

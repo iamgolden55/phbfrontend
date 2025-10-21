@@ -27,7 +27,18 @@ interface ProfessionalAuthContextType {
 // Create the context with a default value
 const ProfessionalAuthContext = createContext<ProfessionalAuthContextType | undefined>(undefined);
 
-// Keys for localStorage
+/**
+ * Professional Authentication Storage
+ *
+ * CURRENT IMPLEMENTATION (localStorage):
+ * - Professional state and preferences stored in browser localStorage
+ * - Accessible to JavaScript code (XSS vulnerable)
+ *
+ * PLANNED MIGRATION:
+ * - Moving to httpOnly cookies for enhanced XSS protection
+ * - See: thoughts/shared/research/2025-10-18-cookie-usage.md
+ * - See: thoughts/shared/plans/2025-10-18-httponly-cookie-migration.md
+ */
 const PROFESSIONAL_AUTH_STATE_KEY = 'phb_professional_auth_state';
 const VIEW_PREFERENCE_KEY = 'phb_view_preference';
 

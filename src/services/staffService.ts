@@ -1,5 +1,3 @@
-import { useOrganizationAuth } from '../features/organization/organizationAuthContext';
-
 export interface Department {
   id: number;
   name: string;
@@ -40,22 +38,6 @@ interface AvailabilityResponse {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/';
 
-export const getAuthData = () => {
-  const organizationAuth = localStorage.getItem('organizationAuth');
-  if (organizationAuth) {
-    try {
-      const authData = JSON.parse(organizationAuth);
-      return {
-        token: authData.tokens?.access,
-        hospitalId: authData.hospital?.id || authData.userData?.hospital?.id || authData.userData?.hospital_id
-      };
-    } catch (e) {
-      console.error('Failed to parse organization auth data:', e);
-    }
-  }
-  return { token: null, hospitalId: null };
-};
-
 interface CreateStaffRequest {
   email: string;
   password: string;
@@ -79,20 +61,13 @@ interface CreateStaffResponse {
 
 export const StaffService = {
   async fetchStaffMembers(): Promise<StaffResponse> {
-    const authData = getAuthData();
-    const token = authData.token;
-    
-    if (!token) {
-      throw new Error('Authentication required');
-    }
-
     try {
       const response = await fetch(`${API_BASE_URL}/api/staff/`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
       });
 
       if (!response.ok) {
@@ -109,20 +84,13 @@ export const StaffService = {
   },
 
   async updateAvailability(isAvailable: boolean): Promise<AvailabilityResponse> {
-    const authData = getAuthData();
-    const token = authData.token;
-    
-    if (!token) {
-      throw new Error('Authentication required');
-    }
-
     try {
       const response = await fetch(`${API_BASE_URL}/api/staff/availability/`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
         body: JSON.stringify({
           is_available: isAvailable
         }),
@@ -141,20 +109,13 @@ export const StaffService = {
   },
 
   async createStaffMember(staffData: CreateStaffRequest): Promise<CreateStaffResponse> {
-    const authData = getAuthData();
-    const token = authData.token;
-    
-    if (!token) {
-      throw new Error('Authentication required');
-    }
-
     try {
       const response = await fetch(`${API_BASE_URL}/api/staff/`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
         body: JSON.stringify(staffData),
       });
 
@@ -171,20 +132,13 @@ export const StaffService = {
   },
 
   async getHospitalDepartments(hospitalId: number): Promise<Department[]> {
-    const authData = getAuthData();
-    const token = authData.token;
-    
-    if (!token) {
-      throw new Error('Authentication required');
-    }
-
     try {
       const response = await fetch(`${API_BASE_URL}/api/hospitals/departments/?hospital_id=${hospitalId}`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
       });
 
       if (!response.ok) {

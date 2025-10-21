@@ -1,7 +1,5 @@
 import { API_BASE_URL, createApiUrl } from '../../utils/config';
 
-const AUTH_TOKEN_KEY = 'phb_auth_token';
-
 // Define types for appointment data
 export interface AppointmentSummary {
   pending_department_count: number;
@@ -67,12 +65,6 @@ export async function fetchDoctorAppointments(filters?: {
   priority?: string;
   doctor_id?: number;
 }) {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   try {
     // Build the query string from filters
     let queryParams = '';
@@ -85,13 +77,13 @@ export async function fetchDoctorAppointments(filters?: {
       if (filters.doctor_id) params.append('doctor_id', filters.doctor_id.toString());
       queryParams = `?${params.toString()}`;
     }
-    
+
     const response = await fetch(`${API_BASE_URL}/api/department-pending-appointments/${queryParams}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Send cookies with request
     });
     
     if (!response.ok) {
@@ -171,19 +163,13 @@ export async function fetchDoctorAppointments(filters?: {
  * @returns Promise that resolves to the appointment details
  */
 export async function fetchDoctorAppointmentDetails(appointmentId: string) {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   try {
     const response = await fetch(`${API_BASE_URL}/api/doctor-appointments/${appointmentId}/`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Send cookies with request
     });
     
     if (!response.ok) {
@@ -252,19 +238,13 @@ export async function fetchDoctorAppointmentDetails(appointmentId: string) {
  * @returns Promise that resolves to the updated appointment
  */
 export async function acceptAppointment(appointmentId: string) {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   try {
     const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/accept/`), {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Send cookies with request
     });
     
     if (!response.ok) {
@@ -287,19 +267,13 @@ export async function acceptAppointment(appointmentId: string) {
  * @returns Promise that resolves to the updated appointment
  */
 export async function startConsultation(appointmentId: string) {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   try {
     const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/start-consultation/`), {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Send cookies with request
     });
     
     if (!response.ok) {
@@ -323,19 +297,13 @@ export async function startConsultation(appointmentId: string) {
  * @returns Promise that resolves to the updated appointment
  */
 export async function completeConsultation(appointmentId: string, notes: string) {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   try {
     const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/complete-consultation/`), {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Send cookies with request
       body: JSON.stringify({ notes }),
     });
     
@@ -359,26 +327,20 @@ export async function completeConsultation(appointmentId: string, notes: string)
  * @returns Promise that resolves to an array of appointments
  */
 export async function fetchAppointments(viewAsDoctor: boolean = false) {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   // If viewAsDoctor is true, use the doctor-appointments endpoint
   // to fetch appointments where the doctor is the provider.
   // Otherwise, use the regular appointments endpoint for patient appointments.
-  const url = viewAsDoctor 
-    ? createApiUrl('api/doctor-appointments/') 
+  const url = viewAsDoctor
+    ? createApiUrl('api/doctor-appointments/')
     : createApiUrl('api/appointments/');
-  
+
   try {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Send cookies with request
     });
     
     if (!response.ok) {
@@ -403,41 +365,35 @@ export async function fetchAppointments(viewAsDoctor: boolean = false) {
  * @returns Promise that resolves to the updated appointment with notification status
  */
 export async function updateAppointmentStatus(
-  appointmentId: string, 
-  status: 'confirmed' | 'cancelled' | 'completed' | 'rescheduled' | 'no_show' | 'in_progress', 
+  appointmentId: string,
+  status: 'confirmed' | 'cancelled' | 'completed' | 'rescheduled' | 'no_show' | 'in_progress',
   notes?: string,
   medicalSummary?: string
 ) {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   // Check if medical summary is required but not provided
   if (status === 'completed' && !medicalSummary) {
     throw new Error('Medical summary is required when completing an appointment');
   }
-  
+
   try {
     const requestBody: any = { status };
-    
+
     // Add notes if provided
     if (notes) {
       requestBody.notes = notes;
     }
-    
+
     // Add medical_summary if status is completed
     if (status === 'completed' && medicalSummary) {
       requestBody.medical_summary = medicalSummary;
     }
-    
+
     const response = await fetch(`${API_BASE_URL}/api/doctor-appointments/${appointmentId}/status/`, {
       method: 'PATCH',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Send cookies with request
       body: JSON.stringify(requestBody),
     });
     
@@ -461,23 +417,17 @@ export async function updateAppointmentStatus(
  * @returns Promise that resolves to the updated appointment
  */
 export async function addDoctorNotes(appointmentId: string, notes: string) {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   if (!notes || !notes.trim()) {
     throw new Error('Notes cannot be empty');
   }
-  
+
   try {
     const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/add-notes/`), {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Send cookies with request
       body: JSON.stringify({ notes }),
     });
     
@@ -502,27 +452,21 @@ export async function addDoctorNotes(appointmentId: string, notes: string) {
  * @returns Promise that resolves to the updated appointment
  */
 export async function cancelAppointment(appointmentId: string, reason?: string) {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   if (!reason || !reason.trim()) {
     throw new Error('Cancellation reason is required');
   }
-  
+
   try {
     const requestBody = {
       cancellation_reason: reason
     };
-    
+
     const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/cancel/`), {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Send cookies with request
       body: JSON.stringify(requestBody),
     });
     
@@ -547,26 +491,20 @@ export async function cancelAppointment(appointmentId: string, reason?: string) 
  * @returns Promise that resolves to the updated appointment
  */
 export async function markAppointmentNoShow(appointmentId: string, notes?: string) {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   try {
     const requestBody: any = {};
-    
+
     // Add notes if provided
     if (notes) {
       requestBody.notes = notes;
     }
-    
+
     const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/no-show/`), {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Send cookies with request
       body: JSON.stringify(requestBody),
     });
     
@@ -635,15 +573,6 @@ export interface PrescriptionResponse {
  * @returns Promise that resolves to the created prescriptions
  */
 export async function addAppointmentPrescriptions(appointmentId: string, medications: PrescriptionMedication[]) {
-const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-if (!token) {
-  throw new Error('Authentication required');
-}
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   if (!medications || medications.length === 0) {
     throw new Error('At least one medication is required');
   }
@@ -652,9 +581,9 @@ if (!token) {
     const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/prescriptions/`), {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Send cookies with request
       body: JSON.stringify({ medications }),
     });
     
@@ -678,19 +607,13 @@ if (!token) {
  * @returns Promise that resolves to the appointment prescriptions
  */
 export async function getAppointmentPrescriptions(appointmentId: string) {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   try {
     const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/prescriptions/view/`), {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Send cookies with request
     });
     
     if (!response.ok) {
@@ -717,21 +640,15 @@ export async function getPatientMedicalRecords(patientId: string | number) {
     throw new Error('Patient ID is required to fetch medical records');
   }
 
-  // Get the auth token
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-
   const url = `${API_BASE_URL}/api/professional/patients/${patientId}/medical-records/`;
-  
+
   try {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
-      }
+      },
+      credentials: 'include' // Send cookies with request
     });
 
     if (!response.ok) {
@@ -761,9 +678,9 @@ export const fetchAppointmentNotes = async (appointmentId: string) => {
     const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/notes/`), {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem(AUTH_TOKEN_KEY)}`
-      }
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include' // Send cookies with request
     });
 
     if (!response.ok) {
@@ -788,15 +705,13 @@ export const fetchAppointmentNotes = async (appointmentId: string) => {
  */
 export const editAppointmentNotes = async (appointmentId: string, notes: { general_notes?: string; doctor_notes?: string }) => {
   try {
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
-    if (!token) throw new Error('No authentication token found');
     console.log('Editing appointment notes:', notes);
     const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/notes/edit/`), {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json'
       },
+      credentials: 'include', // Send cookies with request
       body: JSON.stringify(notes)
     });
 
@@ -821,14 +736,9 @@ export const editAppointmentNotes = async (appointmentId: string, notes: { gener
  */
 export const deleteAppointmentNotes = async (appointmentId: string) => {
   try {
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
-    if (!token) throw new Error('No authentication token found');
-    
     const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/notes/delete/`), {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      credentials: 'include' // Send cookies with request
     });
 
     if (!response.ok) {
@@ -862,15 +772,13 @@ export interface ReferralRequest {
  */
 export const referAppointment = async (appointmentId: string, referralData: ReferralRequest) => {
   try {
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
-    if (!token) throw new Error('No authentication token found');
     console.log('Refer appointment:', referralData);
     const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/refer/`), {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
+      credentials: 'include', // Send cookies with request
       body: JSON.stringify(referralData)
     });
 
@@ -893,19 +801,13 @@ export const referAppointment = async (appointmentId: string, referralData: Refe
  * @returns Promise that resolves to the list of hospitals
  */
 export async function fetchHospitals() {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   try {
     const response = await fetch(`${API_BASE_URL}/api/hospitals/`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Send cookies with request
     });
     
     if (!response.ok) {
@@ -926,19 +828,13 @@ export async function fetchHospitals() {
  * @returns Promise that resolves to the list of departments
  */
 export async function fetchDepartments(hospitalId: number) {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   try {
     const response = await fetch(`${API_BASE_URL}/api/departments/${hospitalId}/`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Send cookies with request
     });
     
     if (!response.ok) {

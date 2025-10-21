@@ -21,27 +21,14 @@ export const useRegistrationStats = (): RegistrationStats => {
 
   const fetchRegistrationCount = async (status: 'pending' | 'approved'): Promise<number> => {
     try {
-      // Get token from organization auth context
-      let token = null;
-      const organizationAuth = localStorage.getItem('organizationAuth');
-      if (organizationAuth) {
-        try {
-          const authData = JSON.parse(organizationAuth);
-          token = authData.tokens?.access;
-          console.log('🔑 Registration Stats - Token found:', token ? 'Yes' : 'No');
-        } catch (e) {
-          console.error('Failed to parse organization auth data:', e);
-        }
-      }
-
       const apiUrl = `${API_BASE_URL}/api/hospitals/registrations/?status=${status}`;
       console.log('🌐 Registration Stats API URL:', apiUrl);
 
       const response = await fetch(apiUrl, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
       });
 
       console.log(`📡 Registration Stats Response (${status}):`, response.status, response.ok);

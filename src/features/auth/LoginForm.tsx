@@ -6,15 +6,16 @@ import './captchaStyles.css';
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [captchaAnswer, setCaptchaAnswer] = useState('');
-  const { 
-    login, 
-    isLoading, 
-    error, 
-    clearError, 
-    captchaRequired, 
-    captchaChallenge, 
-    captchaToken 
+  const {
+    login,
+    isLoading,
+    error,
+    clearError,
+    captchaRequired,
+    captchaChallenge,
+    captchaToken
   } = useAuth();
   
   // Reset captcha answer when captchaRequired changes to false
@@ -27,9 +28,9 @@ const LoginForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (captchaRequired) {
-      await login(email, password, captchaToken, captchaAnswer);
+      await login(email, password, captchaToken, captchaAnswer, rememberMe);
     } else {
-      await login(email, password);
+      await login(email, password, undefined, undefined, rememberMe);
     }
   };
 
@@ -68,7 +69,7 @@ const LoginForm: React.FC = () => {
           />
         </div>
 
-        <div className="mb-6">
+        <div className="mb-4">
           <div className="flex justify-between mb-1">
             <label htmlFor="password" className="block font-medium">
               Password
@@ -87,7 +88,23 @@ const LoginForm: React.FC = () => {
             required
           />
         </div>
-        
+
+        {/* Remember Me checkbox */}
+        <div className="mb-6">
+          <label className="flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              className="w-4 h-4 text-[#005eb8] border-gray-300 rounded focus:ring-2 focus:ring-[#005eb8]"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
+            <span className="ml-2 text-sm text-gray-700">
+              Remember me for 30 days
+            </span>
+          </label>
+        </div>
+
         {/* CAPTCHA challenge section */}
         {captchaRequired && (
           <div className="captcha-container mb-6">

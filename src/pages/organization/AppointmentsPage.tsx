@@ -20,21 +20,11 @@ const AppointmentsPage: React.FC = () => {
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
-        const storedAuth = localStorage.getItem('organizationAuth');
-        if (!storedAuth) {
-          throw new Error('Not authenticated');
-        }
-
-        const authData = JSON.parse(storedAuth);
-        if (!authData.tokens) {
-          throw new Error('Invalid auth data');
-        }
-
         const response = await fetch(`${API_BASE_URL}/api/hospitals/departments/`, {
           headers: {
-            'Authorization': `Bearer ${authData.tokens.access}`,
             'Content-Type': 'application/json',
           },
+          credentials: 'include', // Send cookies with request
         });
 
         if (!response.ok) {

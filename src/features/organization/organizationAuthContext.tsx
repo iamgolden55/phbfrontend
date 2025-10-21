@@ -70,6 +70,16 @@ export interface OrganizationRegistrationData {
 
 const OrganizationAuthContext = createContext<OrganizationAuthContextType | undefined>(undefined);
 
+/**
+ * Organization Authentication Storage
+ *
+ * MIGRATED TO HTTPONLY COOKIES:
+ * - JWT tokens now stored in httpOnly cookies (XSS protected)
+ * - Cookies: 'access_token' and 'refresh_token'
+ * - Automatic token refresh every 25 minutes
+ * - Cookies sent automatically with every API request (credentials: 'include')
+ * - User data stored in React state (not localStorage)
+ */
 export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -78,128 +88,192 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
   const [needsVerification, setNeedsVerification] = useState<boolean>(false);
   const [currentEmail, setCurrentEmail] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
+  const [lastAuthTime, setLastAuthTime] = useState<number>(Date.now());
+  const refreshTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  // Token refresh function
+  const refreshAccessToken = React.useCallback(async (): Promise<boolean> => {
+    try {
+      console.log('🔄 Organization: Attempting to refresh access token...');
+      const response = await fetch('http://127.0.0.1:8000/api/token/refresh/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Send cookies with request
+      });
+
+      if (!response.ok) {
+        console.error('❌ Organization: Token refresh failed');
+        return false;
+      }
+
+      const data = await response.json();
+      if (data.status === 'success') {
+        console.log('✅ Organization: Token refresh successful');
+        setLastAuthTime(Date.now());
+        return true;
+      }
+
+      return false;
+    } catch (err: any) {
+      console.error('❌ Organization: Token refresh error:', err);
+      if (err.status === 401 || err.status === 403) {
+        console.log('🔒 Organization: Refresh token expired - logging out user');
+        setIsAuthenticated(false);
+        setUserData(null);
+        setNeedsVerification(false);
+        setCurrentEmail(null);
+        sessionStorage.removeItem('org_auth_email');
+        sessionStorage.removeItem('org_auth_needs_verification');
+      }
+      return false;
+    }
+  }, []);
+
+  // Setup token refresh timer
+  const setupTokenRefreshTimer = React.useCallback(() => {
+    if (refreshTimerRef.current) {
+      clearTimeout(refreshTimerRef.current);
+      refreshTimerRef.current = null;
+    }
+
+    const REFRESH_INTERVAL = 25 * 60 * 1000; // 25 minutes (5 min before 30-min expiry)
+    console.log('⏰ Organization: Setting up token refresh timer (will refresh in 25 minutes)');
+
+    refreshTimerRef.current = setTimeout(async () => {
+      console.log('⏰ Organization: Token refresh timer triggered');
+      const success = await refreshAccessToken();
+      if (success) {
+        setupTokenRefreshTimer(); // Set up next refresh
+      }
+    }, REFRESH_INTERVAL);
+  }, [refreshAccessToken]);
+
+  // Cleanup refresh timer on unmount
+  React.useEffect(() => {
+    return () => {
+      if (refreshTimerRef.current) {
+        clearTimeout(refreshTimerRef.current);
+      }
+    };
+  }, []);
 
   // Check if user is already logged in on mount or if OTP verification is in progress
   useEffect(() => {
     const initializeAuth = async () => {
-      console.log('🔐 === AUTH INITIALIZATION STARTING ===');
-      
+      console.log('🔐 === ORGANIZATION AUTH INITIALIZATION STARTING ===');
+
       // Prevent multiple initializations
       if (isInitialized) {
-        console.log('🔐 Auth already initialized, skipping...');
+        console.log('🔐 Organization auth already initialized, skipping...');
         return;
       }
 
       try {
         setIsLoading(true);
-        
-        // Debug: Check what's in localStorage
-        const storedAuth = localStorage.getItem('organizationAuth');
-        console.log('🔐 Raw localStorage content:', storedAuth ? 'EXISTS' : 'NULL');
-        
-        if (storedAuth) {
-          console.log('🔐 Found stored auth, attempting to parse...');
-          try {
-            const authData = JSON.parse(storedAuth);
-            console.log('🔐 Parsed auth data structure:', {
-              hasUserData: !!authData.userData,
-              hasTokens: !!authData.tokens,
-              userRole: authData.userData?.role,
-              userEmail: authData.userData?.email,
-              hospitalId: authData.userData?.hospital?.id
-            });
-            
-            if (authData.userData && authData.tokens) {
-              console.log('🔐 ✅ RESTORING USER SESSION FROM LOCALSTORAGE');
-              
-              // IMPORTANT: Ensure we set these values SYNCHRONOUSLY to avoid race conditions
-              // This ensures the auth state is immediately available to route guards
-              setIsAuthenticated(true);
-              setUserData(authData.userData);
-              setNeedsVerification(false);
-              setCurrentEmail(null);
-              
-              // Only clear session storage if we're fully authenticated
-              sessionStorage.removeItem('org_auth_email');
-              sessionStorage.removeItem('org_auth_needs_verification');
-              
-              // Persist the auth state in a more reliable storage method
-              // This is a fallback in case localStorage is cleared or corrupted
-              try {
-                sessionStorage.setItem('org_auth_initialized', 'true');
-                sessionStorage.setItem('org_auth_state', JSON.stringify({
-                  isAuthenticated: true,
-                  userData: authData.userData
-                }));
-              } catch (err) {
-                console.warn('🔐 Failed to set backup session storage:', err);
-              }
-              
-              setIsInitialized(true);
-              setIsLoading(false);
-              console.log('🔐 ✅ USER RESTORED SUCCESSFULLY');
-              return;
-            } else {
-              console.warn('🔐 ⚠️ Invalid auth data structure:', {
-                userDataExists: !!authData.userData,
-                tokensExist: !!authData.tokens
-              });
-            }
-          } catch (err) {
-            console.warn('🔐 ❌ Failed to parse auth data:', err);
-          }
-        } else {
-          // Check backup storage in session storage
-          try {
-            const backupState = sessionStorage.getItem('org_auth_state');
-            if (backupState) {
-              const parsedState = JSON.parse(backupState);
-              if (parsedState.isAuthenticated && parsedState.userData) {
-                console.log('🔐 Recovering from backup session storage');
-                setIsAuthenticated(true);
-                setUserData(parsedState.userData);
-                setNeedsVerification(false);
-                setCurrentEmail(null);
-                setIsInitialized(true);
-                setIsLoading(false);
-                
-                // Restore localStorage for future refreshes
-                localStorage.setItem('organizationAuth', JSON.stringify({
-                  userData: parsedState.userData,
-                  tokens: { access: 'recovered-token', refresh: 'recovered-refresh' }
-                }));
-                
-                console.log('🔐 ✅ USER RESTORED FROM BACKUP');
-                return;
-              }
-            }
-          } catch (err) {
-            console.warn('🔐 Failed to check backup session storage:', err);
-          }
-          
-          console.log('🔐 No stored auth found in localStorage');
-        }
 
-        // If not fully authenticated, check if we're in the middle of OTP verification
-        const storedEmail = sessionStorage.getItem('org_auth_email');
-        const needsVerify = sessionStorage.getItem('org_auth_needs_verification');
-        
-        if (storedEmail && needsVerify === 'true') {
-          console.log('🔐 Resuming OTP verification for email:', storedEmail);
-          setCurrentEmail(storedEmail);
-          setNeedsVerification(true);
-          setIsAuthenticated(false);
-          setUserData(null);
-        } else {
-          // No auth data and no verification in progress
-          console.log('🔐 No existing auth found, user needs to login');
+        // Check if this is right after an intentional logout
+        const logoutFlag = sessionStorage.getItem('org_logout_flag');
+        if (logoutFlag === 'true') {
+          console.log('🔐 Organization: Clean logout detected, skipping auth check');
+          sessionStorage.removeItem('org_logout_flag');
           setIsAuthenticated(false);
           setUserData(null);
           setNeedsVerification(false);
           setCurrentEmail(null);
+          setIsLoading(false);
+          setIsInitialized(true);
+          return;
+        }
+
+        // Check authentication status by calling the backend
+        // The backend will check the httpOnly cookies automatically
+        console.log('🔐 Checking authentication status with backend...');
+
+        try {
+          const response = await fetch('http://127.0.0.1:8000/api/organizations/profile/', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include', // Send cookies with request
+          });
+
+          if (response.ok) {
+            const profileData = await response.json();
+            console.log('🔐 ✅ ORGANIZATION USER AUTHENTICATED VIA COOKIES');
+            console.log('🔐 Profile data:', profileData);
+
+            // Map the profile data to UserData format
+            const userData: UserData = {
+              id: profileData.id || profileData.user_id,
+              email: profileData.email,
+              full_name: profileData.full_name || profileData.name || '',
+              role: profileData.role || 'hospital_admin',
+              is_verified: profileData.is_verified || true,
+              position: profileData.position || 'Administrator',
+              hospital: profileData.hospital
+            };
+
+            setIsAuthenticated(true);
+            setUserData(userData);
+            setNeedsVerification(false);
+            setCurrentEmail(null);
+            setLastAuthTime(Date.now());
+
+            // Clear session storage for OTP verification
+            sessionStorage.removeItem('org_auth_email');
+            sessionStorage.removeItem('org_auth_needs_verification');
+
+            // Setup automatic token refresh
+            setupTokenRefreshTimer();
+
+            console.log('🔐 ✅ ORGANIZATION USER RESTORED SUCCESSFULLY');
+          } else {
+            console.log('🔐 No valid authentication found (401/403)');
+
+            // Check if we're in the middle of OTP verification
+            const storedEmail = sessionStorage.getItem('org_auth_email');
+            const needsVerify = sessionStorage.getItem('org_auth_needs_verification');
+
+            if (storedEmail && needsVerify === 'true') {
+              console.log('🔐 Resuming OTP verification for email:', storedEmail);
+              setCurrentEmail(storedEmail);
+              setNeedsVerification(true);
+              setIsAuthenticated(false);
+              setUserData(null);
+            } else {
+              // No auth data and no verification in progress
+              console.log('🔐 No existing auth found, user needs to login');
+              setIsAuthenticated(false);
+              setUserData(null);
+              setNeedsVerification(false);
+              setCurrentEmail(null);
+            }
+          }
+        } catch (fetchError) {
+          console.log('🔐 Error checking auth status:', fetchError);
+
+          // Check if we're in the middle of OTP verification
+          const storedEmail = sessionStorage.getItem('org_auth_email');
+          const needsVerify = sessionStorage.getItem('org_auth_needs_verification');
+
+          if (storedEmail && needsVerify === 'true') {
+            console.log('🔐 Resuming OTP verification for email:', storedEmail);
+            setCurrentEmail(storedEmail);
+            setNeedsVerification(true);
+            setIsAuthenticated(false);
+            setUserData(null);
+          } else {
+            setIsAuthenticated(false);
+            setUserData(null);
+            setNeedsVerification(false);
+            setCurrentEmail(null);
+          }
         }
       } catch (error) {
-        console.error('🔐 ❌ Auth initialization error:', error);
+        console.error('🔐 ❌ Organization auth initialization error:', error);
         setError('Failed to initialize authentication');
         setIsAuthenticated(false);
         setUserData(null);
@@ -208,7 +282,7 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
       } finally {
         setIsInitialized(true);
         setIsLoading(false);
-        console.log('🔐 === AUTH INITIALIZATION COMPLETE ===');
+        console.log('🔐 === ORGANIZATION AUTH INITIALIZATION COMPLETE ===');
       }
     };
 
@@ -314,19 +388,14 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
         };
       }
       
-      // Automatically log in after registration
-      const authData = {
-        userData: mockUserData,
-        tokens: {
-          access: 'mock-access-token',
-          refresh: 'mock-refresh-token'
-        }
-      };
-      
-      localStorage.setItem('organizationAuth', JSON.stringify(authData));
-      
+      // Note: For real implementation, backend would set cookies
+      // For now with mock data, just set the state
       setIsAuthenticated(true);
       setUserData(mockUserData);
+      setLastAuthTime(Date.now());
+
+      // Setup automatic token refresh (even for mock)
+      setupTokenRefreshTimer();
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -339,54 +408,46 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
     }
   };
 
-  const logout = (): void => {
-    console.log('🔐 Logging out user...');
-    // Clear all auth-related storage
-    localStorage.removeItem('organizationAuth');
+  const logout = async (): Promise<void> => {
+    console.log('🔐 Organization: Logging out user...');
+
+    // Set flag to indicate this is an intentional logout (not session expiry)
+    sessionStorage.setItem('org_logout_flag', 'true');
+
+    // Clear the refresh timer
+    if (refreshTimerRef.current) {
+      clearTimeout(refreshTimerRef.current);
+      refreshTimerRef.current = null;
+    }
+
+    // Call backend logout endpoint to clear cookies
+    try {
+      await fetch('http://127.0.0.1:8000/api/logout/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Send cookies with request
+      });
+      console.log('✅ Organization: Logout request successful - cookies cleared by backend');
+    } catch (err) {
+      console.error('❌ Organization: Error during logout API call:', err);
+    }
+
+    // Clear all auth-related session storage
     sessionStorage.removeItem('org_auth_email');
     sessionStorage.removeItem('org_auth_needs_verification');
     sessionStorage.removeItem('org_auth_timestamp');
-    
-    // Also clear backup auth state
     sessionStorage.removeItem('org_auth_initialized');
     sessionStorage.removeItem('org_auth_state');
-    
+
+    // Update state
     setIsAuthenticated(false);
     setUserData(null);
     setNeedsVerification(false);
     setCurrentEmail(null);
     setError(null);
   };
-
-  // Add token validation function
-  const validateToken = React.useCallback(async () => {
-    const storedAuth = localStorage.getItem('organizationAuth');
-    if (!storedAuth) return false;
-
-    try {
-      const authData = JSON.parse(storedAuth);
-      if (!authData.userData || !authData.tokens?.access) {
-        return false;
-      }
-
-      // TODO: Add actual token validation against backend
-      // For now, just check if the token exists and userData is valid
-      return !!(authData.userData.id && authData.userData.email && authData.userData.role);
-    } catch (error) {
-      console.error('🔐 Token validation error:', error);
-      return false;
-    }
-  }, []);
-
-  // Prevent automatic logout on page refresh
-  const refreshTokenIfNeeded = React.useCallback(async () => {
-    const isValid = await validateToken();
-    if (!isValid && isAuthenticated) {
-      console.warn('🔐 Invalid token detected, but not auto-logging out');
-      // Don't automatically log out - let user try to use the app
-      // They'll get proper error messages if APIs fail
-    }
-  }, [validateToken, isAuthenticated]);
 
   const clearError = (): void => {
     setError(null);
@@ -417,7 +478,8 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
           email,
           verification_code: verificationCode,
           remember_device: rememberDevice
-        })
+        }),
+        credentials: 'include', // Ensure cookies are sent/received
       });
 
       const data = await response.json();
@@ -427,53 +489,34 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
         throw new Error(data.message || 'Verification failed');
       }
       
-      if (!data.user_data || !data.tokens) {
+      if (!data.user_data) {
         throw new Error('Invalid response from server');
       }
 
-      // Store auth data in localStorage
-      const authData = {
-        userData: data.user_data,
-        tokens: data.tokens
-      };
-      
-      console.log('🔐 Storing auth data to localStorage:', {
-        hasUserData: !!authData.userData,
-        hasTokens: !!authData.tokens,
-        userRole: authData.userData?.role,
-        hospitalId: authData.userData?.hospital?.id
+      console.log('🔐 User data received from backend:', {
+        hasUserData: !!data.user_data,
+        userRole: data.user_data?.role,
+        hospitalId: data.user_data?.hospital?.id
       });
-      
-      // Store in localStorage for primary persistence
-      localStorage.setItem('organizationAuth', JSON.stringify(authData));
-      
-      // ALSO store in sessionStorage as a backup mechanism
-      try {
-        sessionStorage.setItem('org_auth_initialized', 'true');
-        sessionStorage.setItem('org_auth_state', JSON.stringify({
-          isAuthenticated: true,
-          userData: data.user_data
-        }));
-      } catch (err) {
-        console.warn('🔐 Failed to set backup session storage:', err);
-      }
-      
-      // Verify it was stored correctly
-      const storedCheck = localStorage.getItem('organizationAuth');
-      console.log('🔐 Verification - localStorage write successful:', !!storedCheck);
-      
+
+      console.log('🔐 ✅ Cookies have been set by backend automatically');
+
       // Clear the verification state from sessionStorage
       sessionStorage.removeItem('org_auth_email');
       sessionStorage.removeItem('org_auth_needs_verification');
       sessionStorage.removeItem('org_auth_timestamp');
-      
+
       // Update React state - IMPORTANT: Do this in the right order
       // Set these values SYNCHRONOUSLY to avoid race conditions
       setUserData(data.user_data);
       setIsAuthenticated(true);
       setNeedsVerification(false);
       setCurrentEmail(null);
-      
+      setLastAuthTime(Date.now());
+
+      // Setup automatic token refresh
+      setupTokenRefreshTimer();
+
       console.log('🔐 ✅ AUTHENTICATION SUCCESSFUL, USER LOGGED IN');
       console.log('🔐 === 2FA VERIFICATION COMPLETE ===');
       

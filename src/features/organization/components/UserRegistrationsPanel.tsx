@@ -65,27 +65,15 @@ const UserRegistrationsPanel: React.FC<UserRegistrationsPanelProps> = ({ classNa
   // Fetch registrations from backend
   const fetchRegistrations = async (status: 'pending' | 'approved') => {
     try {
-      let token = null;
-      
-      const organizationAuth = localStorage.getItem('organizationAuth');
-      if (organizationAuth) {
-        try {
-          const authData = JSON.parse(organizationAuth);
-          token = authData.tokens?.access;
-        } catch (e) {
-          console.error('Failed to parse organization auth data:', e);
-        }
-      }
-      
       // FIXED: Use correct endpoint - backend handles hospital filtering via authentication
       const apiUrl = `${API_BASE_URL}/api/hospitals/registrations/?status=${status}`;
       console.log(`🏥 Fetching ${status} registrations from:`, apiUrl);
-      
+
       const response = await fetch(apiUrl, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
       });
 
       if (!response.ok) {
@@ -180,25 +168,13 @@ const UserRegistrationsPanel: React.FC<UserRegistrationsPanelProps> = ({ classNa
   const handleApprove = async (registrationId: number) => {
     setActionLoading(registrationId);
     try {
-      let token = null;
-      
-      const organizationAuth = localStorage.getItem('organizationAuth');
-      if (organizationAuth) {
-        try {
-          const authData = JSON.parse(organizationAuth);
-          token = authData.tokens?.access;
-        } catch (e) {
-          console.error('Failed to parse organization auth data:', e);
-        }
-      }
-
       // FIXED: Use correct endpoint from backend URLs
       const response = await fetch(`${API_BASE_URL}/api/hospitals/registrations/${registrationId}/approve/`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
       });
 
       if (!response.ok) {

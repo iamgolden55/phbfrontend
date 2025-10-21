@@ -90,39 +90,6 @@ export interface GuidelineCategory {
   count: number;
 }
 
-// Helper function to get auth token (fixed to prioritize doctor auth correctly)
-const getAuthToken = (): string | null => {
-  let token = null;
-  
-  // First priority: Standard auth token (for doctors and other medical staff)
-  token = localStorage.getItem('phb_auth_token');
-  
-  // Second priority: Professional token (alternative doctor auth)
-  if (!token) {
-    token = localStorage.getItem('phb_professional_token');
-  }
-  
-  // Third priority: Organization auth (for hospital admins)
-  if (!token) {
-    const organizationAuth = localStorage.getItem('organizationAuth');
-    if (organizationAuth) {
-      try {
-        const authData = JSON.parse(organizationAuth);
-        token = authData.tokens?.access;
-      } catch (e) {
-        console.error('Failed to parse organization auth data:', e);
-      }
-    }
-  }
-  
-  // Final fallback: Legacy token key
-  if (!token) {
-    token = localStorage.getItem('phb_token');
-  }
-  
-  return token;
-};
-
 class GuidelinesService {
   // Fetch all guidelines accessible to the current user
   async getGuidelines(params?: {
@@ -134,11 +101,6 @@ class GuidelinesService {
     search?: string;
   }): Promise<ClinicalGuideline[]> {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const searchParams = new URLSearchParams();
       if (params) {
         Object.entries(params).forEach(([key, value]) => {
@@ -153,9 +115,9 @@ class GuidelinesService {
 
       const response = await fetch(fullUrl, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
       });
 
       if (!response.ok) {
@@ -174,16 +136,11 @@ class GuidelinesService {
   // Get a specific guideline by ID
   async getGuideline(guidelineId: string): Promise<ClinicalGuideline> {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await fetch(createApiUrl(`api/clinical-guidelines/${guidelineId}/`), {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
       });
 
       if (!response.ok) {
@@ -200,17 +157,12 @@ class GuidelinesService {
   // Create a new guideline
   async createGuideline(data: GuidelineCreateData): Promise<ClinicalGuideline> {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await fetch(createApiUrl('api/clinical-guidelines/'), {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
         body: JSON.stringify(data),
       });
 
@@ -230,17 +182,12 @@ class GuidelinesService {
   // Update an existing guideline
   async updateGuideline(guidelineId: string, data: Partial<GuidelineCreateData>): Promise<ClinicalGuideline> {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await fetch(createApiUrl(`api/clinical-guidelines/${guidelineId}/`), {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
         body: JSON.stringify(data),
       });
 
@@ -258,16 +205,9 @@ class GuidelinesService {
   // Delete a guideline
   async deleteGuideline(guidelineId: string): Promise<void> {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await fetch(createApiUrl(`api/clinical-guidelines/${guidelineId}/`), {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        credentials: 'include', // Send cookies with request
       });
 
       if (!response.ok) {
@@ -282,17 +222,12 @@ class GuidelinesService {
   // Approve a guideline
   async approveGuideline(guidelineId: string): Promise<ClinicalGuideline> {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await fetch(createApiUrl(`api/clinical-guidelines/${guidelineId}/approve/`), {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
       });
 
       if (!response.ok) {
@@ -309,17 +244,12 @@ class GuidelinesService {
   // Publish a guideline
   async publishGuideline(guidelineId: string): Promise<ClinicalGuideline> {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await fetch(createApiUrl(`api/clinical-guidelines/${guidelineId}/publish/`), {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
       });
 
       if (!response.ok) {
@@ -336,17 +266,10 @@ class GuidelinesService {
   // Upload a guideline with file
   async uploadGuideline(formData: FormData): Promise<ClinicalGuideline> {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await fetch(createApiUrl('api/clinical-guidelines/upload/'), {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          // Don't set Content-Type for FormData, let browser set it
-        },
+        credentials: 'include', // Send cookies with request
+        // Don't set Content-Type for FormData, let browser set it
         body: formData,
       });
 
@@ -367,17 +290,10 @@ class GuidelinesService {
   // Update guideline file
   async updateGuidelineFile(guidelineId: string, formData: FormData): Promise<ClinicalGuideline> {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await fetch(createApiUrl(`api/clinical-guidelines/${guidelineId}/update-file/`), {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          // Don't set Content-Type for FormData, let browser set it
-        },
+        credentials: 'include', // Send cookies with request
+        // Don't set Content-Type for FormData, let browser set it
         body: formData,
       });
 
@@ -396,15 +312,8 @@ class GuidelinesService {
   // Download guideline file
   async downloadGuideline(guidelineId: string): Promise<Blob> {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await fetch(createApiUrl(`api/clinical-guidelines/${guidelineId}/download/`), {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        credentials: 'include', // Send cookies with request
       });
 
       if (!response.ok) {
@@ -421,17 +330,12 @@ class GuidelinesService {
   // Toggle bookmark
   async toggleBookmark(guidelineId: string): Promise<GuidelineBookmark> {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await fetch(createApiUrl(`api/clinical-guidelines/${guidelineId}/bookmark/`), {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
       });
 
       if (!response.ok) {
@@ -448,16 +352,9 @@ class GuidelinesService {
   // Remove bookmark
   async removeBookmark(guidelineId: string): Promise<void> {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await fetch(createApiUrl(`api/clinical-guidelines/${guidelineId}/bookmark/`), {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        credentials: 'include', // Send cookies with request
       });
 
       if (!response.ok) {
@@ -472,16 +369,11 @@ class GuidelinesService {
   // Get bookmarked guidelines
   async getBookmarkedGuidelines(): Promise<ClinicalGuideline[]> {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await fetch(createApiUrl('api/clinical-guidelines/my_bookmarks/'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
       });
 
       if (!response.ok) {
@@ -498,16 +390,11 @@ class GuidelinesService {
   // Get guideline categories
   async getCategories(): Promise<GuidelineCategory[]> {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await fetch(createApiUrl('api/clinical-guidelines/categories/'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
       });
 
       if (!response.ok) {
@@ -524,16 +411,11 @@ class GuidelinesService {
   // Get guidelines statistics
   async getGuidelinesStats(): Promise<GuidelineStats> {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await fetch(createApiUrl('api/clinical-guidelines/stats/'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
       });
 
       if (!response.ok) {
@@ -550,16 +432,11 @@ class GuidelinesService {
   // Get guideline access logs (hospital admin only)
   async getAccessLogs(): Promise<GuidelineAccess[]> {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await fetch(createApiUrl('api/guideline-access/'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
       });
 
       if (!response.ok) {
@@ -576,16 +453,11 @@ class GuidelinesService {
   // Get guideline bookmarks (hospital admin only)
   async getBookmarks(): Promise<GuidelineBookmark[]> {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await fetch(createApiUrl('api/guideline-bookmarks/'), {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send cookies with request
       });
 
       if (!response.ok) {
