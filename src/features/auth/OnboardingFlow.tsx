@@ -95,12 +95,20 @@ const OnboardingFlow: React.FC = () => {
     }
   };
 
-  // Function to navigate to GP Record
-  const handleGoToGPRecord = (e: React.MouseEvent) => {
+  // Function to navigate to Hospital Registration page
+  const handleFindHospital = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('Navigating to GP Record page using window.location');
-    window.location.href = '/account/gp-record';
+    console.log('Navigating to Hospital Registration page');
+    window.location.href = '/account/link-phb';
+  };
+
+  // Function to navigate to Health Records page
+  const handleUploadRecords = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Navigating to Health Records page');
+    window.location.href = '/account/health-records';
   };
 
   // Onboarding steps data
@@ -180,13 +188,13 @@ const OnboardingFlow: React.FC = () => {
             </ul>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 mt-2">
-            <button 
+            <button
               className="flex-1 bg-[#005eb8] text-white py-2 px-4 rounded hover:bg-[#004c93] transition-colors"
-              onClick={handleGoToGPRecord}
+              onClick={handleFindHospital}
             >
               Find hospitals near me
             </button>
-            <button 
+            <button
               onClick={() => handleNext()}
               className="flex-1 border border-[#005eb8] text-[#005eb8] py-2 px-4 rounded hover:bg-blue-50 transition-colors"
             >
@@ -219,10 +227,16 @@ const OnboardingFlow: React.FC = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 mt-2">
-            <button className="flex-1 bg-[#005eb8] text-white py-2 px-4 rounded hover:bg-[#004c93] transition-colors">
+            <button
+              className="flex-1 bg-[#005eb8] text-white py-2 px-4 rounded hover:bg-[#004c93] transition-colors"
+              onClick={handleUploadRecords}
+            >
               Upload records now
             </button>
-            <button className="flex-1 border border-[#005eb8] text-[#005eb8] py-2 px-4 rounded hover:bg-blue-50 transition-colors">
+            <button
+              onClick={() => handleNext()}
+              className="flex-1 border border-[#005eb8] text-[#005eb8] py-2 px-4 rounded hover:bg-blue-50 transition-colors"
+            >
               Explore later
             </button>
           </div>
