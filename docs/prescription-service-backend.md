@@ -473,6 +473,6 @@ The system includes a comprehensive notification service:
 
 For technical questions regarding this implementation, please contact:
 
-- **Technical Lead**: tech.lead@phb.org.uk
-- **Integration Support**: integration@phb.org.uk
-- **Security Team**: security@phb.org.uk
+- **Technical Lead**: tech.lead@phb.org.ng
+- **Integration Support**: integration@phb.org.ng
+- **Security Team**: security@phb.org.ng
