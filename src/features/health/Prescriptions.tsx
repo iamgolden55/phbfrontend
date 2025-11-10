@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../auth/authContext';
 import { Link } from 'react-router-dom';
 import AccountHealthLayout from '../../layouts/AccountHealthLayout';
-import { fetchPatientPrescriptions, orderPrescription, completePrescription, ApiMedication, ApiPrescriptionsResponse } from './prescriptionsService';
+import { fetchPatientPrescriptions, orderPrescription, completePrescription, generateNotifications, ApiMedication, ApiPrescriptionsResponse, ApiPharmacy } from './prescriptionsService';
+import PrintablePrescription from './PrintablePrescription';
 
 interface PrescriptionType {
   id: string;
@@ -20,6 +21,25 @@ interface PrescriptionType {
   indication?: string;
   strength?: string;
   generic_name?: string;
+  nominated_pharmacy?: ApiPharmacy | null;
+  signed_prescription_data?: {
+    payload: {
+      type: string;
+      id: string;
+      nonce: string;
+      hpn: string;
+      medication: string;
+      strength?: string;
+      patient: string;
+      prescriber: string;
+      dosage: string;
+      frequency: string;
+      pharmacy: any | null;
+      issued: string;
+      expiry: string;
+    };
+    signature: string;
+  } | null;
 }
 
 interface NotificationType {
@@ -29,22 +49,6 @@ interface NotificationType {
   date: string;
 }
 
-// Sample notifications
-const mockNotifications: NotificationType[] = [
-  {
-    id: 'n1',
-    type: 'success',
-    message: 'Your prescription for Omeprazole 20mg has been collected and is ready for use.',
-    date: '2023-10-06'
-  },
-  {
-    id: 'n2',
-    type: 'info',
-    message: 'Your Cetirizine prescription will be dispensed at your next appointment.',
-    date: '2023-10-18'
-  },
-];
-
 const Prescriptions: React.FC = () => {
   const { user } = useAuth();
   const [view, setView] = useState<'all' | 'active' | 'inProgress' | 'history'>('active');
@@ -53,9 +57,12 @@ const Prescriptions: React.FC = () => {
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [prescriptions, setPrescriptions] = useState<PrescriptionType[]>([]);
+  const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+  const [showPrintFormatDialog, setShowPrintFormatDialog] = useState(false);
+  const [printFormat, setPrintFormat] = useState<'electronic' | 'paper' | null>(null);
 
   useEffect(() => {
     const loadPrescriptions = async () => {
@@ -89,9 +96,10 @@ const Prescriptions: React.FC = () => {
           }
 
           // Get the prescriber name safely
-          const prescriber = apiMed.prescriber_name || 
+          const prescriber = apiMed.prescriber_name ||
                           // @ts-ignore - doctor_name is added to the interface
-                          apiMed.doctor_name || 'Dr.' + apiMed.prescribed_by.first_name + ' ' + apiMed.prescribed_by.last_name ||
+                          apiMed.doctor_name ||
+                          (apiMed.prescribed_by ? `Dr. ${apiMed.prescribed_by.first_name} ${apiMed.prescribed_by.last_name}` : null) ||
                           'Your Doctor';
           
           return {
@@ -110,11 +118,19 @@ const Prescriptions: React.FC = () => {
             patient_instructions: apiMed.patient_instructions,
             indication: apiMed.indication,
             strength: apiMed.strength,
-            generic_name: apiMed.generic_name
+            generic_name: apiMed.generic_name,
+            nominated_pharmacy: apiMed.nominated_pharmacy || null,
+            // Security fields for prescription verification
+            signed_prescription_data: apiMed.signed_prescription_data
           };
         });
         console.log('Formatted prescriptions:', formattedPrescriptions);
         setPrescriptions(formattedPrescriptions);
+
+        // Generate notifications from actual prescription data
+        const generatedNotifications = generateNotifications(apiPrescriptions);
+        setNotifications(generatedNotifications);
+        console.log('Generated notifications:', generatedNotifications);
       } catch (err: any) {
         console.error('Failed to load prescriptions:', err);
         setError(err.message || 'Failed to load prescriptions');
@@ -279,11 +295,11 @@ const Prescriptions: React.FC = () => {
         )}
 
         {/* Notifications */}
-        {!isLoading && mockNotifications.length > 0 && (
+        {!isLoading && notifications.length > 0 && (
           <div className="mb-6">
             <h3 className="font-bold mb-3">Notifications</h3>
             <div className="space-y-3">
-              {mockNotifications.map(notification => (
+              {notifications.map(notification => (
                 <div
                   key={notification.id}
                   className={`p-3 rounded-md ${
@@ -674,39 +690,194 @@ const Prescriptions: React.FC = () => {
                 </div>
               </div>
 
+              {/* Pharmacy information */}
+              {selectedPrescription.nominated_pharmacy && (
+                <div className="mb-6">
+                  <h4 className="font-bold mb-3 text-gray-700">Nominated Pharmacy</h4>
+                  <div className="bg-green-50 border border-green-200 p-4 rounded-md">
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0">
+                        <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                      </div>
+                      <div className="ml-3 flex-1">
+                        <p className="font-bold text-green-800">{selectedPrescription.nominated_pharmacy.name}</p>
+                        <p className="text-sm text-green-700 mt-1">{selectedPrescription.nominated_pharmacy.address_line_1}</p>
+                        <p className="text-sm text-green-700">{selectedPrescription.nominated_pharmacy.city}, {selectedPrescription.nominated_pharmacy.postcode}</p>
+                        <p className="text-sm text-green-700 mt-2">
+                          <span className="font-medium">Phone:</span> {selectedPrescription.nominated_pharmacy.phone}
+                        </p>
+                        {selectedPrescription.nominated_pharmacy.electronic_prescriptions_enabled && (
+                          <div className="mt-2 flex items-center">
+                            <svg className="h-4 w-4 text-green-600 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span className="text-xs text-green-700">Electronic prescriptions enabled</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    This prescription will be sent to your nominated pharmacy electronically.{' '}
+                    <Link to="/account/nominated-pharmacy" className="text-[#005eb8] hover:underline">
+                      Change pharmacy
+                    </Link>
+                  </p>
+                </div>
+              )}
+
+              {!selectedPrescription.nominated_pharmacy && (
+                <div className="mb-6">
+                  <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-md">
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0">
+                        <svg className="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                      </div>
+                      <div className="ml-3 flex-1">
+                        <p className="font-medium text-yellow-800">No nominated pharmacy</p>
+                        <p className="text-sm text-yellow-700 mt-1">
+                          You haven't set a nominated pharmacy yet. Set one now to have your prescriptions sent electronically.
+                        </p>
+                        <Link
+                          to="/account/nominated-pharmacy"
+                          className="inline-block mt-2 text-sm text-[#005eb8] hover:underline font-medium"
+                        >
+                          Set your nominated pharmacy →
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Action buttons */}
-              <div className="flex justify-end gap-3 mt-6">
-                {selectedPrescription.status === 'active' && (
-                  <button
-                    onClick={() => {
-                      setShowDetailModal(false);
-                      setShowCollectModal(true);
-                    }}
-                    className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e]"
-                  >
-                    Collect
-                  </button>
-                )}
-                {selectedPrescription.status === 'collected' && (
-                  <button
-                    onClick={() => {
-                      setShowDetailModal(false);
-                      setShowCompleteModal(true);
-                    }}
-                    className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e]"
-                  >
-                    Complete
-                  </button>
-                )}
+              <div className="flex justify-between items-center gap-3 mt-6">
+                {/* Print button on the left */}
                 <button
-                  onClick={() => setShowDetailModal(false)}
+                  onClick={() => setShowPrintFormatDialog(true)}
+                  className="px-4 py-2 border-2 border-[#005eb8] text-[#005eb8] rounded-md hover:bg-blue-50 flex items-center gap-2"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                  </svg>
+                  Print Prescription
+                </button>
+
+                {/* Action buttons on the right */}
+                <div className="flex gap-3">
+                  {selectedPrescription.status === 'active' && (
+                    <button
+                      onClick={() => {
+                        setShowDetailModal(false);
+                        setShowCollectModal(true);
+                      }}
+                      className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e]"
+                    >
+                      Collect
+                    </button>
+                  )}
+                  {selectedPrescription.status === 'collected' && (
+                    <button
+                      onClick={() => {
+                        setShowDetailModal(false);
+                        setShowCompleteModal(true);
+                      }}
+                      className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e]"
+                    >
+                      Complete
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setShowDetailModal(false)}
+                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Print Format Selection Dialog */}
+        {showPrintFormatDialog && selectedPrescription && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg max-w-md w-full p-6">
+              <h3 className="text-xl font-bold text-blue-800 mb-4">Select Prescription Format</h3>
+              <p className="text-gray-600 mb-6 text-sm">
+                Choose which prescription format you would like to print:
+              </p>
+
+              <div className="space-y-3 mb-6">
+                {/* Electronic Token Option */}
+                <button
+                  onClick={() => {
+                    setPrintFormat('electronic');
+                    setShowPrintFormatDialog(false);
+                  }}
+                  className="w-full p-4 border-2 border-[#005eb8] rounded-lg hover:bg-blue-50 text-left transition-colors"
+                >
+                  <div className="flex items-start gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#005eb8] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    <div>
+                      <div className="font-bold text-[#005eb8] mb-1">Electronic Prescription Token</div>
+                      <div className="text-sm text-gray-600">
+                        Modern digital format with QR code. Can be used at any pharmacy in Nigeria.
+                        Includes prescription ID and barcode for easy verification.
+                      </div>
+                    </div>
+                  </div>
+                </button>
+
+                {/* Paper Prescription Option */}
+                <button
+                  onClick={() => {
+                    setPrintFormat('paper');
+                    setShowPrintFormatDialog(false);
+                  }}
+                  className="w-full p-4 border-2 border-green-600 rounded-lg hover:bg-green-50 text-left transition-colors"
+                >
+                  <div className="flex items-start gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <div>
+                      <div className="font-bold text-green-700 mb-1">Paper Prescription (FP10-Style)</div>
+                      <div className="text-sm text-gray-600">
+                        Traditional NHS-style paper prescription format.
+                        Ideal for pharmacies without electronic systems or as a backup.
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowPrintFormatDialog(false)}
                   className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                 >
-                  Close
+                  Cancel
                 </button>
               </div>
             </div>
           </div>
+        )}
+
+        {/* Printable Prescription Component */}
+        {printFormat && selectedPrescription && user && (
+          <PrintablePrescription
+            prescription={selectedPrescription}
+            user={user}
+            format={printFormat}
+            onClose={() => setPrintFormat(null)}
+          />
         )}
       </div>
     </AccountHealthLayout>
