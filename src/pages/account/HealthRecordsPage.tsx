@@ -69,18 +69,14 @@ const HealthRecordsPage: React.FC = () => {
   const fetchDocuments = async () => {
     try {
       setIsLoading(true);
-      
-      const token = localStorage.getItem('phb_auth_token') ||  // Real PHB token first!
-                   localStorage.getItem('access_token') || 
-                   localStorage.getItem('authToken') ||
-                   localStorage.getItem('med_access_token');  // Mock token last
 
+      // Use cookie-based authentication (JWT tokens are in httpOnly cookies)
       const response = await fetch(createApiUrl('api/secure/files/'), {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          ...(token && { 'Authorization': `Bearer ${token}` }),
         },
+        credentials: 'include', // CRITICAL: Send cookies with request
       });
 
       const result = await response.json();
@@ -117,16 +113,10 @@ const HealthRecordsPage: React.FC = () => {
     setViewingDocument(document);
     
     try {
-      const token = localStorage.getItem('phb_auth_token') ||
-                   localStorage.getItem('access_token') || 
-                   localStorage.getItem('authToken') ||
-                   localStorage.getItem('med_access_token');
-
+      // Use cookie-based authentication (JWT tokens are in httpOnly cookies)
       const response = await fetch(createApiUrl(`api/secure/files/${document.id}/preview/`), {
         method: 'GET',
-        headers: {
-          ...(token && { 'Authorization': `Bearer ${token}` }),
-        },
+        credentials: 'include', // CRITICAL: Send cookies with request
       });
 
       if (response.ok) {
@@ -211,11 +201,6 @@ const HealthRecordsPage: React.FC = () => {
         formData.append('files', file);
       });
 
-      const token = localStorage.getItem('phb_auth_token') ||  // Real PHB token first!
-                   localStorage.getItem('access_token') || 
-                   localStorage.getItem('authToken') ||
-                   localStorage.getItem('med_access_token');  // Mock token last
-
       const phases = [
         { progress: 25, message: 'Validating files...' },
         { progress: 50, message: 'Scanning for security...' },
@@ -228,11 +213,10 @@ const HealthRecordsPage: React.FC = () => {
         await new Promise(resolve => setTimeout(resolve, 400));
       }
 
+      // Use cookie-based authentication (JWT tokens are in httpOnly cookies)
       const response = await fetch(createApiUrl('api/secure/upload/'), {
         method: 'POST',
-        headers: {
-          ...(token && { 'Authorization': `Bearer ${token}` }),
-        },
+        credentials: 'include', // CRITICAL: Send cookies with request
         body: formData,
       });
 
@@ -306,17 +290,13 @@ const HealthRecordsPage: React.FC = () => {
     setIsDeleting(true);
     
     try {
-      const token = localStorage.getItem('phb_auth_token') ||
-                   localStorage.getItem('access_token') || 
-                   localStorage.getItem('authToken') ||
-                   localStorage.getItem('med_access_token');
-
+      // Use cookie-based authentication (JWT tokens are in httpOnly cookies)
       const response = await fetch(createApiUrl(`api/secure/files/${documentToDelete.id}/delete/`), {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          ...(token && { 'Authorization': `Bearer ${token}` }),
         },
+        credentials: 'include', // CRITICAL: Send cookies with request
       });
 
       const result = await response.json();

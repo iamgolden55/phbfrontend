@@ -19,16 +19,13 @@ const MedicalOTPAccess: React.FC<MedicalOTPProps> = ({ onAccessGranted }) => {
     setMessage('');
 
     try {
-      const token = localStorage.getItem('phb_auth_token') ||  
-                   localStorage.getItem('access_token') || 
-                   localStorage.getItem('authToken');
-
+      // Use cookie-based authentication (JWT tokens are in httpOnly cookies)
       const response = await fetch(createApiUrl('api/patient/medical-record/request-otp/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
+        credentials: 'include', // CRITICAL: Send cookies with request
       });
 
       const result = await response.json();
@@ -56,16 +53,13 @@ const MedicalOTPAccess: React.FC<MedicalOTPProps> = ({ onAccessGranted }) => {
     setError('');
 
     try {
-      const token = localStorage.getItem('phb_auth_token') ||  
-                   localStorage.getItem('access_token') || 
-                   localStorage.getItem('authToken');
-
+      // Use cookie-based authentication (JWT tokens are in httpOnly cookies)
       const response = await fetch(createApiUrl('api/patient/medical-record/verify-otp/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
+        credentials: 'include', // CRITICAL: Send cookies with request
         body: JSON.stringify({ otp }),
       });
 
@@ -74,13 +68,10 @@ const MedicalOTPAccess: React.FC<MedicalOTPProps> = ({ onAccessGranted }) => {
       if (response.ok) {
         // Store the medical access token and expiry time
         const expiryTime = Date.now() + (result.expires_in * 1000); // Convert seconds to milliseconds
-        
+
         localStorage.setItem('med_access_token', result.med_access_token);
         localStorage.setItem('med_access_expiry', expiryTime.toString());
-        
-        // Also store the PHB token for secure file uploads
-        localStorage.setItem('phb_auth_token', token);
-        
+
         setMessage('Access granted successfully!');
         setTimeout(() => {
           onAccessGranted();
