@@ -42,6 +42,7 @@ const Header: React.FC = () => {
   const { isDarkMode } = useDarkMode();
   const location = useLocation();
 
+
   // Check if we're in professional view
   const isProfessionalView = location.pathname.includes('/professional');
 
@@ -192,8 +193,8 @@ const Header: React.FC = () => {
                 </svg>
               </button>
 
-              {/* Enhanced View Toggle for Doctors */}
-              {isAuthenticated && isDoctor && <EnhancedViewToggle compact={true} className="ml-1" />}
+              {/* Enhanced View Toggle for All Professionals */}
+              {isAuthenticated && (isDoctor || !!professionalUser) && <EnhancedViewToggle compact={true} className="ml-1" />}
 
               {/* Login/Account button */}
               {isAuthenticated ? (

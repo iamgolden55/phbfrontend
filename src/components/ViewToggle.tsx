@@ -31,8 +31,8 @@ const ViewToggle: React.FC = () => {
   // Track tooltip visibility
   const [showTooltip, setShowTooltip] = useState(false);
   
-  // Check if we should show the toggle - either user is a doctor or professional user is logged in
-  const showToggle = isDoctor || (user?.role === 'doctor') || (user?.hpn) || professionalUser?.role === 'doctor';
+  // Check if we should show the toggle - show for any verified professional
+  const showToggle = !!(isDoctor || (user?.role === 'doctor') || (user?.hpn) || professionalUser);
   
   // If the doctor HPN exists, it confirms this user is a doctor
   const hasHPN = !!user?.hpn;
@@ -46,49 +46,40 @@ const ViewToggle: React.FC = () => {
       setIsProfessionalView(isCurrentlyInProfessionalView);
       // Update stored preference to match current location
       localStorage.setItem(VIEW_PREFERENCE_KEY, isCurrentlyInProfessionalView ? 'doctor' : 'patient');
-      
+
       // If switching to professional view, set auth state
       if (isCurrentlyInProfessionalView && (isDoctor || user?.role === 'doctor' || user?.hpn || professionalUser)) {
         localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
       }
     }
-  }, [location.pathname, isProfessionalView, isDoctor, user, professionalUser]);
+  }, [location.pathname, isDoctor, user, professionalUser]); // Removed isProfessionalView to prevent infinite loop
 
-  // Create a custom event that will keep the view state consistent
+  // Set up popstate listener for browser back/forward buttons (runs once on mount)
   useEffect(() => {
-    // Broadcast the initial view state on component mount
-    const initialViewState = isProfessionalView ? 'doctor' : 'patient';
-    localStorage.setItem(VIEW_PREFERENCE_KEY, initialViewState);
-    
-    // If doctor and in professional view, set auth state
-    if (isProfessionalView && (isDoctor || user?.role === 'doctor' || user?.hpn || professionalUser)) {
-      localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
-    }
-    
     // Function to handle popstate (browser back/forward buttons)
     const handlePopState = () => {
       const currentPreference = localStorage.getItem(VIEW_PREFERENCE_KEY);
       const isInProfessionalPath = location.pathname.includes('/professional');
-      
+
       // If there's a mismatch between path and preference, fix it
-      if ((isInProfessionalPath && currentPreference !== 'doctor') || 
+      if ((isInProfessionalPath && currentPreference !== 'doctor') ||
           (!isInProfessionalPath && currentPreference === 'doctor')) {
         localStorage.setItem(VIEW_PREFERENCE_KEY, isInProfessionalPath ? 'doctor' : 'patient');
         setIsProfessionalView(isInProfessionalPath);
       }
-      
+
       // Ensure auth state is set when navigating to professional pages
       if (isInProfessionalPath && (isDoctor || user?.role === 'doctor' || user?.hpn || professionalUser)) {
         localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
       }
     };
-    
+
     // Listen for browser navigation events
     window.addEventListener('popstate', handlePopState);
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [isProfessionalView, isDoctor, user, professionalUser, location.pathname]);
+  }, []); // Empty dependency array - only set up listener once
   
   // Handle toggle switch
   const handleToggleView = () => {
@@ -144,7 +135,7 @@ const ViewToggle: React.FC = () => {
       <div className="mr-2 text-sm font-medium">
         <span className={`${!isProfessionalView ? 'text-blue-600' : 'text-gray-500'}`}>Patient</span>
         <span className="mx-1 text-gray-400">/</span>
-        <span className={`${isProfessionalView ? 'text-blue-600' : 'text-gray-500'}`}>Doctor</span>
+        <span className={`${isProfessionalView ? 'text-blue-600' : 'text-gray-500'}`}>Professional</span>
       </div>
       <button
         onClick={handleToggleView}
@@ -166,7 +157,7 @@ const ViewToggle: React.FC = () => {
         aria-label="Toggle view mode"
       >
         <span className="sr-only">
-          {isProfessionalView ? 'Switch to patient view' : 'Switch to doctor view'}
+          {isProfessionalView ? 'Switch to patient view' : 'Switch to professional view'}
         </span>
         <span
           className={`
@@ -182,7 +173,7 @@ const ViewToggle: React.FC = () => {
       {/* Tooltip */}
       {showTooltip && (
         <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap z-50">
-          Switch between patient and doctor views
+          Switch between patient and professional views
           <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
         </div>
       )}

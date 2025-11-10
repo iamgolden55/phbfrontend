@@ -242,6 +242,7 @@ const FluentOrganizationLayoutInner: React.FC = () => {
           { label: 'Department Management', path: '/organization/wards', icon: <Bed24Regular /> },
           { label: 'Staff Roster', path: '/organization/staffing', icon: <Badge24Regular /> },
           { label: 'Clinical Guidelines', path: '/organization/clinical-guidelines', icon: <ClipboardTextLtr24Regular /> },
+          { label: 'Licenses', path: '/organization/licenses', icon: <DocumentText24Regular /> },
           { label: 'Inventory Check', path: '/organization/inventory', icon: <Box24Regular /> },
           { label: 'Analytics', path: '/organization/analytics', icon: <ChartMultiple24Regular /> },
           { label: 'Emergency', path: '/organization/emergency', icon: <Alert24Regular /> },

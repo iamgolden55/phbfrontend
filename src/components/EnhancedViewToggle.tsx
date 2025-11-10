@@ -39,12 +39,12 @@ const EnhancedViewToggle: React.FC<EnhancedViewToggleProps> = ({
   // Track touch/tap feedback
   const [isTouched, setIsTouched] = useState(false);
   
-  // Check if we should show the toggle - either user is a doctor or professional user is logged in
-  const showToggle = isDoctor || (user?.role === 'doctor') || (user?.hpn) || professionalUser?.role === 'doctor';
-  
+  // Check if we should show the toggle - show for any verified professional
+  const showToggle = !!(isDoctor || (user?.role === 'doctor') || (user?.hpn) || professionalUser);
+
   // If the doctor HPN exists, it confirms this user is a doctor
   const hasHPN = !!user?.hpn;
-  
+
   // Handle route changes
   useEffect(() => {
     // If the user navigates directly to a professional route,
@@ -54,76 +54,67 @@ const EnhancedViewToggle: React.FC<EnhancedViewToggleProps> = ({
       setIsProfessionalView(isCurrentlyInProfessionalView);
       // Update stored preference to match current location
       localStorage.setItem(VIEW_PREFERENCE_KEY, isCurrentlyInProfessionalView ? 'doctor' : 'patient');
-      
+
       // If switching to professional view, set auth state
       if (isCurrentlyInProfessionalView && (isDoctor || user?.role === 'doctor' || user?.hpn || professionalUser)) {
         localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
       }
     }
-  }, [location.pathname, isProfessionalView, isDoctor, user, professionalUser]);
+  }, [location.pathname, isDoctor, user, professionalUser]); // Removed isProfessionalView to prevent infinite loop
 
-  // Create a custom event that will keep the view state consistent
+  // Set up popstate listener for browser back/forward buttons (runs once on mount)
   useEffect(() => {
-    // Broadcast the initial view state on component mount
-    const initialViewState = isProfessionalView ? 'doctor' : 'patient';
-    localStorage.setItem(VIEW_PREFERENCE_KEY, initialViewState);
-    
-    // If doctor and in professional view, set auth state
-    if (isProfessionalView && (isDoctor || user?.role === 'doctor' || user?.hpn || professionalUser)) {
-      localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
-    }
-    
     // Function to handle popstate (browser back/forward buttons)
     const handlePopState = () => {
       const currentPreference = localStorage.getItem(VIEW_PREFERENCE_KEY);
       const isInProfessionalPath = location.pathname.includes('/professional');
-      
+
       // If there's a mismatch between path and preference, fix it
-      if ((isInProfessionalPath && currentPreference !== 'doctor') || 
+      if ((isInProfessionalPath && currentPreference !== 'doctor') ||
           (!isInProfessionalPath && currentPreference === 'doctor')) {
         localStorage.setItem(VIEW_PREFERENCE_KEY, isInProfessionalPath ? 'doctor' : 'patient');
         setIsProfessionalView(isInProfessionalPath);
       }
-      
+
       // Ensure auth state is set when navigating to professional pages
       if (isInProfessionalPath && (isDoctor || user?.role === 'doctor' || user?.hpn || professionalUser)) {
         localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
       }
     };
-    
+
     // Listen for browser navigation events
     window.addEventListener('popstate', handlePopState);
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [isProfessionalView, isDoctor, user, professionalUser, location.pathname]);
+  }, []); // Empty dependency array - only set up listener once
   
   // Handle toggle switch
   const handleToggleView = () => {
     // Set animation state
     setIsAnimating(true);
-    
+
     // Toggle the view
     const newValue = !isProfessionalView;
     setIsProfessionalView(newValue);
-    
+
     // Save preference
     localStorage.setItem(VIEW_PREFERENCE_KEY, newValue ? 'doctor' : 'patient');
-    
-    // Set auth state if switching to professional view and user is a doctor
+
+    // Set auth state if switching to professional view and user is a professional
     if (newValue && (isDoctor || user?.role === 'doctor' || user?.hpn || professionalUser)) {
       localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
     }
-    
+
     // Dispatch a custom event to notify other components
     window.dispatchEvent(new CustomEvent('phb_view_changed'));
-    
+
     // Check if we're in an appointment-related path
     const isAppointmentPath = location.pathname.includes('/appointment');
-    
+
     // Redirect to appropriate dashboard or appointments page based on toggle state
     if (newValue) {
-      // If in appointment page, navigate to doctor appointments
+      // If in appointment page, navigate to professional appointments
       if (isAppointmentPath) {
         navigate('/professional/appointments');
       } else {
@@ -137,7 +128,7 @@ const EnhancedViewToggle: React.FC<EnhancedViewToggleProps> = ({
         navigate('/account');
       }
     }
-    
+
     // Reset animation after a delay
     setTimeout(() => {
       setIsAnimating(false);
@@ -173,26 +164,26 @@ const EnhancedViewToggle: React.FC<EnhancedViewToggleProps> = ({
             ${isTouched ? 'bg-opacity-70' : ''}
             active:scale-95 hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-blue-500
           `}
-          aria-label={isProfessionalView ? 'Switch to patient view' : 'Switch to doctor view'}
+          aria-label={isProfessionalView ? 'Switch to patient view' : 'Switch to professional view'}
         >
           <div className="flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
             </svg>
             <span className="sr-only">
-              {isProfessionalView ? 'Doctor View' : 'Patient View'}
+              {isProfessionalView ? 'Professional View' : 'Patient View'}
             </span>
           </div>
         </button>
 
         {/* Mobile-friendly tooltip that shows on tap */}
         <div className={`
-          absolute top-full left-1/2 transform -translate-x-1/2 mt-2 
-          px-3 py-2 bg-gray-800 text-white text-xs rounded-md shadow-lg 
+          absolute top-full left-1/2 transform -translate-x-1/2 mt-2
+          px-3 py-2 bg-gray-800 text-white text-xs rounded-md shadow-lg
           whitespace-nowrap z-50 transition-opacity duration-200
           ${isTouched ? 'opacity-100' : 'opacity-0 pointer-events-none'}
         `}>
-          {isProfessionalView ? 'Doctor View' : 'Patient View'}
+          {isProfessionalView ? 'Professional View' : 'Patient View'}
           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
         </div>
       </div>
@@ -228,15 +219,15 @@ const EnhancedViewToggle: React.FC<EnhancedViewToggleProps> = ({
           </span>
         </button>
         
-        {/* Doctor button */}
+        {/* Professional button */}
         <button
           onClick={() => isProfessionalView ? null : handleToggleView()}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
           className={`
             flex-1 py-3 px-4 text-center transition-all duration-300 ease-in-out
-            ${isProfessionalView 
-              ? 'bg-blue-500 text-white font-medium' 
+            ${isProfessionalView
+              ? 'bg-blue-500 text-white font-medium'
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}
             ${isAnimating && isProfessionalView ? 'scale-105' : ''}
             ${isTouched && !isProfessionalView ? 'bg-gray-200' : ''}
@@ -248,7 +239,7 @@ const EnhancedViewToggle: React.FC<EnhancedViewToggleProps> = ({
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
             </svg>
-            Doctor
+            Professional
           </span>
         </button>
       </div>
