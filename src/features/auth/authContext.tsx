@@ -37,6 +37,7 @@ interface Hospital {
   name: string;
   address?: string;
   city?: string;
+  state?: string;
   country?: string;
   region?: string;
   registration_date?: string;
@@ -123,9 +124,11 @@ interface AuthContextType {
   checkPrimaryHospital: () => Promise<PrimaryHospitalResponse>;
   fetchNearbyHospitals: (latitude: number, longitude: number, radius?: number) => Promise<{ hospitals: Hospital[]; message?: string; location?: { latitude: number; longitude: number; radius_km: number; } }>;
   fetchAllHospitals: () => Promise<Hospital[]>;
+  searchHospitals: (query: string, options?: { state?: string; city?: string; limit?: number }) => Promise<Hospital[]>;
   registerWithHospital: (hospitalId: number, isPrimary?: boolean) => Promise<{ message: string; data: any }>;
   primaryHospital: Hospital | null;
   hasPrimaryHospital: boolean;
+  primaryHospitalStatus: 'pending' | 'approved' | 'rejected' | null;
   // Doctor role check - check both role and hpn for reliability
   isDoctor: boolean;
   // CAPTCHA-related properties
@@ -242,6 +245,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // New state variables for hospital functionality
   const [primaryHospital, setPrimaryHospital] = useState<Hospital | null>(null);
   const [hasPrimaryHospital, setHasPrimaryHospital] = useState<boolean>(false);
+  const [primaryHospitalStatus, setPrimaryHospitalStatus] = useState<'pending' | 'approved' | 'rejected' | null>(null);
   // CAPTCHA-related state
   const [captchaRequired, setCaptchaRequired] = useState(false);
   const [captchaChallenge, setCaptchaChallenge] = useState('');
@@ -257,25 +261,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     params: any;
     timestamp: number;
   } | null>(null);
-  
+
+  // Add cache for hospital data with support for multiple search queries
+  const hospitalCache = useRef<{
+    searches: Record<string, { hospitals: Hospital[]; timestamp: number }>;
+    nearbyHospitals: { hospitals: Hospital[]; location?: any; timestamp: number } | null;
+  }>({
+    searches: {},
+    nearbyHospitals: null
+  });
+
   // Helper to throttle API calls
   const shouldThrottleApiCall = (endpoint: string, params: any, throttleMs: number = 500) => {
     const now = Date.now();
-    
-    if (lastApiCall.current && 
-        lastApiCall.current.endpoint === endpoint && 
+
+    if (lastApiCall.current &&
+        lastApiCall.current.endpoint === endpoint &&
         JSON.stringify(lastApiCall.current.params) === JSON.stringify(params) &&
         now - lastApiCall.current.timestamp < throttleMs) {
       return true; // Should throttle
     }
-    
+
     // Update the last API call reference
     lastApiCall.current = {
       endpoint,
       params,
       timestamp: now
     };
-    
+
     return false; // Should not throttle
   };
 
@@ -323,6 +336,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setUser(null);
         setPrimaryHospital(null);
         setHasPrimaryHospital(false);
+        setPrimaryHospitalStatus(null);
       }
 
       return false;
@@ -461,6 +475,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setUser(null);
         setPrimaryHospital(null);
         setHasPrimaryHospital(false);
+        setPrimaryHospitalStatus(null);
         // Clear refresh timer
         if (refreshTimerRef.current) {
           clearTimeout(refreshTimerRef.current);
@@ -808,6 +823,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setUser(null);
     setPrimaryHospital(null);
     setHasPrimaryHospital(false);
+    setPrimaryHospitalStatus(null);
 
     // Clear pending authentication data
     setPendingEmail(null);
@@ -1121,10 +1137,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // This prevents re-renders that could trigger more API calls
       const hasPrimaryChanged = response.has_primary !== hasPrimaryHospital;
       const hospitalChanged = JSON.stringify(response.primary_hospital) !== JSON.stringify(primaryHospital);
-      
-      if (hasPrimaryChanged || hospitalChanged) {
+      const statusChanged = response.primary_hospital?.status !== primaryHospitalStatus;
+
+      if (hasPrimaryChanged || hospitalChanged || statusChanged) {
         setHasPrimaryHospital(response.has_primary);
         setPrimaryHospital(response.primary_hospital || null);
+        // Validate and set status - ensure it's one of the expected values
+        const status = response.primary_hospital?.status;
+        if (status === 'pending' || status === 'approved' || status === 'rejected') {
+          setPrimaryHospitalStatus(status);
+        } else {
+          setPrimaryHospitalStatus(null);
+        }
       }
       
       // Only log in development (removed production check to fix TypeScript error)
@@ -1143,17 +1167,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // New function to fetch nearby hospitals
   const fetchNearbyHospitals = async (latitude: number, longitude: number, radius: number = 10) => {
     if (!user) throw new Error("User not authenticated");
-    
+
     // Throttle identical API calls
     const endpoint = `/api/hospitals/nearby/`;
     const params = { latitude, longitude, radius };
-    
+
     if (shouldThrottleApiCall(endpoint, params)) {
-      console.log("Throttling identical API call to fetchNearbyHospitals");
-      return { hospitals: [] }; // Return empty result for throttled calls
+      console.log("Throttling identical API call to fetchNearbyHospitals - returning cached data");
+      // Return cached data instead of empty array
+      return hospitalCache.current.nearbyHospitals || { hospitals: [] };
     }
-    
-    setIsLoading(true);
+
+    // DON'T set global isLoading for hospital fetches - it causes ProtectedRoute to unmount!
+    // setIsLoading(true);
     setError(null);
 
     try {
@@ -1170,32 +1196,43 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         `${endpoint}?latitude=${latitude}&longitude=${longitude}&radius=${radius}`,
         'GET'
       );
-      
+
+      // Cache the response with timestamp
+      hospitalCache.current.nearbyHospitals = {
+        ...response,
+        timestamp: Date.now()
+      };
+
       // Return the full response object to allow displaying the message
       return response;
     } catch (err: any) {
       console.error("Fetch nearby hospitals failed:", err);
       setError(err.message || "Failed to fetch nearby hospitals.");
-      // Return empty array instead of throwing to handle gracefully
-      return { hospitals: [] };
-    } finally {
-      setIsLoading(false);
+      // Return cached data if available, otherwise empty array
+      return hospitalCache.current.nearbyHospitals || { hospitals: [] };
     }
+    // DON'T set global isLoading for hospital fetches
+    // finally {
+    //   setIsLoading(false);
+    // }
   };
 
   // New function to fetch all hospitals
   const fetchAllHospitals = async () => {
     if (!user) throw new Error("User not authenticated");
-    
+
     // Throttle identical API calls
     const endpoint = `/api/hospitals/`;
-    
+    const cacheKey = 'all';
+
     if (shouldThrottleApiCall(endpoint, {})) {
-      console.log("Throttling identical API call to fetchAllHospitals");
-      return []; // Return empty result for throttled calls
+      console.log("Throttling identical API call to fetchAllHospitals - returning cached data");
+      // Return cached data for 'all' hospitals
+      return hospitalCache.current.searches[cacheKey]?.hospitals || [];
     }
-    
-    setIsLoading(true);
+
+    // DON'T set global isLoading for hospital fetches - it causes ProtectedRoute to unmount!
+    // setIsLoading(true);
     setError(null);
 
     try {
@@ -1207,23 +1244,93 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         endpoint,
         'GET'
       );
-      
+
+      // Cache the hospitals array with 'all' key
+      hospitalCache.current.searches[cacheKey] = {
+        hospitals: response.hospitals || [],
+        timestamp: Date.now()
+      };
+
       // Return just the hospitals array
       return response.hospitals || [];
     } catch (err: any) {
       console.error("Fetch all hospitals failed:", err);
       setError(err.message || "Failed to fetch hospitals.");
-      // Return empty array instead of throwing to handle gracefully
-      return [];
-    } finally {
-      setIsLoading(false);
+      // Return cached data for 'all' hospitals if available, otherwise empty array
+      return hospitalCache.current.searches[cacheKey]?.hospitals || [];
     }
+    // DON'T set global isLoading for hospital fetches
+    // finally {
+    //   setIsLoading(false);
+    // }
+  };
+
+  // New function to search hospitals with server-side filtering
+  const searchHospitals = async (
+    query: string,
+    options?: {
+      state?: string;
+      city?: string;
+      limit?: number;
+    }
+  ) => {
+    if (!user) throw new Error("User not authenticated");
+
+    // Build query parameters
+    const params = new URLSearchParams();
+    if (query) params.append('q', query);
+    if (options?.state) params.append('state', options.state);
+    if (options?.city) params.append('city', options.city);
+    if (options?.limit) params.append('limit', options.limit.toString());
+
+    const endpoint = `/api/hospitals/search/?${params.toString()}`;
+
+    // Create unique cache key based on query parameters
+    const cacheKey = `${query || 'all'}_${options?.state || ''}_${options?.city || ''}_${options?.limit || ''}`;
+
+    // Throttle identical API calls
+    if (shouldThrottleApiCall(endpoint, {})) {
+      console.log("Throttling identical API call to searchHospitals - returning cached data");
+      // Return cached data for this specific search if available
+      return hospitalCache.current.searches[cacheKey]?.hospitals || [];
+    }
+
+    // DON'T set global isLoading for hospital searches - it causes ProtectedRoute to unmount!
+    // setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await apiRequest<{
+        hospitals: Hospital[];
+        message?: string;
+        total?: number;
+      }>(endpoint, 'GET');
+
+      // Cache the search results with unique key
+      hospitalCache.current.searches[cacheKey] = {
+        hospitals: response.hospitals || [],
+        timestamp: Date.now()
+      };
+
+      return response.hospitals || [];
+    } catch (err: any) {
+      console.error("Search hospitals failed:", err);
+      setError(err.message || "Failed to search hospitals.");
+      // Return cached data for this specific search if available, otherwise empty array
+      return hospitalCache.current.searches[cacheKey]?.hospitals || [];
+    }
+    // DON'T set global isLoading for hospital searches
+    // finally {
+    //   setIsLoading(false);
+    // }
   };
 
   // New function to register with a hospital
   const registerWithHospital = async (hospitalId: number, isPrimary: boolean = true) => {
     if (!user) throw new Error("User not authenticated");
-    setIsLoading(true);
+    // DON'T set global isLoading - it causes ProtectedRoute to unmount the entire app!
+    // Components using this function should manage their own loading states
+    // setIsLoading(true);
     setError(null);
 
     try {
@@ -1232,21 +1339,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         'POST',
         { hospital: hospitalId, is_primary: isPrimary }
       );
-      
-      // If this is set as the primary hospital and registration was successful
-      if (isPrimary && response.data) {
-        // Check primary hospital status again to update state
-        await checkPrimaryHospital();
-      }
-      
+
+      // Note: Removed automatic checkPrimaryHospital() call to prevent cascading
+      // state updates. Components should manually refresh primary hospital status
+      // if needed after successful registration.
+
       return response;
     } catch (err: any) {
       console.error("Hospital registration failed:", err);
       setError(err.message || "Failed to register with hospital.");
       throw err;
-    } finally {
-      setIsLoading(false);
     }
+    // DON'T set global isLoading - components manage their own loading states
+    // finally {
+    //   setIsLoading(false);
+    // }
   };
 
   // Calculate needsOnboarding based on user state
@@ -1366,9 +1473,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     checkPrimaryHospital,
     fetchNearbyHospitals,
     fetchAllHospitals,
+    searchHospitals,
     registerWithHospital,
     primaryHospital,
     hasPrimaryHospital,
+    primaryHospitalStatus,
     // Doctor role check - check both role and hpn for reliability
     isDoctor: user?.role === 'doctor',
     // CAPTCHA-related properties

@@ -1,14 +1,26 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect, useRef, ReactNode } from 'react';
 import { useAuth } from '../auth/authContext';
+import { API_BASE_URL } from '../../utils/config';
 
 // Define types for professional user and auth context
-export type ProfessionalRole = 'doctor' | 'nurse' | 'researcher' | 'pharmacist';
+export type ProfessionalRole =
+  | 'doctor'
+  | 'nurse'
+  | 'researcher'
+  | 'pharmacist'
+  | 'physiotherapist'
+  | 'lab_technician'
+  | 'radiographer'
+  | 'midwife'
+  | 'dentist'
+  | 'optometrist';
 
 interface ProfessionalUser {
   id: string;
   name: string;
   email: string;
   role: ProfessionalRole;
+  professional_type?: string; // From PHB Registry (e.g., 'pharmacist', 'doctor')
   licenseNumber?: string;
   specialty?: string;
   verified: boolean;
@@ -22,6 +34,7 @@ interface ProfessionalAuthContextType {
   clearError: () => void;
   hasAccess: (requiredRoles: ProfessionalRole[]) => boolean;
   professionalInfo: ProfessionalUser | null;
+  logout: () => void;
 }
 
 // Create the context with a default value
@@ -47,44 +60,127 @@ export const ProfessionalAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
   const [professionalUser, setProfessionalUser] = useState<ProfessionalUser | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  
+  const hasChecked = useRef(false);
+
   // Use the main auth context
   const { user, isLoading: authLoading, isAuthenticated: mainUserAuthenticated, isDoctor } = useAuth();
 
-  // Check if the user is a professional (doctor)
-  useEffect(() => {
-    // Only process when the main auth has completed loading
-    if (!authLoading) {
-      if (mainUserAuthenticated && isDoctor && user) {
-        // Convert regular user to professional user format
-        const professionalUserData: ProfessionalUser = {
-          id: user.id,
-          name: user.full_name,
-          email: user.email,
-          role: 'doctor', // User is detected as a doctor
-          licenseNumber: user.hpn || '', // Healthcare Professional Number
-          specialty: '', // User specialty might not be in the regular user model
-          verified: true,
+  // Fetch professional info from registry
+  const fetchProfessionalInfo = async () => {
+    try {
+      const url = `${API_BASE_URL}/api/registry/my-info/`;
+      console.log('🔍 Fetching professional info from:', url);
+
+      const response = await fetch(url, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('📡 Professional info response status:', response.status);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Professional info received:', data);
+        return {
+          professional_type: data.professional_type,
+          licenseNumber: data.license_number,
+          specialty: data.specialization,
+          verified: data.verified,
         };
-        
-        setProfessionalUser(professionalUserData);
-        
-        // Update view preference if in professional view
-        if (window.location.pathname.includes('/professional')) {
-          localStorage.setItem(VIEW_PREFERENCE_KEY, 'doctor');
-          localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
-        }
       } else {
-        // Not a professional user or not authenticated
-        setProfessionalUser(null);
+        const errorData = await response.json().catch(() => ({}));
+        console.log('❌ Professional info error:', response.status, errorData);
       }
-      
-      setIsLoading(false);
+      return null;
+    } catch (error) {
+      console.error('💥 Error fetching professional info:', error);
+      return null;
     }
+  };
+
+  // Check if the user is a professional (doctor, pharmacist, etc.)
+  useEffect(() => {
+    const loadProfessionalData = async () => {
+      // Prevent infinite loop - only run once
+      if (hasChecked.current) {
+        return;
+      }
+
+      // Only process when the main auth has completed loading
+      if (!authLoading) {
+        hasChecked.current = true;
+
+        if (mainUserAuthenticated && user) {
+          // Try to fetch detailed professional info from registry
+          const registryInfo = await fetchProfessionalInfo();
+
+          if (registryInfo) {
+            // User has an active professional license in PHB Registry
+            const professionalUserData: ProfessionalUser = {
+              id: user.id,
+              name: user.full_name,
+              email: user.email,
+              role: registryInfo.professional_type as ProfessionalRole,
+              professional_type: registryInfo.professional_type,
+              licenseNumber: registryInfo.licenseNumber,
+              specialty: registryInfo.specialty,
+              verified: registryInfo.verified,
+            };
+
+            setProfessionalUser(professionalUserData);
+
+            // Update view preference if in professional view
+            if (window.location.pathname.includes('/professional')) {
+              localStorage.setItem(VIEW_PREFERENCE_KEY, 'doctor');
+              localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
+            }
+          } else if (isDoctor && user.hpn) {
+            // Fallback: User is detected as a doctor via old HPN system
+            const professionalUserData: ProfessionalUser = {
+              id: user.id,
+              name: user.full_name,
+              email: user.email,
+              role: 'doctor',
+              professional_type: 'doctor',
+              licenseNumber: user.hpn,
+              specialty: '',
+              verified: true,
+            };
+
+            setProfessionalUser(professionalUserData);
+
+            if (window.location.pathname.includes('/professional')) {
+              localStorage.setItem(VIEW_PREFERENCE_KEY, 'doctor');
+              localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
+            }
+          } else {
+            // Not a professional user
+            setProfessionalUser(null);
+          }
+        } else {
+          // Not authenticated
+          setProfessionalUser(null);
+        }
+
+        setIsLoading(false);
+      }
+    };
+
+    loadProfessionalData();
   }, [user, authLoading, mainUserAuthenticated, isDoctor]);
 
   const clearError = () => {
     setError(null);
+  };
+
+  // Logout function
+  const logout = () => {
+    setProfessionalUser(null);
+    localStorage.removeItem(PROFESSIONAL_AUTH_STATE_KEY);
+    localStorage.removeItem(VIEW_PREFERENCE_KEY);
   };
 
   // Helper function to check if user has access to a feature
@@ -102,6 +198,7 @@ export const ProfessionalAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
     clearError,
     hasAccess,
     professionalInfo: professionalUser,
+    logout,
   };
   console.log("professionalUser:", professionalUser);
   return (

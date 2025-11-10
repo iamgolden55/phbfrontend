@@ -111,7 +111,10 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
       const data = await response.json();
       if (data.status === 'success') {
         console.log('✅ Organization: Token refresh successful');
-        setLastAuthTime(Date.now());
+        const now = Date.now();
+        setLastAuthTime(now);
+        // Update localStorage to track this refresh
+        localStorage.setItem('org_last_token_refresh', now.toString());
         return true;
       }
 
@@ -131,7 +134,7 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
     }
   }, []);
 
-  // Setup token refresh timer
+  // Setup token refresh timer with persistent tracking
   const setupTokenRefreshTimer = React.useCallback(() => {
     if (refreshTimerRef.current) {
       clearTimeout(refreshTimerRef.current);
@@ -139,6 +142,11 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
     }
 
     const REFRESH_INTERVAL = 25 * 60 * 1000; // 25 minutes (5 min before 30-min expiry)
+    const now = Date.now();
+
+    // Store last refresh time in localStorage for persistence across navigations
+    localStorage.setItem('org_last_token_refresh', now.toString());
+
     console.log('⏰ Organization: Setting up token refresh timer (will refresh in 25 minutes)');
 
     refreshTimerRef.current = setTimeout(async () => {
@@ -158,6 +166,69 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
       }
     };
   }, []);
+
+  // Handle page visibility changes - refresh token when user returns to tab
+  React.useEffect(() => {
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'visible' && isAuthenticated) {
+        const lastRefresh = localStorage.getItem('org_last_token_refresh');
+        const REFRESH_THRESHOLD = 20 * 60 * 1000; // 20 minutes
+
+        if (lastRefresh) {
+          const timeSinceRefresh = Date.now() - parseInt(lastRefresh);
+          if (timeSinceRefresh >= REFRESH_THRESHOLD) {
+            console.log('⏰ Organization: Tab became visible, refreshing token...');
+            await refreshAccessToken();
+            setupTokenRefreshTimer(); // Reset the timer
+          }
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isAuthenticated, refreshAccessToken, setupTokenRefreshTimer]);
+
+  // Activity-based token refresh - refresh on user interaction if token is getting old
+  React.useEffect(() => {
+    const handleUserActivity = async () => {
+      if (!isAuthenticated) return;
+
+      const lastRefresh = localStorage.getItem('org_last_token_refresh');
+      const ACTIVITY_REFRESH_THRESHOLD = 20 * 60 * 1000; // 20 minutes
+
+      if (lastRefresh) {
+        const timeSinceRefresh = Date.now() - parseInt(lastRefresh);
+        if (timeSinceRefresh >= ACTIVITY_REFRESH_THRESHOLD) {
+          console.log('⏰ Organization: User activity detected, refreshing token...');
+          await refreshAccessToken();
+          setupTokenRefreshTimer(); // Reset the timer
+        }
+      }
+    };
+
+    // Throttle activity checks to avoid excessive calls
+    let activityTimeout: NodeJS.Timeout;
+    const throttledActivity = () => {
+      if (activityTimeout) clearTimeout(activityTimeout);
+      activityTimeout = setTimeout(handleUserActivity, 5000); // Check 5 seconds after activity
+    };
+
+    // Listen for user interactions
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+    events.forEach(event => {
+      document.addEventListener(event, throttledActivity);
+    });
+
+    return () => {
+      events.forEach(event => {
+        document.removeEventListener(event, throttledActivity);
+      });
+      if (activityTimeout) clearTimeout(activityTimeout);
+    };
+  }, [isAuthenticated, refreshAccessToken, setupTokenRefreshTimer]);
 
   // Check if user is already logged in on mount or if OTP verification is in progress
   useEffect(() => {
@@ -225,6 +296,18 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
             // Clear session storage for OTP verification
             sessionStorage.removeItem('org_auth_email');
             sessionStorage.removeItem('org_auth_needs_verification');
+
+            // Check if token needs immediate refresh based on last refresh time
+            const lastRefresh = localStorage.getItem('org_last_token_refresh');
+            const REFRESH_THRESHOLD = 20 * 60 * 1000; // 20 minutes - refresh if it's been this long
+
+            if (lastRefresh) {
+              const timeSinceRefresh = Date.now() - parseInt(lastRefresh);
+              if (timeSinceRefresh >= REFRESH_THRESHOLD) {
+                console.log('⏰ Organization: Token is old, refreshing immediately...');
+                await refreshAccessToken();
+              }
+            }
 
             // Setup automatic token refresh
             setupTokenRefreshTimer();
@@ -440,6 +523,9 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
     sessionStorage.removeItem('org_auth_timestamp');
     sessionStorage.removeItem('org_auth_initialized');
     sessionStorage.removeItem('org_auth_state');
+
+    // Clear token refresh tracking from localStorage
+    localStorage.removeItem('org_last_token_refresh');
 
     // Update state
     setIsAuthenticated(false);
