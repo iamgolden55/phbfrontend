@@ -13,7 +13,7 @@ const VIEW_PREFERENCE_KEY = 'phb_view_preference';
 const ProfessionalLayout: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { professionalUser, logout } = useProfessionalAuth();
-  const { user } = useAuth();
+  const { user, isDoctor } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -85,41 +85,98 @@ const ProfessionalLayout: React.FC = () => {
     navigate('/professional/login');
   };
 
-  // Define menu items based on user role
+  // Define menu items based on professional type
   const getMenuItems = () => {
-    const baseItems = [
-      { label: 'Dashboard', path: '/professional/dashboard' },
-      { label: 'Appointments', path: '/professional/appointments' },
-      { label: 'Patient Management', path: '/professional/patients' },
-      { label: 'Clinical Guidelines', path: '/professional/guidelines' },
-      { label: 'Professional Forum', path: '/professional/forum' },
-      { label: 'Clinical Calculators', path: '/professional/calculators' },
-    ];
-
     // Check both professional context and regular user context
     const effectiveUser = professionalUser || (user?.role === 'doctor' ? user : null);
+    const professionalType = professionalUser?.professional_type || professionalUser?.role || user?.role;
 
-    if (effectiveUser) {
-      const role = professionalUser?.role || user?.role;
-      
-      if (role === 'doctor') {
-        baseItems.push({ label: 'Doctor Resources', path: '/professional/resources' });
-      }
+    // Default menu for unknown/legacy users
+    const defaultMenu = [
+      { label: 'Dashboard', path: '/professional/dashboard' },
+      { label: 'Professional Forum', path: '/professional/forum' },
+    ];
 
-      if (role === 'researcher') {
-        baseItems.push({ label: 'Research Dashboard', path: '/professional/research' });
-      }
-
-      if (role === 'nurse') {
-        baseItems.push({ label: 'Nursing Resources', path: '/professional/nursing-resources' });
-      }
-
-      if (role === 'pharmacist') {
-        baseItems.push({ label: 'Pharmacy Resources', path: '/professional/pharmacy-resources' });
-      }
+    if (!professionalType) {
+      return defaultMenu;
     }
 
-    return baseItems;
+    // Role-based menus
+    switch (professionalType) {
+      case 'pharmacist':
+        return [
+          { label: 'Dashboard', path: '/professional/dashboard' },
+          { label: 'Practice Page', path: '/professional/practice-page' },
+          { label: 'Prescription Requests', path: '/professional/prescription-triage' },
+          { label: 'Clinical Guidelines', path: '/professional/guidelines' },
+          { label: 'Professional Forum', path: '/professional/forum' },
+          { label: 'Pharmacy Resources', path: '/professional/pharmacy-resources' },
+        ];
+
+      case 'doctor':
+        return [
+          { label: 'Dashboard', path: '/professional/dashboard' },
+          { label: 'Appointments', path: '/professional/appointments' },
+          { label: 'Patient Management', path: '/professional/patients' },
+          { label: 'Practice Page', path: '/professional/practice-page' },
+          { label: 'Clinical Guidelines', path: '/professional/guidelines' },
+          { label: 'Professional Forum', path: '/professional/forum' },
+          { label: 'Clinical Calculators', path: '/professional/calculators' },
+          { label: 'Doctor Resources', path: '/professional/resources' },
+        ];
+
+      case 'nurse':
+      case 'midwife':
+        return [
+          { label: 'Dashboard', path: '/professional/dashboard' },
+          { label: 'Appointments', path: '/professional/appointments' },
+          { label: 'Patient Management', path: '/professional/patients' },
+          { label: 'Practice Page', path: '/professional/practice-page' },
+          { label: 'Clinical Guidelines', path: '/professional/guidelines' },
+          { label: 'Professional Forum', path: '/professional/forum' },
+          { label: 'Nursing Resources', path: '/professional/nursing-resources' },
+        ];
+
+      case 'dentist':
+        return [
+          { label: 'Dashboard', path: '/professional/dashboard' },
+          { label: 'Appointments', path: '/professional/appointments' },
+          { label: 'Patient Management', path: '/professional/patients' },
+          { label: 'Practice Page', path: '/professional/practice-page' },
+          { label: 'Clinical Guidelines', path: '/professional/guidelines' },
+          { label: 'Professional Forum', path: '/professional/forum' },
+          { label: 'Clinical Calculators', path: '/professional/calculators' },
+        ];
+
+      case 'physiotherapist':
+      case 'optometrist':
+        return [
+          { label: 'Dashboard', path: '/professional/dashboard' },
+          { label: 'Appointments', path: '/professional/appointments' },
+          { label: 'Practice Page', path: '/professional/practice-page' },
+          { label: 'Clinical Guidelines', path: '/professional/guidelines' },
+          { label: 'Professional Forum', path: '/professional/forum' },
+        ];
+
+      case 'lab_technician':
+      case 'radiographer':
+        return [
+          { label: 'Dashboard', path: '/professional/dashboard' },
+          { label: 'Clinical Guidelines', path: '/professional/guidelines' },
+          { label: 'Professional Forum', path: '/professional/forum' },
+        ];
+
+      case 'researcher':
+        return [
+          { label: 'Dashboard', path: '/professional/dashboard' },
+          { label: 'Research Dashboard', path: '/professional/research' },
+          { label: 'Clinical Guidelines', path: '/professional/guidelines' },
+          { label: 'Professional Forum', path: '/professional/forum' },
+        ];
+
+      default:
+        return defaultMenu;
+    }
   };
 
   const menuItems = getMenuItems();

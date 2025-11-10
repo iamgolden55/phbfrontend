@@ -101,11 +101,11 @@ const ProfessionalAppointmentsPage: React.FC = () => {
   const { professionalUser, isAuthenticated: profIsAuthenticated, isLoading: profIsLoading } = useProfessionalAuth();
   const navigate = useNavigate();
 
-  // Check if the user is authenticated and is a doctor
+  // Check if the user is authenticated as ANY professional (not just doctors)
   const isAuthLoading = mainIsLoading || profIsLoading;
-  const isAuthenticated = mainIsAuthenticated && isDoctor;
+  const isAuthenticated = mainIsAuthenticated && (isDoctor || profIsAuthenticated || !!professionalUser);
 
-  // Redirect if not authenticated or not a doctor
+  // Redirect if not authenticated as a professional
   useEffect(() => {
     if (!isAuthLoading && !isAuthenticated) {
       navigate('/login');

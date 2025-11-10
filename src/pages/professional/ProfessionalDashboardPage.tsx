@@ -7,22 +7,61 @@ import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns/format';
 import { ProfessionalCalendar } from '../../components/ProfessionalCalendar';
 
-// Mock data for a doctor dashboard
-const mockDoctorData = {
-  welcomeMessage: 'Welcome to your doctor dashboard',
-  stats: [
-    { label: 'Clinical Guidelines Updates', value: '12 new' },
-    { label: 'CME Opportunities', value: '8 available' },
-    { label: 'Professional Forum Threads', value: '24 unread' },
-    { label: 'Research Collaborations', value: '5 open' },
-  ],
-  quickLinks: [
-    { label: 'Appointments', path: '/professional/appointments' },
-    { label: 'Clinical Guidelines', path: '/professional/guidelines' },
-    { label: 'Doctor Resources', path: '/professional/doctor-resources' },
-    { label: 'Clinical Calculators', path: '/professional/calculators' },
-    { label: 'Professional Forum', path: '/professional/forum' },
-  ],
+// Function to get role-specific dashboard data
+const getRoleSpecificData = (professionalType: string) => {
+  switch (professionalType) {
+    case 'pharmacist':
+      return {
+        welcomeMessage: 'Welcome to your pharmacist dashboard',
+        stats: [
+          { label: 'Clinical Guidelines Updates', value: '12 new' },
+          { label: 'CME Opportunities', value: '8 available' },
+          { label: 'Professional Forum Threads', value: '24 unread' },
+          { label: 'Prescription Requests', value: '15 pending' },
+        ],
+        quickLinks: [
+          { label: 'Prescription Requests', path: '/professional/prescription-triage' },
+          { label: 'Practice Page', path: '/professional/practice-page' },
+          { label: 'Clinical Guidelines', path: '/professional/guidelines' },
+          { label: 'Pharmacy Resources', path: '/professional/resources' },
+          { label: 'Professional Forum', path: '/professional/forum' },
+        ],
+      };
+
+    case 'doctor':
+      return {
+        welcomeMessage: 'Welcome to your doctor dashboard',
+        stats: [
+          { label: 'Clinical Guidelines Updates', value: '12 new' },
+          { label: 'CME Opportunities', value: '8 available' },
+          { label: 'Professional Forum Threads', value: '24 unread' },
+          { label: 'Research Collaborations', value: '5 open' },
+        ],
+        quickLinks: [
+          { label: 'Appointments', path: '/professional/appointments' },
+          { label: 'Clinical Guidelines', path: '/professional/guidelines' },
+          { label: 'Doctor Resources', path: '/professional/resources' },
+          { label: 'Clinical Calculators', path: '/professional/calculators' },
+          { label: 'Professional Forum', path: '/professional/forum' },
+        ],
+      };
+
+    default:
+      // Default professional dashboard
+      return {
+        welcomeMessage: 'Welcome to your professional dashboard',
+        stats: [
+          { label: 'Clinical Guidelines Updates', value: '12 new' },
+          { label: 'CME Opportunities', value: '8 available' },
+          { label: 'Professional Forum Threads', value: '24 unread' },
+          { label: 'Research Collaborations', value: '5 open' },
+        ],
+        quickLinks: [
+          { label: 'Clinical Guidelines', path: '/professional/guidelines' },
+          { label: 'Professional Forum', path: '/professional/forum' },
+        ],
+      };
+  }
 };
 
 // Latest announcements - common for all roles
@@ -86,11 +125,11 @@ const ProfessionalDashboardPage: React.FC = () => {
   const [expandedEvents, setExpandedEvents] = useState<Record<string, boolean>>({});
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
 
-  // Check if the user is authenticated and is a doctor
+  // Check if the user is authenticated as ANY professional (not just doctors)
   const isAuthLoading = mainIsLoading || profIsLoading;
-  const isAuthenticated = mainIsAuthenticated && isDoctor;
+  const isAuthenticated = mainIsAuthenticated && (isDoctor || profIsAuthenticated || !!professionalUser);
 
-  // Redirect if not authenticated or not a doctor
+  // Redirect if not authenticated as a professional
   useEffect(() => {
     if (!isAuthLoading && !isAuthenticated) {
       navigate('/login');
@@ -101,14 +140,14 @@ const ProfessionalDashboardPage: React.FC = () => {
   useEffect(() => {
     const loadAppointments = async () => {
       if (!isAuthenticated) return;
-      
+
       setIsLoadingAppointments(true);
       setAppointmentsError(null);
-      
+
       try {
         // Fetch appointments from API
         const data = await fetchDoctorAppointments();
-        
+
         // Save the appointment data
         setAppointmentData(data);
         setDoctorInfo(data.doctor_info);
@@ -116,7 +155,7 @@ const ProfessionalDashboardPage: React.FC = () => {
       } catch (err: any) {
         console.error('Failed to load doctor appointments:', err);
         setAppointmentsError(err.message || 'Failed to load appointments. Please try again later.');
-        
+
         // Create mock data structure for the new format
         setAppointmentData({
           pending_department_appointments: [],
@@ -154,9 +193,9 @@ const ProfessionalDashboardPage: React.FC = () => {
         setIsLoadingAppointments(false);
       }
     };
-    
+
     loadAppointments();
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated]); // Fixed: Removed 'user' from dependencies to prevent infinite render loop
 
   // Handle accepting an appointment
   const handleAcceptAppointment = async (appointmentId: string) => {
@@ -347,10 +386,14 @@ const ProfessionalDashboardPage: React.FC = () => {
   const doctorName = doctorInfo?.name || professionalUser?.name || user?.full_name || 'Doctor';
   const doctorRole = professionalUser?.role || 'Doctor';
   const doctorSpecialty = doctorInfo?.specialization || professionalUser?.specialty || '';
-  
+
   // Get department and hospital info
   const departmentName = doctorInfo?.department?.name || '';
   const hospitalName = doctorInfo?.hospital?.name || '';
+
+  // Get professional type and role-specific dashboard data
+  const professionalType = professionalUser?.professional_type || professionalUser?.role || user?.role || 'doctor';
+  const dashboardData = getRoleSpecificData(professionalType);
 
   return (
     <div>
@@ -360,7 +403,7 @@ const ProfessionalDashboardPage: React.FC = () => {
 
       {/* Header Section */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-blue-800">{mockDoctorData.welcomeMessage}</h1>
+        <h1 className="text-3xl font-bold text-blue-800">{dashboardData.welcomeMessage}</h1>
         <p className="mt-2 text-gray-600">
           {doctorName} | {doctorRole}
           {doctorSpecialty ? ` | ${doctorSpecialty}` : ''}
@@ -379,8 +422,8 @@ const ProfessionalDashboardPage: React.FC = () => {
         </div>
       )}
 
-      {/* Appointment Summary Stats */}
-      {appointmentSummary && (
+      {/* Appointment Summary Stats - Only for doctors */}
+      {(isDoctor || professionalType === 'doctor') && appointmentSummary && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           <div className="bg-blue-50 p-4 rounded-lg shadow-md">
             <p className="text-lg font-bold text-blue-600">{appointmentSummary.pending_department_count}</p>
@@ -407,7 +450,7 @@ const ProfessionalDashboardPage: React.FC = () => {
 
       {/* Static Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {mockDoctorData.stats.map((stat, index) => (
+        {dashboardData.stats.map((stat, index) => (
           <div key={index} className="bg-white p-4 rounded-lg shadow-md">
             <p className="text-lg font-bold text-blue-600">{stat.value}</p>
             <p className="text-sm text-gray-600">{stat.label}</p>
@@ -415,12 +458,13 @@ const ProfessionalDashboardPage: React.FC = () => {
         ))}
       </div>
 
-      {/* Pending Department Appointments Section */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-blue-800">Pending Department Appointments</h2>
-          <a href="/professional/appointments?filter=pending" className="text-blue-600 hover:underline text-sm">View all pending</a>
-        </div>
+      {/* Pending Department Appointments Section - Only for doctors */}
+      {(isDoctor || professionalType === 'doctor') && (
+        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold text-blue-800">Pending Department Appointments</h2>
+            <a href="/professional/appointments?filter=pending" className="text-blue-600 hover:underline text-sm">View all pending</a>
+          </div>
         
         {isLoadingAppointments ? (
           <div className="flex justify-center py-6">
@@ -484,10 +528,12 @@ const ProfessionalDashboardPage: React.FC = () => {
             </table>
           </div>
         )}
-      </div>
+        </div>
+      )}
 
-      {/* My Confirmed Appointments Section */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+      {/* My Confirmed Appointments Section - Only for doctors */}
+      {(isDoctor || professionalType === 'doctor') && (
+        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-blue-800">My Confirmed Appointments</h2>
           <a href="/professional/appointments?filter=confirmed" className="text-blue-600 hover:underline text-sm">View all confirmed</a>
@@ -537,7 +583,8 @@ const ProfessionalDashboardPage: React.FC = () => {
             </table>
           </div>
         )}
-      </div>
+        </div>
+      )}
 
       {/* In Progress Appointments Section */}
       {appointmentData && appointmentData.my_appointments.in_progress.length > 0 && (
@@ -595,7 +642,7 @@ const ProfessionalDashboardPage: React.FC = () => {
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-bold text-blue-800 mb-4">Quick Links</h2>
           <div className="grid grid-cols-1 gap-2">
-            {mockDoctorData.quickLinks.map((link, index) => (
+            {dashboardData.quickLinks.map((link, index) => (
               <a
                 key={index}
                 href={link.path}
