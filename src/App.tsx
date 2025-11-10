@@ -1,6 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
+// Debug utility
+import './utils/authDebug';
+
 // Layouts
 import MainLayout from './layouts/MainLayout';
 import ProfessionalLayout from './layouts/ProfessionalLayout';
@@ -36,6 +39,7 @@ import EmergencyPage from './pages/organization/EmergencyPage';
 import UserRegistrationsPage from './pages/organization/UserRegistrationsPage';
 import AppointmentsPage from './pages/organization/AppointmentsPage';
 import ClinicalGuidelinesManagementPage from './pages/organization/ClinicalGuidelinesManagementPage';
+import HospitalLicensesPage from './pages/organization/HospitalLicensesPage';
 import { OrganizationAuthProvider } from './features/organization/organizationAuthContext';
 import ForgotPasswordPage from './pages/ForgotPasswordPage'; // Add this import
 import ResetPasswordPage from './pages/ResetPasswordPage'; // Add this import
@@ -46,6 +50,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage'; // Add this import
 // Account Pages
 import PersonalDetailsPage from './pages/account/PersonalDetailsPage';
 import ContactPreferencesPage from './pages/account/ContactPreferencesPage';
+import ContactSupportPage from './pages/account/ContactSupportPage';
 import PasswordPage from './pages/account/PasswordPage';
 import HealthGoalsPage from './pages/account/HealthGoalsPage';
 import HealthRecordsPage from './pages/account/HealthRecordsPage';
@@ -90,6 +95,7 @@ import ExercisePage from './pages/live-well/ExercisePage';
 import MentalWellbeingPage from './pages/live-well/MentalWellbeingPage';
 import SleepPage from './pages/live-well/SleepPage';
 import QuitSmokingPage from './pages/live-well/QuitSmokingPage';
+import AlcoholPage from './pages/live-well/AlcoholPage';
 import LiveWellSexualHealthPage from './pages/live-well/SexualHealthPage';
 import HealthyWeightPage from './pages/live-well/HealthyWeightPage';
 import FiveWeekWorkoutPlanPage from './pages/live-well/exercise/FiveWeekWorkoutPlanPage';
@@ -175,6 +181,26 @@ import ProfessionalPatientsPage from './pages/professional/ProfessionalPatientsP
 import ProfessionalResearchPage from './pages/professional/ProfessionalResearchPage';
 import ProfessionalProfilePage from './pages/professional/ProfessionalProfilePage';
 import ProfessionalResourcesPage from './pages/professional/ProfessionalResourcesPage';
+import PrescriptionRequestsPage from './pages/professional/PrescriptionRequestsPage';
+import PrescriptionTriagePage from './pages/professional/PrescriptionTriagePage';
+
+// Practice Pages
+import MyPracticePageDashboard from './pages/professional/MyPracticePageDashboard';
+import { CreatePracticePageWizard } from './components/professional/CreatePracticePageWizard';
+import PracticePagePreview from './pages/professional/PracticePagePreview';
+import EditPracticePageForm from './pages/professional/EditPracticePageForm';
+import PharmacyResourcesPage from './pages/professional/PharmacyResourcesPage';
+import { PracticePageView } from './pages/public/PracticePageView';
+import { PracticePageDirectory } from './pages/public/PracticePageDirectory';
+
+// Registry Pages
+import RegistryLandingPage from './pages/registry/RegistryLandingPage';
+import RegistrySearchPage from './pages/registry/RegistrySearchPage';
+import RegistryProfessionalProfilePage from './pages/registry/ProfessionalProfilePage';
+import ApplyPage from './pages/registry/ApplyPage';
+import ApplicationSuccessPage from './pages/registry/ApplicationSuccessPage';
+import RegistryDashboardPage from './pages/registry/RegistryDashboardPage';
+import ApplicationDetailPage from './pages/registry/ApplicationDetailPageRedesigned';
 
 // Features
 import { AuthProvider, useAuth } from './features/auth/authContext';
@@ -182,6 +208,7 @@ import { ProfessionalAuthProvider, useProfessionalAuth } from './features/profes
 import { useOrganizationAuth } from './features/organization/organizationAuthContext';
 import GPHealthRecord from './features/health/GPHealthRecord';
 import Prescriptions from './features/health/Prescriptions';
+import PharmacyVerification from './features/health/PharmacyVerification';
 import Appointments from './features/health/Appointments';
 import TestResultsPage from './pages/account/TestResultsPage';
 import HospitalStatusGuard from './features/health/HospitalStatusGuard';
@@ -246,6 +273,7 @@ import AppointmentTypesPage from './pages/help/appointments/AppointmentTypesPage
 import PrepareForAppointmentPage from './pages/help/appointments/PrepareForAppointmentPage';
 import TechnicalIssuesPage from './pages/help/appointments/TechnicalIssuesPage';
 import HelpPage from './pages/help/HelpPage'; // New import for HelpPage
+import FindPhbNumberPage from './pages/help/FindPhbNumberPage';
 import HowToRequestPage from './pages/help/prescriptions/HowToRequestPage';
 import UrgentRequestsPage from './pages/help/prescriptions/UrgentRequestsPage';
 import HowNominationsWorkPage from './pages/help/prescriptions/HowNominationsWorkPage';
@@ -259,7 +287,9 @@ import SelfHarmPage from './pages/mental-health/SelfHarmPage';
 import EatingDisordersPage from './pages/mental-health/EatingDisordersPage';
 
 // Services Pages
+import ServicesPage from './pages/ServicesPage';
 import TalkingTherapiesPage from './pages/services/TalkingTherapiesPage';
+import MentalHealthSupportPage from './pages/services/MentalHealthSupportPage';
 
 // New import for Research Publications Page
 import ResearchPublicationsPage from './pages/ResearchPublicationsPage';
@@ -344,16 +374,36 @@ const OrganizationRouteGuard = ({ children }: { children: React.ReactNode }) => 
 
 // Protected route component that redirects to onboarding if needed
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, needsOnboarding } = useAuth();
+  const { isAuthenticated, needsOnboarding, isLoading } = useAuth();
+
+  console.log('🔒 ProtectedRoute: isLoading:', isLoading);
+  console.log('🔒 ProtectedRoute: isAuthenticated:', isAuthenticated);
+  console.log('🔒 ProtectedRoute: needsOnboarding:', needsOnboarding);
+
+  // Show loading state while auth is initializing
+  if (isLoading) {
+    console.log('🔒 ProtectedRoute: Showing loading state');
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
+    console.log('🔒 ProtectedRoute: Redirecting to login (not authenticated)');
     return <Navigate to="/login" replace />;
   }
 
   if (needsOnboarding) {
+    console.log('🔒 ProtectedRoute: Redirecting to onboarding');
     return <Navigate to="/onboarding" replace />;
   }
 
+  console.log('🔒 ProtectedRoute: Allowing access to protected route');
   return <>{children}</>;
 };
 
@@ -374,11 +424,14 @@ function App() {
               <Route path="professional/register" element={<ProfessionalRegisterPage />} />
               <Route path="organization/login" element={<OrganizationLoginPage />} />
               <Route path="organization/register" element={<OrganizationRegisterPage />} />
-              
+
               {/* Hospital Admin Password Reset Routes */}
               <Route path="hospital-admin/reset-password/request" element={<HospitalAdminForgotPasswordPage />} />
               <Route path="hospital-admin/reset-password/verify" element={<HospitalAdminPasswordResetVerifyPage />} />
               <Route path="hospital-admin/reset-password/complete" element={<HospitalAdminPasswordResetCompletePage />} />
+
+              {/* Pharmacy Verification - Public Tool */}
+              <Route path="pharmacy-verification" element={<PharmacyVerification />} />
 
               {/* Organization layout routes */}
               <Route path="/organization" element={<FluentOrganizationLayout />}>
@@ -442,6 +495,11 @@ function App() {
                     <ClinicalGuidelinesManagementPage />
                   </OrganizationRouteGuard>
                 } />
+                <Route path="licenses" element={
+                  <OrganizationRouteGuard>
+                    <HospitalLicensesPage />
+                  </OrganizationRouteGuard>
+                } />
               </Route>
 
 
@@ -476,6 +534,7 @@ function App() {
                 <Route path="live-well/sexual-health" element={<LiveWellSexualHealthPage />} />
                 <Route path="live-well/healthy-weight" element={<HealthyWeightPage />} />
                 <Route path="live-well/quit-smoking" element={<QuitSmokingPage />} />
+                <Route path="live-well/alcohol" element={<AlcoholPage />} />
                 <Route path="live-well/quit-smoking/behavioral-support" element={<BehavioralSupportPage />} />
                 <Route path="live-well/quit-smoking/nicotine-replacement" element={<NicotineReplacementPage />} />
                 <Route path="live-well/quit-smoking/prescription-medications" element={<PrescriptionMedicationsPage />} />
@@ -502,7 +561,9 @@ function App() {
                 <Route path="mental-health/eating-disorders" element={<EatingDisordersPage />} />
 
                 {/* Services Routes */}
+                <Route path="services" element={<ServicesPage />} />
                 <Route path="services/talking-therapies" element={<TalkingTherapiesPage />} />
+                <Route path="services/mental-health-support" element={<MentalHealthSupportPage />} />
                 <Route path="care-and-support" element={<CareAndSupportPage />} />
                 <Route path="care-and-support/older-people" element={<OlderPeoplePage />} />
                 <Route path="care-and-support/dementia" element={<DementiaPage />} />
@@ -517,6 +578,7 @@ function App() {
 
                 {/* Help Routes */}
                 <Route path="help" element={<HelpPage />} /> {/* New Help Route */}
+                <Route path="help/find-phb-number" element={<FindPhbNumberPage />} />
                 <Route path="help/appointments/how-to-book" element={<HowToBookPage />} />
                 <Route path="help/appointments/managing" element={<ManagingAppointmentsPage />} />
                 <Route path="help/appointments/types" element={<AppointmentTypesPage />} />
@@ -593,6 +655,7 @@ function App() {
                 {/* Health Assessment Routes */}
                 <Route path="tools/health-assessments/health-check" element={<HealthCheckAssessment />} />
                 <Route path="tools/health-assessments/mental-wellbeing" element={<MentalWellbeingAssessment />} />
+                <Route path="tools/mental-wellbeing-assessment" element={<MentalWellbeingAssessment />} />
                 <Route path="tools/health-assessments/heart-disease-risk" element={<HeartDiseaseRiskAssessment />} />
                 <Route path="tools/health-assessments/diabetes-risk" element={<DiabetesRiskAssessment />} />
                 <Route path="tools/health-assessments/sleep-quality" element={<SleepQualityAssessment />} />
@@ -637,6 +700,11 @@ function App() {
                 <Route path="account/contact-preferences" element={
                   <ProtectedRoute>
                     <ContactPreferencesPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="account/contact-support" element={
+                  <ProtectedRoute>
+                    <ContactSupportPage />
                   </ProtectedRoute>
                 } />
                 <Route path="account/password" element={
@@ -791,7 +859,30 @@ function App() {
                 {/* Test Pages */}
                 <Route path="captcha-test" element={<CaptchaTestPage />} />
                 <Route path="captcha-script" element={<CaptchaTestScript />} />
+
+                {/* Registry Routes - Professional Registration System */}
+                <Route path="registry" element={<RegistryLandingPage />} />
+                <Route path="registry/search" element={<RegistrySearchPage />} />
+                <Route path="registry/apply" element={<ApplyPage />} />
+                <Route path="registry/application-success" element={<ApplicationSuccessPage />} />
+                <Route path="registry/dashboard" element={
+                  <ProtectedRoute>
+                    <RegistryDashboardPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="registry/applications/:applicationId" element={
+                  <ProtectedRoute>
+                    <ApplicationDetailPage />
+                  </ProtectedRoute>
+                } />
+
+                {/* Practice Pages - Public Directory */}
+                <Route path="practice-pages" element={<PracticePageDirectory />} />
+                <Route path="practice-pages/:slug" element={<PracticePageView />} />
               </Route>
+
+              {/* Standalone Public Registry Routes (No Layout) */}
+              <Route path="/registry/professional/:id" element={<RegistryProfessionalProfilePage />} />
 
               {/* Professional layout routes */}
               <Route path="/professional" element={<ProfessionalLayout />}>
@@ -804,6 +895,8 @@ function App() {
                 <Route path="appointments" element={<ProfessionalAppointmentsPage />} />
                 <Route path="appointments/reschedule/:appointmentId" element={<ProfessionalAppointmentReschedulePage />} />
                 <Route path="appointments/:appointmentId" element={<ProfessionalAppointmentDetailPage />} />
+                <Route path="prescriptions" element={<PrescriptionRequestsPage />} />
+                <Route path="prescriptions/triage" element={<PrescriptionTriagePage />} />
                 <Route path="calculators" element={<ProfessionalCalculatorsPage />} />
                 <Route path="guidelines" element={<ClinicalGuidelinesPage />} />
                 <Route path="resources" element={<DoctorResourcesPage />} />
@@ -811,6 +904,11 @@ function App() {
                 <Route path="research" element={<ProfessionalResearchPage />} />
                 <Route path="forum" element={<ProfessionalForumPage />} />
                 <Route path="profile" element={<ProfessionalProfilePage />} />
+                <Route path="practice-page" element={<MyPracticePageDashboard />} />
+                <Route path="practice-page/create" element={<CreatePracticePageWizard />} />
+                <Route path="practice-page/edit" element={<EditPracticePageForm />} />
+                <Route path="practice-page/preview" element={<PracticePagePreview />} />
+                <Route path="pharmacy-resources" element={<PharmacyResourcesPage />} />
               </Route>
 
               {/* Catch all for 404 - can be replaced with a NotFoundPage component */}

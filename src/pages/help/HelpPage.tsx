@@ -156,7 +156,10 @@ const HelpPage: React.FC = () => {
             <div>
               <h3 className="font-medium text-lg text-gray-900">How can I Find my HPN number?</h3>
               <p className="text-gray-600 mt-1">
-                Your PHB number is a 10-digit number shown at the top of any letter from the PHB. It's also available in your PHB account under "Account Settings" &gt; "Personal Details".
+                Your HPN (Health Point Number) is your digital access point to healthcare services. You can find it in your welcome email, on your main dashboard, or in your account settings.{' '}
+                <Link to="/help/find-phb-number" className="text-blue-600 hover:underline">
+                  Learn more about finding your HPN
+                </Link>
               </p>
             </div>
           </div>
@@ -182,7 +185,7 @@ const HelpPage: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
               <h3 className="text-lg font-medium text-gray-900">By Email</h3>
-              <p className="text-gray-600 mt-1">support@phb.org.uk</p>
+              <p className="text-gray-600 mt-1">support@phb.org.ng</p>
               <p className="text-gray-500 text-sm">Response within 24 hours</p>
             </div>
 

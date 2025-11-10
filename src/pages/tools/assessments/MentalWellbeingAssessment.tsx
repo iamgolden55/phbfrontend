@@ -1,174 +1,174 @@
 import React from 'react';
 import AssessmentTemplate, { AssessmentQuestion } from '../../../components/assessment/AssessmentTemplate';
 
-// Define the questions for the Mental Wellbeing assessment
+// Define the questions for the Mental Wellbeing assessment - encouraging and strength-based
 const questions: AssessmentQuestion[] = [
   {
     id: 'feeling_optimistic',
-    text: "I've been feeling optimistic about the future",
+    text: "Looking ahead fills you with hope and possibility",
     required: true,
     options: [
-      { value: 0, label: 'None of the time', description: 'Rarely or never felt this way' },
-      { value: 1, label: 'Rarely', description: 'Felt this way once or twice' },
-      { value: 2, label: 'Some of the time', description: 'Felt this way on several days' },
-      { value: 3, label: 'Often', description: 'Felt this way more than half the days' },
-      { value: 4, label: 'All of the time', description: 'Felt this way nearly every day' }
+      { value: 0, label: 'Building this strength', description: 'This is something you\'re working on' },
+      { value: 1, label: 'Occasionally', description: 'You catch glimpses of this feeling' },
+      { value: 2, label: 'Sometimes', description: 'You experience this regularly' },
+      { value: 3, label: 'Frequently', description: 'This is often part of your experience' },
+      { value: 4, label: 'Almost always', description: 'This is a core part of how you feel' }
     ]
   },
   {
     id: 'feeling_useful',
-    text: "I've been feeling useful",
+    text: "You feel like you're making a meaningful contribution",
     required: true,
     options: [
-      { value: 0, label: 'None of the time', description: 'Rarely or never felt this way' },
-      { value: 1, label: 'Rarely', description: 'Felt this way once or twice' },
-      { value: 2, label: 'Some of the time', description: 'Felt this way on several days' },
-      { value: 3, label: 'Often', description: 'Felt this way more than half the days' },
-      { value: 4, label: 'All of the time', description: 'Felt this way nearly every day' }
+      { value: 0, label: 'Building this strength', description: 'This is something you\'re working on' },
+      { value: 1, label: 'Occasionally', description: 'You catch glimpses of this feeling' },
+      { value: 2, label: 'Sometimes', description: 'You experience this regularly' },
+      { value: 3, label: 'Frequently', description: 'This is often part of your experience' },
+      { value: 4, label: 'Almost always', description: 'This is a core part of how you feel' }
     ]
   },
   {
     id: 'feeling_relaxed',
-    text: "I've been feeling relaxed",
+    text: "You can find moments of calm and peace in your day",
     required: true,
     options: [
-      { value: 0, label: 'None of the time', description: 'Rarely or never felt this way' },
-      { value: 1, label: 'Rarely', description: 'Felt this way once or twice' },
-      { value: 2, label: 'Some of the time', description: 'Felt this way on several days' },
-      { value: 3, label: 'Often', description: 'Felt this way more than half the days' },
-      { value: 4, label: 'All of the time', description: 'Felt this way nearly every day' }
+      { value: 0, label: 'Building this strength', description: 'This is something you\'re working on' },
+      { value: 1, label: 'Occasionally', description: 'You catch glimpses of this feeling' },
+      { value: 2, label: 'Sometimes', description: 'You experience this regularly' },
+      { value: 3, label: 'Frequently', description: 'This is often part of your experience' },
+      { value: 4, label: 'Almost always', description: 'This is a core part of how you feel' }
     ]
   },
   {
     id: 'interest_in_others',
-    text: "I've been feeling interested in other people",
+    text: "You feel genuinely curious and engaged with people around you",
     required: true,
     options: [
-      { value: 0, label: 'None of the time', description: 'Rarely or never felt this way' },
-      { value: 1, label: 'Rarely', description: 'Felt this way once or twice' },
-      { value: 2, label: 'Some of the time', description: 'Felt this way on several days' },
-      { value: 3, label: 'Often', description: 'Felt this way more than half the days' },
-      { value: 4, label: 'All of the time', description: 'Felt this way nearly every day' }
+      { value: 0, label: 'Building this strength', description: 'This is something you\'re working on' },
+      { value: 1, label: 'Occasionally', description: 'You catch glimpses of this feeling' },
+      { value: 2, label: 'Sometimes', description: 'You experience this regularly' },
+      { value: 3, label: 'Frequently', description: 'This is often part of your experience' },
+      { value: 4, label: 'Almost always', description: 'This is a core part of how you feel' }
     ]
   },
   {
     id: 'energy_spare',
-    text: "I've had energy to spare",
+    text: "You have the energy you need to tackle what matters to you",
     required: true,
     options: [
-      { value: 0, label: 'None of the time', description: 'Rarely or never felt this way' },
-      { value: 1, label: 'Rarely', description: 'Felt this way once or twice' },
-      { value: 2, label: 'Some of the time', description: 'Felt this way on several days' },
-      { value: 3, label: 'Often', description: 'Felt this way more than half the days' },
-      { value: 4, label: 'All of the time', description: 'Felt this way nearly every day' }
+      { value: 0, label: 'Building this strength', description: 'This is something you\'re working on' },
+      { value: 1, label: 'Occasionally', description: 'You catch glimpses of this feeling' },
+      { value: 2, label: 'Sometimes', description: 'You experience this regularly' },
+      { value: 3, label: 'Frequently', description: 'This is often part of your experience' },
+      { value: 4, label: 'Almost always', description: 'This is a core part of how you feel' }
     ]
   },
   {
     id: 'dealing_with_problems',
-    text: "I've been dealing with problems well",
+    text: "You're handling life's challenges with resilience",
     required: true,
     options: [
-      { value: 0, label: 'None of the time', description: 'Rarely or never felt this way' },
-      { value: 1, label: 'Rarely', description: 'Felt this way once or twice' },
-      { value: 2, label: 'Some of the time', description: 'Felt this way on several days' },
-      { value: 3, label: 'Often', description: 'Felt this way more than half the days' },
-      { value: 4, label: 'All of the time', description: 'Felt this way nearly every day' }
+      { value: 0, label: 'Building this strength', description: 'This is something you\'re working on' },
+      { value: 1, label: 'Occasionally', description: 'You catch glimpses of this feeling' },
+      { value: 2, label: 'Sometimes', description: 'You experience this regularly' },
+      { value: 3, label: 'Frequently', description: 'This is often part of your experience' },
+      { value: 4, label: 'Almost always', description: 'This is a core part of how you feel' }
     ]
   },
   {
     id: 'thinking_clearly',
-    text: "I've been thinking clearly",
+    text: "Your mind feels sharp and focused",
     required: true,
     options: [
-      { value: 0, label: 'None of the time', description: 'Rarely or never felt this way' },
-      { value: 1, label: 'Rarely', description: 'Felt this way once or twice' },
-      { value: 2, label: 'Some of the time', description: 'Felt this way on several days' },
-      { value: 3, label: 'Often', description: 'Felt this way more than half the days' },
-      { value: 4, label: 'All of the time', description: 'Felt this way nearly every day' }
+      { value: 0, label: 'Building this strength', description: 'This is something you\'re working on' },
+      { value: 1, label: 'Occasionally', description: 'You catch glimpses of this feeling' },
+      { value: 2, label: 'Sometimes', description: 'You experience this regularly' },
+      { value: 3, label: 'Frequently', description: 'This is often part of your experience' },
+      { value: 4, label: 'Almost always', description: 'This is a core part of how you feel' }
     ]
   },
   {
     id: 'good_about_self',
-    text: "I've been feeling good about myself",
+    text: "You appreciate who you are and feel comfortable in your own skin",
     required: true,
     options: [
-      { value: 0, label: 'None of the time', description: 'Rarely or never felt this way' },
-      { value: 1, label: 'Rarely', description: 'Felt this way once or twice' },
-      { value: 2, label: 'Some of the time', description: 'Felt this way on several days' },
-      { value: 3, label: 'Often', description: 'Felt this way more than half the days' },
-      { value: 4, label: 'All of the time', description: 'Felt this way nearly every day' }
+      { value: 0, label: 'Building this strength', description: 'This is something you\'re working on' },
+      { value: 1, label: 'Occasionally', description: 'You catch glimpses of this feeling' },
+      { value: 2, label: 'Sometimes', description: 'You experience this regularly' },
+      { value: 3, label: 'Frequently', description: 'This is often part of your experience' },
+      { value: 4, label: 'Almost always', description: 'This is a core part of how you feel' }
     ]
   },
   {
     id: 'close_to_others',
-    text: "I've been feeling close to other people",
+    text: "You feel connected and valued in your relationships",
     required: true,
     options: [
-      { value: 0, label: 'None of the time', description: 'Rarely or never felt this way' },
-      { value: 1, label: 'Rarely', description: 'Felt this way once or twice' },
-      { value: 2, label: 'Some of the time', description: 'Felt this way on several days' },
-      { value: 3, label: 'Often', description: 'Felt this way more than half the days' },
-      { value: 4, label: 'All of the time', description: 'Felt this way nearly every day' }
+      { value: 0, label: 'Building this strength', description: 'This is something you\'re working on' },
+      { value: 1, label: 'Occasionally', description: 'You catch glimpses of this feeling' },
+      { value: 2, label: 'Sometimes', description: 'You experience this regularly' },
+      { value: 3, label: 'Frequently', description: 'This is often part of your experience' },
+      { value: 4, label: 'Almost always', description: 'This is a core part of how you feel' }
     ]
   },
   {
     id: 'feeling_confident',
-    text: "I've been feeling confident",
+    text: "You trust in your abilities and your capacity to grow",
     required: true,
     options: [
-      { value: 0, label: 'None of the time', description: 'Rarely or never felt this way' },
-      { value: 1, label: 'Rarely', description: 'Felt this way once or twice' },
-      { value: 2, label: 'Some of the time', description: 'Felt this way on several days' },
-      { value: 3, label: 'Often', description: 'Felt this way more than half the days' },
-      { value: 4, label: 'All of the time', description: 'Felt this way nearly every day' }
+      { value: 0, label: 'Building this strength', description: 'This is something you\'re working on' },
+      { value: 1, label: 'Occasionally', description: 'You catch glimpses of this feeling' },
+      { value: 2, label: 'Sometimes', description: 'You experience this regularly' },
+      { value: 3, label: 'Frequently', description: 'This is often part of your experience' },
+      { value: 4, label: 'Almost always', description: 'This is a core part of how you feel' }
     ]
   },
   {
     id: 'make_up_mind',
-    text: "I've been able to make up my own mind about things",
+    text: "You feel empowered to make your own choices",
     required: true,
     options: [
-      { value: 0, label: 'None of the time', description: 'Rarely or never felt this way' },
-      { value: 1, label: 'Rarely', description: 'Felt this way once or twice' },
-      { value: 2, label: 'Some of the time', description: 'Felt this way on several days' },
-      { value: 3, label: 'Often', description: 'Felt this way more than half the days' },
-      { value: 4, label: 'All of the time', description: 'Felt this way nearly every day' }
+      { value: 0, label: 'Building this strength', description: 'This is something you\'re working on' },
+      { value: 1, label: 'Occasionally', description: 'You catch glimpses of this feeling' },
+      { value: 2, label: 'Sometimes', description: 'You experience this regularly' },
+      { value: 3, label: 'Frequently', description: 'This is often part of your experience' },
+      { value: 4, label: 'Almost always', description: 'This is a core part of how you feel' }
     ]
   },
   {
     id: 'feeling_loved',
-    text: "I've been feeling loved",
+    text: "You know you matter to the people in your life",
     required: true,
     options: [
-      { value: 0, label: 'None of the time', description: 'Rarely or never felt this way' },
-      { value: 1, label: 'Rarely', description: 'Felt this way once or twice' },
-      { value: 2, label: 'Some of the time', description: 'Felt this way on several days' },
-      { value: 3, label: 'Often', description: 'Felt this way more than half the days' },
-      { value: 4, label: 'All of the time', description: 'Felt this way nearly every day' }
+      { value: 0, label: 'Building this strength', description: 'This is something you\'re working on' },
+      { value: 1, label: 'Occasionally', description: 'You catch glimpses of this feeling' },
+      { value: 2, label: 'Sometimes', description: 'You experience this regularly' },
+      { value: 3, label: 'Frequently', description: 'This is often part of your experience' },
+      { value: 4, label: 'Almost always', description: 'This is a core part of how you feel' }
     ]
   },
   {
     id: 'interested_new_things',
-    text: "I've been interested in new things",
+    text: "You're open to new experiences and learning",
     required: true,
     options: [
-      { value: 0, label: 'None of the time', description: 'Rarely or never felt this way' },
-      { value: 1, label: 'Rarely', description: 'Felt this way once or twice' },
-      { value: 2, label: 'Some of the time', description: 'Felt this way on several days' },
-      { value: 3, label: 'Often', description: 'Felt this way more than half the days' },
-      { value: 4, label: 'All of the time', description: 'Felt this way nearly every day' }
+      { value: 0, label: 'Building this strength', description: 'This is something you\'re working on' },
+      { value: 1, label: 'Occasionally', description: 'You catch glimpses of this feeling' },
+      { value: 2, label: 'Sometimes', description: 'You experience this regularly' },
+      { value: 3, label: 'Frequently', description: 'This is often part of your experience' },
+      { value: 4, label: 'Almost always', description: 'This is a core part of how you feel' }
     ]
   },
   {
     id: 'cheerful',
-    text: "I've been feeling cheerful",
+    text: "You find moments of joy and lightness in your days",
     required: true,
     options: [
-      { value: 0, label: 'None of the time', description: 'Rarely or never felt this way' },
-      { value: 1, label: 'Rarely', description: 'Felt this way once or twice' },
-      { value: 2, label: 'Some of the time', description: 'Felt this way on several days' },
-      { value: 3, label: 'Often', description: 'Felt this way more than half the days' },
-      { value: 4, label: 'All of the time', description: 'Felt this way nearly every day' }
+      { value: 0, label: 'Building this strength', description: 'This is something you\'re working on' },
+      { value: 1, label: 'Occasionally', description: 'You catch glimpses of this feeling' },
+      { value: 2, label: 'Sometimes', description: 'You experience this regularly' },
+      { value: 3, label: 'Frequently', description: 'This is often part of your experience' },
+      { value: 4, label: 'Almost always', description: 'This is a core part of how you feel' }
     ]
   }
 ];
@@ -188,39 +188,39 @@ const calculateScore = (answers: Record<string, string | number>) => {
 
   if (scorePercentage >= 75) {
     riskLevel = 'low';
-    interpretation = "Your responses suggest you have good mental wellbeing. You appear to be feeling positive and functioning well in most aspects of your life.";
+    interpretation = "You're thriving! Your responses show strong mental wellbeing across many areas of your life. You're experiencing positive emotions, feeling connected, and functioning well.";
     recommendations = [
-      'Continue practicing habits that support your mental wellbeing',
-      'Consider mentoring or supporting others who may be struggling',
-      'Maintain your social connections and supportive relationships',
-      'Continue to engage in activities that give you a sense of meaning and purpose'
+      'Keep nurturing the practices that help you thrive',
+      'Share your strength - your experience could inspire others on their journey',
+      'Continue investing in the relationships and activities that bring meaning to your life',
+      'Stay curious about new ways to maintain and deepen your sense of wellbeing'
     ];
   } else if (scorePercentage >= 50) {
     riskLevel = 'low';
-    interpretation = "Your mental wellbeing appears to be average. While you're doing well in some areas, there may be aspects of your mental health that could benefit from additional attention.";
+    interpretation = "You're doing well in many areas and building strength in others. Your wellbeing journey is progressing, with room to grow even stronger.";
     recommendations = [
-      'Identify the areas where you scored lower and consider ways to strengthen these aspects',
-      'Practice mindfulness or relaxation techniques to help manage stress',
-      'Engage in regular physical activity, which is known to improve mood',
-      "Consider talking to trusted friends or family about how you're feeling"
+      'Notice the areas where you\'re already strong - these are your foundations to build on',
+      'Explore mindfulness or breathing practices to cultivate more moments of calm',
+      'Movement can be powerful - find physical activities that feel good to you',
+      'Connect with people who energize and support you'
     ];
   } else if (scorePercentage >= 25) {
     riskLevel = 'moderate';
-    interpretation = "Your responses suggest your mental wellbeing is below average. You may be experiencing challenges in several areas of your life.";
+    interpretation = "You're navigating some challenges right now. Your responses show you're building important strengths, and there's support available to help you grow stronger.";
     recommendations = [
-      'Consider speaking with a mental health professional for additional support',
-      'Focus on self-care activities like adequate sleep, healthy eating, and physical activity',
-      'Try to identify specific stressors in your life and develop strategies to address them',
-      'Build your support network by connecting with friends, family, or support groups'
+      'Consider connecting with a mental health professional who can support your journey',
+      'Start with small acts of self-care: rest when you need it, nourish your body, move gently',
+      'You don\'t have to figure everything out alone - reaching out is a sign of wisdom',
+      'Notice what drains your energy and what restores it, then do more of what helps'
     ];
   } else {
     riskLevel = 'high';
-    interpretation = "Your responses indicate you may be experiencing significant challenges with your mental wellbeing. It's important to seek support.";
+    interpretation = "Right now feels challenging, and that takes courage to acknowledge. Your wellbeing matters, and support is available to help you move forward.";
     recommendations = [
-      "We recommend speaking with a healthcare professional about how you're feeling",
-      'Remember that mental health challenges are common and treatable',
-      'Consider contacting a mental health helpline for immediate support if needed',
-      'Be gentle with yourself and recognize that seeking help is a sign of strength'
+      'Please reach out to a healthcare professional - they\'re there to support you through this',
+      'You deserve support and care, and asking for help shows incredible strength',
+      'If you need someone to talk to right away, mental health helplines are available 24/7',
+      'Be compassionate with yourself - healing is possible, and you don\'t have to do it alone'
     ];
   }
 
@@ -236,9 +236,9 @@ const MentalWellbeingAssessment: React.FC = () => {
   return (
     <AssessmentTemplate
       id="mental-wellbeing"
-      title="Mental Wellbeing Assessment"
-      description="Evaluate your mental health, stress levels, and emotional wellbeing"
-      introduction="This assessment is based on the Warwick-Edinburgh Mental Wellbeing Scale (WEMWBS), a widely used tool for measuring mental wellbeing. Please answer based on your experience over the past 2 weeks. This is not a diagnostic tool, but it can help you understand your current mental wellbeing."
+      title="Wellbeing Check-In"
+      description="Discover your strengths and explore opportunities to nurture your mental wellness"
+      introduction="Take a moment to reflect on how you've been feeling lately. This check-in, inspired by the Warwick-Edinburgh Mental Wellbeing Scale, helps you notice your current strengths and areas where you might want to focus more attention. There are no right or wrong answers - just an opportunity to pause and tune into your experience over the past 2 weeks."
       questions={questions}
       calculateScore={calculateScore}
     />
