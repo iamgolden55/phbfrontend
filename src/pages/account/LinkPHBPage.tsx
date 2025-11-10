@@ -1,4 +1,4 @@
- import React, { useState, useEffect, useRef } from 'react';
+ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../features/auth/authContext';
 
@@ -8,6 +8,7 @@ interface HospitalResponse {
     id: number;
     name: string;
     region?: string;
+    state?: string;
     city?: string;
     country?: string;
     address?: string;
@@ -23,8 +24,8 @@ interface HospitalResponse {
 
 const LinkPHBPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isLoading: authLoading, error: authError, registerWithHospital, fetchNearbyHospitals, fetchAllHospitals, checkPrimaryHospital, hasPrimaryHospital, primaryHospital } = useAuth();
-  
+  const { user, isLoading: authLoading, error: authError, registerWithHospital, fetchNearbyHospitals, searchHospitals, checkPrimaryHospital, hasPrimaryHospital, primaryHospital } = useAuth();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRegion, setSelectedRegion] = useState('');
   const [selectedHospital, setSelectedHospital] = useState<number | null>(null);
@@ -33,12 +34,13 @@ const LinkPHBPage: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [locationMessage, setLocationMessage] = useState<string | null>(null);
-  
+
   // New state variables for hospital loading
   const [hospitals, setHospitals] = useState<Array<{
     id: number;
     name: string;
     region?: string;
+    state?: string;
     city?: string;
     country?: string;
     address?: string;
@@ -49,25 +51,45 @@ const LinkPHBPage: React.FC = () => {
   const [searchRadius, setSearchRadius] = useState(10);
   const [userCoords, setUserCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [noHospitalsFound, setNoHospitalsFound] = useState(false);
-  
+  const [isSearching, setIsSearching] = useState(false);
+
   // Add refs to track if hospitals are already loaded and if an API call is in progress
   const hospitalsLoaded = useRef(false);
   const apiCallInProgress = useRef(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hasInitialized = useRef(false);
 
   // Add new state for region warning
   const [regionWarning, setRegionWarning] = useState<string | null>(null);
 
   // Check if user already has a primary hospital on load - RUN ONCE ONLY
   useEffect(() => {
-    // Skip if hospitals are already loaded or if an API call is in progress
-    if (hospitalsLoaded.current || apiCallInProgress.current) return;
-    
+    // CRITICAL: Check hasInitialized FIRST to prevent React Strict Mode double-mount
+    if (hasInitialized.current) {
+      return;
+    }
+
+    // Skip if still loading auth - wait for auth to complete
+    if (authLoading) {
+      return;
+    }
+
+    // Skip if hospitals are already loaded, if an API call is in progress,
+    // OR if user has already searched/loaded hospitals
+    if (hospitalsLoaded.current || apiCallInProgress.current || hospitals.length > 0 || searchTerm.length > 0) {
+      return;
+    }
+
+    // Mark as initialized immediately to prevent double execution
+    hasInitialized.current = true;
+
     const checkUserHospital = async () => {
       if (apiCallInProgress.current) return;
       apiCallInProgress.current = true;
-      
+
       try {
         const result = await checkPrimaryHospital();
+
         if (result.has_primary && result.primary_hospital) {
           setSuccess(`You are already registered with ${result.primary_hospital.name} as your primary hospital.`);
           hospitalsLoaded.current = true;
@@ -75,7 +97,10 @@ const LinkPHBPage: React.FC = () => {
           // Only load hospitals if user doesn't have a primary hospital
           // and hospitals haven't been loaded yet
           if (!hospitalsLoaded.current) {
-            await loadHospitals(true);
+            // Reset apiCallInProgress before calling loadHospitals
+            apiCallInProgress.current = false;
+            // Use false to skip geolocation and prevent infinite loop
+            await loadHospitals(false);
             hospitalsLoaded.current = true;
           }
         }
@@ -85,7 +110,10 @@ const LinkPHBPage: React.FC = () => {
         // Still try to load hospitals even if check fails
         // but only if hospitals haven't been loaded yet
         if (!hospitalsLoaded.current) {
-          await loadHospitals(true);
+          // Reset apiCallInProgress before calling loadHospitals
+          apiCallInProgress.current = false;
+          // Use false to skip geolocation and prevent infinite loop
+          await loadHospitals(false);
           hospitalsLoaded.current = true;
         }
       } finally {
@@ -93,12 +121,68 @@ const LinkPHBPage: React.FC = () => {
       }
     };
 
-    if (!authLoading) {
-      checkUserHospital();
-    }
-    // Only run this effect once when the component mounts
+    checkUserHospital();
+    // Run when authLoading changes - this ensures we run after auth completes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading]);
+
+  // Debounced search effect - triggers server-side search when user types
+  useEffect(() => {
+    // Clear any existing timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // If search term is empty or less than 2 characters, don't search
+    if (!searchTerm || searchTerm.length < 2) {
+      return;
+    }
+
+    // Set loading state immediately
+    setIsSearching(true);
+
+    // Debounce the search by 500ms
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        // Perform server-side search with limit (search nationwide)
+        const results = await searchHospitals(searchTerm, {
+          limit: 50
+        });
+
+        // Format hospitals
+        const formattedHospitals = results.map(hospital => ({
+          ...hospital,
+          region: hospital.state || hospital.city || '',
+          available: hospital.available !== false
+        }));
+
+        // Batch state updates using React 18 automatic batching
+        const noResults = formattedHospitals.length === 0;
+        setHospitals(formattedHospitals);
+        setNoHospitalsFound(noResults);
+        setLocationMessage(
+          noResults
+            ? `No hospitals found matching "${searchTerm}". Try a different search term.`
+            : `Found ${formattedHospitals.length} hospital(s) matching "${searchTerm}"`
+        );
+        setIsSearching(false);
+      } catch (err) {
+        console.error('Search failed:', err);
+        // Batch error state updates
+        setError('Failed to search hospitals. Please try again.');
+        setIsSearching(false);
+      }
+    }, 500);
+
+    // Cleanup timeout on unmount or when searchTerm changes
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+    // Remove searchHospitals from dependencies to prevent unnecessary re-runs
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm]);
 
   // Get user location
   const getUserLocation = async () => {
@@ -126,83 +210,81 @@ const LinkPHBPage: React.FC = () => {
   // Load hospitals - either nearby or all
   const loadHospitals = async (useLocation: boolean = false) => {
     // Skip if an API call is already in progress
-    if (apiCallInProgress.current) return;
+    if (apiCallInProgress.current) {
+      return;
+    }
     apiCallInProgress.current = true;
-    
+
     setIsLoadingHospitals(true);
     setError('');
     setNoHospitalsFound(false);
-    
+
     try {
       let response: HospitalResponse;
-      
+
       if (useLocation) {
         try {
           const coords = await getUserLocation();
           setUserCoords(coords);
           setUsingGeolocation(true);
-          
+
           // Call the nearby hospitals API with coordinates
           const nearbyResponse = await fetchNearbyHospitals(coords.latitude, coords.longitude, searchRadius);
           response = nearbyResponse as HospitalResponse;
-          
-          // If no hospitals found with current location, try user's profile location
+
+          // If no hospitals found with current location, show search prompt
           if (!response.hospitals || response.hospitals.length === 0) {
-            console.log('No hospitals found near current location, trying profile location');
-            
-            // Check if user has location data in their profile
-            if (user && (user.city || user.country || user.state)) {
-              setLocationMessage('No hospitals found near your current location. Showing hospitals near your profile address.');
-              
-              // Just fetch all hospitals as we can't directly geocode the profile address
-              const allHospitalsResponse = await fetchAllHospitals();
-              
-              // Filter hospitals by user's location
-              // This is a basic client-side filter as we don't have geocoding
-              // In a production app, you'd make an API call with the profile address coordinates
-              const filteredHospitals = filterHospitalsByProfileLocation(allHospitalsResponse);
-              
-              if (filteredHospitals.length > 0) {
-                response = { 
-                  hospitals: filteredHospitals,
-                  message: 'Showing hospitals near your profile address'
-                };
-              } else {
-                // If no hospitals found near profile location either, show all
-                response = { 
-                  hospitals: allHospitalsResponse,
-                  message: 'No hospitals found near your locations. Showing all available hospitals.'
-                };
-              }
+            // Check if user has location data in their profile for search suggestions
+            if (user && user.state) {
+              setLocationMessage(
+                `No hospitals found within ${searchRadius}km of your location. Try searching by hospital name or state.`
+              );
+              // Set empty array - user will need to search
+              response = { hospitals: [] };
             } else {
-              // No profile location available, fetch all hospitals
-              const allHospitalsResponse = await fetchAllHospitals();
-              response = { 
-                hospitals: allHospitalsResponse,
-                message: 'No hospitals found nearby. Showing all available hospitals.'
-              };
+              setLocationMessage(
+                'No hospitals found nearby. Please search for your hospital by name or location.'
+              );
+              response = { hospitals: [] };
             }
           }
-          
+
         } catch (locationError) {
           console.warn("Could not get user location:", locationError);
           setUsingGeolocation(false);
-          
-          // Fall back to all hospitals
-          const allHospitalsResponse = await fetchAllHospitals();
-          response = { hospitals: allHospitalsResponse };
+
+          // If user has state in profile, search by state
+          if (user && user.state) {
+            setLocationMessage(`Showing hospitals in your region (${user.state}). You can search for hospitals in other regions using the search box.`);
+            const stateHospitals = await searchHospitals('', {
+              state: user.state,
+              limit: 50
+            });
+            response = { hospitals: stateHospitals };
+          } else {
+            // No location data at all - show search prompt
+            setLocationMessage('Please search for your hospital by name or location.');
+            response = { hospitals: [] };
+          }
         }
       } else {
         setUsingGeolocation(false);
-        
-        // Just fetch all hospitals
-        const allHospitalsResponse = await fetchAllHospitals();
-        response = { hospitals: allHospitalsResponse };
+
+        // If user has state, show hospitals in their state
+        if (user && user.state) {
+          setLocationMessage(`Showing hospitals in your region (${user.state}). You can search for hospitals in other regions using the search box.`);
+          const stateHospitals = await searchHospitals('', {
+            state: user.state,
+            limit: 50
+          });
+          response = { hospitals: stateHospitals };
+        } else {
+          // Prompt user to search
+          setLocationMessage('Please search for your hospital by name or location.');
+          response = { hospitals: [] };
+        }
       }
-      
-      // Handle the enhanced API response
-      console.log('Hospital response received');
-      
+
       // Save location message if provided
       if (response.message) {
         setLocationMessage(response.message);
@@ -211,20 +293,20 @@ const LinkPHBPage: React.FC = () => {
       } else {
         setLocationMessage('Showing all available hospitals');
       }
-      
+
       // Ensure hospitals is always an array
       const hospitalData = response.hospitals || [];
-      
+
       // Check if we have any hospitals
       setNoHospitalsFound(hospitalData.length === 0);
-      
+
       // Format hospitals for display
       const formattedHospitals = hospitalData.map(hospital => ({
         ...hospital,
-        region: hospital.region || hospital.city || '',
+        region: hospital.state || hospital.city || '',
         available: hospital.available !== false // default to true if available is not specified
       }));
-      
+
       // Update state only once with the formatted hospitals
       setHospitals(formattedHospitals);
     } catch (err) {
@@ -242,18 +324,20 @@ const LinkPHBPage: React.FC = () => {
     id: number;
     name: string;
     region?: string;
+    state?: string;
     city?: string;
     country?: string;
     address?: string;
-    available: boolean;
+    available?: boolean;
   }>): Array<{
     id: number;
     name: string;
     region?: string;
+    state?: string;
     city?: string;
     country?: string;
     address?: string;
-    available: boolean;
+    available?: boolean;
   }> => {
     // If user has no location data, return all hospitals
     if (!user || (!user.city && !user.country && !user.state)) {
@@ -318,7 +402,7 @@ const LinkPHBPage: React.FC = () => {
         const response = await fetchNearbyHospitals(userCoords.latitude, userCoords.longitude, radius);
         
         // Handle the enhanced API response
-        if ('message' in response) {
+        if ('message' in response && response.message) {
           setLocationMessage(response.message);
         }
         
@@ -330,7 +414,7 @@ const LinkPHBPage: React.FC = () => {
         
         const formattedHospitals = hospitalData.map(hospital => ({
           ...hospital,
-          region: hospital.region || hospital.city || '',
+          region: hospital.state || hospital.city || '',
           available: hospital.available !== false
         }));
         
@@ -345,7 +429,7 @@ const LinkPHBPage: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validate the HPN number
@@ -369,17 +453,21 @@ const LinkPHBPage: React.FC = () => {
 
       setSuccess(result.message || 'Your HPN number has been successfully linked to the selected hospital.');
 
-      // Redirect after successful linking
+      // Refresh primary hospital status in auth context
+      await checkPrimaryHospital();
+
+      // Keep submitting state true during redirect to prevent form interaction
+      // Redirect after showing success message
       setTimeout(() => {
-        navigate('/account');
-      }, 3000);
+        console.log('Redirecting to account page after successful hospital link');
+        navigate('/account', { replace: true });
+      }, 2500);
     } catch (err: any) {
       console.error("Hospital registration failed:", err);
       setError(err.message || 'Failed to register with the selected hospital. Please try again.');
-    } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [phbNumber, selectedHospital, registerWithHospital, checkPrimaryHospital, navigate]);
 
   // Handle toggling between geolocation and all hospitals
   const toggleLocationSearch = () => {
@@ -401,40 +489,55 @@ const LinkPHBPage: React.FC = () => {
   // Extract unique regions from hospitals
   const regions = Array.from(new Set(hospitals.map(hospital => hospital.region))).sort();
 
-  // Filter hospitals by search term and selected region
+  // Filter hospitals only by selected region (search is now server-side)
   const filteredHospitals = hospitals.filter(hospital => {
-    const matchesSearch = searchTerm === '' ||
-      hospital.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (hospital.region && hospital.region.toLowerCase().includes(searchTerm.toLowerCase()));
-
     const matchesRegion = selectedRegion === '' || hospital.region === selectedRegion;
-
-    return matchesSearch && matchesRegion;
+    return matchesRegion;
   });
 
-  const handleHospitalSelect = (hospitalId: number) => {
+  const handleHospitalSelect = useCallback((hospitalId: number) => {
     setSelectedHospital(hospitalId);
     setError('');
-    
+    setRegionWarning(null); // Clear previous warning
+
     // Check if selected hospital is in a different region than user's location
-    // and show warning if necessary
     const selectedHosp = hospitals.find(h => h.id === hospitalId);
-    if (selectedHosp) {
-      checkHospitalRegionMismatch(selectedHosp);
-    } else {
-      setRegionWarning(null);
+
+    if (selectedHosp && user) {
+      console.log('Checking region mismatch for:', selectedHosp.name);
+      console.log('Hospital region:', selectedHosp.region || selectedHosp.state);
+      console.log('User state:', user.state);
+
+      // Compare hospital region/state with user's state
+      const hospitalRegion = (selectedHosp.region || selectedHosp.state || '').toLowerCase().trim();
+      const userState = (user.state || '').toLowerCase().trim();
+
+      // Check if they're different regions (handle cases like "delta state" vs "delta")
+      const isDifferentRegion = hospitalRegion && userState &&
+        hospitalRegion !== userState &&
+        !hospitalRegion.includes(userState) &&
+        !userState.includes(hospitalRegion);
+
+      if (isDifferentRegion) {
+        const warningMessage = `This hospital is in ${selectedHosp.region || selectedHosp.state}, which is different from your registered region (${user.state}). Registering with a hospital outside your state may make routine appointments and healthcare access more difficult. We recommend choosing a hospital in your local area.`;
+        console.log('Setting warning:', warningMessage);
+        setRegionWarning(warningMessage);
+      } else {
+        console.log('No warning needed - same region or missing data');
+      }
     }
-  };
+  }, [hospitals, user]);
 
   // Function to check if selected hospital is in a different region
   const checkHospitalRegionMismatch = (hospital: {
     id: number;
     name: string;
     region?: string;
+    state?: string;
     city?: string;
     country?: string;
     address?: string;
-    available: boolean;
+    available?: boolean;
   }) => {
     // Clear any previous warnings
     setRegionWarning(null);
@@ -571,10 +674,25 @@ const LinkPHBPage: React.FC = () => {
         </div>
 
         {success ? (
-          <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-8">
-            <h2 className="text-xl font-bold mb-2 text-green-800">Success!</h2>
-            <p className="text-green-700">{success}</p>
-            <p className="text-green-700 mt-2">Redirecting you to your account page...</p>
+          <div className="bg-green-50 border-l-4 border-green-500 p-6 mb-8 rounded-lg shadow-lg">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="ml-4 flex-1">
+                <h2 className="text-2xl font-bold mb-3 text-green-800">Hospital Linked Successfully!</h2>
+                <p className="text-green-700 text-lg mb-3">{success}</p>
+                <div className="flex items-center text-green-600 mt-4">
+                  <svg className="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span className="font-medium">Redirecting to your account page...</span>
+                </div>
+              </div>
+            </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="mb-8">
@@ -588,9 +706,8 @@ const LinkPHBPage: React.FC = () => {
                   type="text"
                   id="phbNumber"
                   value={phbNumber}
-                  onChange={(e) => setPhbNumber(e.target.value)}
-                  placeholder="e.g., PHB1234567890"
-                  className="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  readOnly
+                  className="w-full md:w-1/2 px-4 py-2 border border-gray-200 bg-gray-50 text-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 cursor-not-allowed"
                   required
                 />
                 <p className="text-sm text-gray-500 mt-1">
@@ -667,14 +784,31 @@ const LinkPHBPage: React.FC = () => {
                 <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
                   Search for a hospital
                 </label>
-                <input
-                  type="text"
-                  id="search"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search by hospital name or region"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <div className="relative">
+                  <input
+                    type="search"
+                    id="search"
+                    name="search"
+                    autoComplete="off"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                      }
+                    }}
+                    placeholder="Type at least 2 characters to search..."
+                    className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  {isSearching && (
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <svg className="animate-spin h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="mt-6">
@@ -707,8 +841,10 @@ const LinkPHBPage: React.FC = () => {
                     {filteredHospitals.map(hospital => (
                       <div
                         key={hospital.id}
-                        onClick={() => hospital.available && handleHospitalSelect(hospital.id)}
-                        className={`p-4 border rounded-md cursor-pointer transition-colors ${
+                        onClick={() => hospital.available && !isSearching && handleHospitalSelect(hospital.id)}
+                        className={`p-4 border rounded-md transition-colors ${
+                          isSearching ? 'pointer-events-none' : 'cursor-pointer'
+                        } ${
                           hospital.available
                             ? selectedHospital === hospital.id
                               ? 'border-blue-500 bg-blue-50'
