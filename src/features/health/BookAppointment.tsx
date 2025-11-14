@@ -71,7 +71,7 @@ const LANGUAGES = [
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/'; // Fallback if .env is missing
 const AUTH_TOKEN_KEY = 'phb_auth_token';
 
-// Helper function for making API calls (reusing pattern from authContext)
+// Helper function for making API calls (using cookie-based authentication)
 async function apiRequest<T>(
   endpoint: string,
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET',
@@ -83,15 +83,11 @@ async function apiRequest<T>(
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
-  
-  const authToken = token || localStorage.getItem(AUTH_TOKEN_KEY);
-  if (authToken) {
-    headers['Authorization'] = `Bearer ${authToken}`;
-  }
 
   const config: RequestInit = {
     method,
     headers,
+    credentials: 'include', // Use cookies for authentication
   };
 
   if (body) {
@@ -316,8 +312,8 @@ const BookAppointment: React.FC = () => {
       try {
         // Handle the departments response format
         const departmentsResponse = await fetch(`${API_BASE_URL.replace(/\/$/, '')}/api/departments/`, {
+          credentials: 'include', // Use cookies for authentication
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem(AUTH_TOKEN_KEY)}`,
             'Accept': 'application/json',
           }
         });
@@ -359,6 +355,12 @@ const BookAppointment: React.FC = () => {
         // Validate that departments have the expected structure
         if (departmentsList.length === 0) {
           console.warn('No departments returned from API');
+          // Better error message for missing departments
+          throw new Error(
+            'This hospital has not configured any departments yet. ' +
+            'Appointment bookings are currently unavailable. ' +
+            'Please contact hospital administration or try a different hospital.'
+          );
         } else if (!departmentsList[0].id || !departmentsList[0].name) {
           console.error('Department objects missing required fields:', departmentsList[0]);
           throw new Error('Invalid department data structure');
@@ -753,7 +755,11 @@ const BookAppointment: React.FC = () => {
       }
 
       if (!departmentId) {
-        throw new Error('Could not determine appropriate department. Please try again.');
+        throw new Error(
+          'Could not find a suitable department for your symptoms at this hospital. ' +
+          'This may be because the hospital does not have the required specialist departments configured. ' +
+          'Please try selecting different symptoms or contact the hospital directly.'
+        );
       }
 
       // Check hospital registration before proceeding

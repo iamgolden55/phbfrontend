@@ -52,6 +52,7 @@ import PersonalDetailsPage from './pages/account/PersonalDetailsPage';
 import ContactPreferencesPage from './pages/account/ContactPreferencesPage';
 import ContactSupportPage from './pages/account/ContactSupportPage';
 import PasswordPage from './pages/account/PasswordPage';
+import SecuritySettingsPage from './pages/account/SecuritySettingsPage';
 import HealthGoalsPage from './pages/account/HealthGoalsPage';
 import HealthRecordsPage from './pages/account/HealthRecordsPage';
 import RequestPrescriptionPage from './pages/account/RequestPrescriptionPage';
@@ -183,6 +184,7 @@ import ProfessionalProfilePage from './pages/professional/ProfessionalProfilePag
 import ProfessionalResourcesPage from './pages/professional/ProfessionalResourcesPage';
 import PrescriptionRequestsPage from './pages/professional/PrescriptionRequestsPage';
 import PrescriptionTriagePage from './pages/professional/PrescriptionTriagePage';
+import PharmacyPrescriptionsPage from './pages/professional/PharmacyPrescriptionsPage';
 
 // Practice Pages
 import MyPracticePageDashboard from './pages/professional/MyPracticePageDashboard';
@@ -712,6 +714,11 @@ function App() {
                     <PasswordPage />
                   </ProtectedRoute>
                 } />
+                <Route path="account/security" element={
+                  <ProtectedRoute>
+                    <SecuritySettingsPage />
+                  </ProtectedRoute>
+                } />
                 <Route path="account/link-phb" element={
                   <ProtectedRoute>
                     <LinkPHBPage />
@@ -897,6 +904,7 @@ function App() {
                 <Route path="appointments/:appointmentId" element={<ProfessionalAppointmentDetailPage />} />
                 <Route path="prescriptions" element={<PrescriptionRequestsPage />} />
                 <Route path="prescriptions/triage" element={<PrescriptionTriagePage />} />
+                <Route path="prescriptions/pharmacy" element={<PharmacyPrescriptionsPage />} />
                 <Route path="calculators" element={<ProfessionalCalculatorsPage />} />
                 <Route path="guidelines" element={<ClinicalGuidelinesPage />} />
                 <Route path="resources" element={<DoctorResourcesPage />} />

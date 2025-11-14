@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import AccountHealthLayout from '../../layouts/AccountHealthLayout';
 import { fetchPatientPrescriptions, orderPrescription, completePrescription, generateNotifications, ApiMedication, ApiPrescriptionsResponse, ApiPharmacy } from './prescriptionsService';
 import PrintablePrescription from './PrintablePrescription';
+import { getCurrentNomination, NominationResponse } from '../../services/pharmacyService';
 
 interface PrescriptionType {
   id: string;
@@ -63,6 +64,8 @@ const Prescriptions: React.FC = () => {
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
   const [showPrintFormatDialog, setShowPrintFormatDialog] = useState(false);
   const [printFormat, setPrintFormat] = useState<'electronic' | 'paper' | null>(null);
+  const [currentNomination, setCurrentNomination] = useState<NominationResponse | null>(null);
+  const [isLoadingNomination, setIsLoadingNomination] = useState(false);
 
   useEffect(() => {
     const loadPrescriptions = async () => {
@@ -70,11 +73,11 @@ const Prescriptions: React.FC = () => {
       try {
         const data = await fetchPatientPrescriptions();
         console.log('Fetched prescriptions:', data);
-        
+
         // Process the API response - only use medications array from the response
         const apiPrescriptions = data.medications || [];
         console.log('API prescriptions:', apiPrescriptions);
-        
+
         // Convert API format to our component format
         const formattedPrescriptions: PrescriptionType[] = apiPrescriptions.map((apiMed: ApiMedication) => {
           // Get creation date safely
@@ -141,8 +144,24 @@ const Prescriptions: React.FC = () => {
         setIsLoading(false);
       }
     };
-    
+
+    const loadNominatedPharmacy = async () => {
+      setIsLoadingNomination(true);
+      try {
+        const nominationData = await getCurrentNomination();
+        console.log('Fetched nominated pharmacy:', nominationData);
+        setCurrentNomination(nominationData);
+      } catch (err: any) {
+        console.error('Failed to load nominated pharmacy:', err);
+        // Don't show error to user - just log it
+        // User might not have a nomination yet, which is OK
+      } finally {
+        setIsLoadingNomination(false);
+      }
+    };
+
     loadPrescriptions();
+    loadNominatedPharmacy();
   }, []);
 
   // Filter prescriptions based on current view
@@ -691,44 +710,62 @@ const Prescriptions: React.FC = () => {
               </div>
 
               {/* Pharmacy information */}
-              {selectedPrescription.nominated_pharmacy && (
+              {(selectedPrescription.nominated_pharmacy || (currentNomination?.has_nomination && currentNomination?.nomination)) && (
                 <div className="mb-6">
-                  <h4 className="font-bold mb-3 text-gray-700">Nominated Pharmacy</h4>
-                  <div className="bg-green-50 border border-green-200 p-4 rounded-md">
-                    <div className="flex items-start">
-                      <div className="flex-shrink-0">
-                        <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                      </div>
-                      <div className="ml-3 flex-1">
-                        <p className="font-bold text-green-800">{selectedPrescription.nominated_pharmacy.name}</p>
-                        <p className="text-sm text-green-700 mt-1">{selectedPrescription.nominated_pharmacy.address_line_1}</p>
-                        <p className="text-sm text-green-700">{selectedPrescription.nominated_pharmacy.city}, {selectedPrescription.nominated_pharmacy.postcode}</p>
-                        <p className="text-sm text-green-700 mt-2">
-                          <span className="font-medium">Phone:</span> {selectedPrescription.nominated_pharmacy.phone}
-                        </p>
-                        {selectedPrescription.nominated_pharmacy.electronic_prescriptions_enabled && (
-                          <div className="mt-2 flex items-center">
-                            <svg className="h-4 w-4 text-green-600 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                            <span className="text-xs text-green-700">Electronic prescriptions enabled</span>
+                  <h4 className="font-bold mb-3 text-gray-700">
+                    {selectedPrescription.nominated_pharmacy ? 'Prescription Pharmacy' : 'Your Nominated Pharmacy'}
+                  </h4>
+                  {(() => {
+                    // Check both pharmacy and practice_page fields for the nomination
+                    const nominatedPharmacy = currentNomination?.nomination?.pharmacy || currentNomination?.nomination?.practice_page;
+                    const pharmacy = selectedPrescription.nominated_pharmacy || nominatedPharmacy;
+                    const isPrescriptionLinked = !!selectedPrescription.nominated_pharmacy;
+
+                    if (!pharmacy) return null;
+
+                    return (
+                      <>
+                        <div className={`${isPrescriptionLinked ? 'bg-green-50 border-green-200' : 'bg-blue-50 border-blue-200'} border p-4 rounded-md`}>
+                          <div className="flex items-start">
+                            <div className="flex-shrink-0">
+                              <svg className={`h-6 w-6 ${isPrescriptionLinked ? 'text-green-600' : 'text-blue-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                              </svg>
+                            </div>
+                            <div className="ml-3 flex-1">
+                              <p className={`font-bold ${isPrescriptionLinked ? 'text-green-800' : 'text-blue-800'}`}>{pharmacy.name}</p>
+                              <p className={`text-sm ${isPrescriptionLinked ? 'text-green-700' : 'text-blue-700'} mt-1`}>{pharmacy.address_line_1}</p>
+                              <p className={`text-sm ${isPrescriptionLinked ? 'text-green-700' : 'text-blue-700'}`}>{pharmacy.city}, {pharmacy.postcode}</p>
+                              <p className={`text-sm ${isPrescriptionLinked ? 'text-green-700' : 'text-blue-700'} mt-2`}>
+                                <span className="font-medium">Phone:</span> {pharmacy.phone}
+                              </p>
+                              {pharmacy.electronic_prescriptions_enabled && (
+                                <div className="mt-2 flex items-center">
+                                  <svg className={`h-4 w-4 ${isPrescriptionLinked ? 'text-green-600' : 'text-blue-600'} mr-1`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                  <span className={`text-xs ${isPrescriptionLinked ? 'text-green-700' : 'text-blue-700'}`}>Electronic prescriptions enabled</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-2">
-                    This prescription will be sent to your nominated pharmacy electronically.{' '}
-                    <Link to="/account/nominated-pharmacy" className="text-[#005eb8] hover:underline">
-                      Change pharmacy
-                    </Link>
-                  </p>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">
+                          {isPrescriptionLinked
+                            ? 'This prescription was sent to this pharmacy electronically.'
+                            : 'This is your currently nominated pharmacy. New prescriptions will be sent here.'
+                          }{' '}
+                          <Link to="/account/nominated-pharmacy" className="text-[#005eb8] hover:underline">
+                            Change pharmacy
+                          </Link>
+                        </p>
+                      </>
+                    );
+                  })()}
                 </div>
               )}
 
-              {!selectedPrescription.nominated_pharmacy && (
+              {!selectedPrescription.nominated_pharmacy && !(currentNomination?.has_nomination && currentNomination?.nomination) && (
                 <div className="mb-6">
                   <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-md">
                     <div className="flex items-start">

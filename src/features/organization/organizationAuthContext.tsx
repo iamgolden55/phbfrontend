@@ -233,11 +233,8 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
   // Check if user is already logged in on mount or if OTP verification is in progress
   useEffect(() => {
     const initializeAuth = async () => {
-      console.log('🔐 === ORGANIZATION AUTH INITIALIZATION STARTING ===');
-
       // Prevent multiple initializations
       if (isInitialized) {
-        console.log('🔐 Organization auth already initialized, skipping...');
         return;
       }
 
@@ -247,7 +244,6 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
         // Check if this is right after an intentional logout
         const logoutFlag = sessionStorage.getItem('org_logout_flag');
         if (logoutFlag === 'true') {
-          console.log('🔐 Organization: Clean logout detected, skipping auth check');
           sessionStorage.removeItem('org_logout_flag');
           setIsAuthenticated(false);
           setUserData(null);
@@ -260,8 +256,7 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
 
         // Check authentication status by calling the backend
         // The backend will check the httpOnly cookies automatically
-        console.log('🔐 Checking authentication status with backend...');
-
+        // If the user is not an organization user, this will fail silently (404)
         try {
           const response = await fetch('http://127.0.0.1:8000/api/organizations/profile/', {
             method: 'GET',
@@ -314,7 +309,8 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
 
             console.log('🔐 ✅ ORGANIZATION USER RESTORED SUCCESSFULLY');
           } else {
-            console.log('🔐 No valid authentication found (401/403)');
+            // Expected for non-organization users (404/401/403)
+            // This is not an error - just means user is not an organization admin
 
             // Check if we're in the middle of OTP verification
             const storedEmail = sessionStorage.getItem('org_auth_email');
@@ -327,8 +323,7 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
               setIsAuthenticated(false);
               setUserData(null);
             } else {
-              // No auth data and no verification in progress
-              console.log('🔐 No existing auth found, user needs to login');
+              // No auth data and no verification in progress - this is normal for non-org users
               setIsAuthenticated(false);
               setUserData(null);
               setNeedsVerification(false);
@@ -336,7 +331,7 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
             }
           }
         } catch (fetchError) {
-          console.log('🔐 Error checking auth status:', fetchError);
+          // Expected error for non-organization users - suppress console log
 
           // Check if we're in the middle of OTP verification
           const storedEmail = sessionStorage.getItem('org_auth_email');
@@ -369,9 +364,10 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
       }
     };
 
-    // Run immediately on mount, with no dependencies, to minimize synchronization issues
+    // Run immediately on mount
     initializeAuth();
-  }, []); // Empty dependency array - only run once, no re-initialization
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   const login = async (email: string, password: string, hospital_code: string): Promise<void> => {
     setIsLoading(true);

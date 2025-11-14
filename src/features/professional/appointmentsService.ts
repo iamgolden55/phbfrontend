@@ -50,6 +50,9 @@ export interface Appointment {
   status: string;
   priority: string;
   appointment_date: string;
+  is_flagged_pending?: boolean; // True if pending and past scheduled time
+  is_past_scheduled_time?: boolean; // True if past scheduled time
+  minutes_past_scheduled?: number; // Minutes past scheduled time
   [key: string]: any; // Allow other properties
 }
 
@@ -235,16 +238,20 @@ export async function fetchDoctorAppointmentDetails(appointmentId: string) {
 /**
  * Accept an appointment as a doctor
  * @param appointmentId The ID of the appointment to accept
+ * @param proposedTime Optional ISO 8601 datetime string for proposing a new time
  * @returns Promise that resolves to the updated appointment
  */
-export async function acceptAppointment(appointmentId: string) {
+export async function acceptAppointment(appointmentId: string, proposedTime?: string) {
   try {
+    const body = proposedTime ? { proposed_time: proposedTime } : {};
+    
     const response = await fetch(createApiUrl(`api/appointments/${appointmentId}/accept/`), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       credentials: 'include', // Send cookies with request
+      body: JSON.stringify(body)
     });
     
     if (!response.ok) {

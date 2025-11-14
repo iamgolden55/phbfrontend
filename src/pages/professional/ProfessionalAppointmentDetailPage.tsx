@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { Tab, Tabs, Box, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, InputLabel, Select, MenuItem } from '@mui/material';
+import { Tab, Tabs, Box, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, InputLabel, Select, MenuItem, Autocomplete, Checkbox, Alert } from '@mui/material';
 import MedicalRecordsTab from '../../features/medical/MedicalRecordsTab';
 import MedicalAccessTab from '../../features/professional/MedicalAccessTab';
 import { 
@@ -57,6 +57,9 @@ interface AppointmentDetails {
   email_verified?: boolean;
   medical_summary?: string;
   prescriptions?: PrescriptionResponse[];
+  started_at?: string;
+  cancelled_at?: string;
+  completed_at?: string;
 }
 
 interface NotificationStatus {
@@ -85,6 +88,7 @@ interface MedicationForm {
   patient_instructions: string;
   indication: string;
   generic_name?: string;
+  is_controlled_override?: boolean;
 }
 
 interface Hospital {
@@ -172,9 +176,15 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
     frequency: '',
     duration: '',
     patient_instructions: '',
-    indication: ''
+    indication: '',
+    is_controlled_override: false
   }]);
-  
+
+  // Drug search state variables
+  const [drugOptions, setDrugOptions] = useState<any[]>([]);
+  const [drugSearchLoading, setDrugSearchLoading] = useState(false);
+  const [drugNotFoundWarning, setDrugNotFoundWarning] = useState<{[key: number]: boolean}>({});
+
   // Referral state variables
   const [showReferralModal, setShowReferralModal] = useState(false);
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
@@ -185,6 +195,86 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
   const [isLoadingReferral, setIsLoadingReferral] = useState(false);
   const [loadingDepartments, setLoadingDepartments] = useState(false);
   const [referralType, setReferralType] = useState<'same-hospital' | 'other-hospital'>('same-hospital');
+
+  // Drug search function
+  const searchDrugs = async (query: string): Promise<any[]> => {
+    if (!query || query.length < 2) {
+      return [];
+    }
+
+    try {
+      setDrugSearchLoading(true);
+      const token = localStorage.getItem('phb_professional_token');
+
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/drugs/search/?q=${encodeURIComponent(query)}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Drug search failed');
+      }
+
+      const data = await response.json();
+      setDrugSearchLoading(false);
+      return data.results || [];
+    } catch (error) {
+      console.error('Error searching drugs:', error);
+      setDrugSearchLoading(false);
+      return [];
+    }
+  };
+
+  // Handle drug selection from autocomplete
+  const handleDrugSelect = (index: number, drug: any | null) => {
+    const updatedMedications = [...medications];
+
+    if (drug) {
+      // Drug selected from database
+      updatedMedications[index] = {
+        ...updatedMedications[index],
+        medication_name: drug.generic_name || drug.brand_names?.[0] || '',
+        generic_name: drug.generic_name || '',
+        is_controlled_override: drug.is_controlled_substance || false
+      };
+
+      // Clear warning for this medication
+      const updatedWarnings = { ...drugNotFoundWarning };
+      delete updatedWarnings[index];
+      setDrugNotFoundWarning(updatedWarnings);
+    } else {
+      // Free text entry - clear controlled override and show warning
+      updatedMedications[index] = {
+        ...updatedMedications[index],
+        is_controlled_override: false
+      };
+
+      // Show warning if drug name is entered but not in database
+      if (updatedMedications[index].medication_name) {
+        setDrugNotFoundWarning({
+          ...drugNotFoundWarning,
+          [index]: true
+        });
+      }
+    }
+
+    setMedications(updatedMedications);
+  };
+
+  // Handle controlled substance checkbox change
+  const handleControlledChange = (index: number, checked: boolean) => {
+    const updatedMedications = [...medications];
+    updatedMedications[index] = {
+      ...updatedMedications[index],
+      is_controlled_override: checked
+    };
+    setMedications(updatedMedications);
+  };
 
   // Effect to load mock hospitals and departments data
 
@@ -199,21 +289,21 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
       try {
         const data = await fetchDoctorAppointmentDetails(appointmentId);
         console.log('Appointment details:', data);
-        console.log('symptoms:', data?.symptoms_data[0].description);
+        console.log('symptoms:', data?.symptoms_data?.[0]?.description);
         // Process patient information
         const processedData: AppointmentDetails = {
           ...data,
-          patient_name: data.patient_name || 
-                       data.patient?.name || 
+          patient_name: data.patient_name ||
+                       data.patient?.name ||
                        data.patient?.full_name ||
                        data.name ||
                        data.full_name ||
-                       data.customer_name || 
+                       data.customer_name ||
                        data.user_name ||
                        `Patient #${data.appointment_id?.slice(-6)}`,
           patient_email: data.patient_email || data.patient?.email || data.email,
           patient_id: data.patient_id || data.patient?.id || data.appointment_id,
-          symptoms: data.symptoms_data[0]?.description || data.chief_complaint
+          symptoms: data.symptoms_data?.[0]?.description || data.chief_complaint
         };
         
 
@@ -476,13 +566,23 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
 
   const handleShowCompletionModal = () => {
     if (appointmentDetails) {
-      const appointmentDate = appointmentDetails.appointment_date?.split('T')[0] || new Date().toISOString().split('T')[0];
-      const appointmentTime = appointmentDetails.formatted_time ? 
-        convertTimeFormat(appointmentDetails.formatted_time) : 
-        new Date().toTimeString().slice(0, 5);
-      
-      setMeetingStartTime(`${appointmentDate}T${appointmentTime}`);
-      
+      // Use started_at if available (actual consultation start time), otherwise fallback to scheduled time
+      if (appointmentDetails.started_at) {
+        // Parse the started_at timestamp
+        const startedDate = new Date(appointmentDetails.started_at);
+        const startDate = startedDate.toISOString().split('T')[0];
+        const startTime = startedDate.toTimeString().slice(0, 5);
+        setMeetingStartTime(`${startDate}T${startTime}`);
+      } else {
+        // Fallback to scheduled time if started_at not available
+        const appointmentDate = appointmentDetails.appointment_date?.split('T')[0] || new Date().toISOString().split('T')[0];
+        const appointmentTime = appointmentDetails.formatted_time ?
+          convertTimeFormat(appointmentDetails.formatted_time) :
+          new Date().toTimeString().slice(0, 5);
+        setMeetingStartTime(`${appointmentDate}T${appointmentTime}`);
+      }
+
+      // Set end time to current time
       const now = new Date();
       const endDate = now.toISOString().split('T')[0];
       const endTime = now.toTimeString().slice(0, 5);
@@ -492,13 +592,13 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
       const dateStr = now.toISOString().split('T')[0];
       const timeStr = now.toTimeString().slice(0, 5);
       setMeetingStartTime(`${dateStr}T${timeStr}`);
-      
+
       const endTime = new Date(now.getTime() + 30 * 60000);
       const endDateStr = endTime.toISOString().split('T')[0];
       const endTimeStr = endTime.toTimeString().slice(0, 5);
       setMeetingEndTime(`${endDateStr}T${endTimeStr}`);
     }
-    
+
     setShowSummaryModal(true);
   };
 
@@ -1768,20 +1868,115 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
                     )}
                   </div>
                   
+                  {/* Drug name not in database warning */}
+                  {drugNotFoundWarning[index] && (
+                    <Alert severity="warning" className="mb-4">
+                      <strong>Drug not found in database.</strong> Please verify the spelling.
+                      If this is a controlled substance, make sure to check the box below.
+                    </Alert>
+                  )}
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Medication Name <span className="text-red-500">*</span>
+                    </label>
+                    <Autocomplete
+                      freeSolo
+                      options={drugOptions}
+                      loading={drugSearchLoading}
+                      value={medication.medication_name}
+                      onInputChange={async (event, newValue) => {
+                        // Update medication name immediately
+                        handleMedicationChange(index, 'medication_name', newValue);
+
+                        // Search for drugs if input length >= 2
+                        if (newValue && newValue.length >= 2) {
+                          const results = await searchDrugs(newValue);
+                          setDrugOptions(results);
+                        } else {
+                          setDrugOptions([]);
+                        }
+                      }}
+                      onChange={(event, newValue) => {
+                        // Handle selection from dropdown
+                        if (typeof newValue === 'object' && newValue !== null) {
+                          handleDrugSelect(index, newValue);
+                        } else {
+                          // Free text entry
+                          handleDrugSelect(index, null);
+                        }
+                      }}
+                      getOptionLabel={(option) => {
+                        if (typeof option === 'string') return option;
+                        return option.generic_name || option.brand_names?.[0] || '';
+                      }}
+                      renderOption={(props, option) => (
+                        <li {...props} style={{
+                          backgroundColor: option.is_controlled_substance ? '#fff3e0' : 'white',
+                          borderLeft: option.is_controlled_substance ? '4px solid #f44336' : 'none'
+                        }}>
+                          <div>
+                            <div style={{ fontWeight: 'bold' }}>
+                              {option.generic_name}
+                              {option.is_controlled_substance && (
+                                <span style={{ color: '#f44336', marginLeft: '8px', fontSize: '0.85em' }}>
+                                  ⚠️ CONTROLLED - {option.nafdac_schedule_display || 'Restricted'}
+                                </span>
+                              )}
+                            </div>
+                            {option.brand_names && option.brand_names.length > 0 && (
+                              <div style={{ fontSize: '0.85em', color: '#666' }}>
+                                Brand names: {option.brand_names.join(', ')}
+                              </div>
+                            )}
+                          </div>
+                        </li>
+                      )}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          placeholder="Start typing drug name..."
+                          required
+                          InputProps={{
+                            ...params.InputProps,
+                            style: { padding: '4px 8px' }
+                          }}
+                        />
+                      )}
+                    />
+
+                    {/* Controlled substance checkbox */}
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={medication.is_controlled_override || false}
+                          onChange={(e) => handleControlledChange(index, e.target.checked)}
+                          disabled={
+                            // Disable if drug from database is already controlled
+                            drugOptions.some(
+                              drug =>
+                                (drug.generic_name === medication.medication_name ||
+                                 drug.brand_names?.includes(medication.medication_name)) &&
+                                drug.is_controlled_substance
+                            )
+                          }
+                        />
+                      }
+                      label={
+                        <span style={{ fontSize: '0.9em' }}>
+                          Is this a controlled substance?
+                          {medication.is_controlled_override && (
+                            <span style={{ color: '#f44336', marginLeft: '8px' }}>
+                              ⚠️ Will require government ID verification at pharmacy
+                            </span>
+                          )}
+                        </span>
+                      }
+                      className="mt-2"
+                    />
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Medication Name <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full border border-gray-300 rounded-md px-3 py-2"
-                        value={medication.medication_name}
-                        onChange={(e) => handleMedicationChange(index, 'medication_name', e.target.value)}
-                        required
-                      />
-                    </div>
-                    
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Strength <span className="text-red-500">*</span>

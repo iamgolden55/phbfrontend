@@ -37,7 +37,7 @@ const Header: React.FC = () => {
   const [showDataStorageBanner, setShowDataStorageBanner] = useState(true);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
-  const { user, isAuthenticated, logout, isDoctor } = useAuth();
+  const { user, isAuthenticated, logout, isDoctor, isLoading } = useAuth();
   const { professionalUser } = useProfessionalAuth();
   const { isDarkMode } = useDarkMode();
   const location = useLocation();
@@ -45,6 +45,39 @@ const Header: React.FC = () => {
 
   // Check if we're in professional view
   const isProfessionalView = location.pathname.includes('/professional');
+
+  // Check if user should see the toggle - be more permissive during loading
+  // Check multiple sources to show toggle as early as possible
+  const shouldShowToggle = React.useMemo(() => {
+    // If authenticated and confirmed professional, show toggle
+    // NOTE: Don't check user?.hpn - ALL users have HPN, not just professionals
+    if (isAuthenticated && (isDoctor || !!professionalUser || user?.role === 'doctor')) {
+      return true;
+    }
+
+    // During loading, check if there's evidence of professional credentials
+    if (isLoading) {
+      // Check stored view preference
+      const viewPreference = localStorage.getItem('phb_view_preference');
+      if (viewPreference === 'doctor') {
+        return true;
+      }
+
+      // Check professional auth state
+      const professionalAuthState = localStorage.getItem('phb_professional_auth_state');
+      if (professionalAuthState === 'true') {
+        return true;
+      }
+
+      // Check if there's a user object with professional role
+      // NOTE: Don't check user?.hpn alone - ALL users have HPN
+      if (user?.role === 'doctor') {
+        return true;
+      }
+    }
+
+    return false;
+  }, [isAuthenticated, isDoctor, professionalUser, user, isLoading]);
 
   // Check if the data storage consent has been saved previously
   useEffect(() => {
@@ -181,8 +214,8 @@ const Header: React.FC = () => {
               {/* Search button - mobile only */}
               <button
                 className={`md:hidden ${
-                  isProfessionalView 
-                    ? 'text-white hover:text-blue-200' 
+                  isProfessionalView
+                    ? 'text-white hover:text-blue-200'
                     : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
                 } transition-colors`}
                 onClick={() => setIsSearchModalOpen(true)}
@@ -193,16 +226,16 @@ const Header: React.FC = () => {
                 </svg>
               </button>
 
-              {/* Enhanced View Toggle for All Professionals */}
-              {isAuthenticated && (isDoctor || !!professionalUser) && <EnhancedViewToggle compact={true} className="ml-1" />}
+              {/* Enhanced View Toggle for All Professionals - Show as early as possible */}
+              {shouldShowToggle && <EnhancedViewToggle compact={true} className="ml-1" />}
 
               {/* Login/Account button */}
               {isAuthenticated ? (
                 <Link
                   to={isProfessionalView ? "/professional/profile" : "/account"}
                   className={`${
-                    isProfessionalView 
-                      ? 'bg-white text-blue-900 hover:bg-blue-100' 
+                    isProfessionalView
+                      ? 'bg-white text-blue-900 hover:bg-blue-100'
                       : 'bg-green-600 hover:bg-green-700 text-white'
                   } px-4 py-2 rounded-md transition-colors text-sm font-medium`}
                 >
@@ -212,8 +245,8 @@ const Header: React.FC = () => {
                 <Link
                   to={isProfessionalView ? "/professional/login" : "/login"}
                   className={`${
-                    isProfessionalView 
-                      ? 'bg-white text-blue-900 hover:bg-blue-100' 
+                    isProfessionalView
+                      ? 'bg-white text-blue-900 hover:bg-blue-100'
                       : 'bg-green-600 hover:bg-green-700 text-white'
                   } px-4 py-2 rounded-md transition-colors text-sm font-medium`}
                 >
@@ -224,7 +257,7 @@ const Header: React.FC = () => {
               {/* Mobile menu button - tablet/mobile only */}
               <button
                 className={`lg:hidden ${
-                  isProfessionalView 
+                  isProfessionalView
                     ? 'text-white hover:text-blue-200'
                     : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
                 } transition-colors`}

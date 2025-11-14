@@ -108,6 +108,26 @@ const events = [
   },
 ];
 
+// Helper function to format overdue time
+const formatOverdueTime = (minutes: number): string => {
+  if (minutes < 60) {
+    return `${minutes} min overdue`;
+  }
+  
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  
+  if (remainingMinutes === 0) {
+    return hours === 1 ? `1 hour overdue` : `${hours} hours overdue`;
+  }
+  
+  if (hours === 1) {
+    return `1 hour ${remainingMinutes} min overdue`;
+  }
+  
+  return `${hours} hours ${remainingMinutes} min overdue`;
+};
+
 const ProfessionalDashboardPage: React.FC = () => {
   // Get data from both auth contexts
   const { user, isAuthenticated: mainIsAuthenticated, isLoading: mainIsLoading, isDoctor } = useAuth();
@@ -124,6 +144,13 @@ const ProfessionalDashboardPage: React.FC = () => {
   const [appointmentSummary, setAppointmentSummary] = useState<AppointmentSummary | null>(null);
   const [expandedEvents, setExpandedEvents] = useState<Record<string, boolean>>({});
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  
+  // State for time proposal modal
+  const [showTimeProposalModal, setShowTimeProposalModal] = useState<boolean>(false);
+  const [proposalAppointmentId, setProposalAppointmentId] = useState<string | null>(null);
+  const [proposedDate, setProposedDate] = useState<string>('');
+  const [proposedTime, setProposedTime] = useState<string>('');
+  const [isSubmittingProposal, setIsSubmittingProposal] = useState<boolean>(false);
 
   // Check if the user is authenticated as ANY professional (not just doctors)
   const isAuthLoading = mainIsLoading || profIsLoading;
@@ -140,6 +167,13 @@ const ProfessionalDashboardPage: React.FC = () => {
   useEffect(() => {
     const loadAppointments = async () => {
       if (!isAuthenticated) return;
+
+      // Only fetch appointments if user is a doctor
+      if (!isDoctor && user?.role !== 'doctor' && professionalUser?.professional_type !== 'doctor') {
+        console.log('⚠️ ProfessionalDashboardPage: User is not a doctor, skipping appointment fetch');
+        setIsLoadingAppointments(false);
+        return;
+      }
 
       setIsLoadingAppointments(true);
       setAppointmentsError(null);
@@ -195,10 +229,108 @@ const ProfessionalDashboardPage: React.FC = () => {
     };
 
     loadAppointments();
-  }, [isAuthenticated]); // Fixed: Removed 'user' from dependencies to prevent infinite render loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, isDoctor]); // Only re-fetch when auth status or doctor flag changes
 
-  // Handle accepting an appointment
-  const handleAcceptAppointment = async (appointmentId: string) => {
+  // Handle opening the time proposal modal for flagged appointments
+  const handleOpenTimeProposal = (appointmentId: string) => {
+    setProposalAppointmentId(appointmentId);
+    setShowTimeProposalModal(true);
+    
+    // Set default proposed time to tomorrow at 10 AM
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(10, 0, 0, 0);
+    
+    const dateStr = tomorrow.toISOString().split('T')[0];
+    const timeStr = '10:00';
+    
+    setProposedDate(dateStr);
+    setProposedTime(timeStr);
+  };
+  
+  // Handle submitting the time proposal
+  const handleSubmitTimeProposal = async () => {
+    if (!proposalAppointmentId || !proposedDate || !proposedTime) {
+      setAppointmentsError('Please select both date and time');
+      return;
+    }
+
+    setIsSubmittingProposal(true);
+    try {
+      // Combine date and time into ISO 8601 format with explicit timezone
+      // Format: YYYY-MM-DDTHH:mm (local time, browser will use local timezone)
+      const proposedDateTime = new Date(`${proposedDate}T${proposedTime}:00`);
+
+      // Convert to ISO string (UTC) for API
+      const isoString = proposedDateTime.toISOString();
+
+      console.log('Proposed date input:', proposedDate);
+      console.log('Proposed time input:', proposedTime);
+      console.log('Combined local datetime:', proposedDateTime);
+      console.log('ISO string sent to API:', isoString);
+
+      const result = await acceptAppointment(proposalAppointmentId, isoString);
+      
+      // Update the appointment data
+      if (appointmentData) {
+        const acceptedAppointment = appointmentData.pending_department_appointments.find(
+          app => app.appointment_id === proposalAppointmentId
+        );
+        
+        if (acceptedAppointment) {
+          const updatedAppointment = {
+            ...acceptedAppointment,
+            status: 'confirmed',
+            status_display: 'Confirmed',
+            appointment_date: proposedDateTime.toISOString(),
+            formatted_date: format(proposedDateTime, 'MMM d, yyyy'),
+            formatted_time: format(proposedDateTime, 'h:mm a')
+          };
+          
+          setAppointmentData({
+            ...appointmentData,
+            pending_department_appointments: appointmentData.pending_department_appointments.filter(
+              app => app.appointment_id !== proposalAppointmentId
+            ),
+            my_appointments: {
+              ...appointmentData.my_appointments,
+              confirmed: [...appointmentData.my_appointments.confirmed, updatedAppointment],
+              all: [...appointmentData.my_appointments.all, updatedAppointment]
+            },
+            summary: {
+              ...appointmentData.summary,
+              pending_department_count: appointmentData.summary.pending_department_count - 1,
+              my_appointments_count: {
+                ...appointmentData.summary.my_appointments_count,
+                confirmed: appointmentData.summary.my_appointments_count.confirmed + 1,
+                total: appointmentData.summary.my_appointments_count.total + 1
+              }
+            }
+          });
+        }
+      }
+      
+      setSuccessMessage(`Appointment accepted with new time: ${format(proposedDateTime, 'MMM d, yyyy at h:mm a')}`);
+      setShowTimeProposalModal(false);
+      setProposalAppointmentId(null);
+      setTimeout(() => setSuccessMessage(null), 5000);
+    } catch (error: any) {
+      setAppointmentsError(error.message || 'Failed to accept appointment with proposed time');
+      setTimeout(() => setAppointmentsError(null), 5000);
+    } finally {
+      setIsSubmittingProposal(false);
+    }
+  };
+
+  // Handle accepting an appointment (direct acceptance without time change)
+  const handleAcceptAppointment = async (appointmentId: string, isLate: boolean = false) => {
+    // If it's a late appointment, open the time proposal modal
+    if (isLate) {
+      handleOpenTimeProposal(appointmentId);
+      return;
+    }
+    
     setProcessingAppointment(appointmentId);
     try {
       const result = await acceptAppointment(appointmentId);
@@ -492,34 +624,68 @@ const ProfessionalDashboardPage: React.FC = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {appointmentData.pending_department_appointments.slice(0, 5).map((appointment: Appointment) => (
-                  <tr key={appointment.appointment_id}>
+                  <tr
+                    key={appointment.appointment_id}
+                    className={appointment.is_flagged_pending ? 'bg-red-50' : ''}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {appointment.patient?.full_name || 
-                       appointment.patient_name || 
-                       appointment.patient_full_name || 
-                       `Patient #${appointment.appointment_id.slice(-6)}`}
+                      <div className="flex items-center">
+                        {appointment.is_flagged_pending && (
+                          <span className="mr-2 flex-shrink-0">
+                            <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                          </span>
+                        )}
+                        <span>
+                          {appointment.patient?.full_name ||
+                           appointment.patient_name ||
+                           appointment.patient_full_name ||
+                           `Patient #${appointment.appointment_id.slice(-6)}`}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {appointment.formatted_date || formatDate(appointment.appointment_date)}
-                      {appointment.formatted_time && ` at ${appointment.formatted_time}`}
+                      <div>
+                        <div className={appointment.is_flagged_pending ? 'text-red-700 font-medium' : ''}>
+                          {appointment.formatted_date || formatDate(appointment.appointment_date)}
+                          {appointment.formatted_time && ` at ${appointment.formatted_time}`}
+                        </div>
+                        {appointment.is_flagged_pending && appointment.minutes_past_scheduled && (
+                          <div className="text-xs text-red-600 mt-1">
+                            {formatOverdueTime(appointment.minutes_past_scheduled)}
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">{appointment.chief_complaint}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        appointment.priority === 'urgent' ? 'bg-red-100 text-red-800' :
-                        appointment.priority === 'high' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-green-100 text-green-800'
-                      }`}>
-                        {appointment.formatted_priority || appointment.priority}
-                      </span>
+                      <div className="flex flex-col gap-1">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          appointment.priority === 'urgent' ? 'bg-red-100 text-red-800' :
+                          appointment.priority === 'high' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-green-100 text-green-800'
+                        }`}>
+                          {appointment.formatted_priority || appointment.priority}
+                        </span>
+                        {appointment.is_flagged_pending && (
+                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">
+                            Overdue
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <button
-                        onClick={() => handleAcceptAppointment(appointment.appointment_id)}
+                        onClick={() => handleAcceptAppointment(appointment.appointment_id, appointment.is_flagged_pending || false)}
                         disabled={processingAppointment === appointment.appointment_id}
-                        className={`bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm ${processingAppointment === appointment.appointment_id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className={`${
+                          appointment.is_flagged_pending
+                            ? 'bg-orange-600 hover:bg-orange-700'
+                            : 'bg-blue-600 hover:bg-blue-700'
+                        } text-white py-1 px-3 rounded text-sm ${processingAppointment === appointment.appointment_id ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
-                        {processingAppointment === appointment.appointment_id ? 'Processing...' : 'Accept'}
+                        {processingAppointment === appointment.appointment_id ? 'Processing...' : (appointment.is_flagged_pending ? 'Accept Late' : 'Accept')}
                       </button>
                     </td>
                   </tr>
@@ -704,6 +870,88 @@ const ProfessionalDashboardPage: React.FC = () => {
           />
         )}
       </div>
+
+      {/* Time Proposal Modal */}
+      {showTimeProposalModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-gray-800">Propose New Appointment Time</h3>
+              <button
+                onClick={() => {
+                  setShowTimeProposalModal(false);
+                  setProposalAppointmentId(null);
+                }}
+                className="text-gray-400 hover:text-gray-600"
+                disabled={isSubmittingProposal}
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="mb-4">
+              <p className="text-sm text-gray-600 mb-4">
+                This appointment has passed its scheduled time. Please propose a new time that works for you.
+              </p>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Proposed Date
+                </label>
+                <input
+                  type="date"
+                  value={proposedDate}
+                  onChange={(e) => setProposedDate(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isSubmittingProposal}
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Proposed Time
+                </label>
+                <input
+                  type="time"
+                  value={proposedTime}
+                  onChange={(e) => setProposedTime(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isSubmittingProposal}
+                />
+              </div>
+
+              {appointmentsError && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                  <p className="text-sm text-red-600">{appointmentsError}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => {
+                  setShowTimeProposalModal(false);
+                  setProposalAppointmentId(null);
+                }}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isSubmittingProposal}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmitTimeProposal}
+                className="px-4 py-2 text-white bg-orange-600 rounded-md hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isSubmittingProposal || !proposedDate || !proposedTime}
+              >
+                {isSubmittingProposal ? 'Accepting...' : 'Accept with New Time'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

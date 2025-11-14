@@ -142,8 +142,72 @@ const ViewAppointments: React.FC = () => {
   };
 
   // Handle add to calendar
-  const handleAddToCalendar = (appointmentId: string) => {
-    window.open(createApiUrl(`api/appointments/${appointmentId}/calendar/`), '_blank');
+  const handleAddToCalendar = (appointment: AppointmentType) => {
+    // Generate iCal file for calendar import
+    // Handle different date/time formats from API
+    let startDateTime: Date;
+
+    if (appointment.date.includes('T')) {
+      // ISO format date already includes time
+      startDateTime = new Date(appointment.date);
+    } else {
+      // Date and time are separate, combine them
+      const datePart = appointment.date;
+      const timePart = appointment.time || '00:00';
+
+      // Parse time string (could be "10:00 AM (30 min)" or "10:00")
+      // Extract just the time portion before any parentheses
+      const timeMatch = timePart.match(/(\d{1,2}:\d{2}(?:\s*[AP]M)?)/i);
+      const cleanTime = timeMatch ? timeMatch[1] : timePart.split('(')[0].trim();
+
+      startDateTime = new Date(`${datePart} ${cleanTime}`);
+    }
+
+    // If date parsing failed, show error and return
+    if (isNaN(startDateTime.getTime())) {
+      console.error('Invalid date/time format:', appointment);
+      alert('Unable to create calendar event. Invalid date/time format.');
+      return;
+    }
+
+    const durationMinutes = parseInt(appointment.duration) || 30;
+    const endDateTime = new Date(startDateTime.getTime() + durationMinutes * 60000);
+
+    // Format dates for iCal (YYYYMMDDTHHMMSS format)
+    const formatICalDate = (date: Date) => {
+      return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    };
+
+    const icalContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//PHB//Appointment//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'BEGIN:VEVENT',
+      `UID:${appointment.id}@phb.com`,
+      `DTSTAMP:${formatICalDate(new Date())}`,
+      `DTSTART:${formatICalDate(startDateTime)}`,
+      `DTEND:${formatICalDate(endDateTime)}`,
+      `SUMMARY:${appointment.speciality || 'Medical'} Appointment`,
+      `DESCRIPTION:Appointment with ${appointment.provider || appointment.doctor_full_name || 'Healthcare Provider'}${appointment.reason ? `\\nReason: ${appointment.reason}` : ''}`,
+      `LOCATION:${appointment.location || 'PHB Medical Center'}`,
+      'STATUS:CONFIRMED',
+      'SEQUENCE:0',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+
+    // Create and download the iCal file
+    const blob = new Blob([icalContent], { type: 'text/calendar;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `appointment-${appointment.id}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
   };
 
   // Filter appointments based on search term
@@ -326,7 +390,7 @@ const ViewAppointments: React.FC = () => {
                         )}
 
                         <button
-                          onClick={() => handleAddToCalendar(appointment.id)}
+                          onClick={() => handleAddToCalendar(appointment)}
                           className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
                         >
                           Add to Calendar

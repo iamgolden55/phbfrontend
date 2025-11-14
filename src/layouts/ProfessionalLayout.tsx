@@ -107,6 +107,7 @@ const ProfessionalLayout: React.FC = () => {
         return [
           { label: 'Dashboard', path: '/professional/dashboard' },
           { label: 'Practice Page', path: '/professional/practice-page' },
+          { label: 'Pharmacy Prescriptions', path: '/professional/prescriptions/pharmacy' },
           { label: 'Prescription Requests', path: '/professional/prescription-triage' },
           { label: 'Clinical Guidelines', path: '/professional/guidelines' },
           { label: 'Professional Forum', path: '/professional/forum' },

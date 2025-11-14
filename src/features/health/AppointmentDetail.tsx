@@ -104,19 +104,11 @@ const AppointmentDetail: React.FC = () => {
       setError(null);
 
       try {
-        // In a real app, this would be an API call
-        // For now, we'll use mock data
-        const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
-        
-        if (!authToken) {
-          throw new Error('Authentication required');
-        }
-
         try {
           // Attempt to get data from actual API
           const response = await fetch(createApiUrl(`api/appointments/${id}/`), {
+            credentials: 'include', // Use cookies for authentication
             headers: {
-              'Authorization': `Bearer ${authToken}`,
               'Accept': 'application/json',
             }
           });
@@ -207,9 +199,72 @@ const AppointmentDetail: React.FC = () => {
 
   const handleAddToCalendar = () => {
     if (!appointment) return;
-    
-    // Open the calendar endpoint in a new tab/window
-    window.open(createApiUrl(`api/appointments/${appointment.id}/calendar/`), '_blank');
+
+    // Generate iCal file for calendar import
+    // Handle different date/time formats from API
+    let startDateTime: Date;
+
+    if (appointment.date.includes('T')) {
+      // ISO format date already includes time
+      startDateTime = new Date(appointment.date);
+    } else {
+      // Date and time are separate, combine them
+      const datePart = appointment.date;
+      const timePart = appointment.time || '00:00';
+
+      // Parse time string (could be "10:00 AM (30 min)" or "10:00")
+      // Extract just the time portion before any parentheses
+      const timeMatch = timePart.match(/(\d{1,2}:\d{2}(?:\s*[AP]M)?)/i);
+      const cleanTime = timeMatch ? timeMatch[1] : timePart.split('(')[0].trim();
+
+      startDateTime = new Date(`${datePart} ${cleanTime}`);
+    }
+
+    // If date parsing failed, show error and return
+    if (isNaN(startDateTime.getTime())) {
+      console.error('Invalid date/time format:', appointment);
+      alert('Unable to create calendar event. Invalid date/time format.');
+      return;
+    }
+
+    const durationMinutes = parseInt(appointment.duration) || 30;
+    const endDateTime = new Date(startDateTime.getTime() + durationMinutes * 60000);
+
+    // Format dates for iCal (YYYYMMDDTHHMMSS format)
+    const formatICalDate = (date: Date) => {
+      return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    };
+
+    const icalContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//PHB//Appointment//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'BEGIN:VEVENT',
+      `UID:${appointment.id}@phb.com`,
+      `DTSTAMP:${formatICalDate(new Date())}`,
+      `DTSTART:${formatICalDate(startDateTime)}`,
+      `DTEND:${formatICalDate(endDateTime)}`,
+      `SUMMARY:${appointment.specialty || appointment.department_name || 'Medical'} Appointment`,
+      `DESCRIPTION:Appointment with ${appointment.provider || appointment.doctor_full_name || 'Healthcare Provider'}${appointment.reason || appointment.chief_complaint ? `\\nReason: ${appointment.reason || appointment.chief_complaint}` : ''}`,
+      `LOCATION:${appointment.location || appointment.hospital_name || 'PHB Medical Center'}`,
+      'STATUS:CONFIRMED',
+      'SEQUENCE:0',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+
+    // Create and download the iCal file
+    const blob = new Blob([icalContent], { type: 'text/calendar;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `appointment-${appointment.id}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
   };
 
   const formatDate = (dateString: string) => {

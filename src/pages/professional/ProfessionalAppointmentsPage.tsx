@@ -456,22 +456,11 @@ const ProfessionalAppointmentsPage: React.FC = () => {
   const handleStartConsultation = async (appointmentId: string) => {
     setStatusUpdateLoading(appointmentId);
     try {
-      const result = await startConsultation(appointmentId);
-      
-      // Update the appointment in the list
-      setAppointments(appointments.map(appointment => {
-        if (appointment.appointment_id === appointmentId) {
-          return {
-            ...appointment,
-            status: 'in_progress',
-            status_display: 'In Progress',
-          };
-        }
-        return appointment;
-      }));
-      
-      setStatusUpdateSuccess(`Consultation for appointment ${appointmentId} has started`);
-      setTimeout(() => setStatusUpdateSuccess(null), 5000);
+      await startConsultation(appointmentId);
+
+      // Navigate to appointment detail page for consultation
+      navigate(`/professional/appointments/${appointmentId}`);
+
     } catch (err: any) {
       console.error(`Failed to start consultation:`, err);
       setError(err.message || `Failed to start consultation`);

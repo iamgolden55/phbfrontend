@@ -472,6 +472,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         console.error('Authentication check failed:', err);
         // Cookies are invalid or expired - clear user state
         // Backend will clear cookies on 401/403 responses
+        const hadValidSession = user !== null;
         setUser(null);
         setPrimaryHospital(null);
         setHasPrimaryHospital(false);
@@ -481,8 +482,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           clearTimeout(refreshTimerRef.current);
           refreshTimerRef.current = null;
         }
-        // Optionally set an error message if needed
-        if (err.status === 401 || err.status === 403) {
+        // Only show session expired message if user had a valid session before
+        if (hadValidSession && (err.status === 401 || err.status === 403)) {
           setError("Your session has expired. Please log in again.");
         }
       }
