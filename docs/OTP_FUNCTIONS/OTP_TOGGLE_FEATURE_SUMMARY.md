@@ -10,7 +10,7 @@ A new **Security & Login** settings page has been added to the PHB account dashb
 
 ### 1. New Security Settings Page ✅
 
-**Location**: [src/pages/account/SecuritySettingsPage.tsx](src/pages/account/SecuritySettingsPage.tsx)
+**Location**: [src/pages/account/SecuritySettingsPage.tsx](../../src/pages/account/SecuritySettingsPage.tsx)
 
 **Features**:
 - Toggle switch to enable/disable OTP verification
@@ -30,7 +30,7 @@ A new **Security & Login** settings page has been added to the PHB account dashb
 
 ### 2. Updated Account Page ✅
 
-**File**: [src/pages/AccountPage.tsx](src/pages/AccountPage.tsx)
+**File**: [src/pages/AccountPage.tsx](../../src/pages/AccountPage.tsx)
 
 **Changes**:
 - Added new "Security & Login" link in Account settings sidebar
@@ -44,7 +44,7 @@ Account Dashboard → Account settings → Security & Login
 
 ### 3. Added Route Configuration ✅
 
-**File**: [src/App.tsx](src/App.tsx)
+**File**: [src/App.tsx](../../src/App.tsx)
 
 **Changes**:
 - Imported `SecuritySettingsPage` component
@@ -349,10 +349,10 @@ src/
 
 ## Documentation Links
 
-- **User Guide**: [TEST_DOCTOR_CREDENTIALS.md](TEST_DOCTOR_CREDENTIALS.md)
+- **User Guide**: [TEST_DOCTOR_CREDENTIALS.md](../../TEST_DOCTOR_CREDENTIALS.md)
 - **OTP Disabled Summary**: [OTP_DISABLED_SUMMARY.md](OTP_DISABLED_SUMMARY.md)
-- **Account Page**: [src/pages/AccountPage.tsx](src/pages/AccountPage.tsx)
-- **Security Page**: [src/pages/account/SecuritySettingsPage.tsx](src/pages/account/SecuritySettingsPage.tsx)
+- **Account Page**: [src/pages/AccountPage.tsx](../../src/pages/AccountPage.tsx)
+- **Security Page**: [src/pages/account/SecuritySettingsPage.tsx](../../src/pages/account/SecuritySettingsPage.tsx)
 
 ---
 

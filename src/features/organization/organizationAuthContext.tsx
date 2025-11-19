@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createApiUrl } from '../../utils/config';
 
 interface OrganizationAuthContextType {
   isAuthenticated: boolean;
@@ -95,7 +96,7 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
   const refreshAccessToken = React.useCallback(async (): Promise<boolean> => {
     try {
       console.log('🔄 Organization: Attempting to refresh access token...');
-      const response = await fetch('http://127.0.0.1:8000/api/token/refresh/', {
+      const response = await fetch(createApiUrl('api/token/refresh/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -258,7 +259,7 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
         // The backend will check the httpOnly cookies automatically
         // If the user is not an organization user, this will fail silently (404)
         try {
-          const response = await fetch('http://127.0.0.1:8000/api/organizations/profile/', {
+          const response = await fetch(createApiUrl('api/organizations/profile/'), {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -375,7 +376,7 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
     console.log('Starting login process for hospital admin');
     
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/hospitals/admin/login/', {
+      const response = await fetch(createApiUrl('api/hospitals/admin/login/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -501,7 +502,7 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
 
     // Call backend logout endpoint to clear cookies
     try {
-      await fetch('http://127.0.0.1:8000/api/logout/', {
+      await fetch(createApiUrl('api/logout/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -551,7 +552,7 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
       console.log('🔐 === 2FA VERIFICATION STARTING ===');
       console.log('🔐 Verifying 2FA for email:', email);
       
-      const response = await fetch('http://127.0.0.1:8000/api/hospitals/admin/verify-2fa/', {
+      const response = await fetch(createApiUrl('api/hospitals/admin/verify-2fa/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -622,7 +623,7 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
     setError(null);
     
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/hospitals/admin/reset-password/request/', {
+      const response = await fetch(createApiUrl('api/hospitals/admin/reset-password/request/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -686,7 +687,7 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
         body.hospital_code = hospitalCode;
       }
       
-      const response = await fetch('http://127.0.0.1:8000/api/hospitals/admin/reset-password/verify/', {
+      const response = await fetch(createApiUrl('api/hospitals/admin/reset-password/verify/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -728,7 +729,7 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
     setError(null);
     
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/hospitals/admin/reset-password/complete/', {
+      const response = await fetch(createApiUrl('api/hospitals/admin/reset-password/complete/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
