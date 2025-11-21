@@ -1,0 +1,15 @@
+# Allow all search engines to crawl the site
+User-agent: *
+Allow: /
+
+# Disallow access to admin and private pages
+Disallow: /account/
+Disallow: /professional/
+Disallow: /organization/
+Disallow: /admin/
+
+# Sitemap location
+Sitemap: https://www.phbhealth.com/sitemap.xml
+
+# Crawl delay (be nice to servers)
+Crawl-delay: 10

@@ -415,13 +415,13 @@ const FeedingPage: React.FC = () => {
                 <h3 className="text-lg font-semibold text-purple-800">Feeding Support</h3>
               </div>
               <div className="space-y-3 text-purple-700 text-sm">
-                <a href="/live-well/mental-health" className="block hover:text-purple-900 underline">
+                <a href="/mental-health/new-parents" className="block hover:text-purple-900 underline">
                   New Parent Mental Health
                 </a>
                 <a href="/conditions/baby/newborn" className="block hover:text-purple-900 underline">
                   Newborn Care Guide
                 </a>
-                <a href="/using-the-phb" className="block hover:text-purple-900 underline">
+                <a href="/using-the-phb/family-health" className="block hover:text-purple-900 underline">
                   PHB Family Services
                 </a>
                 <div className="pt-2 border-t border-purple-200">

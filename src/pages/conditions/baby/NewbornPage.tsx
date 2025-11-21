@@ -174,13 +174,13 @@ const NewbornPage: React.FC = () => {
             <div className="bg-purple-50 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-purple-800 mb-4">You're Not Alone</h3>
               <div className="space-y-3 text-purple-700 text-sm">
-                <a href="/live-well/mental-health" className="block hover:text-purple-900 underline">
+                <a href="/mental-health/new-parents" className="block hover:text-purple-900 underline">
                   New Parent Mental Health Support
                 </a>
                 <a href="/conditions/baby/feeding" className="block hover:text-purple-900 underline">
                   Feeding Guidance & Support
                 </a>
-                <a href="/using-the-phb" className="block hover:text-purple-900 underline">
+                <a href="/using-the-phb/family-health" className="block hover:text-purple-900 underline">
                   PHB Family Health Services
                 </a>
                 <a href="/emergency-services" className="block hover:text-purple-900 underline">

@@ -228,6 +228,13 @@ import PregnancyVaccinePage from './pages/vaccinations/PregnancyVaccinePage';
 import TravelVaccinePage from './pages/vaccinations/TravelVaccinePage';
 import HealthcareAbroadPage from './pages/using-the-phb/healthcare-abroad/HealthcareAbroadPage';
 import GHICPage from './pages/using-the-phb/healthcare-abroad/GHICPage';
+import ApplyForGHICPage from './pages/using-the-phb/healthcare-abroad/ApplyForGHICPage';
+import EmergencyServicesPage from './pages/EmergencyServicesPage';
+import VaccinationSafetyPage from './pages/vaccinations/VaccinationSafetyPage';
+import Covid19ConditionsPage from './pages/conditions/Covid19ConditionsPage';
+import NewParentMentalHealthPage from './pages/mental-health/NewParentMentalHealthPage';
+import PHBFamilyHealthPage from './pages/using-the-phb/PHBFamilyHealthPage';
+import ProductSafetyRecallsPage from './pages/ProductSafetyRecallsPage';
 import WomensHealthPage from './pages/womens-health/WomensHealthPage';
 import ContraceptionPage from './pages/contraception/ContraceptionPage';
 import BabyHealthPage from './pages/conditions/BabyHealthPage';
@@ -244,9 +251,63 @@ import HealthChecksPage from './pages/conditions/baby/HealthChecksPage';
 // Women's Health Pages
 import PeriodsPage from './pages/womens-health/PeriodsPage';
 import MenopausePage from './pages/womens-health/MenopausePage';
+import PrematureMenopausePage from './pages/womens-health/menopause/PrematureMenopausePage';
+import HRTPage from './pages/womens-health/menopause/treatments/HRTPage';
+import NonHormonalPage from './pages/womens-health/menopause/treatments/NonHormonalPage';
+import LifestyleTreatmentPage from './pages/womens-health/menopause/treatments/LifestylePage';
+import ComplementaryPage from './pages/womens-health/menopause/treatments/ComplementaryPage';
+import PerinatalMentalHealthPage from './pages/womens-health/mental-health/PerinatalMentalHealthPage';
+import PremenstrualDisordersPage from './pages/womens-health/mental-health/PremenstrualDisordersPage';
+import WomensEatingDisordersPage from './pages/womens-health/mental-health/EatingDisordersPage';
+import AnxietyDepressionPage from './pages/womens-health/mental-health/AnxietyDepressionPage';
 import BreastHealthPage from './pages/womens-health/BreastHealthPage';
 import SexualHealthPage from './pages/womens-health/SexualHealthPage';
+
+// Sexual Health STI Pages
+import ChlamydiaPage from './pages/womens-health/sexual-health/stis/ChlamydiaPage';
+import GonorrheaPage from './pages/womens-health/sexual-health/stis/GonorrheaPage';
+import GenitalHerpesPage from './pages/womens-health/sexual-health/stis/GenitalHerpesPage';
+import GenitalWartsPage from './pages/womens-health/sexual-health/stis/GenitalWartsPage';
+import TrichomoniasisPage from './pages/womens-health/sexual-health/stis/TrichomoniasisPage';
+import SyphilisPage from './pages/womens-health/sexual-health/stis/SyphilisPage';
+import HIVPage from './pages/womens-health/sexual-health/stis/HIVPage';
+
+// Sexual Health Problems Pages
+import PainDuringSexPage from './pages/womens-health/sexual-health/problems/PainDuringSexPage';
+import LossOfDesirePage from './pages/womens-health/sexual-health/problems/LossOfDesirePage';
+import DifficultyOrgasmPage from './pages/womens-health/sexual-health/problems/DifficultyOrgasmPage';
+import VaginismusPage from './pages/womens-health/sexual-health/problems/VaginismusPage';
+
+// Breast Health Pages
+import BreastCancerPage from './pages/womens-health/breast-health/BreastCancerPage';
+import BenignLumpsPage from './pages/womens-health/breast-health/BenignLumpsPage';
+import MastitisPage from './pages/womens-health/breast-health/MastitisPage';
+import BreastPainPage from './pages/womens-health/breast-health/BreastPainPage';
+import BreastScreeningPage from './pages/womens-health/breast-health/ScreeningPage';
+import BreastRiskAssessmentPage from './pages/womens-health/breast-health/RiskAssessmentPage';
+
 import FertilityPage from './pages/womens-health/FertilityPage';
+import AgeAndFertilityPage from './pages/womens-health/fertility/AgeAndFertilityPage';
+
+// Fertility Problems Pages
+import OvulationDisordersPage from './pages/womens-health/fertility/problems/OvulationDisordersPage';
+import TubalDamagePage from './pages/womens-health/fertility/problems/TubalDamagePage';
+import EndometriosisFertilityPage from './pages/womens-health/fertility/problems/EndometriosisFertilityPage';
+import UterineFibroidsPage from './pages/womens-health/fertility/problems/UterineFibroidsPage';
+import UnexplainedInfertilityPage from './pages/womens-health/fertility/problems/UnexplainedInfertilityPage';
+
+// Fertility Treatments Pages
+import FertilityMedicationPage from './pages/womens-health/fertility/treatments/MedicationPage';
+import FertilitySurgeryPage from './pages/womens-health/fertility/treatments/SurgeryPage';
+import IUIPage from './pages/womens-health/fertility/treatments/IUIPage';
+import IVFPage from './pages/womens-health/fertility/treatments/IVFPage';
+import ICSIPage from './pages/womens-health/fertility/treatments/ICSIPage';
+import DonorPage from './pages/womens-health/fertility/treatments/DonorPage';
+import SurrogacyPage from './pages/womens-health/fertility/treatments/SurrogacyPage';
+
+// Find Support
+import FertilitySupportPage from './pages/find-support/FertilitySupportPage';
+
 import WomensMentalHealthPage from './pages/womens-health/MentalHealthPage';
 import ScreeningsPage from './pages/womens-health/ScreeningsPage';
 import PeriodProductsPage from './pages/womens-health/PeriodProductsPage';
@@ -516,6 +577,7 @@ function App() {
               <Route path="/" element={<MainLayout />}>
                 <Route index element={<HomePage />} />
                 <Route path="conditions" element={<ConditionsPage />} />
+                <Route path="conditions/covid-19" element={<Covid19ConditionsPage />} />
                 <Route path="health-assessment-tools" element={<HealthAssessmentToolsPage />} /> {/* New route */}
                 <Route path="health-assessment-tools/calculate-your-bmi" element={<HealthAssessmentBMICalculatorPage />} />
                 <Route path="health-a-z" element={<HealthAZPage />} />
@@ -531,6 +593,7 @@ function App() {
                 <Route path="live-well/exercise" element={<ExercisePage />} />
                 <Route path="live-well/exercise/5-week-workout-plan" element={<FiveWeekWorkoutPlanPage />} />
                 <Route path="live-well/mental-wellbeing" element={<MentalWellbeingPage />} />
+                <Route path="live-well/mental-health" element={<MentalWellbeingPage />} />
                 <Route path="live-well/sleep" element={<SleepPage />} />
                 <Route path="live-well/sleep/better-sleep-techniques" element={<BetterSleepTechniquesPage />} />
                 <Route path="live-well/sexual-health" element={<LiveWellSexualHealthPage />} />
@@ -561,6 +624,7 @@ function App() {
                 <Route path="mental-health/ptsd" element={<PTSDPage />} />
                 <Route path="mental-health/self-harm" element={<SelfHarmPage />} />
                 <Route path="mental-health/eating-disorders" element={<EatingDisordersPage />} />
+                <Route path="mental-health/new-parents" element={<NewParentMentalHealthPage />} />
 
                 {/* Services Routes */}
                 <Route path="services" element={<ServicesPage />} />
@@ -578,6 +642,9 @@ function App() {
             <Route path="care-and-support/carers-assessment" element={<CarersAssessmentPage />} />
             <Route path="care-and-support/financial-help" element={<FinancialHelpPage />} />
 
+                {/* Find Support Routes */}
+                <Route path="find-support/fertility" element={<FertilitySupportPage />} />
+
                 {/* Help Routes */}
                 <Route path="help" element={<HelpPage />} /> {/* New Help Route */}
                 <Route path="help/find-phb-number" element={<FindPhbNumberPage />} />
@@ -594,10 +661,62 @@ function App() {
                 <Route path="womens-health" element={<WomensHealthPage />} />
                 <Route path="womens-health/periods" element={<PeriodsPage />} />
                 <Route path="womens-health/menopause" element={<MenopausePage />} />
+                <Route path="womens-health/menopause/premature-menopause" element={<PrematureMenopausePage />} />
+                <Route path="womens-health/menopause/treatments/hrt" element={<HRTPage />} />
+                <Route path="womens-health/menopause/treatments/non-hormonal" element={<NonHormonalPage />} />
+                <Route path="womens-health/menopause/treatments/lifestyle" element={<LifestyleTreatmentPage />} />
+                <Route path="womens-health/menopause/treatments/complementary" element={<ComplementaryPage />} />
                 <Route path="womens-health/breast-health" element={<BreastHealthPage />} />
+
+                {/* Breast Health Pages */}
+                <Route path="womens-health/breast-health/breast-cancer" element={<BreastCancerPage />} />
+                <Route path="womens-health/breast-health/benign-lumps" element={<BenignLumpsPage />} />
+                <Route path="womens-health/breast-health/mastitis" element={<MastitisPage />} />
+                <Route path="womens-health/breast-health/breast-pain" element={<BreastPainPage />} />
+                <Route path="womens-health/breast-health/screening" element={<BreastScreeningPage />} />
+                <Route path="womens-health/breast-health/risk-assessment" element={<BreastRiskAssessmentPage />} />
+
                 <Route path="womens-health/sexual-health" element={<SexualHealthPage />} />
+
+                {/* Sexual Health STI Pages */}
+                <Route path="womens-health/sexual-health/stis/chlamydia" element={<ChlamydiaPage />} />
+                <Route path="womens-health/sexual-health/stis/gonorrhea" element={<GonorrheaPage />} />
+                <Route path="womens-health/sexual-health/stis/genital-herpes" element={<GenitalHerpesPage />} />
+                <Route path="womens-health/sexual-health/stis/genital-warts" element={<GenitalWartsPage />} />
+                <Route path="womens-health/sexual-health/stis/trichomoniasis" element={<TrichomoniasisPage />} />
+                <Route path="womens-health/sexual-health/stis/syphilis" element={<SyphilisPage />} />
+                <Route path="womens-health/sexual-health/stis/hiv" element={<HIVPage />} />
+
+                {/* Sexual Health Problems Pages */}
+                <Route path="womens-health/sexual-health/problems/pain-during-sex" element={<PainDuringSexPage />} />
+                <Route path="womens-health/sexual-health/problems/loss-of-desire" element={<LossOfDesirePage />} />
+                <Route path="womens-health/sexual-health/problems/difficulty-orgasm" element={<DifficultyOrgasmPage />} />
+                <Route path="womens-health/sexual-health/problems/vaginismus" element={<VaginismusPage />} />
+
                 <Route path="womens-health/fertility" element={<FertilityPage />} />
+                <Route path="womens-health/fertility/age-and-fertility" element={<AgeAndFertilityPage />} />
+
+                {/* Fertility Problems Pages */}
+                <Route path="womens-health/fertility/problems/ovulation-disorders" element={<OvulationDisordersPage />} />
+                <Route path="womens-health/fertility/problems/tubal-damage" element={<TubalDamagePage />} />
+                <Route path="womens-health/fertility/problems/endometriosis" element={<EndometriosisFertilityPage />} />
+                <Route path="womens-health/fertility/problems/uterine-fibroids" element={<UterineFibroidsPage />} />
+                <Route path="womens-health/fertility/problems/unexplained-infertility" element={<UnexplainedInfertilityPage />} />
+
+                {/* Fertility Treatments Pages */}
+                <Route path="womens-health/fertility/treatments/medication" element={<FertilityMedicationPage />} />
+                <Route path="womens-health/fertility/treatments/surgery" element={<FertilitySurgeryPage />} />
+                <Route path="womens-health/fertility/treatments/iui" element={<IUIPage />} />
+                <Route path="womens-health/fertility/treatments/ivf" element={<IVFPage />} />
+                <Route path="womens-health/fertility/treatments/icsi" element={<ICSIPage />} />
+                <Route path="womens-health/fertility/treatments/donor" element={<DonorPage />} />
+                <Route path="womens-health/fertility/treatments/surrogacy" element={<SurrogacyPage />} />
+
                 <Route path="womens-health/mental-health" element={<WomensMentalHealthPage />} />
+                <Route path="womens-health/mental-health/perinatal" element={<PerinatalMentalHealthPage />} />
+                <Route path="womens-health/mental-health/premenstrual-disorders" element={<PremenstrualDisordersPage />} />
+                <Route path="womens-health/mental-health/eating-disorders" element={<WomensEatingDisordersPage />} />
+                <Route path="womens-health/mental-health/anxiety-depression" element={<AnxietyDepressionPage />} />
                 <Route path="womens-health/screenings" element={<ScreeningsPage />} />
                 <Route path="womens-health/period-products" element={<PeriodProductsPage />} />
 
@@ -673,8 +792,11 @@ function App() {
                 <Route path="vaccinations/children" element={<ChildrenVaccinePage />} />
                 <Route path="vaccinations/pregnancy" element={<PregnancyVaccinePage />} />
                 <Route path="vaccinations/travel" element={<TravelVaccinePage />} />
+                <Route path="vaccinations/safety" element={<VaccinationSafetyPage />} />
                 <Route path="using-the-phb/healthcare-abroad" element={<HealthcareAbroadPage />} />
                 <Route path="using-the-phb/healthcare-abroad/nigerian-travel-health" element={<GHICPage />} />
+                <Route path="using-the-phb/healthcare-abroad/apply-for-ghic" element={<ApplyForGHICPage />} />
+                <Route path="using-the-phb/family-health" element={<PHBFamilyHealthPage />} />
                 <Route path="conditions/baby" element={<BabyHealthPage />} />
                 <Route path="conditions/baby/newborn" element={<NewbornPage />} />
                 <Route path="conditions/baby/feeding" element={<FeedingPage />} />
@@ -859,6 +981,8 @@ function App() {
                 <Route path="phb-services" element={<PHBServicesPage />} />
                 <Route path="find-services" element={<FindServicesPage />} />
                 <Route path="find-pharmacy" element={<FindPharmacyPage />} />
+                <Route path="emergency-services" element={<EmergencyServicesPage />} />
+                <Route path="product-safety-recalls" element={<ProductSafetyRecallsPage />} />
                 <Route path="medical-ai-demo" element={<MedicalAIDemoPage />} />
                 <Route path="link-validator" element={<LinkValidatorPage />} />
                 <Route path="site-map" element={<SiteMapPage />} />
