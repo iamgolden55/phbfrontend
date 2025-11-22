@@ -4,7 +4,7 @@ const ElaraAIPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Hero section */}
-      <section className="bg-[#005eb8] text-white relative pb-0 overflow-hidden">
+      <section className="bg-[#0891b2] text-white relative pb-0 overflow-hidden">
         <div className="phb-container py-8 md:py-16">
           <div className="max-w-4xl z-10 relative">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
@@ -30,31 +30,31 @@ const ElaraAIPage: React.FC = () => {
           {/* Left sidebar for navigation */}
           <div className="md:col-span-1">
             <div className="bg-gray-50 p-4 rounded-lg shadow-sm mb-6">
-              <h2 className="text-lg font-bold mb-3 text-[#005eb8]">On this page</h2>
+              <h2 className="text-lg font-bold mb-3 text-[#0891b2]">On this page</h2>
               <nav className="flex flex-col space-y-2">
-                <a href="#introduction" className="hover:underline text-[#005eb8]">Introduction</a>
-                <a href="#capabilities" className="hover:underline text-[#005eb8]">Capabilities</a>
-                <a href="#benefits" className="hover:underline text-[#005eb8]">Benefits</a>
-                <a href="#limitations" className="hover:underline text-[#005eb8]">Limitations & Ethics</a>
-                <a href="#use-cases" className="hover:underline text-[#005eb8]">Use Cases</a>
-                <a href="#technology" className="hover:underline text-[#005eb8]">Technology</a>
-                <a href="#integrations" className="hover:underline text-[#005eb8]">Integrations</a>
-                <a href="#future" className="hover:underline text-[#005eb8]">Future Development</a>
+                <a href="#introduction" className="hover:underline text-[#0891b2]">Introduction</a>
+                <a href="#capabilities" className="hover:underline text-[#0891b2]">Capabilities</a>
+                <a href="#benefits" className="hover:underline text-[#0891b2]">Benefits</a>
+                <a href="#limitations" className="hover:underline text-[#0891b2]">Limitations & Ethics</a>
+                <a href="#use-cases" className="hover:underline text-[#0891b2]">Use Cases</a>
+                <a href="#technology" className="hover:underline text-[#0891b2]">Technology</a>
+                <a href="#integrations" className="hover:underline text-[#0891b2]">Integrations</a>
+                <a href="#future" className="hover:underline text-[#0891b2]">Future Development</a>
               </nav>
             </div>
 
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-              <h3 className="text-lg font-bold mb-2 text-[#005eb8]">Try Elara AI</h3>
+              <h3 className="text-lg font-bold mb-2 text-[#0891b2]">Try Elara AI</h3>
               <p className="mb-4 text-sm">Experience the power of AI-driven healthcare with a demo of Elara.</p>
-              <a href="/register" className="bg-[#005eb8] text-white px-4 py-2 rounded inline-block hover:bg-[#003f7e]">Request demo</a>
+              <a href="/register" className="bg-[#0891b2] text-white px-4 py-2 rounded inline-block hover:bg-[#0e7490]">Request demo</a>
             </div>
           </div>
 
           {/* Main content area */}
           <div className="md:col-span-2">
             <section id="introduction" className="mb-12">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Meet Elara AI</h2>
-              <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-[#005eb8] mb-6">
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Meet Elara AI</h2>
+              <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-[#0891b2] mb-6">
                 <p className="italic text-lg">
                   "Elara is not just a healthcare tool – it's a healthcare revolution."
                 </p>
@@ -84,7 +84,7 @@ const ElaraAIPage: React.FC = () => {
             </section>
 
             <section id="capabilities" className="mb-12">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Capabilities of Elara</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Capabilities of Elara</h2>
 
               <p className="mb-6">
                 Elara is a versatile AI system that serves as a valuable assistant in medical practice.
@@ -95,7 +95,7 @@ const ElaraAIPage: React.FC = () => {
                 <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex items-start mb-3">
                     <div className="bg-blue-100 p-3 rounded-full mr-4">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#005eb8" className="w-6 h-6">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#0891b2" className="w-6 h-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
                       </svg>
                     </div>
@@ -110,7 +110,7 @@ const ElaraAIPage: React.FC = () => {
                 <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex items-start mb-3">
                     <div className="bg-blue-100 p-3 rounded-full mr-4">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#005eb8" className="w-6 h-6">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#0891b2" className="w-6 h-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
                       </svg>
                     </div>
@@ -125,7 +125,7 @@ const ElaraAIPage: React.FC = () => {
                 <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex items-start mb-3">
                     <div className="bg-blue-100 p-3 rounded-full mr-4">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#005eb8" className="w-6 h-6">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#0891b2" className="w-6 h-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
                       </svg>
                     </div>
@@ -140,7 +140,7 @@ const ElaraAIPage: React.FC = () => {
                 <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex items-start mb-3">
                     <div className="bg-blue-100 p-3 rounded-full mr-4">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#005eb8" className="w-6 h-6">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#0891b2" className="w-6 h-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 01.778-.332 48.294 48.294 0 005.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
                       </svg>
                     </div>
@@ -176,7 +176,7 @@ const ElaraAIPage: React.FC = () => {
             </section>
 
             <section id="benefits" className="mb-12">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Benefits</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Benefits</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 <div>
@@ -253,18 +253,18 @@ const ElaraAIPage: React.FC = () => {
               </div>
 
               <div className="bg-blue-50 p-6 rounded-lg">
-                <h3 className="text-xl font-bold mb-3 text-[#005eb8]">For Healthcare Systems</h3>
+                <h3 className="text-xl font-bold mb-3 text-[#0891b2]">For Healthcare Systems</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div className="bg-white p-4 rounded-lg text-center">
-                    <span className="text-3xl font-bold text-[#005eb8] block mb-2">30%</span>
+                    <span className="text-3xl font-bold text-[#0891b2] block mb-2">30%</span>
                     <span className="text-sm">Reduction in administrative costs</span>
                   </div>
                   <div className="bg-white p-4 rounded-lg text-center">
-                    <span className="text-3xl font-bold text-[#005eb8] block mb-2">25%</span>
+                    <span className="text-3xl font-bold text-[#0891b2] block mb-2">25%</span>
                     <span className="text-sm">Increase in patient satisfaction</span>
                   </div>
                   <div className="bg-white p-4 rounded-lg text-center">
-                    <span className="text-3xl font-bold text-[#005eb8] block mb-2">20%</span>
+                    <span className="text-3xl font-bold text-[#0891b2] block mb-2">20%</span>
                     <span className="text-sm">More patients served on average</span>
                   </div>
                 </div>
@@ -277,7 +277,7 @@ const ElaraAIPage: React.FC = () => {
             </section>
 
             <section id="limitations" className="mb-12">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Limitations & Ethics</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Limitations & Ethics</h2>
               <div className="bg-yellow-50 p-6 rounded-lg border border-yellow-100 mb-6">
                 <h4 className="font-bold text-lg mb-2">Important Note: Elara's Role and Limitations</h4>
                 <p className="mb-4">

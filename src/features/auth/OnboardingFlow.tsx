@@ -189,14 +189,14 @@ const OnboardingFlow: React.FC = () => {
           </div>
           <div className="flex flex-col sm:flex-row gap-4 mt-2">
             <button
-              className="flex-1 bg-[#005eb8] text-white py-2 px-4 rounded hover:bg-[#004c93] transition-colors"
+              className="flex-1 bg-[#0891b2] text-white py-2 px-4 rounded hover:bg-[#004c93] transition-colors"
               onClick={handleFindHospital}
             >
               Find hospitals near me
             </button>
             <button
               onClick={() => handleNext()}
-              className="flex-1 border border-[#005eb8] text-[#005eb8] py-2 px-4 rounded hover:bg-blue-50 transition-colors"
+              className="flex-1 border border-[#0891b2] text-[#0891b2] py-2 px-4 rounded hover:bg-blue-50 transition-colors"
             >
               Set up later
             </button>
@@ -228,14 +228,14 @@ const OnboardingFlow: React.FC = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 mt-2">
             <button
-              className="flex-1 bg-[#005eb8] text-white py-2 px-4 rounded hover:bg-[#004c93] transition-colors"
+              className="flex-1 bg-[#0891b2] text-white py-2 px-4 rounded hover:bg-[#004c93] transition-colors"
               onClick={handleUploadRecords}
             >
               Upload records now
             </button>
             <button
               onClick={() => handleNext()}
-              className="flex-1 border border-[#005eb8] text-[#005eb8] py-2 px-4 rounded hover:bg-blue-50 transition-colors"
+              className="flex-1 border border-[#0891b2] text-[#0891b2] py-2 px-4 rounded hover:bg-blue-50 transition-colors"
             >
               Explore later
             </button>
@@ -328,7 +328,7 @@ const OnboardingFlow: React.FC = () => {
 
           <div className="text-center mt-6">
             <button
-              className="bg-[#005eb8] text-white py-3 px-8 rounded-full hover:bg-[#004c93] transition-colors text-lg font-medium"
+              className="bg-[#0891b2] text-white py-3 px-8 rounded-full hover:bg-[#004c93] transition-colors text-lg font-medium"
               onClick={handleComplete}
             >
               Go to Dashboard
@@ -441,7 +441,7 @@ const OnboardingFlow: React.FC = () => {
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
-              className="bg-[#005eb8] h-2 rounded-full transition-all duration-300 ease-in-out"
+              className="bg-[#0891b2] h-2 rounded-full transition-all duration-300 ease-in-out"
               style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
             ></div>
           </div>
@@ -501,7 +501,7 @@ const OnboardingFlow: React.FC = () => {
 
               <button
                 onClick={handleNext}
-                className="px-6 py-2 bg-[#005eb8] text-white rounded hover:bg-[#004c93] transition-colors"
+                className="px-6 py-2 bg-[#0891b2] text-white rounded hover:bg-[#004c93] transition-colors"
               >
                 {currentStep < steps.length - 1 ? 'Continue' : 'Finish'}
               </button>

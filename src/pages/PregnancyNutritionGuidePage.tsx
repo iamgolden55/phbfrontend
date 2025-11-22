@@ -5,7 +5,7 @@ import PregnancyNutritionGuide from '../features/pregnancy/PregnancyNutritionGui
 const PregnancyNutritionGuidePage: React.FC = () => {
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <div className="flex items-center mb-2">
             <Link to="/pregnancy" className="text-white hover:underline mr-2">
@@ -127,21 +127,21 @@ const PregnancyNutritionGuidePage: React.FC = () => {
             <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               <h3 className="font-bold mb-2">Baby Names Directory</h3>
               <p className="text-sm text-gray-600 mb-3">Find the perfect name for your baby with our searchable database.</p>
-              <Link to="/pregnancy/baby-names-directory" className="text-[#005eb8] hover:underline text-sm">
+              <Link to="/pregnancy/baby-names-directory" className="text-[#0891b2] hover:underline text-sm">
                 Browse names →
               </Link>
             </div>
             <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               <h3 className="font-bold mb-2">Birth Plan Creator</h3>
               <p className="text-sm text-gray-600 mb-3">Create a personalized birth plan to share with your healthcare team.</p>
-              <Link to="/pregnancy/birth-plan-creator" className="text-[#005eb8] hover:underline text-sm">
+              <Link to="/pregnancy/birth-plan-creator" className="text-[#0891b2] hover:underline text-sm">
                 Create your plan →
               </Link>
             </div>
             <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               <h3 className="font-bold mb-2">Baby Shower Planner</h3>
               <p className="text-sm text-gray-600 mb-3">Plan your celebration with checklists, invitation templates, and game ideas.</p>
-              <Link to="/pregnancy/baby-shower-planner" className="text-[#005eb8] hover:underline text-sm">
+              <Link to="/pregnancy/baby-shower-planner" className="text-[#0891b2] hover:underline text-sm">
                 Start planning →
               </Link>
             </div>

@@ -291,7 +291,7 @@ const PregnancyNutritionGuide: React.FC = () => {
           <nav className="-mb-px flex space-x-6">
             <button
               className={`pb-4 px-2 ${activeTrimester === 0
-                ? 'border-b-2 border-[#005eb8] text-[#005eb8] font-medium'
+                ? 'border-b-2 border-[#0891b2] text-[#0891b2] font-medium'
                 : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
               onClick={() => setActiveTrimester(0)}
             >
@@ -301,7 +301,7 @@ const PregnancyNutritionGuide: React.FC = () => {
               <button
                 key={trimester.number}
                 className={`pb-4 px-2 ${activeTrimester === trimester.number
-                  ? 'border-b-2 border-[#005eb8] text-[#005eb8] font-medium'
+                  ? 'border-b-2 border-[#0891b2] text-[#0891b2] font-medium'
                   : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
                 onClick={() => setActiveTrimester(trimester.number)}
               >
@@ -352,7 +352,7 @@ const PregnancyNutritionGuide: React.FC = () => {
                 key={type}
                 className={`px-4 py-2 rounded-md text-sm ${
                   activeMealType === type
-                    ? 'bg-[#005eb8] text-white'
+                    ? 'bg-[#0891b2] text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
                 onClick={() => setActiveMealType(type as typeof activeMealType)}
@@ -428,7 +428,7 @@ const PregnancyNutritionGuide: React.FC = () => {
               <div
                 key={index}
                 className={`border rounded-lg overflow-hidden cursor-pointer transition-shadow hover:shadow-md
-                  ${selectedNutrient === nutrient ? 'border-[#005eb8] border-2' : 'border-gray-200'}`}
+                  ${selectedNutrient === nutrient ? 'border-[#0891b2] border-2' : 'border-gray-200'}`}
                 onClick={() => handleNutrientClick(nutrient)}
               >
                 <div className="p-4">

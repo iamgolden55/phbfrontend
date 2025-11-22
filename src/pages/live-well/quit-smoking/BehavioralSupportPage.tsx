@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const BehavioralSupportPage: React.FC = () => {
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <nav className="text-sm mb-4">
             <Link to="/live-well" className="hover:underline">Live well</Link>
@@ -49,7 +49,7 @@ const BehavioralSupportPage: React.FC = () => {
               />
             </div>
             <div className="p-5">
-              <h3 className="text-xl font-bold text-[#005eb8] mb-2">Individual Counseling</h3>
+              <h3 className="text-xl font-bold text-[#0891b2] mb-2">Individual Counseling</h3>
               <p className="text-gray-600 mb-4">One-on-one sessions with trained quit-smoking counselors to develop personalized strategies.</p>
               <div className="space-y-2 mb-4">
                 <div className="flex items-center text-sm text-gray-600">
@@ -80,7 +80,7 @@ const BehavioralSupportPage: React.FC = () => {
               />
             </div>
             <div className="p-5">
-              <h3 className="text-xl font-bold text-[#005eb8] mb-2">Group Support Sessions</h3>
+              <h3 className="text-xl font-bold text-[#0891b2] mb-2">Group Support Sessions</h3>
               <p className="text-gray-600 mb-4">Weekly group meetings with others who are quitting smoking for mutual support and encouragement.</p>
               <div className="space-y-2 mb-4">
                 <div className="flex items-center text-sm text-gray-600">
@@ -111,7 +111,7 @@ const BehavioralSupportPage: React.FC = () => {
               />
             </div>
             <div className="p-5">
-              <h3 className="text-xl font-bold text-[#005eb8] mb-2">Phone Counseling</h3>
+              <h3 className="text-xl font-bold text-[#0891b2] mb-2">Phone Counseling</h3>
               <p className="text-gray-600 mb-4">Convenient support through scheduled phone calls with qualified quit-smoking counselors.</p>
               <div className="space-y-2 mb-4">
                 <div className="flex items-center text-sm text-gray-600">
@@ -139,7 +139,7 @@ const BehavioralSupportPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           
           <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="text-xl font-bold text-[#005eb8] mb-3">Cognitive Behavioral Therapy (CBT)</h3>
+            <h3 className="text-xl font-bold text-[#0891b2] mb-3">Cognitive Behavioral Therapy (CBT)</h3>
             <p className="text-gray-600 mb-4">
               Helps identify and change thought patterns that lead to smoking. Learn to recognize triggers and develop alternative responses.
             </p>
@@ -151,7 +151,7 @@ const BehavioralSupportPage: React.FC = () => {
           </div>
 
           <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="text-xl font-bold text-[#005eb8] mb-3">Motivational Interviewing</h3>
+            <h3 className="text-xl font-bold text-[#0891b2] mb-3">Motivational Interviewing</h3>
             <p className="text-gray-600 mb-4">
               Explores your personal reasons for quitting and builds motivation to change. Focuses on your own goals and values.
             </p>
@@ -163,7 +163,7 @@ const BehavioralSupportPage: React.FC = () => {
           </div>
 
           <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="text-xl font-bold text-[#005eb8] mb-3">Stress Management</h3>
+            <h3 className="text-xl font-bold text-[#0891b2] mb-3">Stress Management</h3>
             <p className="text-gray-600 mb-4">
               Learn healthy ways to cope with stress without smoking. Includes relaxation techniques and lifestyle changes.
             </p>
@@ -175,7 +175,7 @@ const BehavioralSupportPage: React.FC = () => {
           </div>
 
           <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="text-xl font-bold text-[#005eb8] mb-3">Habit Replacement</h3>
+            <h3 className="text-xl font-bold text-[#0891b2] mb-3">Habit Replacement</h3>
             <p className="text-gray-600 mb-4">
               Replace smoking habits with healthier alternatives. Develop new routines for situations where you used to smoke.
             </p>
@@ -242,7 +242,7 @@ const BehavioralSupportPage: React.FC = () => {
         <div className="bg-white p-6 border border-gray-200 rounded-lg shadow-sm mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <h3 className="font-bold mb-3 text-[#005eb8]">First Session (60 minutes)</h3>
+              <h3 className="font-bold mb-3 text-[#0891b2]">First Session (60 minutes)</h3>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li>• Assessment of smoking history and patterns</li>
                 <li>• Identification of personal triggers</li>
@@ -252,7 +252,7 @@ const BehavioralSupportPage: React.FC = () => {
               </ul>
             </div>
             <div>
-              <h3 className="font-bold mb-3 text-[#005eb8]">Follow-up Sessions (30-45 minutes)</h3>
+              <h3 className="font-bold mb-3 text-[#0891b2]">Follow-up Sessions (30-45 minutes)</h3>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li>• Review of progress and challenges</li>
                 <li>• Practice stress management techniques</li>
@@ -297,7 +297,7 @@ const BehavioralSupportPage: React.FC = () => {
         <div className="bg-[#f0f4f5] p-6 rounded-lg mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h3 className="font-semibold mb-3 text-[#005eb8]">Before you start:</h3>
+              <h3 className="font-semibold mb-3 text-[#0891b2]">Before you start:</h3>
               <ul className="text-sm text-gray-600 space-y-1">
                 <li>• Be honest about your smoking habits</li>
                 <li>• Set realistic expectations</li>
@@ -307,7 +307,7 @@ const BehavioralSupportPage: React.FC = () => {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold mb-3 text-[#005eb8]">During support:</h3>
+              <h3 className="font-semibold mb-3 text-[#0891b2]">During support:</h3>
               <ul className="text-sm text-gray-600 space-y-1">
                 <li>• Practice techniques between sessions</li>
                 <li>• Keep a smoking/craving diary</li>
@@ -320,7 +320,7 @@ const BehavioralSupportPage: React.FC = () => {
         </div>
 
         {/* Next steps */}
-        <div className="bg-[#005eb8] text-white p-8 rounded-lg">
+        <div className="bg-[#0891b2] text-white p-8 rounded-lg">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-4">Ready to start behavioral support?</h2>
             <p className="mb-6">
@@ -329,7 +329,7 @@ const BehavioralSupportPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/account/appointments/book"
-                className="bg-white text-[#005eb8] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
+                className="bg-white text-[#0891b2] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
               >
                 Book counseling session
               </Link>

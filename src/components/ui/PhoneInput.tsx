@@ -89,7 +89,7 @@ const CountryPhoneInput: React.FC<CountryPhoneInputProps> = ({
       <div className={`flex border rounded-md bg-white transition-all duration-200 ${
           error ? 'border-red-500' : 'border-gray-300'
         } ${
-          isDropdownOpen ? 'ring-2 ring-[#005eb8] ring-opacity-20 border-[#005eb8]' : 'hover:border-gray-400'
+          isDropdownOpen ? 'ring-2 ring-[#0891b2] ring-opacity-20 border-[#0891b2]' : 'hover:border-gray-400'
         } ${disabled ? 'bg-gray-50 cursor-not-allowed' : ''}`}>
         
         <button
@@ -128,7 +128,7 @@ const CountryPhoneInput: React.FC<CountryPhoneInputProps> = ({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search countries..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#005eb8] focus:border-[#005eb8]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#0891b2] focus:border-[#0891b2]"
             />
           </div>
           
@@ -139,7 +139,7 @@ const CountryPhoneInput: React.FC<CountryPhoneInputProps> = ({
                 type="button"
                 onClick={() => handleCountrySelect(country)}
                 className={`w-full flex items-center px-3 py-2 text-left hover:bg-gray-50 transition-colors ${
-                  selectedCountry.code === country.code ? 'bg-blue-50 text-[#005eb8]' : 'text-gray-700'
+                  selectedCountry.code === country.code ? 'bg-blue-50 text-[#0891b2]' : 'text-gray-700'
                 }`}
               >
                 <span className="text-lg mr-3">{country.flag}</span>

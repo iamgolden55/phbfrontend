@@ -149,7 +149,7 @@ const FindServicesPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <nav className="text-sm mb-4">
             <Link to="/" className="hover:underline">Home</Link>
@@ -180,7 +180,7 @@ const FindServicesPage: React.FC = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search by service name or keyword..."
-                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#005eb8] focus:border-[#005eb8]"
+                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#0891b2] focus:border-[#0891b2]"
               />
             </div>
 
@@ -192,7 +192,7 @@ const FindServicesPage: React.FC = () => {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#005eb8] focus:border-[#005eb8]"
+                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#0891b2] focus:border-[#0891b2]"
               >
                 {categories.map(category => (
                   <option key={category} value={category}>{category}</option>
@@ -208,7 +208,7 @@ const FindServicesPage: React.FC = () => {
               <select
                 value={selectedLocation}
                 onChange={(e) => setSelectedLocation(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#005eb8] focus:border-[#005eb8]"
+                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#0891b2] focus:border-[#0891b2]"
               >
                 {locations.map(location => (
                   <option key={location} value={location}>{location}</option>
@@ -228,7 +228,7 @@ const FindServicesPage: React.FC = () => {
             <div key={service.id} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
               <div className="mb-4">
                 <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-lg font-bold text-[#005eb8] flex-grow">{service.title}</h3>
+                  <h3 className="text-lg font-bold text-[#0891b2] flex-grow">{service.title}</h3>
                   <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs font-medium ml-2 flex-shrink-0">
                     {service.category}
                   </span>
@@ -261,7 +261,7 @@ const FindServicesPage: React.FC = () => {
 
               <Link
                 to={service.url}
-                className="w-full bg-[#005eb8] text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors text-center font-medium text-sm inline-block"
+                className="w-full bg-[#0891b2] text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors text-center font-medium text-sm inline-block"
               >
                 Access Service
               </Link>
@@ -283,7 +283,7 @@ const FindServicesPage: React.FC = () => {
                 setSelectedCategory('All Services');
                 setSelectedLocation('All Locations');
               }}
-              className="bg-[#005eb8] text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
+              className="bg-[#0891b2] text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
             >
               Clear all filters
             </button>
@@ -326,7 +326,7 @@ const FindServicesPage: React.FC = () => {
         </div>
 
         {/* Contact section */}
-        <div className="bg-[#005eb8] text-white p-8 rounded-lg mt-8">
+        <div className="bg-[#0891b2] text-white p-8 rounded-lg mt-8">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-4">Can't find what you're looking for?</h2>
             <p className="mb-6">
@@ -335,7 +335,7 @@ const FindServicesPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href="tel:0800-PHB-HELP"
-                className="bg-white text-[#005eb8] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
+                className="bg-white text-[#0891b2] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
               >
                 Call: 0800-PHB-HELP
               </a>

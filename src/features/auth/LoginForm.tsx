@@ -67,7 +67,7 @@ const LoginForm: React.FC = () => {
           <input
             type="email"
             id="email"
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2]"
             value={email}
             onChange={(e) => { setEmail(e.target.value); clearError(); }}
             placeholder="Enter your email"
@@ -80,14 +80,14 @@ const LoginForm: React.FC = () => {
             <label htmlFor="password" className="block font-medium">
               Password
             </label>
-            <Link to="/forgot-password" className="text-sm text-[#005eb8] hover:underline">
+            <Link to="/forgot-password" className="text-sm text-[#0891b2] hover:underline">
               Forgot password?
             </Link>
           </div>
           <input
             type="password"
             id="password"
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2]"
             value={password}
             onChange={(e) => { setPassword(e.target.value); clearError(); }}
             placeholder="Enter your password"
@@ -101,7 +101,7 @@ const LoginForm: React.FC = () => {
             <input
               type="checkbox"
               id="rememberMe"
-              className="w-4 h-4 text-[#005eb8] border-gray-300 rounded focus:ring-2 focus:ring-[#005eb8]"
+              className="w-4 h-4 text-[#0891b2] border-gray-300 rounded focus:ring-2 focus:ring-[#0891b2]"
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
             />
@@ -125,7 +125,7 @@ const LoginForm: React.FC = () => {
               <input
                 type="text"
                 id="captcha-answer"
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2]"
                 value={captchaAnswer}
                 onChange={(e) => { setCaptchaAnswer(e.target.value); clearError(); }}
                 placeholder="Enter your answer"
@@ -137,7 +137,7 @@ const LoginForm: React.FC = () => {
 
         <button
           type="submit"
-          className="w-full bg-[#005eb8] text-white py-2 px-4 rounded hover:bg-[#003f7e] transition-colors"
+          className="w-full bg-[#0891b2] text-white py-2 px-4 rounded hover:bg-[#0e7490] transition-colors"
           disabled={isLoading}
         >
           {isLoading ? 'Signing in...' : captchaRequired ? 'Verify & Sign in' : 'Sign in'}
@@ -147,7 +147,7 @@ const LoginForm: React.FC = () => {
       <div className="mt-6 pt-4 border-t border-gray-200 text-center">
         <p className="text-gray-600">
           Don't have an account?{' '}
-          <Link to="/register" className="text-[#005eb8] hover:underline">
+          <Link to="/register" className="text-[#0891b2] hover:underline">
             Create an account
           </Link>
         </p>

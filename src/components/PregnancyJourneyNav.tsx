@@ -38,7 +38,7 @@ const PregnancyJourneyNav: React.FC<PregnancyJourneyNavProps> = ({
             {/* Progress bar */}
             <div className="h-2 bg-gray-200 rounded-full absolute w-full top-4 z-0"></div>
             <div
-              className="h-2 bg-[#005eb8] rounded-full absolute top-4 z-0"
+              className="h-2 bg-[#0891b2] rounded-full absolute top-4 z-0"
               style={{ width: `${(currentStepIndex / (pregnancyJourneySteps.length - 1)) * 100}%` }}
             ></div>
 
@@ -50,9 +50,9 @@ const PregnancyJourneyNav: React.FC<PregnancyJourneyNavProps> = ({
                     <div
                       className={`w-10 h-10 rounded-full flex items-center justify-center ${
                         index === currentStepIndex
-                          ? 'bg-[#005eb8] text-white'
+                          ? 'bg-[#0891b2] text-white'
                           : index < currentStepIndex
-                            ? 'bg-[#005eb8] text-white opacity-70'
+                            ? 'bg-[#0891b2] text-white opacity-70'
                             : 'bg-gray-200 text-gray-600'
                       }`}
                     >
@@ -76,7 +76,7 @@ const PregnancyJourneyNav: React.FC<PregnancyJourneyNavProps> = ({
       {showPrevNext && (
         <div className="flex justify-between border-t border-b border-gray-200 py-4 my-6">
           {prevStep ? (
-            <Link to={prevStep.path} className="flex items-center text-[#005eb8] hover:underline">
+            <Link to={prevStep.path} className="flex items-center text-[#0891b2] hover:underline">
               <svg className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
@@ -87,7 +87,7 @@ const PregnancyJourneyNav: React.FC<PregnancyJourneyNavProps> = ({
           )}
 
           {nextStep ? (
-            <Link to={nextStep.path} className="flex items-center text-[#005eb8] hover:underline">
+            <Link to={nextStep.path} className="flex items-center text-[#0891b2] hover:underline">
               Next: {nextStep.label}
               <svg className="h-5 w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

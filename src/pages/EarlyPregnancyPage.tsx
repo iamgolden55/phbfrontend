@@ -100,7 +100,7 @@ const EarlyPregnancyPage: React.FC = () => {
           </div>
 
           <p className="mb-4">
-            For more detailed information about early pregnancy symptoms and how to manage them, visit our <Link to="/pregnancy/early-pregnancy-symptoms" className="text-[#005eb8] hover:underline">Early pregnancy symptoms</Link> page.
+            For more detailed information about early pregnancy symptoms and how to manage them, visit our <Link to="/pregnancy/early-pregnancy-symptoms" className="text-[#0891b2] hover:underline">Early pregnancy symptoms</Link> page.
           </p>
 
           <div className="bg-gray-50 p-4 rounded-md mb-4">
@@ -146,7 +146,7 @@ const EarlyPregnancyPage: React.FC = () => {
             </ul>
           </div>
           <p className="mb-3">
-            For more details about what to expect at this important appointment, see our guide to <Link to="/pregnancy/first-prenatal-visit" className="text-[#005eb8] hover:underline">Your first prenatal visit</Link>.
+            For more details about what to expect at this important appointment, see our guide to <Link to="/pregnancy/first-prenatal-visit" className="text-[#0891b2] hover:underline">Your first prenatal visit</Link>.
           </p>
 
           <h3 className="font-medium text-lg mb-3 mt-6">Ultrasound scans</h3>
@@ -179,7 +179,7 @@ const EarlyPregnancyPage: React.FC = () => {
             During early pregnancy, you\'ll be offered various screening tests to check for potential health conditions. These are optional, and your healthcare provider will explain each test so you can make an informed decision.
           </p>
           <p className="mb-6">
-            For detailed information about available tests, visit our <Link to="/pregnancy/prenatal-tests" className="text-[#005eb8] hover:underline">Prenatal tests explained</Link> page.
+            For detailed information about available tests, visit our <Link to="/pregnancy/prenatal-tests" className="text-[#0891b2] hover:underline">Prenatal tests explained</Link> page.
           </p>
         </div>
       )
@@ -240,7 +240,7 @@ const EarlyPregnancyPage: React.FC = () => {
           </div>
 
           <p className="mb-6">
-            For more detailed information about nutrition during pregnancy, see our <Link to="/pregnancy/nutrition-guide" className="text-[#005eb8] hover:underline">Pregnancy nutrition guide</Link>.
+            For more detailed information about nutrition during pregnancy, see our <Link to="/pregnancy/nutrition-guide" className="text-[#0891b2] hover:underline">Pregnancy nutrition guide</Link>.
           </p>
 
           <h3 className="font-medium text-lg mb-3">Exercise and activity</h3>
@@ -365,7 +365,7 @@ const EarlyPregnancyPage: React.FC = () => {
                 <li>Research birthing options available in your area</li>
                 <li>Talk to friends or family who have had children</li>
                 <li>Discuss your questions with your midwife or doctor</li>
-                <li>Explore our <Link to="/pregnancy/calendar" className="text-[#005eb8] hover:underline">Pregnancy calendar</Link> to learn about fetal development week by week</li>
+                <li>Explore our <Link to="/pregnancy/calendar" className="text-[#0891b2] hover:underline">Pregnancy calendar</Link> to learn about fetal development week by week</li>
               </ul>
             </div>
 
@@ -412,7 +412,7 @@ const EarlyPregnancyPage: React.FC = () => {
               The second trimester is often considered the "honeymoon period" of pregnancy, when many discomforts ease and the risk of complications is lower.
             </p>
             <p className="mt-3">
-              Learn more in our <Link to="/pregnancy/middle" className="text-[#005eb8] font-medium hover:underline">Middle pregnancy guide</Link>.
+              Learn more in our <Link to="/pregnancy/middle" className="text-[#0891b2] font-medium hover:underline">Middle pregnancy guide</Link>.
             </p>
           </div>
         </div>
@@ -422,7 +422,7 @@ const EarlyPregnancyPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Early Pregnancy</h1>
           <p className="text-xl font-medium">
@@ -452,19 +452,19 @@ const EarlyPregnancyPage: React.FC = () => {
                 <h3 className="font-bold mb-3">Related information</h3>
                 <ul className="space-y-2">
                   <li>
-                    <Link to="/pregnancy/early-pregnancy-symptoms" className="text-[#005eb8] hover:underline text-sm">Early pregnancy symptoms</Link>
+                    <Link to="/pregnancy/early-pregnancy-symptoms" className="text-[#0891b2] hover:underline text-sm">Early pregnancy symptoms</Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/first-prenatal-visit" className="text-[#005eb8] hover:underline text-sm">Your first prenatal visit</Link>
+                    <Link to="/pregnancy/first-prenatal-visit" className="text-[#0891b2] hover:underline text-sm">Your first prenatal visit</Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/nutrition-guide" className="text-[#005eb8] hover:underline text-sm">Nutrition guide</Link>
+                    <Link to="/pregnancy/nutrition-guide" className="text-[#0891b2] hover:underline text-sm">Nutrition guide</Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/common-concerns" className="text-[#005eb8] hover:underline text-sm">Common pregnancy concerns</Link>
+                    <Link to="/pregnancy/common-concerns" className="text-[#0891b2] hover:underline text-sm">Common pregnancy concerns</Link>
                   </li>
                   <li>
-                    <Link to="/tools/due-date-calculator" className="text-[#005eb8] hover:underline text-sm">Due date calculator</Link>
+                    <Link to="/tools/due-date-calculator" className="text-[#0891b2] hover:underline text-sm">Due date calculator</Link>
                   </li>
                 </ul>
               </div>
@@ -482,7 +482,7 @@ const EarlyPregnancyPage: React.FC = () => {
 
             {sections.map((section) => (
               <section key={section.id} id={section.id} className="mb-12 scroll-mt-4">
-                <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">{section.title}</h2>
+                <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">{section.title}</h2>
                 <div className="prose max-w-none">{section.content}</div>
               </section>
             ))}
@@ -494,14 +494,14 @@ const EarlyPregnancyPage: React.FC = () => {
               </p>
               <Link
                 to="/pregnancy/calendar"
-                className="inline-block bg-[#005eb8] text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors"
+                className="inline-block bg-[#0891b2] text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors"
               >
                 View pregnancy calendar
               </Link>
             </div>
 
             <div className="mt-8">
-              <Link to="/pregnancy" className="text-[#005eb8] font-medium hover:underline flex items-center">
+              <Link to="/pregnancy" className="text-[#0891b2] font-medium hover:underline flex items-center">
                 <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>

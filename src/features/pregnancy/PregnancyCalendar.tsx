@@ -233,7 +233,7 @@ const PregnancyCalendar: React.FC = () => {
                 onClick={() => handleWeekSelect(week)}
                 className={`px-3 py-1 rounded-md text-sm font-medium
                   ${selectedWeek === week
-                    ? 'bg-[#005eb8] text-white'
+                    ? 'bg-[#0891b2] text-white'
                     : currentWeek === week
                       ? 'bg-blue-100 text-blue-600 border border-blue-300'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -323,7 +323,7 @@ const PregnancyCalendar: React.FC = () => {
               {selectedWeek > 1 && (
                 <button
                   onClick={() => handleWeekSelect(selectedWeek - 1)}
-                  className="text-sm text-[#005eb8] hover:underline flex items-center"
+                  className="text-sm text-[#0891b2] hover:underline flex items-center"
                 >
                   <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -337,7 +337,7 @@ const PregnancyCalendar: React.FC = () => {
               {selectedWeek < 40 && (
                 <button
                   onClick={() => handleWeekSelect(selectedWeek + 1)}
-                  className="text-sm text-[#005eb8] hover:underline flex items-center"
+                  className="text-sm text-[#0891b2] hover:underline flex items-center"
                 >
                   Next Week
                   <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

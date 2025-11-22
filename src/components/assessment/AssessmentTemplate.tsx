@@ -120,7 +120,7 @@ const AssessmentTemplate: React.FC<AssessmentProps> = ({
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <div className="flex items-center mb-2">
             <Link to="/tools/health-assessments" className="text-white hover:underline flex items-center">
@@ -218,7 +218,7 @@ const AssessmentTemplate: React.FC<AssessmentProps> = ({
               </button>
               <button
                 onClick={handleNext}
-                className={`px-6 py-2 rounded-md bg-[#005eb8] hover:bg-[#003f7e] text-white transition-colors ${
+                className={`px-6 py-2 rounded-md bg-[#0891b2] hover:bg-[#0e7490] text-white transition-colors ${
                   questions[currentStep].required && !isQuestionAnswered(questions[currentStep].id)
                     ? 'opacity-50 cursor-not-allowed'
                     : ''
@@ -310,7 +310,7 @@ const AssessmentTemplate: React.FC<AssessmentProps> = ({
               </button>
               <Link
                 to="/tools/health-assessments"
-                className="px-6 py-2 rounded-md bg-[#005eb8] hover:bg-[#003f7e] text-white transition-colors text-center"
+                className="px-6 py-2 rounded-md bg-[#0891b2] hover:bg-[#0e7490] text-white transition-colors text-center"
               >
                 Find More Assessments
               </Link>

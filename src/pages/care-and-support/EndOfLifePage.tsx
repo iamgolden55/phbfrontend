@@ -85,7 +85,7 @@ const EndOfLifePage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <nav className="text-sm mb-4">
             <Link to="/" className="hover:underline">Home</Link>
@@ -171,7 +171,7 @@ const EndOfLifePage: React.FC = () => {
                 onClick={() => setSelectedStage(stage.stage)}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   selectedStage === stage.stage
-                    ? 'bg-[#005eb8] text-white'
+                    ? 'bg-[#0891b2] text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -183,7 +183,7 @@ const EndOfLifePage: React.FC = () => {
 
         <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
           <div className="mb-4">
-            <h3 className="text-xl font-bold text-[#005eb8] mb-2">{currentStage.title}</h3>
+            <h3 className="text-xl font-bold text-[#0891b2] mb-2">{currentStage.title}</h3>
             <p className="text-gray-600 mb-4">{currentStage.description}</p>
             <div className="text-sm text-gray-500 mb-4">
               <strong>Typical timeframe:</strong> {currentStage.timeframe}
@@ -407,7 +407,7 @@ const EndOfLifePage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/account/appointments/book"
-                className="bg-[#005eb8] text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors inline-block font-bold"
+                className="bg-[#0891b2] text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors inline-block font-bold"
               >
                 Palliative care consultation
               </Link>
@@ -419,7 +419,7 @@ const EndOfLifePage: React.FC = () => {
               </a>
               <Link
                 to="/help"
-                className="bg-transparent border-2 border-[#005eb8] text-[#005eb8] px-6 py-3 rounded-md hover:bg-[#005eb8] hover:text-white transition-colors inline-block font-bold"
+                className="bg-transparent border-2 border-[#0891b2] text-[#0891b2] px-6 py-3 rounded-md hover:bg-[#0891b2] hover:text-white transition-colors inline-block font-bold"
               >
                 Bereavement support
               </Link>

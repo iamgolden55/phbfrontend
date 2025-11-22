@@ -19,7 +19,7 @@ const HealthConditionPage: React.FC = () => {
   if (!condition) {
     return (
       <div className="bg-white">
-        <div className="bg-[#005eb8] text-white py-8">
+        <div className="bg-[#0891b2] text-white py-8">
           <div className="phb-container">
             <h1 className="text-3xl font-bold mb-4">Condition not found</h1>
           </div>
@@ -41,7 +41,7 @@ const HealthConditionPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Header */}
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <div className="flex items-center gap-2 mb-4">
             <Link to="/health-a-z" className="text-white hover:underline">
@@ -80,7 +80,7 @@ const HealthConditionPage: React.FC = () => {
           {/* Sidebar with "On this page" quick links */}
           <div className="md:w-1/4 order-2 md:order-1">
             <div className="sticky top-4 bg-gray-50 p-5 rounded-md border border-gray-200 shadow-sm">
-              <h2 className="text-xl font-bold mb-4 text-[#005eb8]">On this page</h2>
+              <h2 className="text-xl font-bold mb-4 text-[#0891b2]">On this page</h2>
               <ul className="space-y-3">
                 <li>
                   <a href="#symptoms" className="flex items-center text-blue-700 hover:text-blue-900 hover:underline">
@@ -166,7 +166,7 @@ const HealthConditionPage: React.FC = () => {
 
             {/* Symptoms */}
             <section id="symptoms" className="mb-8 scroll-mt-4">
-              <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">Symptoms of {condition.name}</h2>
+              <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">Symptoms of {condition.name}</h2>
               <p className="mb-4">Common symptoms of {condition.name.toLowerCase()} include:</p>
               <ul className="list-disc pl-6 space-y-2">
                 {condition.symptoms.map((symptom, index) => (
@@ -177,7 +177,7 @@ const HealthConditionPage: React.FC = () => {
 
             {/* Causes */}
             <section id="causes" className="mb-8 scroll-mt-4">
-              <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">Causes of {condition.name}</h2>
+              <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">Causes of {condition.name}</h2>
               <p className="mb-4">{condition.name} can be caused or triggered by:</p>
               <ul className="list-disc pl-6 space-y-2">
                 {condition.causes.map((cause, index) => (
@@ -188,7 +188,7 @@ const HealthConditionPage: React.FC = () => {
 
             {/* Treatments */}
             <section id="treatments" className="mb-8 scroll-mt-4">
-              <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">Treatments for {condition.name}</h2>
+              <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">Treatments for {condition.name}</h2>
               <p className="mb-4">Treatment options for {condition.name.toLowerCase()} include:</p>
               <ul className="list-disc pl-6 space-y-2">
                 {condition.treatments.map((treatment, index) => (
@@ -199,7 +199,7 @@ const HealthConditionPage: React.FC = () => {
 
             {/* Prevention */}
             <section id="prevention" className="mb-8 scroll-mt-4">
-              <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">Prevention and management</h2>
+              <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">Prevention and management</h2>
               <p className="mb-4">Ways to manage and prevent {condition.name.toLowerCase()} symptoms:</p>
               <ul className="list-disc pl-6 space-y-2">
                 {condition.preventions.map((tip, index) => (
@@ -211,7 +211,7 @@ const HealthConditionPage: React.FC = () => {
             {/* Common Questions */}
             {condition.commonQuestions && condition.commonQuestions.length > 0 && (
               <section id="questions" className="mb-8 scroll-mt-4">
-                <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">Common questions about {condition.name}</h2>
+                <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">Common questions about {condition.name}</h2>
                 <div className="space-y-4">
                   {condition.commonQuestions.map((qa, index) => (
                     <div key={index} className="border-b border-gray-200 pb-4 last:border-b-0">
@@ -226,7 +226,7 @@ const HealthConditionPage: React.FC = () => {
             {/* Affected Groups */}
             {condition.affectedGroups && condition.affectedGroups.length > 0 && (
               <section id="affected-groups" className="mb-8 scroll-mt-4">
-                <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">Who is affected by {condition.name}</h2>
+                <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">Who is affected by {condition.name}</h2>
                 <ul className="list-disc pl-6 space-y-2">
                   {condition.affectedGroups.map((group, index) => (
                     <li key={index}>{group}</li>
@@ -243,7 +243,7 @@ const HealthConditionPage: React.FC = () => {
             )}
             {condition.moreInfoLinks && condition.moreInfoLinks.length > 0 && (
               <div className="mb-8">
-                <h2 className="text-xl font-bold mb-2 text-[#005eb8]">Related links</h2>
+                <h2 className="text-xl font-bold mb-2 text-[#0891b2]">Related links</h2>
                 <ul className="space-y-2">
                   {condition.moreInfoLinks.map((link, idx) => (
                     <li key={idx}>
@@ -257,7 +257,7 @@ const HealthConditionPage: React.FC = () => {
             {/* Wikipedia and References */}
             {condition.wikipediaUrl && (
               <section className="mb-8">
-                <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">Sources & References</h2>
+                <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">Sources & References</h2>
                 <p className="mb-4">This information is based on data from reliable medical sources including <a href={condition.wikipediaUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Wikipedia</a>. <a href="#references" className="text-blue-600 hover:underline">View all references</a>.</p>
                 <a 
                   href={condition.wikipediaUrl} 

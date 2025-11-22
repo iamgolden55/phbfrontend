@@ -118,7 +118,7 @@ const HealthGoalsPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Health Goals</h1>
           <p className="text-xl font-medium">
@@ -135,7 +135,7 @@ const HealthGoalsPage: React.FC = () => {
           </div>
           <button
             onClick={() => setShowAddGoalForm(!showAddGoalForm)}
-            className="bg-[#005eb8] hover:bg-[#003f7e] text-white px-4 py-2 rounded-md transition-colors"
+            className="bg-[#0891b2] hover:bg-[#0e7490] text-white px-4 py-2 rounded-md transition-colors"
           >
             {showAddGoalForm ? 'Cancel' : '+ Add New Goal'}
           </button>
@@ -214,7 +214,7 @@ const HealthGoalsPage: React.FC = () => {
               <div className="mt-6 flex justify-end">
                 <button
                   type="submit"
-                  className="bg-[#005eb8] hover:bg-[#003f7e] text-white px-6 py-2 rounded-md transition-colors"
+                  className="bg-[#0891b2] hover:bg-[#0e7490] text-white px-6 py-2 rounded-md transition-colors"
                 >
                   Save Goal
                 </button>
@@ -228,7 +228,7 @@ const HealthGoalsPage: React.FC = () => {
             <p className="text-gray-600 mb-4">You don't have any health goals yet.</p>
             <button
               onClick={() => setShowAddGoalForm(true)}
-              className="text-[#005eb8] hover:underline"
+              className="text-[#0891b2] hover:underline"
             >
               Create your first health goal
             </button>

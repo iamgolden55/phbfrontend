@@ -4,7 +4,7 @@ import BMICalculator from '../features/calculators/BMICalculator';
 const BMICalculatorPage: React.FC = () => {
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">BMI Calculator</h1>
           <p className="text-xl font-medium">
@@ -60,9 +60,9 @@ const BMICalculatorPage: React.FC = () => {
               href="/live-well/healthy-eating"
               className="bg-[#f0f4f5] p-5 rounded-md hover:bg-[#e8edee] transition-colors flex flex-col"
             >
-              <h3 className="text-lg font-bold mb-2 text-[#005eb8]">Healthy eating</h3>
+              <h3 className="text-lg font-bold mb-2 text-[#0891b2]">Healthy eating</h3>
               <p className="text-sm text-gray-600 mb-3">Discover the benefits of a balanced diet and get tips for healthy eating.</p>
-              <span className="text-[#005eb8] font-medium mt-auto flex items-center">
+              <span className="text-[#0891b2] font-medium mt-auto flex items-center">
                 Read more
                 <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -73,9 +73,9 @@ const BMICalculatorPage: React.FC = () => {
               href="/live-well/exercise"
               className="bg-[#f0f4f5] p-5 rounded-md hover:bg-[#e8edee] transition-colors flex flex-col"
             >
-              <h3 className="text-lg font-bold mb-2 text-[#005eb8]">Exercise and fitness</h3>
+              <h3 className="text-lg font-bold mb-2 text-[#0891b2]">Exercise and fitness</h3>
               <p className="text-sm text-gray-600 mb-3">Find out how to get more active and improve your fitness level.</p>
-              <span className="text-[#005eb8] font-medium mt-auto flex items-center">
+              <span className="text-[#0891b2] font-medium mt-auto flex items-center">
                 Read more
                 <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -86,9 +86,9 @@ const BMICalculatorPage: React.FC = () => {
               href="/phb-services"
               className="bg-[#f0f4f5] p-5 rounded-md hover:bg-[#e8edee] transition-colors flex flex-col"
             >
-              <h3 className="text-lg font-bold mb-2 text-[#005eb8]">Get support</h3>
+              <h3 className="text-lg font-bold mb-2 text-[#0891b2]">Get support</h3>
               <p className="text-sm text-gray-600 mb-3">Find local services that can help you achieve a healthy weight.</p>
-              <span className="text-[#005eb8] font-medium mt-auto flex items-center">
+              <span className="text-[#0891b2] font-medium mt-auto flex items-center">
                 Find services
                 <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

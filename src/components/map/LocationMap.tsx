@@ -137,7 +137,7 @@ export function LocationMap<T extends BaseLocation>({
     el.innerHTML = `
       <div style="
         background: white;
-        border: 3px solid ${category?.color || '#003f7e'};
+        border: 3px solid ${category?.color || '#0e7490'};
         border-radius: 50%;
         width: 40px;
         height: 40px;

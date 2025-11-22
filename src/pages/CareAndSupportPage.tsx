@@ -50,7 +50,7 @@ const supportCategories: SupportCategoryType[] = [
 const CareAndSupportPage: React.FC = () => {
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Care and support</h1>
           <p className="text-xl font-medium">
@@ -89,7 +89,7 @@ const CareAndSupportPage: React.FC = () => {
                 </div>
               )}
               <div className="p-5 flex-grow flex flex-col">
-                <h3 className="text-xl font-bold text-[#005eb8] mb-2">
+                <h3 className="text-xl font-bold text-[#0891b2] mb-2">
                   <Link to={category.href} className="hover:underline">
                     {category.title}
                   </Link>
@@ -97,7 +97,7 @@ const CareAndSupportPage: React.FC = () => {
                 <p className="text-gray-600 mb-4 flex-grow">{category.description}</p>
                 <Link
                   to={category.href}
-                  className="text-[#005eb8] font-medium hover:underline flex items-center mt-auto"
+                  className="text-[#0891b2] font-medium hover:underline flex items-center mt-auto"
                 >
                   Read more
                   <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -149,14 +149,14 @@ const CareAndSupportPage: React.FC = () => {
               <div className="bg-gray-50 p-4 rounded-md">
                 <h3 className="font-bold mb-2">Carer's assessment</h3>
                 <p className="text-sm mb-3">Find out what support is available to help you as a carer.</p>
-                <Link to="/care-and-support/carers-assessment" className="text-[#005eb8] text-sm hover:underline">
+                <Link to="/care-and-support/carers-assessment" className="text-[#0891b2] text-sm hover:underline">
                   Apply for an assessment
                 </Link>
               </div>
               <div className="bg-gray-50 p-4 rounded-md">
                 <h3 className="font-bold mb-2">Carer's benefits</h3>
                 <p className="text-sm mb-3">Learn about financial help available to carers.</p>
-                <Link to="/care-and-support/carers-benefits" className="text-[#005eb8] text-sm hover:underline">
+                <Link to="/care-and-support/carers-benefits" className="text-[#0891b2] text-sm hover:underline">
                   Check benefit eligibility
                 </Link>
               </div>
@@ -165,7 +165,7 @@ const CareAndSupportPage: React.FC = () => {
         </div>
 
         {/* Find local services */}
-        <div className="bg-[#005eb8] text-white p-8 rounded-lg">
+        <div className="bg-[#0891b2] text-white p-8 rounded-lg">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-4">Find local care services</h2>
             <p className="mb-6">
@@ -173,7 +173,7 @@ const CareAndSupportPage: React.FC = () => {
             </p>
             <Link
               to="/find-services"
-              className="bg-white text-[#005eb8] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
+              className="bg-white text-[#0891b2] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
             >
               Find care services
             </Link>

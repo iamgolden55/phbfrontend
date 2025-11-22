@@ -2,14 +2,14 @@
  * PharmacyPrescriptionsPage
  *
  * Main page for pharmacies to search and view patient prescriptions by HPN.
- * Implements NHS EPS-style patient-choice model with comprehensive drug database integration.
+ * Implements industry-standard patient-choice prescription model with comprehensive drug database integration.
  *
  * Features:
  * - HPN-based prescription lookup
  * - Comprehensive drug database information
  * - Risk-based patient verification
  * - Complete audit trail
- * - Industry-standard compliance (NHS EPS, NAFDAC, PCN)
+ * - Industry-standard compliance (NAFDAC, PCN)
  */
 
 import React, { useState } from 'react';
@@ -172,7 +172,7 @@ const PharmacyPrescriptionsPage: React.FC = () => {
             Industry Standards Implemented
           </Typography>
           <Typography variant="caption">
-            • NHS EPS Patient-Choice Model<br />
+            • Patient-Choice Prescription Model<br />
             • PCN (Pharmacists Council of Nigeria) License Verification<br />
             • NAFDAC Drug Classification & Schedules<br />
             • Risk-Based Patient Verification<br />
@@ -294,7 +294,7 @@ const PharmacyPrescriptionsPage: React.FC = () => {
         <Typography variant="caption" color="text.secondary">
           <strong>Compliance Notice:</strong> All prescription access is logged for audit compliance.
           Patient must be physically present for verification. Controlled substances require
-          government-issued photo ID verification. This system complies with NHS EPS standards,
+          government-issued photo ID verification. This system complies with international healthcare standards,
           NAFDAC regulations, and PCN guidelines.
         </Typography>
       </Paper>

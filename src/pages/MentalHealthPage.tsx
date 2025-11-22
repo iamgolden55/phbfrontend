@@ -57,7 +57,7 @@ const mentalHealthResources: ResourceType[] = [
 const MentalHealthPage: React.FC = () => {
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Mental health</h1>
           <p className="text-xl font-medium">
@@ -82,7 +82,7 @@ const MentalHealthPage: React.FC = () => {
             </a>
             <a
               href="tel:0800-12-13-14"
-              className="bg-[#005eb8] text-white px-4 py-2 rounded-md hover:bg-[#003f7e] transition-colors text-center font-bold"
+              className="bg-[#0891b2] text-white px-4 py-2 rounded-md hover:bg-[#0e7490] transition-colors text-center font-bold"
             >
               PHB Mental Health Helpline
             </a>
@@ -121,7 +121,7 @@ const MentalHealthPage: React.FC = () => {
                 </div>
               )}
               <div className="p-5 flex-grow flex flex-col">
-                <h3 className="text-xl font-bold text-[#005eb8] mb-2">
+                <h3 className="text-xl font-bold text-[#0891b2] mb-2">
                   <Link to={resource.href} className="hover:underline">
                     {resource.title}
                   </Link>
@@ -143,7 +143,7 @@ const MentalHealthPage: React.FC = () => {
 
                 <Link
                   to={resource.href}
-                  className="text-[#005eb8] font-medium hover:underline flex items-center mt-auto"
+                  className="text-[#0891b2] font-medium hover:underline flex items-center mt-auto"
                 >
                   Read more
                   <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -198,7 +198,7 @@ const MentalHealthPage: React.FC = () => {
               <p className="text-sm text-gray-600 mb-2">
                 Religious organizations often provide counseling and community support that can help with mental well-being.
               </p>
-              <Link to="/mental-health/faith-support" className="text-[#005eb8] text-sm hover:underline">
+              <Link to="/mental-health/faith-support" className="text-[#0891b2] text-sm hover:underline">
                 Faith-based mental health support
               </Link>
             </div>
@@ -208,7 +208,7 @@ const MentalHealthPage: React.FC = () => {
               <p className="text-sm text-gray-600 mb-2">
                 Family plays a central role in mental health support in many African communities. Learn how families can help.
               </p>
-              <Link to="/mental-health/family-support" className="text-[#005eb8] text-sm hover:underline">
+              <Link to="/mental-health/family-support" className="text-[#0891b2] text-sm hover:underline">
                 Family support guide
               </Link>
             </div>
@@ -218,7 +218,7 @@ const MentalHealthPage: React.FC = () => {
               <p className="text-sm text-gray-600 mb-2">
                 Peer support groups bring together people with similar experiences to share coping strategies and provide mutual support.
               </p>
-              <Link to="/mental-health/community-support" className="text-[#005eb8] text-sm hover:underline">
+              <Link to="/mental-health/community-support" className="text-[#0891b2] text-sm hover:underline">
                 Find local support groups
               </Link>
             </div>
@@ -234,7 +234,7 @@ const MentalHealthPage: React.FC = () => {
               <p className="text-sm text-gray-600 mb-2">
                 5 steps to mental wellbeing that can help you feel more positive and get the most out of life.
               </p>
-              <Link to="/mental-health/wellbeing" className="text-[#005eb8] text-sm hover:underline">
+              <Link to="/mental-health/wellbeing" className="text-[#0891b2] text-sm hover:underline">
                 5 steps to wellbeing
               </Link>
             </div>
@@ -244,7 +244,7 @@ const MentalHealthPage: React.FC = () => {
               <p className="text-sm text-gray-600 mb-2">
                 Find out how to improve your sleep when you have mental health problems, and how poor sleep can affect your mental health.
               </p>
-              <Link to="/mental-health/sleep" className="text-[#005eb8] text-sm hover:underline">
+              <Link to="/mental-health/sleep" className="text-[#0891b2] text-sm hover:underline">
                 Sleep tips
               </Link>
             </div>
@@ -254,7 +254,7 @@ const MentalHealthPage: React.FC = () => {
               <p className="text-sm text-gray-600 mb-2">
                 Learn practical techniques to manage stress in daily life and during challenging times.
               </p>
-              <Link to="/mental-health/stress-management" className="text-[#005eb8] text-sm hover:underline">
+              <Link to="/mental-health/stress-management" className="text-[#0891b2] text-sm hover:underline">
                 Stress management guide
               </Link>
             </div>
@@ -262,7 +262,7 @@ const MentalHealthPage: React.FC = () => {
         </div>
 
         {/* Mental health assessment tool */}
-        <div className="bg-[#005eb8] text-white p-8 rounded-lg">
+        <div className="bg-[#0891b2] text-white p-8 rounded-lg">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-4">Mental health self-assessment</h2>
             <p className="mb-6">
@@ -270,7 +270,7 @@ const MentalHealthPage: React.FC = () => {
             </p>
             <Link
               to="/tools/mental-health-assessment"
-              className="bg-white text-[#005eb8] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
+              className="bg-white text-[#0891b2] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
             >
               Take the assessment
             </Link>

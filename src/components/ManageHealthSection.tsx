@@ -38,7 +38,7 @@ const ManageHealthSection: React.FC = () => {
               <li key={index}>
                 <a
                   href={link.href}
-                  className="flex items-center text-[#005eb8] hover:underline"
+                  className="flex items-center text-[#0891b2] hover:underline"
                 >
                   <svg
                     className="h-5 w-5 mr-4 flex-shrink-0 text-green-600"

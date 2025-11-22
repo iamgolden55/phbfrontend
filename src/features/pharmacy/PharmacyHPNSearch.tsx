@@ -146,7 +146,7 @@ const PharmacyHPNSearch: React.FC<PharmacyHPNSearchProps> = ({
           {/* Information Alert */}
           <Alert severity="info" icon={<MedicalServices />}>
             <Typography variant="body2" sx={{ fontWeight: 500 }}>
-              Patient-Choice Model (NHS Standard)
+              Patient-Choice Model
             </Typography>
             <Typography variant="caption">
               Any pharmacy can access prescriptions if the patient is physically present.

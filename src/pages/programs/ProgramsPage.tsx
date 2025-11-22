@@ -37,7 +37,7 @@ const ProgramsPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Header */}
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">PHB Programs and Recruitment</h1>
           <p className="text-xl font-medium">
@@ -61,7 +61,7 @@ const ProgramsPage: React.FC = () => {
       {/* Main Content */}
       <div className="phb-container py-8">
         <div className="max-w-3xl mx-auto mb-12">
-          <h2 className="text-2xl font-bold text-[#005eb8] mb-4">About Our Programs</h2>
+          <h2 className="text-2xl font-bold text-[#0891b2] mb-4">About Our Programs</h2>
           <p className="mb-4">
             The Public Health Bureau (PHB) is committed to developing the next generation of public health professionals
             in Nigeria. Through our various programs, we aim to bridge the gap between academic training and
@@ -97,7 +97,7 @@ const ProgramsPage: React.FC = () => {
                 </div>
               )}
               <div className="p-6 flex-grow flex flex-col">
-                <h2 className="text-xl font-bold text-[#005eb8] mb-2">
+                <h2 className="text-xl font-bold text-[#0891b2] mb-2">
                   <Link to={program.href} className="hover:underline">
                     {program.title}
                   </Link>
@@ -105,7 +105,7 @@ const ProgramsPage: React.FC = () => {
                 <p className="text-gray-600 mb-4 flex-grow">{program.description}</p>
                 <Link
                   to={program.href}
-                  className="bg-[#005eb8] text-white px-4 py-2 rounded-md hover:bg-[#003f7e] inline-block w-full text-center mt-auto"
+                  className="bg-[#0891b2] text-white px-4 py-2 rounded-md hover:bg-[#0e7490] inline-block w-full text-center mt-auto"
                 >
                   Learn More
                 </Link>
@@ -116,7 +116,7 @@ const ProgramsPage: React.FC = () => {
 
         {/* CTA Section */}
         <div className="mt-12 bg-blue-50 rounded-lg p-8 text-center">
-          <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Stay Informed</h2>
+          <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Stay Informed</h2>
           <p className="mb-6 max-w-2xl mx-auto">
             Sign up to receive updates on new programs, application deadlines, and other opportunities from the
             Public Health Bureau.
@@ -127,7 +127,7 @@ const ProgramsPage: React.FC = () => {
               placeholder="Your email address"
               className="px-4 py-3 rounded-md border border-gray-300 flex-grow"
             />
-            <button className="bg-[#005eb8] text-white px-6 py-3 rounded-md hover:bg-[#003f7e] transition-colors font-medium whitespace-nowrap">
+            <button className="bg-[#0891b2] text-white px-6 py-3 rounded-md hover:bg-[#0e7490] transition-colors font-medium whitespace-nowrap">
               Subscribe
             </button>
           </div>
@@ -135,7 +135,7 @@ const ProgramsPage: React.FC = () => {
 
         {/* Contact Information */}
         <div className="mt-12 bg-gray-100 p-8 rounded-lg">
-          <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Contact Us</h2>
+          <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Contact Us</h2>
           <p className="mb-6">
             For more information about any of our programs or to discuss potential partnerships, please contact our
             Programs and Recruitment team.
@@ -145,13 +145,13 @@ const ProgramsPage: React.FC = () => {
               <h3 className="text-lg font-semibold mb-3">General Inquiries</h3>
               <div className="space-y-2">
                 <div className="flex items-start">
-                  <svg className="h-5 w-5 mr-2 mt-0.5 text-[#005eb8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-5 w-5 mr-2 mt-0.5 text-[#0891b2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                   <span>programs@phb.gov.ng</span>
                 </div>
                 <div className="flex items-start">
-                  <svg className="h-5 w-5 mr-2 mt-0.5 text-[#005eb8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-5 w-5 mr-2 mt-0.5 text-[#0891b2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
                   <span>+234 (0) 123 456 7890</span>

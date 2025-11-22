@@ -66,7 +66,7 @@ const QuitSmokingPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Quit smoking</h1>
           <p className="text-xl font-medium">
@@ -91,7 +91,7 @@ const QuitSmokingPage: React.FC = () => {
             </a>
             <Link
               to="/account/appointments/book"
-              className="bg-[#005eb8] text-white px-4 py-2 rounded-md hover:bg-[#003f7e] transition-colors text-center font-bold"
+              className="bg-[#0891b2] text-white px-4 py-2 rounded-md hover:bg-[#0e7490] transition-colors text-center font-bold"
             >
               Book Quit Smoking Appointment
             </Link>
@@ -125,7 +125,7 @@ const QuitSmokingPage: React.FC = () => {
               value={quitDate}
               onChange={(e) => setQuitDate(e.target.value)}
               min={new Date().toISOString().split('T')[0]}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#005eb8] focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0891b2] focus:border-transparent"
             />
             {quitDate && (
               <div className="mt-4 p-4 bg-white rounded-lg border">
@@ -139,7 +139,7 @@ const QuitSmokingPage: React.FC = () => {
                 </p>
                 <Link 
                   to="/account/health-goals" 
-                  className="bg-[#005eb8] text-white px-4 py-2 rounded-md hover:bg-[#003f7e] transition-colors inline-block text-sm font-bold"
+                  className="bg-[#0891b2] text-white px-4 py-2 rounded-md hover:bg-[#0e7490] transition-colors inline-block text-sm font-bold"
                 >
                   Save to My Health Goals
                 </Link>
@@ -166,7 +166,7 @@ const QuitSmokingPage: React.FC = () => {
                 </div>
               )}
               <div className="p-5 flex-grow flex flex-col">
-                <h3 className="text-xl font-bold text-[#005eb8] mb-2">
+                <h3 className="text-xl font-bold text-[#0891b2] mb-2">
                   <Link to={resource.href} className="hover:underline">
                     {resource.title}
                   </Link>
@@ -188,7 +188,7 @@ const QuitSmokingPage: React.FC = () => {
 
                 <Link
                   to={resource.href}
-                  className="text-[#005eb8] font-medium hover:underline flex items-center mt-auto"
+                  className="text-[#0891b2] font-medium hover:underline flex items-center mt-auto"
                 >
                   Read more
                   <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -274,7 +274,7 @@ const QuitSmokingPage: React.FC = () => {
               <p className="text-sm text-gray-600 mb-2">
                 Learn how family members can help create a supportive environment for your quit journey.
               </p>
-              <Link to="/live-well/quit-smoking/family-support" className="text-[#005eb8] text-sm hover:underline">
+              <Link to="/live-well/quit-smoking/family-support" className="text-[#0891b2] text-sm hover:underline">
                 Family support guide
               </Link>
             </div>
@@ -284,7 +284,7 @@ const QuitSmokingPage: React.FC = () => {
               <p className="text-sm text-gray-600 mb-2">
                 Many workplaces offer smoking cessation programs and support for employees who want to quit.
               </p>
-              <Link to="/live-well/quit-smoking/workplace-support" className="text-[#005eb8] text-sm hover:underline">
+              <Link to="/live-well/quit-smoking/workplace-support" className="text-[#0891b2] text-sm hover:underline">
                 Workplace quit programs
               </Link>
             </div>
@@ -294,7 +294,7 @@ const QuitSmokingPage: React.FC = () => {
               <p className="text-sm text-gray-600 mb-2">
                 Join others on the same journey. Share experiences, strategies, and encouragement with people who understand.
               </p>
-              <Link to="/live-well/quit-smoking/support-groups" className="text-[#005eb8] text-sm hover:underline">
+              <Link to="/live-well/quit-smoking/support-groups" className="text-[#0891b2] text-sm hover:underline">
                 Find local support groups
               </Link>
             </div>
@@ -310,7 +310,7 @@ const QuitSmokingPage: React.FC = () => {
               <p className="text-sm text-gray-600 mb-2">
                 Learn the "4 D's" technique: Delay, Deep breathe, Drink water, Do something else. Most cravings last only 3-5 minutes.
               </p>
-              <Link to="/live-well/quit-smoking/managing-cravings" className="text-[#005eb8] text-sm hover:underline">
+              <Link to="/live-well/quit-smoking/managing-cravings" className="text-[#0891b2] text-sm hover:underline">
                 Craving management tips
               </Link>
             </div>
@@ -320,7 +320,7 @@ const QuitSmokingPage: React.FC = () => {
               <p className="text-sm text-gray-600 mb-2">
                 Since many people smoke when stressed, learning healthy stress management techniques is crucial for success.
               </p>
-              <Link to="/live-well/quit-smoking/stress-management" className="text-[#005eb8] text-sm hover:underline">
+              <Link to="/live-well/quit-smoking/stress-management" className="text-[#0891b2] text-sm hover:underline">
                 Stress management guide
               </Link>
             </div>
@@ -330,7 +330,7 @@ const QuitSmokingPage: React.FC = () => {
               <p className="text-sm text-gray-600 mb-2">
                 Learn practical strategies to maintain a healthy weight while quitting smoking through diet and exercise.
               </p>
-              <Link to="/live-well/quit-smoking/weight-management" className="text-[#005eb8] text-sm hover:underline">
+              <Link to="/live-well/quit-smoking/weight-management" className="text-[#0891b2] text-sm hover:underline">
                 Weight management tips
               </Link>
             </div>
@@ -338,7 +338,7 @@ const QuitSmokingPage: React.FC = () => {
         </div>
 
         {/* Quit smoking assessment tool */}
-        <div className="bg-[#005eb8] text-white p-8 rounded-lg">
+        <div className="bg-[#0891b2] text-white p-8 rounded-lg">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-4">Quit smoking readiness assessment</h2>
             <p className="mb-6">
@@ -346,7 +346,7 @@ const QuitSmokingPage: React.FC = () => {
             </p>
             <Link
               to="/tools/quit-smoking-assessment"
-              className="bg-white text-[#005eb8] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
+              className="bg-white text-[#0891b2] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
             >
               Take the assessment
             </Link>

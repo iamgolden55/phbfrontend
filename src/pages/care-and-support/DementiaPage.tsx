@@ -85,7 +85,7 @@ const DementiaPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <nav className="text-sm mb-4">
             <Link to="/" className="hover:underline">Home</Link>
@@ -168,7 +168,7 @@ const DementiaPage: React.FC = () => {
                 onClick={() => setSelectedStage(stage.stage.toLowerCase())}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   selectedStage === stage.stage.toLowerCase()
-                    ? 'bg-[#005eb8] text-white'
+                    ? 'bg-[#0891b2] text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -180,7 +180,7 @@ const DementiaPage: React.FC = () => {
 
         <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
           <div className="mb-4">
-            <h3 className="text-xl font-bold text-[#005eb8] mb-2">{currentStage.title}</h3>
+            <h3 className="text-xl font-bold text-[#0891b2] mb-2">{currentStage.title}</h3>
             <p className="text-gray-600 mb-4">{currentStage.description}</p>
             <div className="text-sm text-gray-500 mb-4">
               <strong>Typical duration:</strong> {currentStage.duration}
@@ -389,7 +389,7 @@ const DementiaPage: React.FC = () => {
         </div>
 
         {/* Emergency and support */}
-        <div className="bg-[#005eb8] text-white p-8 rounded-lg">
+        <div className="bg-[#0891b2] text-white p-8 rounded-lg">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-4">You don't have to face this alone</h2>
             <p className="mb-6">
@@ -399,7 +399,7 @@ const DementiaPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/account/appointments/book"
-                className="bg-white text-[#005eb8] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
+                className="bg-white text-[#0891b2] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
               >
                 Schedule consultation
               </Link>
@@ -411,7 +411,7 @@ const DementiaPage: React.FC = () => {
               </a>
               <Link
                 to="/care-and-support/older-people"
-                className="bg-transparent border-2 border-white text-white px-6 py-3 rounded-md hover:bg-white hover:text-[#005eb8] transition-colors inline-block font-bold"
+                className="bg-transparent border-2 border-white text-white px-6 py-3 rounded-md hover:bg-white hover:text-[#0891b2] transition-colors inline-block font-bold"
               >
                 General elderly care
               </Link>

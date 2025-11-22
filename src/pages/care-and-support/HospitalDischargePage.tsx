@@ -59,7 +59,7 @@ const HospitalDischargePage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <nav className="text-sm mb-4">
             <Link to="/" className="hover:underline">Home</Link>
@@ -148,7 +148,7 @@ const HospitalDischargePage: React.FC = () => {
                 onClick={() => setSelectedChecklist(option.key)}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   selectedChecklist === option.key
-                    ? 'bg-[#005eb8] text-white'
+                    ? 'bg-[#0891b2] text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -159,7 +159,7 @@ const HospitalDischargePage: React.FC = () => {
         </div>
 
         <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
-          <h3 className="text-xl font-bold text-[#005eb8] mb-4">{currentChecklist.category}</h3>
+          <h3 className="text-xl font-bold text-[#0891b2] mb-4">{currentChecklist.category}</h3>
           <div className="space-y-3">
             {currentChecklist.items.map((item, idx) => (
               <div key={idx} className="flex items-start">
@@ -320,7 +320,7 @@ const HospitalDischargePage: React.FC = () => {
             },
             {
               question: "What if I need to return to hospital?",
-              answer: "Don't hesitate to return if you're genuinely concerned about your health. It's better to be cautious. For emergencies, call 999. For urgent but non-emergency concerns, contact your GP or call NHS 111 for guidance."
+              answer: "Don't hesitate to return if you're genuinely concerned about your health. It's better to be cautious. For emergencies, call 999. For urgent but non-emergency concerns, contact your GP or use the PHB Health Helpline for guidance."
             },
             {
               question: "How can my family help during recovery?",
@@ -347,7 +347,7 @@ const HospitalDischargePage: React.FC = () => {
         </div>
 
         {/* Support and emergency */}
-        <div className="bg-[#005eb8] text-white p-8 rounded-lg">
+        <div className="bg-[#0891b2] text-white p-8 rounded-lg">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-4">Your recovery journey continues at home</h2>
             <p className="mb-6">
@@ -358,19 +358,19 @@ const HospitalDischargePage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/account/appointments/book"
-                className="bg-white text-[#005eb8] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
+                className="bg-white text-[#0891b2] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
               >
                 Schedule follow-up
               </Link>
               <a
-                href="tel:111"
+                href="tel:0800-PHB-CARE"
                 className="bg-green-500 text-white px-6 py-3 rounded-md hover:bg-green-600 transition-colors inline-block font-bold"
               >
-                24/7 Health Helpline: 111
+                24/7 Health Helpline
               </a>
               <Link
                 to="/care-and-support"
-                className="bg-transparent border-2 border-white text-white px-6 py-3 rounded-md hover:bg-white hover:text-[#005eb8] transition-colors inline-block font-bold"
+                className="bg-transparent border-2 border-white text-white px-6 py-3 rounded-md hover:bg-white hover:text-[#0891b2] transition-colors inline-block font-bold"
               >
                 More care support
               </Link>

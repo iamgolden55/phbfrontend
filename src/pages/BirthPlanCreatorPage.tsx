@@ -5,7 +5,7 @@ import BirthPlanCreator from '../features/pregnancy/BirthPlanCreator';
 const BirthPlanCreatorPage: React.FC = () => {
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <div className="flex items-center mb-2">
             <Link to="/pregnancy" className="text-white hover:underline mr-2">
@@ -50,23 +50,23 @@ const BirthPlanCreatorPage: React.FC = () => {
             <p className="mb-3">The best time to create your birth plan is during the third trimester, when:</p>
             <ul className="space-y-2">
               <li className="flex items-start">
-                <span className="text-[#005eb8] mr-2">•</span>
+                <span className="text-[#0891b2] mr-2">•</span>
                 <span>You've had time to research and consider your options</span>
               </li>
               <li className="flex items-start">
-                <span className="text-[#005eb8] mr-2">•</span>
+                <span className="text-[#0891b2] mr-2">•</span>
                 <span>You've developed a relationship with your healthcare provider</span>
               </li>
               <li className="flex items-start">
-                <span className="text-[#005eb8] mr-2">•</span>
+                <span className="text-[#0891b2] mr-2">•</span>
                 <span>You have a better understanding of any pregnancy complications that might affect your birth</span>
               </li>
               <li className="flex items-start">
-                <span className="text-[#005eb8] mr-2">•</span>
+                <span className="text-[#0891b2] mr-2">•</span>
                 <span>You're close enough to your due date that your preferences likely won't change significantly</span>
               </li>
               <li className="flex items-start">
-                <span className="text-[#005eb8] mr-2">•</span>
+                <span className="text-[#0891b2] mr-2">•</span>
                 <span>You still have time to discuss it with your provider at prenatal appointments</span>
               </li>
             </ul>
@@ -77,35 +77,35 @@ const BirthPlanCreatorPage: React.FC = () => {
             <p className="mb-3">Tips for sharing your plan with your healthcare team:</p>
             <ul className="space-y-2">
               <li className="flex items-start">
-                <span className="text-[#005eb8] mr-2">•</span>
+                <span className="text-[#0891b2] mr-2">•</span>
                 <div>
                   <span className="font-medium">Keep it concise</span>
                   <p className="text-sm text-gray-600">A 1-2 page document is more likely to be read in full</p>
                 </div>
               </li>
               <li className="flex items-start">
-                <span className="text-[#005eb8] mr-2">•</span>
+                <span className="text-[#0891b2] mr-2">•</span>
                 <div>
                   <span className="font-medium">Be specific but flexible</span>
                   <p className="text-sm text-gray-600">Clearly state preferences but acknowledge that medical necessity may require changes</p>
                 </div>
               </li>
               <li className="flex items-start">
-                <span className="text-[#005eb8] mr-2">•</span>
+                <span className="text-[#0891b2] mr-2">•</span>
                 <div>
                   <span className="font-medium">Discuss it in advance</span>
                   <p className="text-sm text-gray-600">Review with your provider before your due date to address any concerns</p>
                 </div>
               </li>
               <li className="flex items-start">
-                <span className="text-[#005eb8] mr-2">•</span>
+                <span className="text-[#0891b2] mr-2">•</span>
                 <div>
                   <span className="font-medium">Bring multiple copies</span>
                   <p className="text-sm text-gray-600">Have copies for your hospital bag, birth partner, and care team</p>
                 </div>
               </li>
               <li className="flex items-start">
-                <span className="text-[#005eb8] mr-2">•</span>
+                <span className="text-[#0891b2] mr-2">•</span>
                 <div>
                   <span className="font-medium">Use positive language</span>
                   <p className="text-sm text-gray-600">Frame as preferences rather than demands ("I would prefer..." vs. "I don't want...")</p>
@@ -121,21 +121,21 @@ const BirthPlanCreatorPage: React.FC = () => {
             <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               <h3 className="font-bold mb-2">Baby Names Directory</h3>
               <p className="text-sm text-gray-600 mb-3">Find the perfect name for your baby with our searchable database.</p>
-              <Link to="/pregnancy/baby-names-directory" className="text-[#005eb8] hover:underline text-sm">
+              <Link to="/pregnancy/baby-names-directory" className="text-[#0891b2] hover:underline text-sm">
                 Browse names →
               </Link>
             </div>
             <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               <h3 className="font-bold mb-2">Pregnancy Calendar</h3>
               <p className="text-sm text-gray-600 mb-3">Track your baby's development week by week throughout your pregnancy.</p>
-              <Link to="/pregnancy/calendar" className="text-[#005eb8] hover:underline text-sm">
+              <Link to="/pregnancy/calendar" className="text-[#0891b2] hover:underline text-sm">
                 View calendar →
               </Link>
             </div>
             <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               <h3 className="font-bold mb-2">Contraction Timer</h3>
               <p className="text-sm text-gray-600 mb-3">Time your contractions during labor to know when to go to the hospital.</p>
-              <Link to="/tools/contraction-timer" className="text-[#005eb8] hover:underline text-sm">
+              <Link to="/tools/contraction-timer" className="text-[#0891b2] hover:underline text-sm">
                 Track contractions →
               </Link>
             </div>

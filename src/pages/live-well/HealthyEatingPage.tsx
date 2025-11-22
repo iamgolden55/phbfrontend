@@ -6,7 +6,7 @@ const HealthyEatingPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Header */}
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Healthy Eating</h1>
           <p className="text-xl font-medium">
@@ -21,7 +21,7 @@ const HealthyEatingPage: React.FC = () => {
           {/* Main Content Area - 2/3 width on large screens */}
           <div className="lg:col-span-2">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Eating a balanced diet</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Eating a balanced diet</h2>
               <p className="mb-4">
                 A healthy, balanced diet is essential for maintaining good health and preventing various diseases. It should include a variety of foods from all major food groups in the right proportions.
               </p>
@@ -42,7 +42,7 @@ const HealthyEatingPage: React.FC = () => {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Nutrition basics</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Nutrition basics</h2>
               <p className="mb-4">
                 Understanding the basics of nutrition can help you make better food choices:
               </p>
@@ -69,7 +69,7 @@ const HealthyEatingPage: React.FC = () => {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Healthy eating tips</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Healthy eating tips</h2>
               <div className="bg-blue-50 p-6 rounded-lg">
                 <ul className="space-y-3">
                   <li className="flex items-start">
@@ -113,7 +113,7 @@ const HealthyEatingPage: React.FC = () => {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Meal planning</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Meal planning</h2>
               <p className="mb-4">
                 Planning your meals ahead of time can help you maintain a healthy diet, save money, and reduce food waste. Here are some tips for effective meal planning:
               </p>
@@ -131,7 +131,7 @@ const HealthyEatingPage: React.FC = () => {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Eating on a budget</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Eating on a budget</h2>
               <p className="mb-4">
                 Eating healthily doesn't have to be expensive. Here are some tips for nutritious eating on a budget:
               </p>
@@ -145,7 +145,7 @@ const HealthyEatingPage: React.FC = () => {
                 <li>Check for special offers, but be wary of buying things you don't need</li>
               </ul>
               <p>
-                <Link to="/live-well/healthy-eating/budget-meal-planning" className="text-[#005eb8] font-medium hover:underline">
+                <Link to="/live-well/healthy-eating/budget-meal-planning" className="text-[#0891b2] font-medium hover:underline">
                   Find more tips on eating well for less →
                 </Link>
               </p>
@@ -159,7 +159,7 @@ const HealthyEatingPage: React.FC = () => {
               <h3 className="text-lg font-bold mb-4">Related topics</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link to="/live-well/exercise" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/live-well/exercise" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -167,7 +167,7 @@ const HealthyEatingPage: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/live-well/healthy-weight" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/live-well/healthy-weight" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -175,7 +175,7 @@ const HealthyEatingPage: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/tools/bmi-calculator" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/tools/bmi-calculator" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -195,11 +195,11 @@ const HealthyEatingPage: React.FC = () => {
                 />
               </div>
               <div className="p-5">
-                <h3 className="text-lg font-bold text-[#005eb8] mb-3">7-day healthy meal plan</h3>
+                <h3 className="text-lg font-bold text-[#0891b2] mb-3">7-day healthy meal plan</h3>
                 <p className="text-gray-600 mb-4">
                   Get started with our nutritionist-designed meal plan for a week of balanced eating.
                 </p>
-                <Link to="/live-well/healthy-eating/meal-plans" className="text-[#005eb8] font-medium hover:underline">
+                <Link to="/live-well/healthy-eating/meal-plans" className="text-[#0891b2] font-medium hover:underline">
                   View meal plan
                 </Link>
               </div>
@@ -211,7 +211,7 @@ const HealthyEatingPage: React.FC = () => {
               <p className="mb-4">Check if you're a healthy weight with our BMI calculator.</p>
               <Link
                 to="/tools/bmi-calculator"
-                className="bg-[#005eb8] text-white px-4 py-2 rounded-md hover:bg-[#003f7e] inline-block w-full text-center"
+                className="bg-[#0891b2] text-white px-4 py-2 rounded-md hover:bg-[#0e7490] inline-block w-full text-center"
               >
                 Calculate your BMI
               </Link>

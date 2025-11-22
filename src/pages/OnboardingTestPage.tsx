@@ -182,7 +182,7 @@ const OnboardingTestPage: React.FC = () => {
             <div className="border p-4 rounded-lg">
               <h3 className="font-bold mb-2">Inline SVG Test</h3>
               <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="100" height="100" rx="50" fill="#005eb8"/>
+                <rect width="100" height="100" rx="50" fill="#0891b2"/>
                 <circle cx="50" cy="50" r="30" fill="white"/>
               </svg>
               <p className="mt-2 text-sm">If you see a blue circle with white center, SVG rendering works.</p>

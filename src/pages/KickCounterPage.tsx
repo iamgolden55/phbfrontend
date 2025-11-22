@@ -5,7 +5,7 @@ import KickCounter from '../features/pregnancy/KickCounter';
 const KickCounterPage: React.FC = () => {
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Baby Kick Counter</h1>
           <p className="text-xl font-medium">
@@ -67,7 +67,7 @@ const KickCounterPage: React.FC = () => {
 
               <div className="space-y-6">
                 <div>
-                  <h3 className="font-bold text-[#005eb8]">How many movements should I feel?</h3>
+                  <h3 className="font-bold text-[#0891b2]">How many movements should I feel?</h3>
                   <p className="text-gray-600 mt-1">
                     There is no specific number of movements that's considered normal. Instead, it's
                     important to get to know your baby's individual pattern of movements. Some babies
@@ -77,7 +77,7 @@ const KickCounterPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <h3 className="font-bold text-[#005eb8]">Is it normal for movement to change in late pregnancy?</h3>
+                  <h3 className="font-bold text-[#0891b2]">Is it normal for movement to change in late pregnancy?</h3>
                   <p className="text-gray-600 mt-1">
                     Your baby's movements may feel different in late pregnancy as there is less room to move around,
                     but the frequency of movements should not reduce. You should still feel your baby moving
@@ -86,7 +86,7 @@ const KickCounterPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <h3 className="font-bold text-[#005eb8]">Can I use loud noises or cold drinks to make my baby move?</h3>
+                  <h3 className="font-bold text-[#0891b2]">Can I use loud noises or cold drinks to make my baby move?</h3>
                   <p className="text-gray-600 mt-1">
                     It's not recommended to use methods like loud noises, cold drinks, or certain foods to make
                     your baby move. If you're concerned about reduced movement, you should contact your healthcare
@@ -100,14 +100,14 @@ const KickCounterPage: React.FC = () => {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-              <div className="bg-[#005eb8] text-white p-4">
+              <div className="bg-[#0891b2] text-white p-4">
                 <h2 className="text-xl font-bold">Pregnancy Resources</h2>
               </div>
               <div className="p-4">
                 <h3 className="font-bold mb-3">Tools & Calculators</h3>
                 <ul className="space-y-2">
                   <li>
-                    <Link to="/tools/due-date-calculator" className="text-[#005eb8] hover:underline flex items-center">
+                    <Link to="/tools/due-date-calculator" className="text-[#0891b2] hover:underline flex items-center">
                       <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
@@ -115,7 +115,7 @@ const KickCounterPage: React.FC = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/tools/weight-gain-calculator" className="text-[#005eb8] hover:underline flex items-center">
+                    <Link to="/tools/weight-gain-calculator" className="text-[#0891b2] hover:underline flex items-center">
                       <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                       </svg>
@@ -123,7 +123,7 @@ const KickCounterPage: React.FC = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/tools/contraction-timer" className="text-[#005eb8] hover:underline flex items-center">
+                    <Link to="/tools/contraction-timer" className="text-[#0891b2] hover:underline flex items-center">
                       <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
@@ -135,22 +135,22 @@ const KickCounterPage: React.FC = () => {
                 <h3 className="font-bold mt-6 mb-3">Related Articles</h3>
                 <ul className="space-y-2">
                   <li>
-                    <Link to="/pregnancy/late/reduced-movements" className="text-[#005eb8] hover:underline">
+                    <Link to="/pregnancy/late/reduced-movements" className="text-[#0891b2] hover:underline">
                       What to do if baby stops moving
                     </Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/middle/feeling-baby-move" className="text-[#005eb8] hover:underline">
+                    <Link to="/pregnancy/middle/feeling-baby-move" className="text-[#0891b2] hover:underline">
                       When you'll feel your baby move
                     </Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/late/baby-movements" className="text-[#005eb8] hover:underline">
+                    <Link to="/pregnancy/late/baby-movements" className="text-[#0891b2] hover:underline">
                       Baby movements in the third trimester
                     </Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/health/concerns-to-report" className="text-[#005eb8] hover:underline">
+                    <Link to="/pregnancy/health/concerns-to-report" className="text-[#0891b2] hover:underline">
                       Pregnancy symptoms you should never ignore
                     </Link>
                   </li>

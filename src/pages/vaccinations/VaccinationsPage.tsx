@@ -74,7 +74,7 @@ const VaccinationsPage: React.FC = () => {
 
   return (
     <div className="bg-white min-h-screen">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <Breadcrumbs
             items={[
@@ -103,12 +103,12 @@ const VaccinationsPage: React.FC = () => {
                         {vaccine.icon}
                       </div>
                       <div className="ml-4">
-                        <h3 className="text-xl font-bold text-[#005eb8] mb-2 group-hover:underline">{vaccine.title}</h3>
+                        <h3 className="text-xl font-bold text-[#0891b2] mb-2 group-hover:underline">{vaccine.title}</h3>
                         <p className="text-gray-600">{vaccine.description}</p>
                       </div>
                     </div>
                     <div className="mt-4 flex justify-end">
-                      <span className="text-[#005eb8] font-medium flex items-center">
+                      <span className="text-[#0891b2] font-medium flex items-center">
                         Learn more
                         <svg className="h-5 w-5 ml-1 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
@@ -126,19 +126,19 @@ const VaccinationsPage: React.FC = () => {
           <h2 className="text-2xl font-bold mb-6">Why vaccination is important</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-white p-5 rounded-md shadow-sm">
-              <h3 className="text-lg font-bold mb-2 text-[#005eb8]">Protection for you</h3>
+              <h3 className="text-lg font-bold mb-2 text-[#0891b2]">Protection for you</h3>
               <p className="text-gray-600">
                 Vaccines protect you from serious and potentially deadly diseases.
               </p>
             </div>
             <div className="bg-white p-5 rounded-md shadow-sm">
-              <h3 className="text-lg font-bold mb-2 text-[#005eb8]">Protection for others</h3>
+              <h3 className="text-lg font-bold mb-2 text-[#0891b2]">Protection for others</h3>
               <p className="text-gray-600">
                 When you're vaccinated, you help protect those who cannot be vaccinated due to age or medical conditions.
               </p>
             </div>
             <div className="bg-white p-5 rounded-md shadow-sm">
-              <h3 className="text-lg font-bold mb-2 text-[#005eb8]">Disease prevention</h3>
+              <h3 className="text-lg font-bold mb-2 text-[#0891b2]">Disease prevention</h3>
               <p className="text-gray-600">
                 Vaccines have helped reduce or eliminate many diseases that used to be common, such as polio and smallpox.
               </p>
@@ -158,7 +158,7 @@ const VaccinationsPage: React.FC = () => {
                 </p>
                 <Link
                   to="/vaccinations/safety"
-                  className="text-[#005eb8] font-medium hover:underline inline-flex items-center"
+                  className="text-[#0891b2] font-medium hover:underline inline-flex items-center"
                 >
                   Learn more about vaccine safety
                   <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -180,7 +180,7 @@ const VaccinationsPage: React.FC = () => {
               </p>
               <Link
                 to="/find-a-gp"
-                className="inline-flex items-center text-[#005eb8] font-medium hover:underline"
+                className="inline-flex items-center text-[#0891b2] font-medium hover:underline"
               >
                 Find a GP surgery
                 <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -195,7 +195,7 @@ const VaccinationsPage: React.FC = () => {
               </p>
               <Link
                 to="/find-pharmacy"
-                className="inline-flex items-center text-[#005eb8] font-medium hover:underline"
+                className="inline-flex items-center text-[#0891b2] font-medium hover:underline"
               >
                 Find a pharmacy
                 <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -6,7 +6,7 @@ const ExercisePage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Header */}
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Exercise and Fitness</h1>
           <p className="text-xl font-medium">
@@ -34,7 +34,7 @@ const ExercisePage: React.FC = () => {
           {/* Main Content Area - 2/3 width on large screens */}
           <div className="lg:col-span-2">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Benefits of physical activity</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Benefits of physical activity</h2>
               <p className="mb-4">
                 Regular exercise has numerous health benefits beyond just weight management. Being physically active can:
               </p>
@@ -54,7 +54,7 @@ const ExercisePage: React.FC = () => {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">How much exercise do I need?</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">How much exercise do I need?</h2>
               <p className="mb-4">
                 For substantial health benefits, Nigerian health guidelines recommend:
               </p>
@@ -103,7 +103,7 @@ const ExercisePage: React.FC = () => {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Types of physical activity</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Types of physical activity</h2>
 
               <h3 className="text-xl font-semibold mb-2">Aerobic activity</h3>
               <p className="mb-4">
@@ -154,7 +154,7 @@ const ExercisePage: React.FC = () => {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Getting started with exercise</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Getting started with exercise</h2>
               <p className="mb-4">
                 If you haven't been active for a while, start slowly and gradually increase your activity level. Here are some tips:
               </p>
@@ -168,14 +168,14 @@ const ExercisePage: React.FC = () => {
                 <li>Check with your healthcare provider if you have chronic conditions or concerns</li>
               </ul>
               <p>
-                <Link to="/live-well/exercise/5-week-workout-plan" className="text-[#005eb8] font-medium hover:underline">
+                <Link to="/live-well/exercise/5-week-workout-plan" className="text-[#0891b2] font-medium hover:underline">
                   Try our beginner-friendly 5-week workout plan →
                 </Link>
               </p>
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Staying motivated</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Staying motivated</h2>
               <p className="mb-4">
                 Here are some strategies to help you stay motivated and make physical activity a regular part of your life:
               </p>
@@ -198,7 +198,7 @@ const ExercisePage: React.FC = () => {
               <h3 className="text-lg font-bold mb-4">Related topics</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link to="/live-well/healthy-eating" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/live-well/healthy-eating" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -206,7 +206,7 @@ const ExercisePage: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/live-well/healthy-weight" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/live-well/healthy-weight" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -214,7 +214,7 @@ const ExercisePage: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/tools/bmi-calculator" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/tools/bmi-calculator" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -234,11 +234,11 @@ const ExercisePage: React.FC = () => {
                 />
               </div>
               <div className="p-5">
-                <h3 className="text-lg font-bold text-[#005eb8] mb-3">5-week workout plan</h3>
+                <h3 className="text-lg font-bold text-[#0891b2] mb-3">5-week workout plan</h3>
                 <p className="text-gray-600 mb-4">
                   A beginner-friendly exercise plan that gradually increases in intensity over 5 weeks.
                 </p>
-                <Link to="/live-well/exercise/5-week-workout-plan" className="text-[#005eb8] font-medium hover:underline">
+                <Link to="/live-well/exercise/5-week-workout-plan" className="text-[#0891b2] font-medium hover:underline">
                   Get started
                 </Link>
               </div>
@@ -250,7 +250,7 @@ const ExercisePage: React.FC = () => {
               <p className="mb-4">Calculate how many calories you burn during different activities.</p>
               <Link
                 to="/tools/calorie-calculator"
-                className="bg-[#005eb8] text-white px-4 py-2 rounded-md hover:bg-[#003f7e] inline-block w-full text-center"
+                className="bg-[#0891b2] text-white px-4 py-2 rounded-md hover:bg-[#0e7490] inline-block w-full text-center"
               >
                 Calorie calculator
               </Link>

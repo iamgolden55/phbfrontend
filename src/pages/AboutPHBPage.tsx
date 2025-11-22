@@ -5,7 +5,7 @@ const AboutPHBPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Hero section */}
-      <section className="bg-[#005eb8] text-white relative pb-0 overflow-hidden">
+      <section className="bg-[#0891b2] text-white relative pb-0 overflow-hidden">
         <div className="phb-container py-8 md:py-16">
           <div className="max-w-4xl z-10 relative">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
@@ -25,39 +25,39 @@ const AboutPHBPage: React.FC = () => {
           {/* Left sidebar for navigation */}
           <div className="md:col-span-1">
             <div className="bg-gray-50 p-4 rounded-lg shadow-sm mb-6">
-              <h2 className="text-lg font-bold mb-3 text-[#005eb8]">On this page</h2>
+              <h2 className="text-lg font-bold mb-3 text-[#0891b2]">On this page</h2>
               <nav className="flex flex-col space-y-2">
-                <a href="#executive-summary" className="hover:underline text-[#005eb8]">Executive Summary</a>
-                <a href="#vision-mission" className="hover:underline text-[#005eb8]">Vision & Mission</a>
-                <a href="#core-features" className="hover:underline text-[#005eb8]">Core Features</a>
-                <a href="#operational-pathways" className="hover:underline text-[#005eb8]">Operational Pathways</a>
-                <a href="#technology" className="hover:underline text-[#005eb8]">Technology Framework</a>
-                <a href="#elara-ai" className="hover:underline text-[#005eb8]">Elara AI</a>
-                <a href="#immigration" className="hover:underline text-[#005eb8]">Immigration Services</a>
-                <a href="#accessibility" className="hover:underline text-[#005eb8]">Accessibility</a>
-                <a href="#policies" className="hover:underline text-[#005eb8]">Policies</a>
-                <a href="#cookies" className="hover:underline text-[#005eb8]">Cookies</a>
-                <a href="#contact-us" className="hover:underline text-[#005eb8]">Contact Us</a>
+                <a href="#executive-summary" className="hover:underline text-[#0891b2]">Executive Summary</a>
+                <a href="#vision-mission" className="hover:underline text-[#0891b2]">Vision & Mission</a>
+                <a href="#core-features" className="hover:underline text-[#0891b2]">Core Features</a>
+                <a href="#operational-pathways" className="hover:underline text-[#0891b2]">Operational Pathways</a>
+                <a href="#technology" className="hover:underline text-[#0891b2]">Technology Framework</a>
+                <a href="#elara-ai" className="hover:underline text-[#0891b2]">Elara AI</a>
+                <a href="#immigration" className="hover:underline text-[#0891b2]">Immigration Services</a>
+                <a href="#accessibility" className="hover:underline text-[#0891b2]">Accessibility</a>
+                <a href="#policies" className="hover:underline text-[#0891b2]">Policies</a>
+                <a href="#cookies" className="hover:underline text-[#0891b2]">Cookies</a>
+                <a href="#contact-us" className="hover:underline text-[#0891b2]">Contact Us</a>
               </nav>
             </div>
 
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-              <h3 className="text-lg font-bold mb-2 text-[#005eb8]">Get involved</h3>
+              <h3 className="text-lg font-bold mb-2 text-[#0891b2]">Get involved</h3>
               <p className="mb-4 text-sm">Help shape the future of healthcare by joining the PHB initiative.</p>
-              <a href="/register" className="bg-[#005eb8] text-white px-4 py-2 rounded inline-block hover:bg-[#003f7e]">Register now</a>
+              <a href="/register" className="bg-[#0891b2] text-white px-4 py-2 rounded inline-block hover:bg-[#0e7490]">Register now</a>
             </div>
 
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mt-6">
-              <h3 className="text-lg font-bold mb-2 text-[#005eb8]">Learn about Elara AI</h3>
+              <h3 className="text-lg font-bold mb-2 text-[#0891b2]">Learn about Elara AI</h3>
               <p className="mb-4 text-sm">Discover how our AI is revolutionizing healthcare delivery and patient outcomes.</p>
-              <a href="/elara-ai" className="bg-[#005eb8] text-white px-4 py-2 rounded inline-block hover:bg-[#003f7e]">Explore Elara AI</a>
+              <a href="/elara-ai" className="bg-[#0891b2] text-white px-4 py-2 rounded inline-block hover:bg-[#0e7490]">Explore Elara AI</a>
             </div>
           </div>
 
           {/* Main content area */}
           <div className="md:col-span-2">
             <section id="executive-summary" className="mb-12">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Executive Summary</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Executive Summary</h2>
 
               <p className="mb-4">
                 The Public Health Bureau (PHB) represents a transformative initiative within the healthcare technology domain.
@@ -75,8 +75,8 @@ const AboutPHBPage: React.FC = () => {
                 entire health history, medical records, and interactions with healthcare facilities, thereby streamlining healthcare access.
               </p>
 
-              <div className="my-8 bg-blue-50 p-6 rounded-lg border-l-4 border-[#005eb8]">
-                <h3 className="text-xl font-bold text-[#005eb8] mb-3">Our approach</h3>
+              <div className="my-8 bg-blue-50 p-6 rounded-lg border-l-4 border-[#0891b2]">
+                <h3 className="text-xl font-bold text-[#0891b2] mb-3">Our approach</h3>
                 <p>
                   We understand that accessing medical care can sometimes be challenging, especially for individuals
                   with limited mobility or busy schedules. That's where we fill the gap—not just for ourselves but for
@@ -88,7 +88,7 @@ const AboutPHBPage: React.FC = () => {
             </section>
 
             <section id="vision-mission" className="mb-12">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Vision and Mission</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Vision and Mission</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div className="bg-gray-50 p-6 rounded-lg">
@@ -116,7 +116,7 @@ const AboutPHBPage: React.FC = () => {
             </section>
 
             <section id="core-features" className="mb-12">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Core Features</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Core Features</h2>
 
               <h3 className="text-xl font-semibold mt-6 mb-3">End-User Services</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
@@ -212,7 +212,7 @@ const AboutPHBPage: React.FC = () => {
             </section>
 
             <section id="operational-pathways" className="mb-12">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Operational Pathways</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Operational Pathways</h2>
 
               <h3 className="text-xl font-semibold mt-6 mb-3">User Engagement</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -252,7 +252,7 @@ const AboutPHBPage: React.FC = () => {
             </section>
 
             <section id="technology" className="mb-12">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Technological Framework</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Technological Framework</h2>
               {/* Removed AI in healthcare network visualization image */}
 
               <h3 className="text-xl font-semibold mt-6 mb-3">AI-Driven Innovations</h3>
@@ -302,8 +302,8 @@ const AboutPHBPage: React.FC = () => {
             </section>
 
             <section id="elara-ai" className="mb-12">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Introducing Elara AI</h2>
-              <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-[#005eb8] mb-6">
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Introducing Elara AI</h2>
+              <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-[#0891b2] mb-6">
                 <p className="italic">
                   "Elara is not just a healthcare tool – it's a healthcare revolution."
                 </p>
@@ -337,14 +337,14 @@ const AboutPHBPage: React.FC = () => {
               </div>
 
               <div className="text-center">
-                <a href="/elara-ai" className="bg-[#005eb8] text-white px-6 py-3 rounded-md inline-block hover:bg-[#003f7e] transition-colors">
+                <a href="/elara-ai" className="bg-[#0891b2] text-white px-6 py-3 rounded-md inline-block hover:bg-[#0e7490] transition-colors">
                   Learn more about Elara AI
                 </a>
               </div>
             </section>
 
             <section id="immigration" className="mb-12">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">PHB & Immigration</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">PHB & Immigration</h2>
               <p className="text-lg mb-4">Revolutionizing Healthcare Access for Immigrants</p>
 
               <p className="mb-6">
@@ -397,7 +397,7 @@ const AboutPHBPage: React.FC = () => {
             </section>
 
             <section id="accessibility" className="mb-12">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Accessibility Statement</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Accessibility Statement</h2>
 
               <p className="mb-4">
                 PHB Health Systems Ltd is committed to ensuring digital accessibility for all users, including those with disabilities.
@@ -477,7 +477,7 @@ const AboutPHBPage: React.FC = () => {
               </ul>
 
               <h3 className="text-xl font-semibold mb-3">Feedback and Contact</h3>
-              <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-[#005eb8]">
+              <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-[#0891b2]">
                 <p className="mb-4">
                   We welcome your feedback on the accessibility of the PHB Health Systems platform. If you encounter
                   accessibility barriers or have suggestions for improvement, please contact us:
@@ -499,9 +499,9 @@ const AboutPHBPage: React.FC = () => {
             </section>
 
             <section id="policies" className="mb-12">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Privacy Policy & Terms of Service</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Privacy Policy & Terms of Service</h2>
 
-              <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-[#005eb8] mb-6">
+              <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-[#0891b2] mb-6">
                 <p className="font-semibold mb-2">PHB Health Systems Ltd - Legal Information</p>
                 <ul className="space-y-1 text-sm">
                   <li><strong>Company Registration:</strong> 8663073 (CAC, Nigeria)</li>
@@ -720,7 +720,7 @@ const AboutPHBPage: React.FC = () => {
               </ul>
 
               <h4 className="text-lg font-semibold mt-4 mb-2">11. Contact Information</h4>
-              <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-[#005eb8]">
+              <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-[#0891b2]">
                 <p className="mb-4">For questions about these policies or to exercise your rights:</p>
                 <ul className="space-y-2">
                   <li><strong>Data Protection Officer:</strong> [PLACEHOLDER: DPO Name]</li>

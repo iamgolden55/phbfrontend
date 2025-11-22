@@ -29,7 +29,7 @@ const TravelVaccinePage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Header */}
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Travel Vaccines</h1>
           <p className="text-xl font-medium">
@@ -57,7 +57,7 @@ const TravelVaccinePage: React.FC = () => {
           {/* Main Content Area - 2/3 width on large screens */}
           <div className="lg:col-span-2">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">About Travel Vaccines</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">About Travel Vaccines</h2>
               <p className="mb-4">
                 Travel vaccines protect you from serious diseases that may not exist in your home country but are
                 common in your travel destination. These vaccines are essential for maintaining your health while
@@ -106,7 +106,7 @@ const TravelVaccinePage: React.FC = () => {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Essential Travel Vaccines</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Essential Travel Vaccines</h2>
               <p className="mb-6">
                 These vaccines are recommended based on your travel destination and activities:
               </p>
@@ -131,7 +131,7 @@ const TravelVaccinePage: React.FC = () => {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Travel Health Planning Timeline</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Travel Health Planning Timeline</h2>
               <div className="space-y-6">
                 <div className="border-l-4 border-blue-500 pl-4">
                   <h3 className="text-xl font-semibold mb-2">4-6 Weeks Before Travel</h3>
@@ -168,7 +168,7 @@ const TravelVaccinePage: React.FC = () => {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Vaccine Requirements by Region</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Vaccine Requirements by Region</h2>
 
               <div className="bg-white p-6 rounded-lg border border-gray-200 mb-6">
                 <h3 className="text-xl font-semibold mb-3">Sub-Saharan Africa:</h3>
@@ -205,7 +205,7 @@ const TravelVaccinePage: React.FC = () => {
             </div>
 
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8">
-              <h2 className="text-xl font-bold text-[#005eb8] mb-2">Important Notice</h2>
+              <h2 className="text-xl font-bold text-[#0891b2] mb-2">Important Notice</h2>
               <p className="mb-4">
                 Travel health requirements change frequently. Always consult with a travel health specialist
                 or visit a travel clinic for the most current recommendations based on your specific itinerary
@@ -214,13 +214,13 @@ const TravelVaccinePage: React.FC = () => {
               <div className="flex flex-col sm:flex-row justify-center gap-4 mt-4">
                 <Link 
                   to="/find-pharmacy"
-                  className="bg-[#005eb8] text-white px-6 py-3 rounded-md hover:bg-[#003f7e] transition-colors font-medium text-center"
+                  className="bg-[#0891b2] text-white px-6 py-3 rounded-md hover:bg-[#0e7490] transition-colors font-medium text-center"
                 >
                   Find Travel Clinic
                 </Link>
                 <Link 
                   to="/account/appointments/book"
-                  className="bg-[#005eb8] text-white px-6 py-3 rounded-md hover:bg-[#003f7e] transition-colors font-medium text-center"
+                  className="bg-[#0891b2] text-white px-6 py-3 rounded-md hover:bg-[#0e7490] transition-colors font-medium text-center"
                 >
                   Book Consultation
                 </Link>
@@ -235,19 +235,19 @@ const TravelVaccinePage: React.FC = () => {
               <h3 className="text-lg font-bold mb-4">Travel Health Tips</h3>
               <div className="space-y-4">
                 <div>
-                  <div className="text-[#005eb8] font-bold">Plan Early</div>
+                  <div className="text-[#0891b2] font-bold">Plan Early</div>
                   <div className="text-sm">Book consultation 4-6 weeks before travel</div>
                 </div>
                 <div>
-                  <div className="text-[#005eb8] font-bold">Check Requirements</div>
+                  <div className="text-[#0891b2] font-bold">Check Requirements</div>
                   <div className="text-sm">Verify destination-specific vaccine requirements</div>
                 </div>
                 <div>
-                  <div className="text-[#005eb8] font-bold">Documentation</div>
+                  <div className="text-[#0891b2] font-bold">Documentation</div>
                   <div className="text-sm">Carry vaccination certificates while traveling</div>
                 </div>
                 <div>
-                  <div className="text-[#005eb8] font-bold">Follow-up Care</div>
+                  <div className="text-[#0891b2] font-bold">Follow-up Care</div>
                   <div className="text-sm">Monitor health during and after travel</div>
                 </div>
               </div>
@@ -293,10 +293,10 @@ const TravelVaccinePage: React.FC = () => {
             {/* Related Pages */}
             <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
               <div className="p-5">
-                <h3 className="text-lg font-bold text-[#005eb8] mb-3">Related Vaccinations</h3>
+                <h3 className="text-lg font-bold text-[#0891b2] mb-3">Related Vaccinations</h3>
                 <ul className="space-y-3">
                   <li>
-                    <Link to="/vaccinations/children" className="text-[#005eb8] hover:underline flex items-center">
+                    <Link to="/vaccinations/children" className="text-[#0891b2] hover:underline flex items-center">
                       <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
@@ -304,7 +304,7 @@ const TravelVaccinePage: React.FC = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/vaccinations/flu-vaccine" className="text-[#005eb8] hover:underline flex items-center">
+                    <Link to="/vaccinations/flu-vaccine" className="text-[#0891b2] hover:underline flex items-center">
                       <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
@@ -312,7 +312,7 @@ const TravelVaccinePage: React.FC = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/vaccinations/covid-19-vaccine" className="text-[#005eb8] hover:underline flex items-center">
+                    <Link to="/vaccinations/covid-19-vaccine" className="text-[#0891b2] hover:underline flex items-center">
                       <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
@@ -329,13 +329,13 @@ const TravelVaccinePage: React.FC = () => {
               <p className="mb-4">For travel health consultations and vaccines:</p>
               <div className="space-y-2">
                 <div className="flex items-start">
-                  <svg className="h-5 w-5 mr-2 mt-0.5 text-[#005eb8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-5 w-5 mr-2 mt-0.5 text-[#0891b2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                   <span>travel.health@phb.gov.ng</span>
                 </div>
                 <div className="flex items-start">
-                  <svg className="h-5 w-5 mr-2 mt-0.5 text-[#005eb8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-5 w-5 mr-2 mt-0.5 text-[#0891b2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
                   <span>+234 (0) 800 TRAVEL (872835)</span>

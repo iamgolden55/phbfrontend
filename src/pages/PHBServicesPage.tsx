@@ -4,7 +4,7 @@ import PHBServicesSection from '../components/PHBServicesSection';
 const PHBServicesPage: React.FC = () => {
   return (
     <div className="min-h-screen">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">PHB Services</h1>
           <p className="text-xl">

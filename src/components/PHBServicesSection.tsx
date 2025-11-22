@@ -34,7 +34,7 @@ const PHBServicesSection: React.FC = () => {
                 <Link
                   key={index}
                   to={link.href}
-                  className="bg-[#005eb8] text-white p-4 rounded-md flex items-center justify-between hover:bg-[#003f7e] transition-colors"
+                  className="bg-[#0891b2] text-white p-4 rounded-md flex items-center justify-between hover:bg-[#0e7490] transition-colors"
                 >
                   <span className="font-medium">{link.text}</span>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -45,9 +45,9 @@ const PHBServicesSection: React.FC = () => {
             </div>
 
             <div className="mt-4">
-              <Link to="/phb-services#all" className="flex items-center text-[#005eb8] hover:underline">
+              <Link to="/phb-services#all" className="flex items-center text-[#0891b2] hover:underline">
                 <svg
-                  className="h-5 w-5 mr-2 flex-shrink-0 text-[#005eb8]"
+                  className="h-5 w-5 mr-2 flex-shrink-0 text-[#0891b2]"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -64,15 +64,15 @@ const PHBServicesSection: React.FC = () => {
             </div>
           </div>
 
-          {/* Right side - Help from PHB 111 */}
+          {/* Right side - Help from PHB Health Helpline */}
           <div className="lg:col-span-1">
             <div className="bg-white p-6 rounded-md shadow-sm border border-gray-200">
-              <h3 className="text-lg font-bold mb-3">Help from PHB 111</h3>
+              <h3 className="text-lg font-bold mb-3">PHB Health Helpline</h3>
               <p className="mb-4 text-gray-700">
-                If you're worried about a symptom and not sure what help you need, PHB 111 can tell you what to do next.
+                If you're worried about a symptom and not sure what help you need, our health helpline can tell you what to do next.
               </p>
               <p className="mb-2">
-                Go to <a href="https://111.phb.uk" className="text-[#005eb8] font-medium hover:underline">111.phb.uk</a> or <a href="tel:111" className="text-[#005eb8] font-medium hover:underline">call 111</a>.
+                <a href="tel:0800-PHB-CARE" className="text-[#0891b2] font-medium hover:underline">Call 0800-PHB-CARE</a> for non-emergency health advice.
               </p>
               <p className="text-red-700 font-medium">
                 For a life-threatening emergency call 999.

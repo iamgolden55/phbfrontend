@@ -63,7 +63,7 @@ const LiveWellPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Header */}
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Live Well</h1>
           <p className="text-xl font-medium">
@@ -90,7 +90,7 @@ const LiveWellPage: React.FC = () => {
                 </div>
               )}
               <div className="p-5 flex-grow flex flex-col">
-                <h2 className="text-xl font-bold text-[#005eb8] mb-2">
+                <h2 className="text-xl font-bold text-[#0891b2] mb-2">
                   <Link to={category.href} className="hover:underline">
                     {category.title}
                   </Link>
@@ -98,7 +98,7 @@ const LiveWellPage: React.FC = () => {
                 <p className="text-gray-600 mb-4 flex-grow">{category.description}</p>
                 <Link
                   to={category.href}
-                  className="text-[#005eb8] font-medium hover:underline flex items-center mt-auto"
+                  className="text-[#0891b2] font-medium hover:underline flex items-center mt-auto"
                 >
                   Learn more
                   <svg className="h-5 w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -117,37 +117,37 @@ const LiveWellPage: React.FC = () => {
           <h2 className="text-2xl font-bold mb-6">Featured guides</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col">
-              <h3 className="text-lg font-bold text-[#005eb8] mb-3">5-week workout plan</h3>
+              <h3 className="text-lg font-bold text-[#0891b2] mb-3">5-week workout plan</h3>
               <p className="text-gray-600 mb-4 flex-grow">
                 A beginner-friendly exercise plan that gradually increases in intensity over 5 weeks.
               </p>
               <Link
                 to="/live-well/exercise/5-week-workout-plan"
-                className="text-[#005eb8] font-medium hover:underline"
+                className="text-[#0891b2] font-medium hover:underline"
               >
                 Get started
               </Link>
             </div>
             <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col">
-              <h3 className="text-lg font-bold text-[#005eb8] mb-3">Eat well for less</h3>
+              <h3 className="text-lg font-bold text-[#0891b2] mb-3">Eat well for less</h3>
               <p className="text-gray-600 mb-4 flex-grow">
                 Tips and recipes for eating healthily on a budget, with meal plans and shopping lists.
               </p>
               <Link
                 to="/live-well/healthy-eating/budget-meal-planning"
-                className="text-[#005eb8] font-medium hover:underline"
+                className="text-[#0891b2] font-medium hover:underline"
               >
                 Read guide
               </Link>
             </div>
             <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col">
-              <h3 className="text-lg font-bold text-[#005eb8] mb-3">Sleep improvement techniques</h3>
+              <h3 className="text-lg font-bold text-[#0891b2] mb-3">Sleep improvement techniques</h3>
               <p className="text-gray-600 mb-4 flex-grow">
                 Practical steps to improve your sleep quality and establish a healthy sleep routine.
               </p>
               <Link
                 to="/live-well/sleep/better-sleep-techniques"
-                className="text-[#005eb8] font-medium hover:underline"
+                className="text-[#0891b2] font-medium hover:underline"
               >
                 View techniques
               </Link>
@@ -165,7 +165,7 @@ const LiveWellPage: React.FC = () => {
             <p className="mb-4">Check your body mass index (BMI) to see if you're a healthy weight.</p>
             <Link
               to="/tools/bmi-calculator"
-              className="bg-[#005eb8] text-white px-4 py-2 rounded-md hover:bg-[#003f7e] inline-block"
+              className="bg-[#0891b2] text-white px-4 py-2 rounded-md hover:bg-[#0e7490] inline-block"
             >
               Calculate your BMI
             </Link>
@@ -175,7 +175,7 @@ const LiveWellPage: React.FC = () => {
             <p className="mb-4">Find out how many calories you need each day to maintain, lose or gain weight.</p>
             <Link
               to="/tools/calorie-calculator"
-              className="bg-[#005eb8] text-white px-4 py-2 rounded-md hover:bg-[#003f7e] inline-block"
+              className="bg-[#0891b2] text-white px-4 py-2 rounded-md hover:bg-[#0e7490] inline-block"
             >
               Check calories
             </Link>

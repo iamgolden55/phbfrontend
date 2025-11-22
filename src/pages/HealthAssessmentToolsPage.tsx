@@ -74,7 +74,7 @@ const HealthAssessmentToolsPage: React.FC = () => {
 
   return (
     <div className="bg-white min-h-screen">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <Breadcrumbs
             items={[
@@ -101,12 +101,12 @@ const HealthAssessmentToolsPage: React.FC = () => {
                       {tool.icon}
                     </div>
                     <div className="ml-4">
-                      <h2 className="text-xl font-bold text-[#005eb8] mb-2 group-hover:underline">{tool.title}</h2>
+                      <h2 className="text-xl font-bold text-[#0891b2] mb-2 group-hover:underline">{tool.title}</h2>
                       <p className="text-gray-600">{tool.description}</p>
                     </div>
                   </div>
                   <div className="mt-4 flex justify-end">
-                    <span className="text-[#005eb8] font-medium flex items-center">
+                    <span className="text-[#0891b2] font-medium flex items-center">
                       Use this tool
                       <svg className="h-5 w-5 ml-1 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
@@ -123,19 +123,19 @@ const HealthAssessmentToolsPage: React.FC = () => {
           <h2 className="text-2xl font-bold mb-6">Why use our health assessment tools?</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="bg-white p-5 rounded-md shadow-sm">
-              <h3 className="text-lg font-bold mb-2 text-[#005eb8]">Reliable information</h3>
+              <h3 className="text-lg font-bold mb-2 text-[#0891b2]">Reliable information</h3>
               <p className="text-gray-600">
                 All our tools are based on clinically validated methods and trusted medical information.
               </p>
             </div>
             <div className="bg-white p-5 rounded-md shadow-sm">
-              <h3 className="text-lg font-bold mb-2 text-[#005eb8]">Easy to use</h3>
+              <h3 className="text-lg font-bold mb-2 text-[#0891b2]">Easy to use</h3>
               <p className="text-gray-600">
                 Our tools are designed to be simple and intuitive, providing clear results and guidance.
               </p>
             </div>
             <div className="bg-white p-5 rounded-md shadow-sm">
-              <h3 className="text-lg font-bold mb-2 text-[#005eb8]">Personalized insights</h3>
+              <h3 className="text-lg font-bold mb-2 text-[#0891b2]">Personalized insights</h3>
               <p className="text-gray-600">
                 Get tailored recommendations based on your individual health assessment results.
               </p>

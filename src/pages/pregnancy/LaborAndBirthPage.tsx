@@ -83,7 +83,7 @@ const LaborAndBirthPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <Breadcrumbs customItems={customBreadcrumbs} />
           <h1 className="text-3xl font-bold mb-4 mt-4">Labor and Birth</h1>
@@ -105,7 +105,7 @@ const LaborAndBirthPage: React.FC = () => {
               <li key={section.id}>
                 <a
                   href={`#${section.id}`}
-                  className="text-[#005eb8] hover:underline"
+                  className="text-[#0891b2] hover:underline"
                 >
                   {section.title}
                 </a>
@@ -128,14 +128,14 @@ const LaborAndBirthPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               <h3 className="font-bold mb-2">
-                <Link to="/pregnancy/signs-of-labor" className="text-[#005eb8] hover:underline">
+                <Link to="/pregnancy/signs-of-labor" className="text-[#0891b2] hover:underline">
                   Signs of labor
                 </Link>
               </h3>
               <p className="text-sm text-gray-600 mb-2">
                 How to recognize when labor is beginning and what to expect.
               </p>
-              <Link to="/pregnancy/signs-of-labor" className="text-sm text-[#005eb8] hover:underline flex items-center">
+              <Link to="/pregnancy/signs-of-labor" className="text-sm text-[#0891b2] hover:underline flex items-center">
                 Read more
                 <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -145,14 +145,14 @@ const LaborAndBirthPage: React.FC = () => {
 
             <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               <h3 className="font-bold mb-2">
-                <Link to="/tools/contraction-timer" className="text-[#005eb8] hover:underline">
+                <Link to="/tools/contraction-timer" className="text-[#0891b2] hover:underline">
                   Contraction timer
                 </Link>
               </h3>
               <p className="text-sm text-gray-600 mb-2">
                 Track the frequency and duration of your contractions with our timer tool.
               </p>
-              <Link to="/tools/contraction-timer" className="text-sm text-[#005eb8] hover:underline flex items-center">
+              <Link to="/tools/contraction-timer" className="text-sm text-[#0891b2] hover:underline flex items-center">
                 Try it now
                 <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -162,14 +162,14 @@ const LaborAndBirthPage: React.FC = () => {
 
             <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               <h3 className="font-bold mb-2">
-                <Link to="/pregnancy/birth-plan-creator" className="text-[#005eb8] hover:underline">
+                <Link to="/pregnancy/birth-plan-creator" className="text-[#0891b2] hover:underline">
                   Birth plan creator
                 </Link>
               </h3>
               <p className="text-sm text-gray-600 mb-2">
                 Create a personalized birth plan to share with your healthcare team.
               </p>
-              <Link to="/pregnancy/birth-plan-creator" className="text-sm text-[#005eb8] hover:underline flex items-center">
+              <Link to="/pregnancy/birth-plan-creator" className="text-sm text-[#0891b2] hover:underline flex items-center">
                 Create your plan
                 <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

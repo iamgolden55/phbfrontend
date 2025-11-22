@@ -11,12 +11,12 @@ interface AccountHealthLayoutProps {
 const NavLink = ({ to, active, icon, label }: { to: string; active: boolean; icon: React.ReactNode; label: string }) => (
   <Link
     to={to}
-    className={`flex items-center px-4 py-3 hover:bg-gray-50 ${active ? 'bg-gray-50 border-l-4 border-[#005eb8]' : ''}`}
+    className={`flex items-center px-4 py-3 hover:bg-gray-50 ${active ? 'bg-gray-50 border-l-4 border-[#0891b2]' : ''}`}
   >
-    <div className={`mr-3 ${active ? 'text-[#005eb8]' : 'text-gray-500'}`}>
+    <div className={`mr-3 ${active ? 'text-[#0891b2]' : 'text-gray-500'}`}>
       {icon}
     </div>
-    <span className={active ? 'font-medium text-[#005eb8]' : 'text-gray-700'}>
+    <span className={active ? 'font-medium text-[#0891b2]' : 'text-gray-700'}>
       {label}
     </span>
   </Link>
@@ -51,7 +51,7 @@ const AccountHealthLayout: React.FC<AccountHealthLayoutProps> = ({
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-6">
+      <div className="bg-[#0891b2] text-white py-6">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-2">{title}</h1>
           <p className="text-xl">
@@ -67,7 +67,7 @@ const AccountHealthLayout: React.FC<AccountHealthLayoutProps> = ({
             <div className="mb-4">
               <Link
                 to="/account"
-                className="flex items-center text-[#005eb8] hover:underline mb-4"
+                className="flex items-center text-[#0891b2] hover:underline mb-4"
               >
                 <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -130,7 +130,7 @@ const AccountHealthLayout: React.FC<AccountHealthLayoutProps> = ({
               </p>
               <Link
                 to="/help/health-services"
-                className="text-[#005eb8] text-sm hover:underline flex items-center"
+                className="text-[#0891b2] text-sm hover:underline flex items-center"
               >
                 Visit our help center
                 <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

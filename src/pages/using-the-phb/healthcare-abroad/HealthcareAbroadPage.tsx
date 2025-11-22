@@ -74,7 +74,7 @@ const HealthcareAbroadPage: React.FC = () => {
 
   return (
     <div className="bg-white min-h-screen">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <Breadcrumbs
             items={[
@@ -103,12 +103,12 @@ const HealthcareAbroadPage: React.FC = () => {
                         {option.icon}
                       </div>
                       <div className="ml-4">
-                        <h3 className="text-xl font-bold text-[#005eb8] mb-2 group-hover:underline">{option.title}</h3>
+                        <h3 className="text-xl font-bold text-[#0891b2] mb-2 group-hover:underline">{option.title}</h3>
                         <p className="text-gray-600">{option.description}</p>
                       </div>
                     </div>
                     <div className="mt-auto pt-4 flex justify-end">
-                      <span className="text-[#005eb8] font-medium flex items-center">
+                      <span className="text-[#0891b2] font-medium flex items-center">
                         Find out more
                         <svg className="h-5 w-5 ml-1 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
@@ -175,7 +175,7 @@ const HealthcareAbroadPage: React.FC = () => {
               <div className="mt-6">
                 <Link
                   to="/travel-health"
-                  className="bg-[#005eb8] text-white px-6 py-2 rounded-md hover:bg-[#004b93] transition-colors inline-block"
+                  className="bg-[#0891b2] text-white px-6 py-2 rounded-md hover:bg-[#004b93] transition-colors inline-block"
                 >
                   Check travel health advice
                 </Link>

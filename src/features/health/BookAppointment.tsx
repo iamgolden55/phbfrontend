@@ -1217,18 +1217,18 @@ const BookAppointment: React.FC = () => {
           <div className="relative">
             <div className="overflow-hidden h-2 mb-4 flex rounded bg-gray-200">
               <div
-                className="bg-[#005eb8] transition-all ease-out duration-500"
+                className="bg-[#0891b2] transition-all ease-out duration-500"
                 style={{ width: `${(currentStep / 3) * 100}%` }}
               ></div>
             </div>
             <div className="flex justify-between">
-              <div className={`text-xs font-medium ${currentStep >= 1 ? 'text-[#005eb8]' : 'text-gray-500'}`}>
+              <div className={`text-xs font-medium ${currentStep >= 1 ? 'text-[#0891b2]' : 'text-gray-500'}`}>
                 Select Symptoms
               </div>
-              <div className={`text-xs font-medium ${currentStep >= 2 ? 'text-[#005eb8]' : 'text-gray-500'}`}>
+              <div className={`text-xs font-medium ${currentStep >= 2 ? 'text-[#0891b2]' : 'text-gray-500'}`}>
                 Schedule
               </div>
-              <div className={`text-xs font-medium ${currentStep >= 3 ? 'text-[#005eb8]' : 'text-gray-500'}`}>
+              <div className={`text-xs font-medium ${currentStep >= 3 ? 'text-[#0891b2]' : 'text-gray-500'}`}>
                 Confirm
               </div>
             </div>
@@ -1237,7 +1237,7 @@ const BookAppointment: React.FC = () => {
 
         {isLoading && (
           <div className="flex justify-center items-center py-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#005eb8]"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0891b2]"></div>
             <span className="ml-3 text-gray-700">Loading...</span>
           </div>
         )}
@@ -1338,7 +1338,7 @@ const BookAppointment: React.FC = () => {
                             value="routine"
                             checked={formData.urgency === 'routine'}
                             onChange={handleInputChange}
-                            className="h-4 w-4 border-gray-300 text-[#005eb8] focus:ring-[#005eb8]"
+                            className="h-4 w-4 border-gray-300 text-[#0891b2] focus:ring-[#0891b2]"
                           />
                           <label htmlFor="urgency-routine" className="ml-3 text-sm text-gray-700">
                             Routine - I need an appointment within the next few weeks
@@ -1352,7 +1352,7 @@ const BookAppointment: React.FC = () => {
                             value="soon"
                             checked={formData.urgency === 'soon'}
                             onChange={handleInputChange}
-                            className="h-4 w-4 border-gray-300 text-[#005eb8] focus:ring-[#005eb8]"
+                            className="h-4 w-4 border-gray-300 text-[#0891b2] focus:ring-[#0891b2]"
                           />
                           <label htmlFor="urgency-soon" className="ml-3 text-sm text-gray-700">
                             Soon - I need an appointment within the next week
@@ -1366,7 +1366,7 @@ const BookAppointment: React.FC = () => {
                             value="urgent"
                             checked={formData.urgency === 'urgent'}
                             onChange={handleInputChange}
-                            className="h-4 w-4 border-gray-300 text-[#005eb8] focus:ring-[#005eb8]"
+                            className="h-4 w-4 border-gray-300 text-[#0891b2] focus:ring-[#0891b2]"
                           />
                           <label htmlFor="urgency-urgent" className="ml-3 text-sm text-gray-700">
                             Urgent - I need an appointment in the next 24-48 hours
@@ -1392,7 +1392,7 @@ const BookAppointment: React.FC = () => {
                       disabled={!validateCurrentStep()}
                       className={`w-full py-3 px-4 rounded-md text-white font-medium
                         ${validateCurrentStep()
-                          ? 'bg-[#005eb8] hover:bg-[#004c93]'
+                          ? 'bg-[#0891b2] hover:bg-[#004c93]'
                           : 'bg-gray-300 cursor-not-allowed'}`}
                     >
                       Continue
@@ -1554,7 +1554,7 @@ const BookAppointment: React.FC = () => {
                       disabled={!validateCurrentStep()}
                       className={`py-3 px-4 rounded-md text-white font-medium
                         ${validateCurrentStep()
-                          ? 'bg-[#005eb8] hover:bg-[#004c93]'
+                          ? 'bg-[#0891b2] hover:bg-[#004c93]'
                           : 'bg-gray-300 cursor-not-allowed'}`}
                     >
                       Review
@@ -1680,7 +1680,7 @@ const BookAppointment: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="py-3 px-4 bg-[#005eb8] rounded-md text-white font-medium hover:bg-[#004c93] flex items-center"
+                    className="py-3 px-4 bg-[#0891b2] rounded-md text-white font-medium hover:bg-[#004c93] flex items-center"
                   >
                     {isSubmitting ? (
                       <>

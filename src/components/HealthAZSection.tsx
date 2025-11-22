@@ -7,7 +7,7 @@ const HealthAZSection: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Health A to Z Card */}
           <div className="bg-white p-6 shadow-sm rounded-md">
-            <h2 className="text-xl font-bold text-[#005eb8] mb-4">
+            <h2 className="text-xl font-bold text-[#0891b2] mb-4">
               <a href="/health-a-z" className="hover:underline flex items-start">
                 Health A to Z
               </a>
@@ -17,7 +17,7 @@ const HealthAZSection: React.FC = () => {
             </p>
             <a
               href="/health-a-z"
-              className="flex items-center text-[#005eb8] font-bold"
+              className="flex items-center text-[#0891b2] font-bold"
               aria-label="Go to Health A to Z"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -28,7 +28,7 @@ const HealthAZSection: React.FC = () => {
 
           {/* Medicines A to Z Card */}
           <div className="bg-white p-6 shadow-sm rounded-md">
-            <h2 className="text-xl font-bold text-[#005eb8] mb-4">
+            <h2 className="text-xl font-bold text-[#0891b2] mb-4">
               <a href="/medicines-a-z" className="hover:underline flex items-start">
                 Medicines A to Z
               </a>
@@ -38,7 +38,7 @@ const HealthAZSection: React.FC = () => {
             </p>
             <a
               href="/medicines-a-z"
-              className="flex items-center text-[#005eb8] font-bold"
+              className="flex items-center text-[#0891b2] font-bold"
               aria-label="Go to Medicines A to Z"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">

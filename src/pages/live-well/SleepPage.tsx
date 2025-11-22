@@ -6,7 +6,7 @@ const SleepPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Header */}
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Sleep and Tiredness</h1>
           <p className="text-xl font-medium">
@@ -34,7 +34,7 @@ const SleepPage: React.FC = () => {
           {/* Main Content Area - 2/3 width on large screens */}
           <div className="lg:col-span-2">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Why is sleep important?</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Why is sleep important?</h2>
               <p className="mb-4">
                 Sleep is a vital function that allows your body and mind to recharge, leaving you refreshed and alert when you wake up. Healthy sleep also helps the body remain healthy and stave off diseases. Without enough sleep, your brain cannot function properly.
               </p>
@@ -53,7 +53,7 @@ const SleepPage: React.FC = () => {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">How much sleep do I need?</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">How much sleep do I need?</h2>
               <p className="mb-4">
                 Sleep needs vary from person to person, but generally, most adults need between 7 and 9 hours of quality sleep each night. Children and teenagers need even more.
               </p>
@@ -113,7 +113,7 @@ const SleepPage: React.FC = () => {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Common sleep problems</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Common sleep problems</h2>
 
               <h3 className="text-xl font-semibold mb-2">Insomnia</h3>
               <p className="mb-4">
@@ -154,7 +154,7 @@ const SleepPage: React.FC = () => {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Tips for better sleep</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Tips for better sleep</h2>
               <div className="bg-blue-50 p-6 rounded-lg mb-6">
                 <h3 className="text-xl font-semibold mb-3">Sleep hygiene practices</h3>
                 <ul className="space-y-3">
@@ -209,14 +209,14 @@ const SleepPage: React.FC = () => {
                 <li>Practicing relaxation techniques like deep breathing or meditation</li>
               </ul>
               <p>
-                <Link to="/live-well/sleep/better-sleep-techniques" className="text-[#005eb8] font-medium hover:underline">
+                <Link to="/live-well/sleep/better-sleep-techniques" className="text-[#0891b2] font-medium hover:underline">
                   Learn more about sleep improvement techniques →
                 </Link>
               </p>
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Managing fatigue and tiredness</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Managing fatigue and tiredness</h2>
               <p className="mb-4">
                 If you're feeling constantly tired despite getting enough sleep, there might be other factors affecting your energy levels:
               </p>
@@ -259,7 +259,7 @@ const SleepPage: React.FC = () => {
               <h3 className="text-lg font-bold mb-4">Related topics</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link to="/live-well/mental-wellbeing" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/live-well/mental-wellbeing" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -267,7 +267,7 @@ const SleepPage: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/live-well/exercise" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/live-well/exercise" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -275,7 +275,7 @@ const SleepPage: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/live-well/healthy-eating" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/live-well/healthy-eating" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -295,11 +295,11 @@ const SleepPage: React.FC = () => {
                 />
               </div>
               <div className="p-5">
-                <h3 className="text-lg font-bold text-[#005eb8] mb-3">Sleep improvement techniques</h3>
+                <h3 className="text-lg font-bold text-[#0891b2] mb-3">Sleep improvement techniques</h3>
                 <p className="text-gray-600 mb-4">
                   Practical steps to improve your sleep quality and establish a healthy sleep routine.
                 </p>
-                <Link to="/live-well/sleep/better-sleep-techniques" className="text-[#005eb8] font-medium hover:underline">
+                <Link to="/live-well/sleep/better-sleep-techniques" className="text-[#0891b2] font-medium hover:underline">
                   View techniques
                 </Link>
               </div>
@@ -311,7 +311,7 @@ const SleepPage: React.FC = () => {
               <p className="mb-4">Keeping a sleep diary can help identify patterns and factors affecting your sleep quality.</p>
               <Link
                 to="/tools/sleep-diary"
-                className="bg-[#005eb8] text-white px-4 py-2 rounded-md hover:bg-[#003f7e] inline-block w-full text-center"
+                className="bg-[#0891b2] text-white px-4 py-2 rounded-md hover:bg-[#0e7490] inline-block w-full text-center"
               >
                 Start sleep diary
               </Link>

@@ -126,7 +126,7 @@ const LaborAndBirthPage: React.FC = () => {
           </div>
 
           <p className="mb-3">
-            For more detailed information about the signs and symptoms that labor is beginning, visit our <Link to="/pregnancy/signs-of-labor" className="text-[#005eb8] hover:underline">Signs of labor</Link> page.
+            For more detailed information about the signs and symptoms that labor is beginning, visit our <Link to="/pregnancy/signs-of-labor" className="text-[#0891b2] hover:underline">Signs of labor</Link> page.
           </p>
         </div>
       )
@@ -233,7 +233,7 @@ const LaborAndBirthPage: React.FC = () => {
               <li>Distance from emergency facilities (for home or birth center births)</li>
             </ul>
             <p className="mt-3 text-sm">
-              Discuss your preferences with your midwife or doctor, and remember that plans may need to change depending on how your pregnancy and labor progress. You can use our <Link to="/pregnancy/birth-plan-creator" className="text-[#005eb8] hover:underline">Birth Plan Creator</Link> to help document your preferences.
+              Discuss your preferences with your midwife or doctor, and remember that plans may need to change depending on how your pregnancy and labor progress. You can use our <Link to="/pregnancy/birth-plan-creator" className="text-[#0891b2] hover:underline">Birth Plan Creator</Link> to help document your preferences.
             </p>
           </div>
         </div>
@@ -594,7 +594,7 @@ const LaborAndBirthPage: React.FC = () => {
               After these first precious moments, you'll move into the postpartum period as you recover from birth and adjust to life with your new baby.
             </p>
             <p className="mb-3">
-              Learn more about the days and weeks following birth in our <Link to="/pregnancy/after-birth" className="text-[#005eb8] font-medium hover:underline">After the birth guide</Link>.
+              Learn more about the days and weeks following birth in our <Link to="/pregnancy/after-birth" className="text-[#0891b2] font-medium hover:underline">After the birth guide</Link>.
             </p>
           </div>
         </div>
@@ -604,7 +604,7 @@ const LaborAndBirthPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Labor and Birth</h1>
           <p className="text-xl font-medium">
@@ -634,19 +634,19 @@ const LaborAndBirthPage: React.FC = () => {
                 <h3 className="font-bold mb-3">Related information</h3>
                 <ul className="space-y-2">
                   <li>
-                    <Link to="/pregnancy/late" className="text-[#005eb8] hover:underline text-sm">Late pregnancy</Link>
+                    <Link to="/pregnancy/late" className="text-[#0891b2] hover:underline text-sm">Late pregnancy</Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/signs-of-labor" className="text-[#005eb8] hover:underline text-sm">Signs of labor</Link>
+                    <Link to="/pregnancy/signs-of-labor" className="text-[#0891b2] hover:underline text-sm">Signs of labor</Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/birth-plan-creator" className="text-[#005eb8] hover:underline text-sm">Birth plan creator</Link>
+                    <Link to="/pregnancy/birth-plan-creator" className="text-[#0891b2] hover:underline text-sm">Birth plan creator</Link>
                   </li>
                   <li>
-                    <Link to="/tools/contraction-timer" className="text-[#005eb8] hover:underline text-sm">Contraction timer</Link>
+                    <Link to="/tools/contraction-timer" className="text-[#0891b2] hover:underline text-sm">Contraction timer</Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/after-birth" className="text-[#005eb8] hover:underline text-sm">After the birth</Link>
+                    <Link to="/pregnancy/after-birth" className="text-[#0891b2] hover:underline text-sm">After the birth</Link>
                   </li>
                 </ul>
               </div>
@@ -664,13 +664,13 @@ const LaborAndBirthPage: React.FC = () => {
 
             {sections.map((section) => (
               <section key={section.id} id={section.id} className="mb-12 scroll-mt-4">
-                <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">{section.title}</h2>
+                <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">{section.title}</h2>
                 <div className="prose max-w-none">{section.content}</div>
               </section>
             ))}
 
             <div className="mt-8">
-              <Link to="/pregnancy" className="text-[#005eb8] font-medium hover:underline flex items-center">
+              <Link to="/pregnancy" className="text-[#0891b2] font-medium hover:underline flex items-center">
                 <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>

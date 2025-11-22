@@ -113,7 +113,7 @@ const CarersBenefitsPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <nav className="text-sm mb-4">
             <Link to="/" className="hover:underline">Home</Link>
@@ -193,7 +193,7 @@ const CarersBenefitsPage: React.FC = () => {
                 onClick={() => setSelectedCategory(category.id)}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   selectedCategory === category.id
-                    ? 'bg-[#005eb8] text-white'
+                    ? 'bg-[#0891b2] text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -211,7 +211,7 @@ const CarersBenefitsPage: React.FC = () => {
               className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="flex items-start justify-between mb-4">
-                <h3 className="text-xl font-bold text-[#005eb8] flex-grow">{benefit.title}</h3>
+                <h3 className="text-xl font-bold text-[#0891b2] flex-grow">{benefit.title}</h3>
                 <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium ml-4">
                   {benefit.amount}
                 </span>
@@ -225,7 +225,7 @@ const CarersBenefitsPage: React.FC = () => {
                   <ul className="space-y-1">
                     {benefit.eligibility.map((criterion, idx) => (
                       <li key={idx} className="flex items-start text-sm text-gray-600">
-                        <span className="w-2 h-2 bg-[#005eb8] rounded-full mr-2 mt-1.5 flex-shrink-0"></span>
+                        <span className="w-2 h-2 bg-[#0891b2] rounded-full mr-2 mt-1.5 flex-shrink-0"></span>
                         {criterion}
                       </li>
                     ))}
@@ -246,7 +246,7 @@ const CarersBenefitsPage: React.FC = () => {
           <h2 className="text-xl font-bold mb-4">How to apply for carer benefits</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
-              <div className="bg-[#005eb8] text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
+              <div className="bg-[#0891b2] text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
                 1
               </div>
               <h3 className="font-bold mb-2">Check Eligibility</h3>
@@ -256,7 +256,7 @@ const CarersBenefitsPage: React.FC = () => {
             </div>
             
             <div className="text-center">
-              <div className="bg-[#005eb8] text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
+              <div className="bg-[#0891b2] text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
                 2
               </div>
               <h3 className="font-bold mb-2">Submit Application</h3>
@@ -266,7 +266,7 @@ const CarersBenefitsPage: React.FC = () => {
             </div>
             
             <div className="text-center">
-              <div className="bg-[#005eb8] text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
+              <div className="bg-[#0891b2] text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
                 3
               </div>
               <h3 className="font-bold mb-2">Assessment & Approval</h3>
@@ -391,7 +391,7 @@ const CarersBenefitsPage: React.FC = () => {
         </div>
 
         {/* Contact and support */}
-        <div className="bg-[#005eb8] text-white p-8 rounded-lg">
+        <div className="bg-[#0891b2] text-white p-8 rounded-lg">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-4">Need help with your application?</h2>
             <p className="mb-6">
@@ -401,7 +401,7 @@ const CarersBenefitsPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href="tel:0800-CARER-HELP"
-                className="bg-white text-[#005eb8] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
+                className="bg-white text-[#0891b2] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
               >
                 Call: 0800-CARER-HELP
               </a>
@@ -413,7 +413,7 @@ const CarersBenefitsPage: React.FC = () => {
               </Link>
               <Link
                 to="/help"
-                className="bg-transparent border-2 border-white text-white px-6 py-3 rounded-md hover:bg-white hover:text-[#005eb8] transition-colors inline-block font-bold"
+                className="bg-transparent border-2 border-white text-white px-6 py-3 rounded-md hover:bg-white hover:text-[#0891b2] transition-colors inline-block font-bold"
               >
                 Online support
               </Link>

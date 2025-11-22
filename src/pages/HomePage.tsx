@@ -55,7 +55,7 @@ const HomePage: React.FC = () => {
                   </p>
                   <Link
                     to="/health-a-z"
-                    className="flex items-center text-[#005eb8] hover:underline"
+                    className="flex items-center text-[#0891b2] hover:underline"
                   >
                     <svg className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
@@ -73,7 +73,7 @@ const HomePage: React.FC = () => {
                   </p>
                   <Link
                     to="/medicines-a-z"
-                    className="flex items-center text-[#005eb8] hover:underline"
+                    className="flex items-center text-[#0891b2] hover:underline"
                   >
                     <svg className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
@@ -92,7 +92,7 @@ const HomePage: React.FC = () => {
                     <li key={index}>
                       <Link
                         to={link.href}
-                        className="flex items-center text-[#005eb8] hover:underline"
+                        className="flex items-center text-[#0891b2] hover:underline"
                       >
                         <svg
                           className="h-5 w-5 mr-4 flex-shrink-0 text-green-600"

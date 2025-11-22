@@ -131,7 +131,7 @@ const MedicinesAZPage: React.FC = () => {
 
   return (
     <div className="bg-white relative">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Medicines A to Z</h1>
           <p className="text-xl font-medium">
@@ -180,7 +180,7 @@ const MedicinesAZPage: React.FC = () => {
                 </button>
                 <button 
                   onClick={handleAcceptDisclaimer}
-                  className="w-full py-2 md:py-3 px-4 bg-[#005eb8] hover:bg-[#003f7e] text-white font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#005eb8] text-sm md:text-base"
+                  className="w-full py-2 md:py-3 px-4 bg-[#0891b2] hover:bg-[#0e7490] text-white font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0891b2] text-sm md:text-base"
                 >
                   I understand and accept
                 </button>
@@ -216,14 +216,14 @@ const MedicinesAZPage: React.FC = () => {
               type="search"
               id="medicine-search"
               placeholder="Enter medicine name"
-              className="px-4 py-2 border border-gray-300 rounded-l-md w-full focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+              className="px-4 py-2 border border-gray-300 rounded-l-md w-full focus:outline-none focus:ring-2 focus:ring-[#0891b2]"
               value={searchTerm}
               onChange={handleSearch}
               aria-label="Search medicines input"
             />
             <button
               type="submit"
-              className="bg-[#005eb8] hover:bg-[#003f7e] text-white px-4 py-2 rounded-r-md"
+              className="bg-[#0891b2] hover:bg-[#0e7490] text-white px-4 py-2 rounded-r-md"
               aria-label="Search medicines"
             >
               Search
@@ -250,9 +250,9 @@ const MedicinesAZPage: React.FC = () => {
                     onClick={() => handleAlphabetClick(letter)}
                     className={`w-10 h-10 flex items-center justify-center rounded-md font-bold text-lg
                       ${activeFilter === letter
-                        ? 'bg-[#005eb8] text-white'
+                        ? 'bg-[#0891b2] text-white'
                         : medicines[letter] && medicines[letter].length > 0
-                          ? 'bg-gray-100 hover:bg-gray-200 text-[#005eb8]'
+                          ? 'bg-gray-100 hover:bg-gray-200 text-[#0891b2]'
                           : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                       }`}
                     disabled={!medicines[letter] || medicines[letter].length === 0}
@@ -268,7 +268,7 @@ const MedicinesAZPage: React.FC = () => {
               <div className="lg:col-span-2">
             {filteredMedicines.map(({ letter, medicines }) => (
               <div key={letter} className="mb-8">
-                <h2 id={`letter-${letter}`} className="text-2xl font-bold mb-4 text-[#005eb8] border-b border-gray-200 pb-2">
+                <h2 id={`letter-${letter}`} className="text-2xl font-bold mb-4 text-[#0891b2] border-b border-gray-200 pb-2">
                   {letter}
                 </h2>
                 <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -276,7 +276,7 @@ const MedicinesAZPage: React.FC = () => {
                     <li key={medicine.id}>
                       <Link
                         to={medicine.href}
-                        className="text-[#005eb8] hover:underline font-medium flex items-center"
+                        className="text-[#0891b2] hover:underline font-medium flex items-center"
                       >
                         <svg className="h-5 w-5 mr-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -299,14 +299,14 @@ const MedicinesAZPage: React.FC = () => {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm overflow-hidden sticky top-4">
-              <div className="bg-[#005eb8] text-white p-4">
+              <div className="bg-[#0891b2] text-white p-4">
                 <h2 className="text-xl font-bold">Useful Information</h2>
               </div>
               <div className="p-4">
                 <h3 className="font-bold mb-3">Related Links</h3>
                 <ul className="space-y-2">
                   <li>
-                    <Link to="/health-a-z" className="text-[#005eb8] hover:underline flex items-center">
+                    <Link to="/health-a-z" className="text-[#0891b2] hover:underline flex items-center">
                       <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
@@ -314,7 +314,7 @@ const MedicinesAZPage: React.FC = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/find-pharmacy" className="text-[#005eb8] hover:underline flex items-center">
+                    <Link to="/find-pharmacy" className="text-[#0891b2] hover:underline flex items-center">
                       <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
@@ -322,7 +322,7 @@ const MedicinesAZPage: React.FC = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/phb-medicines-information" className="text-[#005eb8] hover:underline flex items-center">
+                    <Link to="/phb-medicines-information" className="text-[#0891b2] hover:underline flex items-center">
                       <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>

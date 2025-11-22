@@ -5,7 +5,7 @@ import PregnancyCalendar from '../features/pregnancy/PregnancyCalendar';
 const PregnancyCalendarPage: React.FC = () => {
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <div className="flex items-center mb-2">
             <Link to="/pregnancy" className="text-white hover:underline mr-2">
@@ -131,21 +131,21 @@ const PregnancyCalendarPage: React.FC = () => {
             <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               <h3 className="font-bold mb-2">Due Date Calculator</h3>
               <p className="text-sm text-gray-600 mb-3">Find out when your baby is due based on your last period or conception date.</p>
-              <Link to="/tools/due-date-calculator" className="text-[#005eb8] hover:underline text-sm">
+              <Link to="/tools/due-date-calculator" className="text-[#0891b2] hover:underline text-sm">
                 Calculate your due date →
               </Link>
             </div>
             <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               <h3 className="font-bold mb-2">Weight Gain Calculator</h3>
               <p className="text-sm text-gray-600 mb-3">Calculate recommended pregnancy weight gain based on your pre-pregnancy BMI.</p>
-              <Link to="/tools/weight-gain-calculator" className="text-[#005eb8] hover:underline text-sm">
+              <Link to="/tools/weight-gain-calculator" className="text-[#0891b2] hover:underline text-sm">
                 Check weight guidelines →
               </Link>
             </div>
             <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               <h3 className="font-bold mb-2">Contraction Timer</h3>
               <p className="text-sm text-gray-600 mb-3">Time your contractions during labor to know when to go to the hospital.</p>
-              <Link to="/tools/contraction-timer" className="text-[#005eb8] hover:underline text-sm">
+              <Link to="/tools/contraction-timer" className="text-[#0891b2] hover:underline text-sm">
                 Track contractions →
               </Link>
             </div>

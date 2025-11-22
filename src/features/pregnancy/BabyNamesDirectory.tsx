@@ -184,7 +184,7 @@ const BabyNamesDirectory: React.FC = () => {
           <label className="block mb-2 font-medium">Browse by letter</label>
           <div className="flex flex-wrap gap-1">
             <button
-              className={`px-2 py-1 border rounded-md text-sm ${selectedLetter === '' ? 'bg-[#005eb8] text-white' : 'bg-gray-100'}`}
+              className={`px-2 py-1 border rounded-md text-sm ${selectedLetter === '' ? 'bg-[#0891b2] text-white' : 'bg-gray-100'}`}
               onClick={() => setSelectedLetter('')}
             >
               All
@@ -192,7 +192,7 @@ const BabyNamesDirectory: React.FC = () => {
             {alphabetButtons.map(letter => (
               <button
                 key={letter}
-                className={`px-2 py-1 border rounded-md text-sm ${selectedLetter === letter ? 'bg-[#005eb8] text-white' : 'bg-gray-100'}`}
+                className={`px-2 py-1 border rounded-md text-sm ${selectedLetter === letter ? 'bg-[#0891b2] text-white' : 'bg-gray-100'}`}
                 onClick={() => setSelectedLetter(letter)}
               >
                 {letter}
@@ -271,7 +271,7 @@ const BabyNamesDirectory: React.FC = () => {
                 <p className="text-sm mt-2 line-clamp-2 mb-3">{name.meaning}</p>
 
                 <button
-                  className="text-[#005eb8] text-sm font-medium hover:underline"
+                  className="text-[#0891b2] text-sm font-medium hover:underline"
                   onClick={() => handleViewDetails(name)}
                 >
                   View details

@@ -106,7 +106,7 @@ const SexualHealthPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <nav className="text-sm mb-4">
             <Link to="/live-well" className="hover:underline">Live well</Link>
@@ -162,7 +162,7 @@ const SexualHealthPage: React.FC = () => {
                 onClick={() => setSelectedCategory(category.id)}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   selectedCategory === category.id
-                    ? 'bg-[#005eb8] text-white'
+                    ? 'bg-[#0891b2] text-white'
                     : `${category.color} text-gray-700 hover:bg-gray-200`
                 }`}
               >
@@ -189,7 +189,7 @@ const SexualHealthPage: React.FC = () => {
                 </div>
               )}
               <div className="p-6">
-                <h3 className="text-xl font-bold text-[#005eb8] mb-3">{topic.title}</h3>
+                <h3 className="text-xl font-bold text-[#0891b2] mb-3">{topic.title}</h3>
                 <p className="text-gray-600 mb-4">{topic.description}</p>
 
                 <div>
@@ -197,7 +197,7 @@ const SexualHealthPage: React.FC = () => {
                   <ul className="space-y-1">
                     {topic.keyPoints.map((point, idx) => (
                       <li key={idx} className="flex items-start text-sm text-gray-600">
-                        <span className="w-2 h-2 bg-[#005eb8] rounded-full mr-2 mt-1.5 flex-shrink-0"></span>
+                        <span className="w-2 h-2 bg-[#0891b2] rounded-full mr-2 mt-1.5 flex-shrink-0"></span>
                         {point}
                       </li>
                     ))}
@@ -425,7 +425,7 @@ const SexualHealthPage: React.FC = () => {
         </div>
 
         {/* Emergency and support */}
-        <div className="bg-[#005eb8] text-white p-8 rounded-lg">
+        <div className="bg-[#0891b2] text-white p-8 rounded-lg">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-4">Need immediate help or have concerns?</h2>
             <p className="mb-6">
@@ -434,7 +434,7 @@ const SexualHealthPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/account/appointments/book"
-                className="bg-white text-[#005eb8] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
+                className="bg-white text-[#0891b2] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
               >
                 Book confidential appointment
               </Link>
@@ -446,7 +446,7 @@ const SexualHealthPage: React.FC = () => {
               </a>
               <Link
                 to="/find-pharmacy"
-                className="bg-transparent border-2 border-white text-white px-6 py-3 rounded-md hover:bg-white hover:text-[#005eb8] transition-colors inline-block font-bold"
+                className="bg-transparent border-2 border-white text-white px-6 py-3 rounded-md hover:bg-white hover:text-[#0891b2] transition-colors inline-block font-bold"
               >
                 Find nearest clinic
               </Link>

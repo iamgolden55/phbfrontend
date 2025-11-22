@@ -43,7 +43,7 @@ const FeaturedSection: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {featuredItems.map((item, index) => (
             <div key={index} className="bg-white p-6 rounded-md shadow-sm">
-              <h3 className="text-lg font-bold text-[#005eb8] mb-3">
+              <h3 className="text-lg font-bold text-[#0891b2] mb-3">
                 <a href={item.href} className="hover:underline">
                   {item.title}
                 </a>

@@ -56,7 +56,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-2 text-sm">
               {supportLinks.map((link, index) => (
                 <li key={index}>
-                  <Link to={link.path} className="text-[#005eb8] hover:underline">
+                  <Link to={link.path} className="text-[#0891b2] hover:underline">
                     {link.text}
                   </Link>
                 </li>
@@ -69,7 +69,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-2 text-sm">
               {appLinks.map((link, index) => (
                 <li key={index}>
-                  <Link to={link.path} className="text-[#005eb8] hover:underline">
+                  <Link to={link.path} className="text-[#0891b2] hover:underline">
                     {link.text}
                   </Link>
                 </li>
@@ -82,7 +82,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-2 text-sm">
               {programLinks.map((link, index) => (
                 <li key={index}>
-                  <Link to={link.path} className="text-[#005eb8] hover:underline">
+                  <Link to={link.path} className="text-[#0891b2] hover:underline">
                     {link.text}
                   </Link>
                 </li>
@@ -95,7 +95,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-2 text-sm">
               {otherLinks.map((link, index) => (
                 <li key={index}>
-                  <Link to={link.path} className="text-[#005eb8] hover:underline">
+                  <Link to={link.path} className="text-[#0891b2] hover:underline">
                     {link.text}
                   </Link>
                 </li>
@@ -111,14 +111,14 @@ const Footer: React.FC = () => {
                   {link.isExternal ? (
                     <a
                       href={link.path}
-                      className="text-[#005eb8] hover:underline"
+                      className="text-[#0891b2] hover:underline"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
                       {link.text}
                     </a>
                   ) : (
-                    <Link to={link.path} className="text-[#005eb8] hover:underline">
+                    <Link to={link.path} className="text-[#0891b2] hover:underline">
                       {link.text}
                     </Link>
                   )}

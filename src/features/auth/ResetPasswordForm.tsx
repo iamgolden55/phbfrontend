@@ -110,7 +110,7 @@ const ResetPasswordForm: React.FC = () => {
           <input
             type="password"
             id="newPassword"
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2]"
             value={newPassword}
             onChange={(e) => { setNewPassword(e.target.value); clearError(); }}
             placeholder="Enter your new password"
@@ -126,7 +126,7 @@ const ResetPasswordForm: React.FC = () => {
           <input
             type="password"
             id="confirmPassword"
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2]"
             value={confirmPassword}
             onChange={(e) => { setConfirmPassword(e.target.value); clearError(); }}
             placeholder="Confirm your new password"
@@ -136,7 +136,7 @@ const ResetPasswordForm: React.FC = () => {
 
         <button
           type="submit"
-          className="w-full bg-[#005eb8] text-white py-2 px-4 rounded hover:bg-[#003f7e] transition-colors"
+          className="w-full bg-[#0891b2] text-white py-2 px-4 rounded hover:bg-[#0e7490] transition-colors"
           disabled={isLoading || !token}
         >
           {isLoading ? 'Resetting...' : 'Reset Password'}
@@ -146,7 +146,7 @@ const ResetPasswordForm: React.FC = () => {
       <div className="mt-6 pt-4 border-t border-gray-200 text-center">
         <p className="text-gray-600">
           Remember your password?{' '}
-          <Link to="/login" className="text-[#005eb8] hover:underline">
+          <Link to="/login" className="text-[#0891b2] hover:underline">
             Back to sign in
           </Link>
         </p>

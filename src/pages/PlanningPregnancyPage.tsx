@@ -362,7 +362,7 @@ const PlanningPregnancyPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Planning Your Pregnancy</h1>
           <p className="text-xl font-medium">
@@ -392,16 +392,16 @@ const PlanningPregnancyPage: React.FC = () => {
                 <h3 className="font-bold mb-3">Related information</h3>
                 <ul className="space-y-2">
                   <li>
-                    <Link to="/pregnancy/early" className="text-[#005eb8] hover:underline text-sm">Early pregnancy</Link>
+                    <Link to="/pregnancy/early" className="text-[#0891b2] hover:underline text-sm">Early pregnancy</Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/first-prenatal-visit" className="text-[#005eb8] hover:underline text-sm">Your first prenatal visit</Link>
+                    <Link to="/pregnancy/first-prenatal-visit" className="text-[#0891b2] hover:underline text-sm">Your first prenatal visit</Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/early-pregnancy-symptoms" className="text-[#005eb8] hover:underline text-sm">Early pregnancy symptoms</Link>
+                    <Link to="/pregnancy/early-pregnancy-symptoms" className="text-[#0891b2] hover:underline text-sm">Early pregnancy symptoms</Link>
                   </li>
                   <li>
-                    <Link to="/tools/due-date-calculator" className="text-[#005eb8] hover:underline text-sm">Due date calculator</Link>
+                    <Link to="/tools/due-date-calculator" className="text-[#0891b2] hover:underline text-sm">Due date calculator</Link>
                   </li>
                 </ul>
               </div>
@@ -419,7 +419,7 @@ const PlanningPregnancyPage: React.FC = () => {
 
             {sections.map((section) => (
               <section key={section.id} id={section.id} className="mb-12 scroll-mt-4">
-                <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">{section.title}</h2>
+                <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">{section.title}</h2>
                 <div className="prose max-w-none">{section.content}</div>
               </section>
             ))}
@@ -456,7 +456,7 @@ const PlanningPregnancyPage: React.FC = () => {
                   <div>
                     <p className="font-medium">Learn about early pregnancy</p>
                     <p className="text-sm text-gray-600">
-                      Read our <Link to="/pregnancy/early" className="text-[#005eb8] hover:underline">Early pregnancy guide</Link> for information on what to expect in the first trimester.
+                      Read our <Link to="/pregnancy/early" className="text-[#0891b2] hover:underline">Early pregnancy guide</Link> for information on what to expect in the first trimester.
                     </p>
                   </div>
                 </li>
@@ -464,7 +464,7 @@ const PlanningPregnancyPage: React.FC = () => {
             </div>
 
             <div className="mt-8">
-              <Link to="/pregnancy" className="text-[#005eb8] font-medium hover:underline flex items-center">
+              <Link to="/pregnancy" className="text-[#0891b2] font-medium hover:underline flex items-center">
                 <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>

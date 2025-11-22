@@ -139,10 +139,10 @@ const ElectronicPrescriptionToken: React.FC<{
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', padding: '40px', maxWidth: '800px', margin: '0 auto' }}>
       {/* Header */}
-      <div style={{ borderBottom: '4px solid #005eb8', paddingBottom: '20px', marginBottom: '30px' }}>
+      <div style={{ borderBottom: '4px solid #0891b2', paddingBottom: '20px', marginBottom: '30px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
           <div>
-            <h1 style={{ color: '#005eb8', margin: '0 0 10px 0', fontSize: '28px', fontWeight: 'bold' }}>
+            <h1 style={{ color: '#0891b2', margin: '0 0 10px 0', fontSize: '28px', fontWeight: 'bold' }}>
               Electronic Prescription Token
             </h1>
             <p style={{ color: '#4c6272', margin: '0', fontSize: '14px' }}>
@@ -163,12 +163,12 @@ const ElectronicPrescriptionToken: React.FC<{
       {/* Important Notice */}
       <div style={{
         backgroundColor: '#e8f4f8',
-        border: '2px solid #005eb8',
+        border: '2px solid #0891b2',
         padding: '15px',
         marginBottom: '30px',
         borderRadius: '4px'
       }}>
-        <p style={{ margin: '0', fontSize: '14px', fontWeight: 'bold', color: '#005eb8' }}>
+        <p style={{ margin: '0', fontSize: '14px', fontWeight: 'bold', color: '#0891b2' }}>
           📋 Present this token at any registered pharmacy to collect your prescription
         </p>
         <p style={{ margin: '5px 0 0 0', fontSize: '12px', color: '#4c6272' }}>
@@ -181,7 +181,7 @@ const ElectronicPrescriptionToken: React.FC<{
         <div style={{
           padding: '10px',
           backgroundColor: 'white',
-          border: '2px solid #005eb8',
+          border: '2px solid #0891b2',
           borderRadius: '4px'
         }}>
           <QRCode
@@ -220,7 +220,7 @@ const ElectronicPrescriptionToken: React.FC<{
               fontSize: '24px',
               fontWeight: 'bold',
               fontFamily: 'monospace',
-              color: '#005eb8',
+              color: '#0891b2',
               letterSpacing: '2px'
             }}>
               PHB-RX-{prescription.id.toString().padStart(8, '0')}
@@ -248,8 +248,8 @@ const ElectronicPrescriptionToken: React.FC<{
         <h2 style={{
           fontSize: '16px',
           fontWeight: 'bold',
-          color: '#005eb8',
-          borderBottom: '2px solid #005eb8',
+          color: '#0891b2',
+          borderBottom: '2px solid #0891b2',
           paddingBottom: '8px',
           marginBottom: '15px'
         }}>
@@ -278,8 +278,8 @@ const ElectronicPrescriptionToken: React.FC<{
         <h2 style={{
           fontSize: '16px',
           fontWeight: 'bold',
-          color: '#005eb8',
-          borderBottom: '2px solid #005eb8',
+          color: '#0891b2',
+          borderBottom: '2px solid #0891b2',
           paddingBottom: '8px',
           marginBottom: '15px'
         }}>
@@ -362,8 +362,8 @@ const ElectronicPrescriptionToken: React.FC<{
         <h2 style={{
           fontSize: '16px',
           fontWeight: 'bold',
-          color: '#005eb8',
-          borderBottom: '2px solid #005eb8',
+          color: '#0891b2',
+          borderBottom: '2px solid #0891b2',
           paddingBottom: '8px',
           marginBottom: '15px'
         }}>
@@ -387,8 +387,8 @@ const ElectronicPrescriptionToken: React.FC<{
           <h2 style={{
             fontSize: '16px',
             fontWeight: 'bold',
-            color: '#005eb8',
-            borderBottom: '2px solid #005eb8',
+            color: '#0891b2',
+            borderBottom: '2px solid #0891b2',
             paddingBottom: '8px',
             marginBottom: '15px'
           }}>
@@ -453,7 +453,7 @@ const PaperPrescriptionForm: React.FC<{
 
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-      {/* Green Header (NHS-style) */}
+      {/* Green Header */}
       <div style={{
         backgroundColor: '#00703c',
         color: 'white',

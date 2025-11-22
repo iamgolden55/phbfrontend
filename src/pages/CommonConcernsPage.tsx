@@ -226,7 +226,7 @@ const CommonConcernsPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Common pregnancy concerns</h1>
           <p className="text-xl font-medium">
@@ -254,7 +254,7 @@ const CommonConcernsPage: React.FC = () => {
               onClick={() => setFilterCategory('all')}
               className={`px-4 py-2 rounded-full text-sm font-medium ${
                 filterCategory === 'all'
-                  ? 'bg-[#005eb8] text-white'
+                  ? 'bg-[#0891b2] text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -264,7 +264,7 @@ const CommonConcernsPage: React.FC = () => {
               onClick={() => setFilterCategory('physical')}
               className={`px-4 py-2 rounded-full text-sm font-medium ${
                 filterCategory === 'physical'
-                  ? 'bg-[#005eb8] text-white'
+                  ? 'bg-[#0891b2] text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -274,7 +274,7 @@ const CommonConcernsPage: React.FC = () => {
               onClick={() => setFilterCategory('digestive')}
               className={`px-4 py-2 rounded-full text-sm font-medium ${
                 filterCategory === 'digestive'
-                  ? 'bg-[#005eb8] text-white'
+                  ? 'bg-[#0891b2] text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -284,7 +284,7 @@ const CommonConcernsPage: React.FC = () => {
               onClick={() => setFilterCategory('emotional')}
               className={`px-4 py-2 rounded-full text-sm font-medium ${
                 filterCategory === 'emotional'
-                  ? 'bg-[#005eb8] text-white'
+                  ? 'bg-[#0891b2] text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -294,7 +294,7 @@ const CommonConcernsPage: React.FC = () => {
               onClick={() => setFilterCategory('sleep')}
               className={`px-4 py-2 rounded-full text-sm font-medium ${
                 filterCategory === 'sleep'
-                  ? 'bg-[#005eb8] text-white'
+                  ? 'bg-[#0891b2] text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -304,7 +304,7 @@ const CommonConcernsPage: React.FC = () => {
               onClick={() => setFilterCategory('other')}
               className={`px-4 py-2 rounded-full text-sm font-medium ${
                 filterCategory === 'other'
-                  ? 'bg-[#005eb8] text-white'
+                  ? 'bg-[#0891b2] text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -318,7 +318,7 @@ const CommonConcernsPage: React.FC = () => {
           {filteredConcerns.map((concern) => (
             <div key={concern.id} id={concern.id} className="border border-gray-200 rounded-lg overflow-hidden">
               <div className="bg-gray-50 p-4 border-b border-gray-200">
-                <h2 className="text-xl font-bold text-[#005eb8]">{concern.title}</h2>
+                <h2 className="text-xl font-bold text-[#0891b2]">{concern.title}</h2>
               </div>
               <div className="p-6">
                 <p className="mb-6">{concern.description}</p>
@@ -349,12 +349,12 @@ const CommonConcernsPage: React.FC = () => {
             If you're experiencing a symptom not covered here or are concerned about your health, don't hesitate to contact your healthcare provider.
           </p>
           <div className="mb-4">
-            <Link to="/pregnancy/concerns" className="text-[#005eb8] font-medium hover:underline">
+            <Link to="/pregnancy/concerns" className="text-[#0891b2] font-medium hover:underline">
               View symptoms not to ignore during pregnancy
             </Link>
           </div>
           <div className="mt-4">
-            <Link to="/pregnancy" className="text-[#005eb8] font-medium hover:underline flex items-center">
+            <Link to="/pregnancy" className="text-[#0891b2] font-medium hover:underline flex items-center">
               <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>

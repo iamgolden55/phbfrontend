@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const FirstPrenatalVisitPage: React.FC = () => {
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Your First Prenatal Visit</h1>
           <p className="text-xl font-medium">
@@ -31,7 +31,7 @@ const FirstPrenatalVisitPage: React.FC = () => {
 
             <div className="space-y-6">
               <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-xl font-bold text-[#005eb8] mb-3">Medical history</h3>
+                <h3 className="text-xl font-bold text-[#0891b2] mb-3">Medical history</h3>
                 <p className="mb-3">Your healthcare provider will ask detailed questions about:</p>
                 <ul className="list-disc pl-5 space-y-2">
                   <li>Your general health and any medical conditions</li>
@@ -46,7 +46,7 @@ const FirstPrenatalVisitPage: React.FC = () => {
               </div>
 
               <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-xl font-bold text-[#005eb8] mb-3">Physical examination</h3>
+                <h3 className="text-xl font-bold text-[#0891b2] mb-3">Physical examination</h3>
                 <p className="mb-3">Your healthcare provider will:</p>
                 <ul className="list-disc pl-5 space-y-2">
                   <li>Check your weight and height</li>
@@ -59,7 +59,7 @@ const FirstPrenatalVisitPage: React.FC = () => {
               </div>
 
               <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-xl font-bold text-[#005eb8] mb-3">Blood tests</h3>
+                <h3 className="text-xl font-bold text-[#0891b2] mb-3">Blood tests</h3>
                 <p className="mb-3">Blood will be taken to check:</p>
                 <ul className="list-disc pl-5 space-y-2">
                   <li>Your blood type and Rhesus (Rh) factor</li>
@@ -72,7 +72,7 @@ const FirstPrenatalVisitPage: React.FC = () => {
               </div>
 
               <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-xl font-bold text-[#005eb8] mb-3">Dating scan</h3>
+                <h3 className="text-xl font-bold text-[#0891b2] mb-3">Dating scan</h3>
                 <p className="mb-3">
                   A dating ultrasound scan is usually scheduled around week 12 of pregnancy. This scan:
                 </p>
@@ -88,7 +88,7 @@ const FirstPrenatalVisitPage: React.FC = () => {
               </div>
 
               <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-xl font-bold text-[#005eb8] mb-3">Information and advice</h3>
+                <h3 className="text-xl font-bold text-[#0891b2] mb-3">Information and advice</h3>
                 <p className="mb-3">
                   You\'ll receive information about:
                 </p>
@@ -202,26 +202,26 @@ const FirstPrenatalVisitPage: React.FC = () => {
           <h2 className="text-xl font-bold mb-4">Related pregnancy information</h2>
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <li>
-              <Link to="/pregnancy/early-pregnancy-symptoms" className="text-[#005eb8] hover:underline">Early pregnancy symptoms</Link>
+              <Link to="/pregnancy/early-pregnancy-symptoms" className="text-[#0891b2] hover:underline">Early pregnancy symptoms</Link>
             </li>
             <li>
-              <Link to="/pregnancy/prenatal-tests" className="text-[#005eb8] hover:underline">Prenatal tests explained</Link>
+              <Link to="/pregnancy/prenatal-tests" className="text-[#0891b2] hover:underline">Prenatal tests explained</Link>
             </li>
             <li>
-              <Link to="/pregnancy/nutrition-guide" className="text-[#005eb8] hover:underline">Nutrition during pregnancy</Link>
+              <Link to="/pregnancy/nutrition-guide" className="text-[#0891b2] hover:underline">Nutrition during pregnancy</Link>
             </li>
             <li>
-              <Link to="/pregnancy/common-concerns" className="text-[#005eb8] hover:underline">Common pregnancy concerns</Link>
+              <Link to="/pregnancy/common-concerns" className="text-[#0891b2] hover:underline">Common pregnancy concerns</Link>
             </li>
             <li>
-              <Link to="/pregnancy/calendar" className="text-[#005eb8] hover:underline">Pregnancy calendar</Link>
+              <Link to="/pregnancy/calendar" className="text-[#0891b2] hover:underline">Pregnancy calendar</Link>
             </li>
             <li>
-              <Link to="/tools/due-date-calculator" className="text-[#005eb8] hover:underline">Due date calculator</Link>
+              <Link to="/tools/due-date-calculator" className="text-[#0891b2] hover:underline">Due date calculator</Link>
             </li>
           </ul>
           <div className="mt-4">
-            <Link to="/pregnancy" className="text-[#005eb8] font-medium hover:underline flex items-center">
+            <Link to="/pregnancy" className="text-[#0891b2] font-medium hover:underline flex items-center">
               <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>

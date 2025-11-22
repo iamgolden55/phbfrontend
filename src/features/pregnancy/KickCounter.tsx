@@ -164,7 +164,7 @@ const KickCounter: React.FC = () => {
   const renderCounter = () => (
     <div className="text-center">
       <div className="mb-8">
-        <div className="text-6xl font-bold text-[#005eb8] mb-2">{kickCount}</div>
+        <div className="text-6xl font-bold text-[#0891b2] mb-2">{kickCount}</div>
         <div className="text-gray-500 text-sm">kicks recorded</div>
 
         {isTracking && (
@@ -178,7 +178,7 @@ const KickCounter: React.FC = () => {
         {!isTracking ? (
           <button
             onClick={handleStartTracking}
-            className="bg-[#005eb8] text-white px-8 py-3 rounded-full hover:bg-[#003f7e] transition-colors text-lg"
+            className="bg-[#0891b2] text-white px-8 py-3 rounded-full hover:bg-[#0e7490] transition-colors text-lg"
           >
             Start Counting
           </button>
@@ -186,7 +186,7 @@ const KickCounter: React.FC = () => {
           <div className="space-y-4">
             <button
               onClick={handleKickRecorded}
-              className="bg-[#005eb8] text-white w-32 h-32 rounded-full hover:bg-[#003f7e] transition-colors text-lg"
+              className="bg-[#0891b2] text-white w-32 h-32 rounded-full hover:bg-[#0e7490] transition-colors text-lg"
             >
               Tap When<br />Baby Kicks
             </button>
@@ -247,7 +247,7 @@ const KickCounter: React.FC = () => {
           <p className="text-gray-500">No kick counting sessions recorded yet.</p>
           <button
             onClick={() => setViewMode('counter')}
-            className="mt-4 text-[#005eb8] hover:underline"
+            className="mt-4 text-[#0891b2] hover:underline"
           >
             Start your first session
           </button>
@@ -300,7 +300,7 @@ const KickCounter: React.FC = () => {
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="bg-[#005eb8] text-white p-4">
+      <div className="bg-[#0891b2] text-white p-4">
         <h2 className="text-xl font-bold">Baby Kick Counter</h2>
       </div>
 
@@ -311,7 +311,7 @@ const KickCounter: React.FC = () => {
             onClick={() => setViewMode('counter')}
             className={`pb-3 px-4 text-sm font-medium ${
               viewMode === 'counter'
-                ? 'border-b-2 border-[#005eb8] text-[#005eb8]'
+                ? 'border-b-2 border-[#0891b2] text-[#0891b2]'
                 : 'border-b-2 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
             }`}
           >
@@ -321,7 +321,7 @@ const KickCounter: React.FC = () => {
             onClick={() => setViewMode('history')}
             className={`pb-3 px-4 text-sm font-medium ${
               viewMode === 'history'
-                ? 'border-b-2 border-[#005eb8] text-[#005eb8]'
+                ? 'border-b-2 border-[#0891b2] text-[#0891b2]'
                 : 'border-b-2 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
             }`}
           >

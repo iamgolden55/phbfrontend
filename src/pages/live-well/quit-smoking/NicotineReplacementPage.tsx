@@ -53,7 +53,7 @@ const nrtProducts: NRTProduct[] = [
 const NicotineReplacementPage: React.FC = () => {
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <nav className="text-sm mb-4">
             <Link to="/live-well" className="hover:underline">Live well</Link>
@@ -122,7 +122,7 @@ const NicotineReplacementPage: React.FC = () => {
               )}
               <div className="p-6">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-xl font-bold text-[#005eb8]">{product.title}</h3>
+                  <h3 className="text-xl font-bold text-[#0891b2]">{product.title}</h3>
                   <span className="text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
                     {product.effectiveness}
                   </span>
@@ -171,7 +171,7 @@ const NicotineReplacementPage: React.FC = () => {
         <div className="bg-white p-6 border border-gray-200 rounded-lg shadow-sm mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <h3 className="font-bold mb-3 text-[#005eb8]">For heavy smokers (20+ cigarettes/day)</h3>
+              <h3 className="font-bold mb-3 text-[#0891b2]">For heavy smokers (20+ cigarettes/day)</h3>
               <p className="text-sm text-gray-600 mb-4">
                 Combination therapy works best: Use patches for steady nicotine levels plus gum/lozenges for breakthrough cravings.
               </p>
@@ -183,7 +183,7 @@ const NicotineReplacementPage: React.FC = () => {
             </div>
 
             <div>
-              <h3 className="font-bold mb-3 text-[#005eb8]">For light smokers (less than 20/day)</h3>
+              <h3 className="font-bold mb-3 text-[#0891b2]">For light smokers (less than 20/day)</h3>
               <p className="text-sm text-gray-600 mb-4">
                 Single therapy often sufficient: Choose the method that fits your lifestyle and smoking patterns.
               </p>
@@ -201,7 +201,7 @@ const NicotineReplacementPage: React.FC = () => {
         <div className="bg-[#f0f4f5] p-6 rounded-lg mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
-              <div className="bg-[#005eb8] text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
+              <div className="bg-[#0891b2] text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
                 1
               </div>
               <h3 className="font-bold mb-2">Weeks 1-6</h3>
@@ -211,7 +211,7 @@ const NicotineReplacementPage: React.FC = () => {
             </div>
             
             <div className="text-center">
-              <div className="bg-[#005eb8] text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
+              <div className="bg-[#0891b2] text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
                 2
               </div>
               <h3 className="font-bold mb-2">Weeks 7-9</h3>
@@ -221,7 +221,7 @@ const NicotineReplacementPage: React.FC = () => {
             </div>
             
             <div className="text-center">
-              <div className="bg-[#005eb8] text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
+              <div className="bg-[#0891b2] text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
                 3
               </div>
               <h3 className="font-bold mb-2">Weeks 10-12</h3>
@@ -290,7 +290,7 @@ const NicotineReplacementPage: React.FC = () => {
         </div>
 
         {/* Next steps */}
-        <div className="bg-[#005eb8] text-white p-8 rounded-lg">
+        <div className="bg-[#0891b2] text-white p-8 rounded-lg">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-4">Ready to start NRT?</h2>
             <p className="mb-6">
@@ -299,7 +299,7 @@ const NicotineReplacementPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/account/appointments/book"
-                className="bg-white text-[#005eb8] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
+                className="bg-white text-[#0891b2] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
               >
                 Book NRT consultation
               </Link>

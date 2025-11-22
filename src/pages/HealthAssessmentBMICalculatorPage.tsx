@@ -6,7 +6,7 @@ import Breadcrumbs from '../components/Breadcrumbs';
 const HealthAssessmentBMICalculatorPage: React.FC = () => {
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <Breadcrumbs
             items={[
@@ -55,7 +55,7 @@ const HealthAssessmentBMICalculatorPage: React.FC = () => {
                 <li>Joint pain and mobility issues</li>
               </ul>
               <div className="mt-6">
-                <Link to="/live-well/healthy-weight" className="text-[#005eb8] font-medium hover:underline">
+                <Link to="/live-well/healthy-weight" className="text-[#0891b2] font-medium hover:underline">
                   Learn more about maintaining a healthy weight
                 </Link>
               </div>
@@ -70,9 +70,9 @@ const HealthAssessmentBMICalculatorPage: React.FC = () => {
               to="/tools/health-assessments/health-check"
               className="bg-[#f0f4f5] p-5 rounded-md hover:bg-[#e8edee] transition-colors flex flex-col"
             >
-              <h3 className="text-lg font-bold mb-2 text-[#005eb8]">Health Check Assessment</h3>
+              <h3 className="text-lg font-bold mb-2 text-[#0891b2]">Health Check Assessment</h3>
               <p className="text-sm text-gray-600 mb-3">Take our comprehensive health check to evaluate your overall wellbeing.</p>
-              <span className="text-[#005eb8] font-medium mt-auto flex items-center">
+              <span className="text-[#0891b2] font-medium mt-auto flex items-center">
                 Start assessment
                 <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -83,9 +83,9 @@ const HealthAssessmentBMICalculatorPage: React.FC = () => {
               to="/tools/health-assessments/mental-wellbeing"
               className="bg-[#f0f4f5] p-5 rounded-md hover:bg-[#e8edee] transition-colors flex flex-col"
             >
-              <h3 className="text-lg font-bold mb-2 text-[#005eb8]">Mental Wellbeing Assessment</h3>
+              <h3 className="text-lg font-bold mb-2 text-[#0891b2]">Mental Wellbeing Assessment</h3>
               <p className="text-sm text-gray-600 mb-3">Evaluate your mental health and get personalized recommendations.</p>
-              <span className="text-[#005eb8] font-medium mt-auto flex items-center">
+              <span className="text-[#0891b2] font-medium mt-auto flex items-center">
                 Start assessment
                 <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -96,9 +96,9 @@ const HealthAssessmentBMICalculatorPage: React.FC = () => {
               to="/tools/weight-gain-calculator"
               className="bg-[#f0f4f5] p-5 rounded-md hover:bg-[#e8edee] transition-colors flex flex-col"
             >
-              <h3 className="text-lg font-bold mb-2 text-[#005eb8]">Weight Gain Calculator</h3>
+              <h3 className="text-lg font-bold mb-2 text-[#0891b2]">Weight Gain Calculator</h3>
               <p className="text-sm text-gray-600 mb-3">Track healthy weight gain during pregnancy with our specialized calculator.</p>
-              <span className="text-[#005eb8] font-medium mt-auto flex items-center">
+              <span className="text-[#0891b2] font-medium mt-auto flex items-center">
                 Use calculator
                 <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

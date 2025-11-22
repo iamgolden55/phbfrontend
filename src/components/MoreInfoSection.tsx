@@ -37,7 +37,7 @@ const MoreInfoSection: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {infoItems.map((item, index) => (
             <div key={index} className="border-b border-gray-300 pb-6">
-              <h3 className="text-lg font-bold text-[#005eb8] mb-3">
+              <h3 className="text-lg font-bold text-[#0891b2] mb-3">
                 <a href={item.href} className="hover:underline">
                   {item.title}
                 </a>

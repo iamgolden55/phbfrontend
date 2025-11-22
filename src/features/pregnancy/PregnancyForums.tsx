@@ -298,7 +298,7 @@ const PregnancyForums: React.FC = () => {
         {/* Navigation breadcrumbs */}
         <div className="flex items-center mb-6 text-sm">
           <button
-            className="text-[#005eb8] hover:underline"
+            className="text-[#0891b2] hover:underline"
             onClick={handleBackToCategories}
           >
             Forums
@@ -310,7 +310,7 @@ const PregnancyForums: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
               <button
-                className={`${selectedTopic ? 'text-[#005eb8] hover:underline' : 'text-gray-700'}`}
+                className={`${selectedTopic ? 'text-[#0891b2] hover:underline' : 'text-gray-700'}`}
                 onClick={handleBackToTopics}
                 disabled={!selectedTopic}
               >
@@ -355,7 +355,7 @@ const PregnancyForums: React.FC = () => {
                 onClick={() => handleCategoryClick(category)}
               >
                 <div className="flex items-center">
-                  <div className="text-[#005eb8] mr-4">
+                  <div className="text-[#0891b2] mr-4">
                     {category.icon}
                   </div>
                   <div className="flex-grow">
@@ -363,7 +363,7 @@ const PregnancyForums: React.FC = () => {
                     <p className="text-gray-600 text-sm">{category.description}</p>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-[#005eb8]">{category.topics}</div>
+                    <div className="font-bold text-[#0891b2]">{category.topics}</div>
                     <div className="text-gray-500 text-sm">Topics</div>
                   </div>
                 </div>
@@ -374,19 +374,19 @@ const PregnancyForums: React.FC = () => {
               <h4 className="font-bold mb-2">Community Statistics</h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-[#005eb8]">1,085</div>
+                  <div className="text-2xl font-bold text-[#0891b2]">1,085</div>
                   <div className="text-sm text-gray-600">Members</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-[#005eb8]">1,142</div>
+                  <div className="text-2xl font-bold text-[#0891b2]">1,142</div>
                   <div className="text-sm text-gray-600">Topics</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-[#005eb8]">15,678</div>
+                  <div className="text-2xl font-bold text-[#0891b2]">15,678</div>
                   <div className="text-sm text-gray-600">Posts</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-[#005eb8]">264</div>
+                  <div className="text-2xl font-bold text-[#0891b2]">264</div>
                   <div className="text-sm text-gray-600">Online Today</div>
                 </div>
               </div>
@@ -399,7 +399,7 @@ const PregnancyForums: React.FC = () => {
           <div>
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold">{selectedCategory.name}</h3>
-              <button className="bg-[#005eb8] text-white px-4 py-2 rounded-md hover:bg-[#004c93]">
+              <button className="bg-[#0891b2] text-white px-4 py-2 rounded-md hover:bg-[#004c93]">
                 New Topic
               </button>
             </div>
@@ -429,7 +429,7 @@ const PregnancyForums: React.FC = () => {
                         <div>
                           <div className="font-medium">{topic.title}</div>
                           <div className="text-sm text-gray-500">
-                            by <span className="text-[#005eb8]">{topic.author}</span> • {new Date(topic.datePosted).toLocaleDateString()}
+                            by <span className="text-[#0891b2]">{topic.author}</span> • {new Date(topic.datePosted).toLocaleDateString()}
                           </div>
                         </div>
                       </div>
@@ -443,7 +443,7 @@ const PregnancyForums: React.FC = () => {
                     <div className="col-span-3 text-right text-sm">
                       {topic.lastReply ? (
                         <div>
-                          <div className="text-[#005eb8]">{topic.lastReply.author}</div>
+                          <div className="text-[#0891b2]">{topic.lastReply.author}</div>
                           <div className="text-gray-500">{new Date(topic.lastReply.date).toLocaleDateString()}</div>
                         </div>
                       ) : (
@@ -456,7 +456,7 @@ const PregnancyForums: React.FC = () => {
             ) : (
               <div className="text-center py-10 text-gray-500">
                 <p>No topics have been created in this category yet.</p>
-                <button className="mt-4 bg-[#005eb8] text-white px-4 py-2 rounded-md hover:bg-[#004c93]">
+                <button className="mt-4 bg-[#0891b2] text-white px-4 py-2 rounded-md hover:bg-[#004c93]">
                   Be the first to post
                 </button>
               </div>
@@ -489,7 +489,7 @@ const PregnancyForums: React.FC = () => {
                       />
                       <div className="flex-grow">
                         <div className="flex justify-between">
-                          <div className="font-bold text-[#005eb8]">{post.author}</div>
+                          <div className="font-bold text-[#0891b2]">{post.author}</div>
                           <div className="text-sm text-gray-500">
                             {new Date(post.datePosted).toLocaleString()}
                           </div>
@@ -537,7 +537,7 @@ const PregnancyForums: React.FC = () => {
                 <div className="mt-4 flex justify-end">
                   <button
                     type="submit"
-                    className="bg-[#005eb8] text-white px-6 py-2 rounded-md hover:bg-[#004c93]"
+                    className="bg-[#0891b2] text-white px-6 py-2 rounded-md hover:bg-[#004c93]"
                     disabled={newPostContent.trim() === ''}
                   >
                     Post Reply
@@ -553,7 +553,7 @@ const PregnancyForums: React.FC = () => {
           <h3 className="font-bold mb-2">Join Our Community</h3>
           <p className="mb-4">Create an account to start new topics and join the conversation with other members.</p>
           <div className="flex justify-center space-x-4">
-            <button className="bg-[#005eb8] text-white px-6 py-2 rounded-md hover:bg-[#004c93]">
+            <button className="bg-[#0891b2] text-white px-6 py-2 rounded-md hover:bg-[#004c93]">
               Sign Up
             </button>
             <button className="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-100">

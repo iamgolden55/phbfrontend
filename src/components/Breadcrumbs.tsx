@@ -84,7 +84,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ customItems }) => {
               ) : (
                 <Link
                   to={breadcrumb.path}
-                  className="text-[#005eb8] hover:underline"
+                  className="text-[#0891b2] hover:underline"
                 >
                   {breadcrumb.label}
                 </Link>

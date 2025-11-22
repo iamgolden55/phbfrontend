@@ -147,7 +147,7 @@ const PregnancyCarePage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Pregnancy Care</h1>
           <p className="text-xl font-medium">
@@ -218,28 +218,28 @@ const PregnancyCarePage: React.FC = () => {
 
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-bold text-[#005eb8]">Create a birth plan</h3>
+                  <h3 className="font-bold text-[#0891b2]">Create a birth plan</h3>
                   <p className="text-gray-600 mt-1">
                     A birth plan outlines your preferences for labor and delivery. Discuss your plan with your healthcare provider to ensure it's realistic and safe.
                   </p>
                 </div>
 
                 <div>
-                  <h3 className="font-bold text-[#005eb8]">Pack your hospital bag</h3>
+                  <h3 className="font-bold text-[#0891b2]">Pack your hospital bag</h3>
                   <p className="text-gray-600 mt-1">
                     Have your hospital bag packed by 36 weeks with essentials for you, your baby, and your partner. Include important documents, comfort items, and necessities for your stay.
                   </p>
                 </div>
 
                 <div>
-                  <h3 className="font-bold text-[#005eb8]">Prepare your home</h3>
+                  <h3 className="font-bold text-[#0891b2]">Prepare your home</h3>
                   <p className="text-gray-600 mt-1">
                     Set up the nursery, stock up on baby supplies, and prepare meals that can be frozen and easily reheated after your baby arrives.
                   </p>
                 </div>
 
                 <div>
-                  <h3 className="font-bold text-[#005eb8]">Arrange for help</h3>
+                  <h3 className="font-bold text-[#0891b2]">Arrange for help</h3>
                   <p className="text-gray-600 mt-1">
                     Organize support for the early weeks after birth. Consider who can help with household tasks, meal preparation, and giving you time to rest.
                   </p>
@@ -251,14 +251,14 @@ const PregnancyCarePage: React.FC = () => {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm overflow-hidden sticky top-4">
-              <div className="bg-[#005eb8] text-white p-4">
+              <div className="bg-[#0891b2] text-white p-4">
                 <h2 className="text-xl font-bold">On This Page</h2>
               </div>
               <div className="p-4">
                 <ul className="space-y-2">
                   {careTopics.map((topic) => (
                     <li key={topic.id}>
-                      <a href={`#${topic.id}`} className="text-[#005eb8] hover:underline">
+                      <a href={`#${topic.id}`} className="text-[#0891b2] hover:underline">
                         {topic.title}
                       </a>
                     </li>
@@ -269,22 +269,22 @@ const PregnancyCarePage: React.FC = () => {
                   <h3 className="font-bold mb-3">Related Pages</h3>
                   <ul className="space-y-2">
                     <li>
-                      <Link to="/pregnancy/health" className="text-[#005eb8] hover:underline">
+                      <Link to="/pregnancy/health" className="text-[#0891b2] hover:underline">
                         Health in Pregnancy
                       </Link>
                     </li>
                     <li>
-                      <Link to="/pregnancy/nutrition-guide" className="text-[#005eb8] hover:underline">
+                      <Link to="/pregnancy/nutrition-guide" className="text-[#0891b2] hover:underline">
                         Pregnancy Nutrition Guide
                       </Link>
                     </li>
                     <li>
-                      <Link to="/pregnancy/birth-plan-creator" className="text-[#005eb8] hover:underline">
+                      <Link to="/pregnancy/birth-plan-creator" className="text-[#0891b2] hover:underline">
                         Birth Plan Creator
                       </Link>
                     </li>
                     <li>
-                      <Link to="/tools/weight-gain-calculator" className="text-[#005eb8] hover:underline">
+                      <Link to="/tools/weight-gain-calculator" className="text-[#0891b2] hover:underline">
                         Weight Gain Calculator
                       </Link>
                     </li>

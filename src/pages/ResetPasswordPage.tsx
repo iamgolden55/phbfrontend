@@ -7,7 +7,7 @@ const ResetPasswordPage: React.FC = () => {
     <div className="bg-gray-100">
       <div className="phb-container py-8">
         <div className="mb-6">
-          <Link to="/login" className="text-[#005eb8] hover:underline flex items-center">
+          <Link to="/login" className="text-[#0891b2] hover:underline flex items-center">
             <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>

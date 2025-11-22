@@ -9,7 +9,7 @@ interface ContactFormProps {
 const ContactForm: React.FC<ContactFormProps> = ({
   title = "Contact Us",
   subtitle = "Have questions about PHB? We're here to help.",
-  primaryColor = "#005eb8"
+  primaryColor = "#0891b2"
 }) => {
   const [formData, setFormData] = useState({
     name: '',

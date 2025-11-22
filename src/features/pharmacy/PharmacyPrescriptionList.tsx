@@ -577,7 +577,7 @@ const PharmacyPrescriptionList: React.FC<PharmacyPrescriptionListProps> = ({
           <strong>Accessed:</strong> {new Date(accessedAt).toLocaleString()} by {accessedBy.pharmacist}
           (License: {accessedBy.license_number}) at {accessedBy.pharmacy}
           <br />
-          <strong>Note:</strong> This access has been logged for audit compliance (NHS EPS standard)
+          <strong>Note:</strong> This access has been logged for audit compliance
         </Typography>
       </Paper>
 

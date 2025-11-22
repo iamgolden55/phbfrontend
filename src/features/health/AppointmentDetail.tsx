@@ -317,7 +317,7 @@ const AppointmentDetail: React.FC = () => {
       <div className="bg-white p-6 rounded-lg shadow-sm">
         {loading ? (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#005eb8]"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0891b2]"></div>
             <span className="ml-3 text-gray-700">Loading appointment details...</span>
           </div>
         ) : error ? (

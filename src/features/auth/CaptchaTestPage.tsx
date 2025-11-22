@@ -145,7 +145,7 @@ const CaptchaTestPage: React.FC = () => {
         <div className="flex space-x-2">
           <select 
             id="api-endpoint"
-            className="flex-grow px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+            className="flex-grow px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2]"
             value={apiEndpoint}
             onChange={(e) => setApiEndpoint(e.target.value)}
           >
@@ -198,7 +198,7 @@ const CaptchaTestPage: React.FC = () => {
           <input
             type="text"
             id="email"
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2]"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
@@ -213,7 +213,7 @@ const CaptchaTestPage: React.FC = () => {
           <input
             type="password"
             id="password"
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2]"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter your password"
@@ -235,7 +235,7 @@ const CaptchaTestPage: React.FC = () => {
               <input
                 type="text"
                 id="captcha-answer"
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2]"
                 value={captchaAnswer}
                 onChange={(e) => setCaptchaAnswer(e.target.value)}
                 placeholder="Enter your answer"
@@ -247,7 +247,7 @@ const CaptchaTestPage: React.FC = () => {
 
         <button
           type="submit"
-          className="w-full bg-[#005eb8] text-white py-2 px-4 rounded hover:bg-[#003f7e] transition-colors"
+          className="w-full bg-[#0891b2] text-white py-2 px-4 rounded hover:bg-[#0e7490] transition-colors"
           disabled={isLoading}
         >
           {isLoading ? 'Processing...' : captchaRequired ? 'Verify & Sign in' : 'Sign in'}

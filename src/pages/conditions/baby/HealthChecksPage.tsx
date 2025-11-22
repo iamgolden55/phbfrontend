@@ -142,7 +142,7 @@ const HealthChecksPage: React.FC = () => {
 
   return (
     <div className="bg-white min-h-screen">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <Breadcrumbs
             items={[
@@ -195,11 +195,11 @@ const HealthChecksPage: React.FC = () => {
             {healthChecks.map((check, index) => (
               <div key={index} className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
                 <div className="flex items-center mb-4">
-                  <div className="bg-[#005eb8] text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-4">
+                  <div className="bg-[#0891b2] text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-4">
                     {index + 1}
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-[#005eb8]">{check.age}</h3>
+                    <h3 className="text-xl font-bold text-[#0891b2]">{check.age}</h3>
                     <p className="text-gray-600">{check.timing}</p>
                   </div>
                 </div>
@@ -279,7 +279,7 @@ const HealthChecksPage: React.FC = () => {
           <h2 className="text-2xl font-bold mb-6">Preparing for health checks</h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-[#f0f4f5] p-6 rounded-lg">
-              <h3 className="text-xl font-bold mb-4 text-[#005eb8]">What to bring</h3>
+              <h3 className="text-xl font-bold mb-4 text-[#0891b2]">What to bring</h3>
               <ul className="space-y-2">
                 <li className="flex items-start">
                   <svg className="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -315,7 +315,7 @@ const HealthChecksPage: React.FC = () => {
             </div>
 
             <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-              <h3 className="text-xl font-bold mb-4 text-[#005eb8]">Questions to consider asking</h3>
+              <h3 className="text-xl font-bold mb-4 text-[#0891b2]">Questions to consider asking</h3>
               <ul className="space-y-2 text-sm">
                 <li>• Is my baby's growth and development on track?</li>
                 <li>• Are there any activities I can do to support development?</li>

@@ -36,20 +36,20 @@ body {
   --popover: 0 0% 100%;
   --popover-foreground: 240 10% 3.9%;
 
-  /* PHB Blue - main brand color */
-  --phb-blue: 210 70% 35%;
-  --phb-light-blue: 210 60% 95%;
+  /* PHB Brand Colors - distinct from NHS */
+  --phb-blue: 200 85% 40%;
+  --phb-light-blue: 200 75% 95%;
 
   --primary: var(--phb-blue);
   --primary-foreground: 0 0% 100%;
-  --secondary: 210 40% 96.1%;
+  --secondary: 200 45% 96%;
   --secondary-foreground: 222.2 47.4% 11.2%;
-  --muted: 210 40% 96.1%;
+  --muted: 200 45% 96%;
   --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 210 40% 96.1%;
+  --accent: 200 45% 96%;
   --accent-foreground: 222.2 47.4% 11.2%;
   --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
+  --destructive-foreground: 200 45% 98%;
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
   --ring: var(--phb-blue);
@@ -93,11 +93,11 @@ body {
   }
 
   .phb-link {
-    @apply text-[#005eb8] hover:underline font-medium;
+    @apply text-[#0891b2] hover:underline font-medium;
   }
 
   .phb-button {
-    @apply bg-[#005eb8] text-white px-5 py-2 rounded-md hover:bg-[#003f7e] transition-colors font-bold;
+    @apply bg-[#0891b2] text-white px-5 py-2 rounded-md hover:bg-[#0e7490] transition-colors font-bold;
   }
 
   .phb-card {

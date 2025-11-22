@@ -63,7 +63,7 @@ const UniversityPartnershipsPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Header */}
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">University Partnerships</h1>
           <p className="text-xl font-medium">
@@ -91,7 +91,7 @@ const UniversityPartnershipsPage: React.FC = () => {
           {/* Main Content Area - 2/3 width on large screens */}
           <div className="lg:col-span-2">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">About Our University Partnerships</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">About Our University Partnerships</h2>
               <p className="mb-4">
                 The PHB University Partnerships program fosters collaboration between PHB and academic institutions
                 throughout Nigeria. These strategic partnerships aim to strengthen public health education, research,
@@ -146,7 +146,7 @@ const UniversityPartnershipsPage: React.FC = () => {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Partnership Areas</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Partnership Areas</h2>
               <p className="mb-6">
                 Our university partnerships encompass various collaborative initiatives across the following areas:
               </p>
@@ -167,7 +167,7 @@ const UniversityPartnershipsPage: React.FC = () => {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Benefits for Universities</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Benefits for Universities</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="border-l-4 border-blue-500 pl-4">
                   <h3 className="text-xl font-semibold mb-2">Enhanced Curriculum</h3>
@@ -204,7 +204,7 @@ const UniversityPartnershipsPage: React.FC = () => {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Partnership Process</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Partnership Process</h2>
               <div className="space-y-6">
                 <div className="flex items-start">
                   <div className="bg-blue-100 rounded-full w-10 h-10 flex items-center justify-center text-blue-600 font-bold mr-4 flex-shrink-0">
@@ -274,13 +274,13 @@ const UniversityPartnershipsPage: React.FC = () => {
             </div>
 
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8">
-              <h2 className="text-xl font-bold text-[#005eb8] mb-2">Coming Soon</h2>
+              <h2 className="text-xl font-bold text-[#0891b2] mb-2">Coming Soon</h2>
               <p className="mb-4">
                 The PHB University Partnerships Program is currently under development and will be launching soon.
                 Interested universities can register below to receive updates when the program opens for applications.
               </p>
               <div className="flex justify-center mt-4">
-                <button className="bg-[#005eb8] text-white px-6 py-3 rounded-md hover:bg-[#003f7e] transition-colors font-medium">
+                <button className="bg-[#0891b2] text-white px-6 py-3 rounded-md hover:bg-[#0e7490] transition-colors font-medium">
                   Register Interest
                 </button>
               </div>
@@ -331,12 +331,12 @@ const UniversityPartnershipsPage: React.FC = () => {
                 />
               </div>
               <div className="p-5">
-                <h3 className="text-lg font-bold text-[#005eb8] mb-3">Student Recruitment Program</h3>
+                <h3 className="text-lg font-bold text-[#0891b2] mb-3">Student Recruitment Program</h3>
                 <p className="text-gray-600 mb-4">
                   A key benefit for partner universities is participation in our Student Recruitment Program, where final year
                   students can be nominated for mentorship and potential career opportunities with PHB.
                 </p>
-                <Link to="/programs/student-recruitment" className="text-[#005eb8] font-medium hover:underline">
+                <Link to="/programs/student-recruitment" className="text-[#0891b2] font-medium hover:underline">
                   Learn more
                 </Link>
               </div>
@@ -345,10 +345,10 @@ const UniversityPartnershipsPage: React.FC = () => {
             {/* Related Programs */}
             <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
               <div className="p-5">
-                <h3 className="text-lg font-bold text-[#005eb8] mb-3">Related Programs</h3>
+                <h3 className="text-lg font-bold text-[#0891b2] mb-3">Related Programs</h3>
                 <ul className="space-y-3">
                   <li>
-                    <Link to="/programs/student-recruitment" className="text-[#005eb8] hover:underline flex items-center">
+                    <Link to="/programs/student-recruitment" className="text-[#0891b2] hover:underline flex items-center">
                       <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
@@ -356,7 +356,7 @@ const UniversityPartnershipsPage: React.FC = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/programs/research" className="text-[#005eb8] hover:underline flex items-center">
+                    <Link to="/programs/research" className="text-[#0891b2] hover:underline flex items-center">
                       <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
@@ -364,7 +364,7 @@ const UniversityPartnershipsPage: React.FC = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/programs/mentorship" className="text-[#005eb8] hover:underline flex items-center">
+                    <Link to="/programs/mentorship" className="text-[#0891b2] hover:underline flex items-center">
                       <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
@@ -381,13 +381,13 @@ const UniversityPartnershipsPage: React.FC = () => {
               <p className="mb-4">For more information about university partnerships:</p>
               <div className="space-y-2">
                 <div className="flex items-start">
-                  <svg className="h-5 w-5 mr-2 mt-0.5 text-[#005eb8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-5 w-5 mr-2 mt-0.5 text-[#0891b2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                   <span>partnerships@phb.gov.ng</span>
                 </div>
                 <div className="flex items-start">
-                  <svg className="h-5 w-5 mr-2 mt-0.5 text-[#005eb8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-5 w-5 mr-2 mt-0.5 text-[#0891b2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
                   <span>+234 (0) 123 456 7890</span>

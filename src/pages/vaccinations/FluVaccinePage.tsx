@@ -5,7 +5,7 @@ import Breadcrumbs from '../../components/Breadcrumbs';
 const FluVaccinePage: React.FC = () => {
   return (
     <div className="bg-white min-h-screen">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <Breadcrumbs
             items={[
@@ -87,13 +87,13 @@ const FluVaccinePage: React.FC = () => {
                 <div className="flex space-x-4 mt-4">
                   <Link
                     to="/find-pharmacy"
-                    className="bg-[#005eb8] text-white px-6 py-2 rounded-md hover:bg-[#004b93] transition-colors"
+                    className="bg-[#0891b2] text-white px-6 py-2 rounded-md hover:bg-[#004b93] transition-colors"
                   >
                     Find a pharmacy
                   </Link>
                   <Link
                     to="/find-a-gp"
-                    className="bg-[#005eb8] text-white px-6 py-2 rounded-md hover:bg-[#004b93] transition-colors"
+                    className="bg-[#0891b2] text-white px-6 py-2 rounded-md hover:bg-[#004b93] transition-colors"
                   >
                     Find a GP
                   </Link>
@@ -129,7 +129,7 @@ const FluVaccinePage: React.FC = () => {
               <h2 className="text-xl font-bold mb-4">Related information</h2>
               <ul className="space-y-3">
                 <li>
-                  <Link to="/vaccinations" className="text-[#005eb8] hover:underline font-medium flex items-center">
+                  <Link to="/vaccinations" className="text-[#0891b2] hover:underline font-medium flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -137,7 +137,7 @@ const FluVaccinePage: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/health-a-z/flu" className="text-[#005eb8] hover:underline font-medium flex items-center">
+                  <Link to="/health-a-z/flu" className="text-[#0891b2] hover:underline font-medium flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -145,7 +145,7 @@ const FluVaccinePage: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/vaccinations/covid-19-vaccine" className="text-[#005eb8] hover:underline font-medium flex items-center">
+                  <Link to="/vaccinations/covid-19-vaccine" className="text-[#0891b2] hover:underline font-medium flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>

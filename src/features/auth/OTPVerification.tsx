@@ -181,7 +181,7 @@ const OTPVerification: React.FC = () => {
             onChange={e => handleChange(index, e.target.value)}
             onKeyDown={e => handleKeyDown(index, e)}
             maxLength={1}
-            className="w-full h-14 text-center text-xl border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+            className="w-full h-14 text-center text-xl border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2]"
             inputMode="numeric"
             autoComplete="one-time-code"
           />
@@ -190,7 +190,7 @@ const OTPVerification: React.FC = () => {
 
       <button
         onClick={() => handleSubmit()}
-        className="w-full bg-[#005eb8] text-white py-3 px-4 rounded hover:bg-[#003f7e] transition-colors mb-4 disabled:opacity-50"
+        className="w-full bg-[#0891b2] text-white py-3 px-4 rounded hover:bg-[#0e7490] transition-colors mb-4 disabled:opacity-50"
         disabled={otp.some(digit => digit === '') || isLoading}
       >
         {isLoading ? 'Verifying...' : 'Verify'}
@@ -203,7 +203,7 @@ const OTPVerification: React.FC = () => {
         {canResend ? (
           <button
             onClick={handleResendOTP}
-            className="text-[#005eb8] hover:underline"
+            className="text-[#0891b2] hover:underline"
             disabled={isLoading || resendAttempting}
           >
             {resendAttempting ? 'Requesting...' : 'Request New Code'}
@@ -217,7 +217,7 @@ const OTPVerification: React.FC = () => {
 
       <div className="mt-6 pt-4 border-t border-gray-200 text-center">
         <p className="text-gray-600">
-          Having trouble? <button onClick={() => window.location.href='/login'} className="text-[#005eb8] hover:underline">Return to login</button>
+          Having trouble? <button onClick={() => window.location.href='/login'} className="text-[#0891b2] hover:underline">Return to login</button>
         </p>
       </div>
     </div>

@@ -54,7 +54,7 @@ const SearchPage: React.FC = () => {
   return (
     <div className="bg-white min-h-screen">
       {/* Header */}
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Search Results</h1>
           <p className="text-xl font-medium">
@@ -196,7 +196,7 @@ const SearchPage: React.FC = () => {
               <div className="space-y-8">
                 {Object.entries(groupedResults).map(([category, categoryResults]) => (
                   <div key={category}>
-                    <h2 className="text-xl font-bold mb-4 text-[#005eb8] border-b pb-2">{category}</h2>
+                    <h2 className="text-xl font-bold mb-4 text-[#0891b2] border-b pb-2">{category}</h2>
                     <ul className="divide-y divide-gray-100">
                       {categoryResults.map((result, index) => (
                         <li key={index} className="py-4">
@@ -214,7 +214,7 @@ const SearchPage: React.FC = () => {
             ) : (
               // Display filtered results when a category is selected
               <div>
-                <h2 className="text-xl font-bold mb-4 text-[#005eb8] border-b pb-2">
+                <h2 className="text-xl font-bold mb-4 text-[#0891b2] border-b pb-2">
                   {selectedCategory} ({filteredResults.length} {filteredResults.length === 1 ? 'result' : 'results'})
                 </h2>
                 {filteredResults.length > 0 ? (

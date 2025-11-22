@@ -361,7 +361,7 @@ const RegisterForm: React.FC = () => {
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
                     ${currentStep === step.id
-                      ? 'bg-[#005eb8] text-white'
+                      ? 'bg-[#0891b2] text-white'
                       : currentStepIndex > index
                         ? 'bg-green-500 text-white'
                         : 'bg-gray-200 text-gray-600'}`}
@@ -411,7 +411,7 @@ const RegisterForm: React.FC = () => {
               <input
                 type="text"
                 id="name"
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8] ${
+                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2] ${
                   formErrors.name ? 'border-red-500' : 'border-gray-300'
                 }`}
                 value={name}
@@ -430,7 +430,7 @@ const RegisterForm: React.FC = () => {
               <input
                 type="email"
                 id="email"
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8] ${
+                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2] ${
                   formErrors.email ? 'border-red-500' : 'border-gray-300'
                 }`}
                 value={email}
@@ -450,7 +450,7 @@ const RegisterForm: React.FC = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
-                  className={`w-full px-4 py-2 pr-10 border rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8] ${
+                  className={`w-full px-4 py-2 pr-10 border rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2] ${
                     formErrors.password ? 'border-red-500' : 'border-gray-300'
                   }`}
                   value={password}
@@ -490,7 +490,7 @@ const RegisterForm: React.FC = () => {
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   id="confirmPassword"
-                  className={`w-full px-4 py-2 pr-10 border rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8] ${
+                  className={`w-full px-4 py-2 pr-10 border rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2] ${
                     formErrors.confirmPassword ? 'border-red-500' : 'border-gray-300'
                   }`}
                   value={confirmPassword}
@@ -533,7 +533,7 @@ const RegisterForm: React.FC = () => {
               </label>
               <select
                 id="gender"
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8] ${
+                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2] ${
                   formErrors.gender ? 'border-red-500' : 'border-gray-300'
                 }`}
                 value={gender}
@@ -557,7 +557,7 @@ const RegisterForm: React.FC = () => {
               <input
                 type="date"
                 id="dateOfBirth"
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8] ${
+                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2] ${
                   formErrors.dateOfBirth ? 'border-red-500' : 'border-gray-300'
                 }`}
                 value={dateOfBirth}
@@ -597,7 +597,7 @@ const RegisterForm: React.FC = () => {
               </label>
               <select
                 id="preferredLanguage"
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8] ${
+                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2] ${
                   formErrors.preferredLanguage ? 'border-red-500' : 'border-gray-300'
                 }`}
                 value={preferredLanguage}
@@ -623,7 +623,7 @@ const RegisterForm: React.FC = () => {
                 <input
                   type="text"
                   id="customLanguage"
-                  className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8] ${
+                  className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2] ${
                     formErrors.customLanguage ? 'border-red-500' : 'border-gray-300'
                   }`}
                   value={customLanguage}
@@ -648,7 +648,7 @@ const RegisterForm: React.FC = () => {
                         id={`lang-${language.value}`}
                         checked={secondaryLanguages.includes(language.value)}
                         onChange={() => handleSecondaryLanguageChange(language.value)}
-                        className="h-4 w-4 text-[#005eb8] border-gray-300 rounded focus:ring-[#005eb8]"
+                        className="h-4 w-4 text-[#0891b2] border-gray-300 rounded focus:ring-[#0891b2]"
                       />
                       <label htmlFor={`lang-${language.value}`} className="ml-2 text-sm">
                         {language.label}
@@ -671,7 +671,7 @@ const RegisterForm: React.FC = () => {
               </label>
               <select
                 id="country"
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8] ${
+                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2] ${
                   formErrors.country ? 'border-red-500' : 'border-gray-300'
                 }`}
                 value={country}
@@ -698,7 +698,7 @@ const RegisterForm: React.FC = () => {
                 <>
                   <select
                     id="state"
-                    className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8] ${
+                    className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2] ${
                       formErrors.state ? 'border-red-500' : 'border-gray-300'
                     }`}
                     value={state}
@@ -720,7 +720,7 @@ const RegisterForm: React.FC = () => {
                   <input
                     type="text"
                     id="state"
-                    className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8] ${
+                    className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2] ${
                       formErrors.state ? 'border-red-500' : 'border-gray-300'
                     }`}
                     value={state}
@@ -741,7 +741,7 @@ const RegisterForm: React.FC = () => {
               <input
                 type="text"
                 id="city"
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8] ${
+                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2] ${
                   formErrors.city ? 'border-red-500' : 'border-gray-300'
                 }`}
                 value={city}
@@ -762,7 +762,7 @@ const RegisterForm: React.FC = () => {
                 <input
                   type="text"
                   id="nin"
-                  className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8] ${
+                  className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2] ${
                     formErrors.nin ? 'border-red-500' : 'border-gray-300'
                   }`}
                   value={nin}
@@ -786,7 +786,7 @@ const RegisterForm: React.FC = () => {
                 <input
                   type="text"
                   id="ssn"
-                  className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8] ${
+                  className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2] ${
                     formErrors.ssn ? 'border-red-500' : 'border-gray-300'
                   }`}
                   value={ssn}
@@ -881,7 +881,7 @@ const RegisterForm: React.FC = () => {
                   <input
                     type="checkbox"
                     id="terms"
-                    className="h-4 w-4 text-[#005eb8] border-gray-300 rounded focus:ring-[#005eb8]"
+                    className="h-4 w-4 text-[#0891b2] border-gray-300 rounded focus:ring-[#0891b2]"
                     checked={consentTerms}
                     onChange={(e) => setConsentTerms(e.target.checked)}
                   />
@@ -889,7 +889,7 @@ const RegisterForm: React.FC = () => {
                 <div className="ml-3 text-sm">
                   <label htmlFor="terms" className="text-gray-700">
                     I agree to the{' '}
-                    <Link to="/terms" className="text-[#005eb8] hover:underline">
+                    <Link to="/terms" className="text-[#0891b2] hover:underline">
                       Terms and Conditions
                     </Link>
                   </label>
@@ -904,7 +904,7 @@ const RegisterForm: React.FC = () => {
                   <input
                     type="checkbox"
                     id="hipaa"
-                    className="h-4 w-4 text-[#005eb8] border-gray-300 rounded focus:ring-[#005eb8]"
+                    className="h-4 w-4 text-[#0891b2] border-gray-300 rounded focus:ring-[#0891b2]"
                     checked={consentHipaa}
                     onChange={(e) => setConsentHipaa(e.target.checked)}
                   />
@@ -912,7 +912,7 @@ const RegisterForm: React.FC = () => {
                 <div className="ml-3 text-sm">
                   <label htmlFor="hipaa" className="text-gray-700">
                     I acknowledge the{' '}
-                    <Link to="/hipaa" className="text-[#005eb8] hover:underline">
+                    <Link to="/hipaa" className="text-[#0891b2] hover:underline">
                       HIPAA Privacy Policy
                     </Link>
                     {' '}and agree that my health information may be used or disclosed as described
@@ -928,7 +928,7 @@ const RegisterForm: React.FC = () => {
                   <input
                     type="checkbox"
                     id="dataProcessing"
-                    className="h-4 w-4 text-[#005eb8] border-gray-300 rounded focus:ring-[#005eb8]"
+                    className="h-4 w-4 text-[#0891b2] border-gray-300 rounded focus:ring-[#0891b2]"
                     checked={consentDataProcessing}
                     onChange={(e) => setConsentDataProcessing(e.target.checked)}
                   />
@@ -936,7 +936,7 @@ const RegisterForm: React.FC = () => {
                 <div className="ml-3 text-sm">
                   <label htmlFor="dataProcessing" className="text-gray-700">
                     I consent to my personal data being processed in accordance with the{' '}
-                    <Link to="/privacy" className="text-[#005eb8] hover:underline">
+                    <Link to="/privacy" className="text-[#0891b2] hover:underline">
                       Privacy Policy
                     </Link>
                   </label>
@@ -1000,14 +1000,14 @@ const RegisterForm: React.FC = () => {
             <button
               type="button"
               onClick={handleNextStep}
-              className="ml-auto px-6 py-2 bg-[#005eb8] text-white rounded hover:bg-[#003f7e] transition-colors"
+              className="ml-auto px-6 py-2 bg-[#0891b2] text-white rounded hover:bg-[#0e7490] transition-colors"
             >
               Continue
             </button>
           ) : (
             <button
               type="submit"
-              className="ml-auto px-6 py-2 bg-[#005eb8] text-white rounded hover:bg-[#003f7e] transition-colors"
+              className="ml-auto px-6 py-2 bg-[#0891b2] text-white rounded hover:bg-[#0e7490] transition-colors"
               disabled={isLoading}
             >
               {isLoading ? 'Creating account...' : 'Create account'}
@@ -1019,7 +1019,7 @@ const RegisterForm: React.FC = () => {
       <div className="mt-6 pt-4 border-t border-gray-200 text-center">
         <p className="text-gray-600">
           Already have an account?{' '}
-          <Link to="/login" className="text-[#005eb8] hover:underline">
+          <Link to="/login" className="text-[#0891b2] hover:underline">
             Sign in
           </Link>
         </p>

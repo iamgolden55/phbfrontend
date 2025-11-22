@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const EatingDisordersPage: React.FC = () => {
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Eating disorders</h1>
           <p className="text-xl font-medium">
@@ -204,7 +204,7 @@ const EatingDisordersPage: React.FC = () => {
             <li><strong>Residential treatment</strong> – Living at a specialized facility for intensive treatment over a longer period</li>
           </ul>
 
-          <Link to="/services/talking-therapies" className="bg-[#005eb8] text-white px-6 py-3 rounded-md hover:bg-[#003f7e] transition-colors inline-block font-medium mt-4">
+          <Link to="/services/talking-therapies" className="bg-[#0891b2] text-white px-6 py-3 rounded-md hover:bg-[#0e7490] transition-colors inline-block font-medium mt-4">
             Find PHB talking therapies
           </Link>
         </div>
@@ -285,7 +285,7 @@ const EatingDisordersPage: React.FC = () => {
             </a>
             <a
               href="tel:111"
-              className="bg-[#005eb8] text-white px-4 py-2 rounded-md hover:bg-[#003f7e] transition-colors text-center font-bold"
+              className="bg-[#0891b2] text-white px-4 py-2 rounded-md hover:bg-[#0e7490] transition-colors text-center font-bold"
             >
               Call PHB 111 for urgent advice
             </a>
@@ -296,15 +296,15 @@ const EatingDisordersPage: React.FC = () => {
           <h2 className="text-2xl font-bold mb-4">Related conditions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <Link to="/mental-health/depression" className="block bg-white p-4 rounded-md shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="font-bold text-[#005eb8]">Depression</h3>
+              <h3 className="font-bold text-[#0891b2]">Depression</h3>
               <p className="text-sm text-gray-600">Information on depression and its treatments</p>
             </Link>
             <Link to="/mental-health/anxiety" className="block bg-white p-4 rounded-md shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="font-bold text-[#005eb8]">Anxiety</h3>
+              <h3 className="font-bold text-[#0891b2]">Anxiety</h3>
               <p className="text-sm text-gray-600">Learn about anxiety disorders and treatments</p>
             </Link>
             <Link to="/mental-health/self-harm" className="block bg-white p-4 rounded-md shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="font-bold text-[#005eb8]">Self-harm</h3>
+              <h3 className="font-bold text-[#0891b2]">Self-harm</h3>
               <p className="text-sm text-gray-600">Information about self-harm and support</p>
             </Link>
           </div>

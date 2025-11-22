@@ -101,7 +101,7 @@ const BMICalculator: React.FC = () => {
             onClick={() => handleUnitSystemChange('metric')}
             className={`px-4 py-2 rounded-l-md ${
               unitSystem === 'metric'
-                ? 'bg-[#005eb8] text-white'
+                ? 'bg-[#0891b2] text-white'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
@@ -111,7 +111,7 @@ const BMICalculator: React.FC = () => {
             onClick={() => handleUnitSystemChange('imperial')}
             className={`px-4 py-2 rounded-r-md ${
               unitSystem === 'imperial'
-                ? 'bg-[#005eb8] text-white'
+                ? 'bg-[#0891b2] text-white'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
@@ -132,7 +132,7 @@ const BMICalculator: React.FC = () => {
             value={height}
             onChange={handleHeightChange}
             placeholder={unitSystem === 'metric' ? 'e.g., 175' : 'e.g., 69'}
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2]"
           />
         </div>
         <div className="mb-4">
@@ -145,7 +145,7 @@ const BMICalculator: React.FC = () => {
             value={weight}
             onChange={handleWeightChange}
             placeholder={unitSystem === 'metric' ? 'e.g., 70' : 'e.g., 160'}
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#0891b2]"
           />
         </div>
       </div>
@@ -153,7 +153,7 @@ const BMICalculator: React.FC = () => {
       {/* Calculate button */}
       <button
         onClick={calculateBMI}
-        className="bg-[#005eb8] text-white px-6 py-2 rounded-md hover:bg-[#003f7e] transition-colors w-full md:w-auto"
+        className="bg-[#0891b2] text-white px-6 py-2 rounded-md hover:bg-[#0e7490] transition-colors w-full md:w-auto"
       >
         Calculate BMI
       </button>

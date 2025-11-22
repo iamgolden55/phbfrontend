@@ -71,7 +71,7 @@ const HealthAZPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Health A to Z</h1>
           <p className="text-xl font-medium">Find conditions and treatments information by selecting a letter</p>
@@ -103,13 +103,13 @@ const HealthAZPage: React.FC = () => {
               type="search"
               id="health-search"
               placeholder="Search by condition or symptom"
-              className="px-4 py-2 border border-gray-300 rounded-l-md w-full focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+              className="px-4 py-2 border border-gray-300 rounded-l-md w-full focus:outline-none focus:ring-2 focus:ring-[#0891b2]"
               value={searchTerm}
               onChange={handleSearch}
             />
             <button
               type="submit"
-              className="bg-[#005eb8] hover:bg-[#003f7e] text-white px-4 py-2 rounded-r-md"
+              className="bg-[#0891b2] hover:bg-[#0e7490] text-white px-4 py-2 rounded-r-md"
             >
               Search
             </button>
@@ -126,9 +126,9 @@ const HealthAZPage: React.FC = () => {
                 onClick={() => handleAlphabetClick(letter)}
                 className={`w-10 h-10 flex items-center justify-center rounded-md font-bold text-lg
                   ${activeFilter === letter
-                    ? 'bg-[#005eb8] text-white'
+                    ? 'bg-[#0891b2] text-white'
                     : healthConditions[letter] && healthConditions[letter].length > 0
-                      ? 'bg-gray-100 hover:bg-gray-200 text-[#005eb8]'
+                      ? 'bg-gray-100 hover:bg-gray-200 text-[#0891b2]'
                       : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   }`}
                 disabled={!healthConditions[letter] || healthConditions[letter].length === 0}
@@ -143,7 +143,7 @@ const HealthAZPage: React.FC = () => {
         <div>
           {filteredConditions().map(({ letter, conditions }) => (
             <div key={letter} className="mb-8">
-              <h2 id={`letter-${letter}`} className="text-2xl font-bold mb-4 text-[#005eb8] border-b border-gray-200 pb-2">
+              <h2 id={`letter-${letter}`} className="text-2xl font-bold mb-4 text-[#0891b2] border-b border-gray-200 pb-2">
                 {letter}
               </h2>
               <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -151,7 +151,7 @@ const HealthAZPage: React.FC = () => {
                   <li key={condition.id}>
                     <a
                       href={condition.href}
-                      className="text-[#005eb8] hover:underline font-medium flex items-center"
+                      className="text-[#0891b2] hover:underline font-medium flex items-center"
                     >
                       <svg className="h-5 w-5 mr-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

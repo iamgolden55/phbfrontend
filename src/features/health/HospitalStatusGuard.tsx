@@ -25,7 +25,7 @@ const HospitalStatusGuard: React.FC<HospitalStatusGuardProps> = ({ children }) =
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#005eb8]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0891b2]"></div>
       </div>
     );
   }

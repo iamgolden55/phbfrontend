@@ -159,7 +159,7 @@ const PregnancyHealthPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Health in Pregnancy</h1>
           <p className="text-xl font-medium">
@@ -231,42 +231,42 @@ const PregnancyHealthPage: React.FC = () => {
 
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-bold text-[#005eb8]">Attend all prenatal appointments</h3>
+                  <h3 className="font-bold text-[#0891b2]">Attend all prenatal appointments</h3>
                   <p className="text-gray-600 mt-1">
                     Regular check-ups allow your healthcare provider to monitor your health and your baby's development.
                   </p>
                 </div>
 
                 <div>
-                  <h3 className="font-bold text-[#005eb8]">Stay hydrated</h3>
+                  <h3 className="font-bold text-[#0891b2]">Stay hydrated</h3>
                   <p className="text-gray-600 mt-1">
                     Drink at least 8-10 glasses of water daily to support your increased blood volume and help prevent constipation and UTIs.
                   </p>
                 </div>
 
                 <div>
-                  <h3 className="font-bold text-[#005eb8]">Eat a balanced diet</h3>
+                  <h3 className="font-bold text-[#0891b2]">Eat a balanced diet</h3>
                   <p className="text-gray-600 mt-1">
                     Focus on fruits, vegetables, whole grains, lean proteins, and healthy fats to provide essential nutrients for you and your baby.
                   </p>
                 </div>
 
                 <div>
-                  <h3 className="font-bold text-[#005eb8]">Take prenatal vitamins</h3>
+                  <h3 className="font-bold text-[#0891b2]">Take prenatal vitamins</h3>
                   <p className="text-gray-600 mt-1">
                     These supplements contain important nutrients like folic acid, iron, and calcium that support your baby's development.
                   </p>
                 </div>
 
                 <div>
-                  <h3 className="font-bold text-[#005eb8]">Stay active safely</h3>
+                  <h3 className="font-bold text-[#0891b2]">Stay active safely</h3>
                   <p className="text-gray-600 mt-1">
                     Regular, moderate exercise can help manage weight, reduce stress, and prepare your body for birth. Always consult your healthcare provider before starting or continuing an exercise routine.
                   </p>
                 </div>
 
                 <div>
-                  <h3 className="font-bold text-[#005eb8]">Get adequate rest</h3>
+                  <h3 className="font-bold text-[#0891b2]">Get adequate rest</h3>
                   <p className="text-gray-600 mt-1">
                     Aim for 7-9 hours of sleep per night, and take short rests during the day if needed.
                   </p>
@@ -278,14 +278,14 @@ const PregnancyHealthPage: React.FC = () => {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm overflow-hidden sticky top-4">
-              <div className="bg-[#005eb8] text-white p-4">
+              <div className="bg-[#0891b2] text-white p-4">
                 <h2 className="text-xl font-bold">On This Page</h2>
               </div>
               <div className="p-4">
                 <ul className="space-y-2">
                   {healthTopics.map((topic) => (
                     <li key={topic.id}>
-                      <a href={`#${topic.id}`} className="text-[#005eb8] hover:underline">
+                      <a href={`#${topic.id}`} className="text-[#0891b2] hover:underline">
                         {topic.title}
                       </a>
                     </li>
@@ -296,27 +296,27 @@ const PregnancyHealthPage: React.FC = () => {
                   <h3 className="font-bold mb-3">Related Pages</h3>
                   <ul className="space-y-2">
                     <li>
-                      <Link to="/pregnancy/care" className="text-[#005eb8] hover:underline">
+                      <Link to="/pregnancy/care" className="text-[#0891b2] hover:underline">
                         Pregnancy Care
                       </Link>
                     </li>
                     <li>
-                      <Link to="/pregnancy/nutrition-guide" className="text-[#005eb8] hover:underline">
+                      <Link to="/pregnancy/nutrition-guide" className="text-[#0891b2] hover:underline">
                         Pregnancy Nutrition Guide
                       </Link>
                     </li>
                     <li>
-                      <Link to="/pregnancy/concerns" className="text-[#005eb8] hover:underline">
+                      <Link to="/pregnancy/concerns" className="text-[#0891b2] hover:underline">
                         Pregnancy Concerns
                       </Link>
                     </li>
                     <li>
-                      <Link to="/pregnancy/prenatal-tests" className="text-[#005eb8] hover:underline">
+                      <Link to="/pregnancy/prenatal-tests" className="text-[#0891b2] hover:underline">
                         Prenatal Tests Explained
                       </Link>
                     </li>
                     <li>
-                      <Link to="/pregnancy/first-prenatal-visit" className="text-[#005eb8] hover:underline">
+                      <Link to="/pregnancy/first-prenatal-visit" className="text-[#0891b2] hover:underline">
                         Your First Prenatal Visit
                       </Link>
                     </li>

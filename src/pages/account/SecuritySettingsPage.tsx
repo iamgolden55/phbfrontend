@@ -57,7 +57,7 @@ const SecuritySettingsPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Security Settings</h1>
           <p className="text-xl font-medium">
@@ -98,7 +98,7 @@ const SecuritySettingsPage: React.FC = () => {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center mb-2">
-                  <svg className="h-6 w-6 text-[#005eb8] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-6 w-6 text-[#0891b2] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                   <h3 className="text-lg font-bold">One-Time Password (OTP) Verification</h3>
@@ -147,7 +147,7 @@ const SecuritySettingsPage: React.FC = () => {
                   disabled={isLoading}
                   className={`relative inline-flex items-center h-10 rounded-full w-20 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
                     otpRequiredForLogin
-                      ? 'bg-[#005eb8]'
+                      ? 'bg-[#0891b2]'
                       : 'bg-gray-300'
                   } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                   aria-label={`OTP verification is ${otpRequiredForLogin ? 'enabled' : 'disabled'}`}

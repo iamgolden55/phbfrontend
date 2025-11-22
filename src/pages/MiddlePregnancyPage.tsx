@@ -206,7 +206,7 @@ const MiddlePregnancyPage: React.FC = () => {
             <li><strong>Cervical length measurement</strong> – for women at risk of preterm labor</li>
           </ul>
           <p className="mb-3">
-            For detailed information about these and other prenatal tests, visit our <Link to="/pregnancy/prenatal-tests" className="text-[#005eb8] hover:underline">Prenatal tests explained</Link> page.
+            For detailed information about these and other prenatal tests, visit our <Link to="/pregnancy/prenatal-tests" className="text-[#0891b2] hover:underline">Prenatal tests explained</Link> page.
           </p>
 
           <div className="bg-red-50 p-4 rounded-md border-l-4 border-red-500">
@@ -403,7 +403,7 @@ const MiddlePregnancyPage: React.FC = () => {
             The second trimester is a good time to start thinking about your preferences for labor and birth, though you don\'t need to finalize your birth plan yet.
           </p>
           <p className="mb-6">
-            Consider exploring our <Link to="/pregnancy/birth-plan-creator" className="text-[#005eb8] hover:underline">Birth Plan Creator</Link> to help you think through your options and preferences.
+            Consider exploring our <Link to="/pregnancy/birth-plan-creator" className="text-[#0891b2] hover:underline">Birth Plan Creator</Link> to help you think through your options and preferences.
           </p>
         </div>
       )
@@ -506,7 +506,7 @@ const MiddlePregnancyPage: React.FC = () => {
               <li>You\'ll make final preparations for birth and bringing your baby home</li>
             </ul>
             <p className="mt-3">
-              Learn more in our <Link to="/pregnancy/late" className="text-[#005eb8] font-medium hover:underline">Late pregnancy guide</Link>.
+              Learn more in our <Link to="/pregnancy/late" className="text-[#0891b2] font-medium hover:underline">Late pregnancy guide</Link>.
             </p>
           </div>
         </div>
@@ -516,7 +516,7 @@ const MiddlePregnancyPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Middle Pregnancy</h1>
           <p className="text-xl font-medium">
@@ -564,19 +564,19 @@ const MiddlePregnancyPage: React.FC = () => {
                 <h3 className="font-bold mb-3">Related information</h3>
                 <ul className="space-y-2">
                   <li>
-                    <Link to="/pregnancy/early" className="text-[#005eb8] hover:underline text-sm">Early pregnancy</Link>
+                    <Link to="/pregnancy/early" className="text-[#0891b2] hover:underline text-sm">Early pregnancy</Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/late" className="text-[#005eb8] hover:underline text-sm">Late pregnancy</Link>
+                    <Link to="/pregnancy/late" className="text-[#0891b2] hover:underline text-sm">Late pregnancy</Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/calendar" className="text-[#005eb8] hover:underline text-sm">Pregnancy calendar</Link>
+                    <Link to="/pregnancy/calendar" className="text-[#0891b2] hover:underline text-sm">Pregnancy calendar</Link>
                   </li>
                   <li>
-                    <Link to="/tools/kick-counter" className="text-[#005eb8] hover:underline text-sm">Kick counter</Link>
+                    <Link to="/tools/kick-counter" className="text-[#0891b2] hover:underline text-sm">Kick counter</Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/common-concerns" className="text-[#005eb8] hover:underline text-sm">Common pregnancy concerns</Link>
+                    <Link to="/pregnancy/common-concerns" className="text-[#0891b2] hover:underline text-sm">Common pregnancy concerns</Link>
                   </li>
                 </ul>
               </div>
@@ -594,13 +594,13 @@ const MiddlePregnancyPage: React.FC = () => {
 
             {sections.map((section) => (
               <section key={section.id} id={section.id} className="mb-12 scroll-mt-4">
-                <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">{section.title}</h2>
+                <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">{section.title}</h2>
                 <div className="prose max-w-none">{section.content}</div>
               </section>
             ))}
 
             <div className="mt-8">
-              <Link to="/pregnancy" className="text-[#005eb8] font-medium hover:underline flex items-center">
+              <Link to="/pregnancy" className="text-[#0891b2] font-medium hover:underline flex items-center">
                 <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>

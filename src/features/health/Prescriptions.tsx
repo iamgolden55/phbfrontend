@@ -360,7 +360,7 @@ const Prescriptions: React.FC = () => {
                 onClick={() => setView('active')}
                 className={`whitespace-nowrap pb-3 px-1 text-sm font-medium ${
                   view === 'active'
-                    ? 'border-b-2 border-[#005eb8] text-[#005eb8]'
+                    ? 'border-b-2 border-[#0891b2] text-[#0891b2]'
                     : 'border-b-2 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                 }`}
               >
@@ -370,7 +370,7 @@ const Prescriptions: React.FC = () => {
                 onClick={() => setView('inProgress')}
                 className={`whitespace-nowrap pb-3 px-1 text-sm font-medium ${
                   view === 'inProgress'
-                    ? 'border-b-2 border-[#005eb8] text-[#005eb8]'
+                    ? 'border-b-2 border-[#0891b2] text-[#0891b2]'
                     : 'border-b-2 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                 }`}
               >
@@ -380,7 +380,7 @@ const Prescriptions: React.FC = () => {
                 onClick={() => setView('history')}
                 className={`whitespace-nowrap pb-3 px-1 text-sm font-medium ${
                   view === 'history'
-                    ? 'border-b-2 border-[#005eb8] text-[#005eb8]'
+                    ? 'border-b-2 border-[#0891b2] text-[#0891b2]'
                     : 'border-b-2 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                 }`}
               >
@@ -390,7 +390,7 @@ const Prescriptions: React.FC = () => {
                 onClick={() => setView('all')}
                 className={`whitespace-nowrap pb-3 px-1 text-sm font-medium ${
                   view === 'all'
-                    ? 'border-b-2 border-[#005eb8] text-[#005eb8]'
+                    ? 'border-b-2 border-[#0891b2] text-[#0891b2]'
                     : 'border-b-2 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                 }`}
               >
@@ -454,7 +454,7 @@ const Prescriptions: React.FC = () => {
                         {prescription.status === 'active' && (
                           <button
                             onClick={() => handleCollectPrescription(prescription)}
-                            className="text-[#005eb8] hover:text-[#003f7e]"
+                            className="text-[#0891b2] hover:text-[#0e7490]"
                           >
                             Purchased
                           </button>
@@ -462,7 +462,7 @@ const Prescriptions: React.FC = () => {
                         {prescription.status === 'collected' && (
                           <button
                             onClick={() => handleCompletePrescription(prescription)}
-                            className="text-[#005eb8] hover:text-[#003f7e]"
+                            className="text-[#0891b2] hover:text-[#0e7490]"
                           >
                             Complete
                           </button>
@@ -503,7 +503,7 @@ const Prescriptions: React.FC = () => {
               <p className="text-sm text-gray-600 mb-3">
                 If you need a prescription for a new medication, you'll need to contact your GP.
               </p>
-              <Link to="/account/request-prescription" className="text-[#005eb8] text-sm hover:underline">
+              <Link to="/account/request-prescription" className="text-[#0891b2] text-sm hover:underline">
                 Request a new prescription
               </Link>
             </div>
@@ -513,7 +513,7 @@ const Prescriptions: React.FC = () => {
               <p className="text-sm text-gray-600 mb-3">
                 Electronic prescriptions will be sent to your nominated pharmacy.
               </p>
-              <Link to="/account/nominated-pharmacy" className="text-[#005eb8] text-sm hover:underline">
+              <Link to="/account/nominated-pharmacy" className="text-[#0891b2] text-sm hover:underline">
                 Set or change your pharmacy
               </Link>
             </div>
@@ -550,7 +550,7 @@ const Prescriptions: React.FC = () => {
                 <button
                   onClick={submitCollect}
                   disabled={isLoading}
-                  className={`px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e] ${
+                  className={`px-4 py-2 bg-[#0891b2] text-white rounded-md hover:bg-[#0e7490] ${
                     isLoading ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
@@ -598,7 +598,7 @@ const Prescriptions: React.FC = () => {
                 <button
                   onClick={submitComplete}
                   disabled={isLoading}
-                  className={`px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e] ${
+                  className={`px-4 py-2 bg-[#0891b2] text-white rounded-md hover:bg-[#0e7490] ${
                     isLoading ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
@@ -755,7 +755,7 @@ const Prescriptions: React.FC = () => {
                             ? 'This prescription was sent to this pharmacy electronically.'
                             : 'This is your currently nominated pharmacy. New prescriptions will be sent here.'
                           }{' '}
-                          <Link to="/account/nominated-pharmacy" className="text-[#005eb8] hover:underline">
+                          <Link to="/account/nominated-pharmacy" className="text-[#0891b2] hover:underline">
                             Change pharmacy
                           </Link>
                         </p>
@@ -781,7 +781,7 @@ const Prescriptions: React.FC = () => {
                         </p>
                         <Link
                           to="/account/nominated-pharmacy"
-                          className="inline-block mt-2 text-sm text-[#005eb8] hover:underline font-medium"
+                          className="inline-block mt-2 text-sm text-[#0891b2] hover:underline font-medium"
                         >
                           Set your nominated pharmacy →
                         </Link>
@@ -796,7 +796,7 @@ const Prescriptions: React.FC = () => {
                 {/* Print button on the left */}
                 <button
                   onClick={() => setShowPrintFormatDialog(true)}
-                  className="px-4 py-2 border-2 border-[#005eb8] text-[#005eb8] rounded-md hover:bg-blue-50 flex items-center gap-2"
+                  className="px-4 py-2 border-2 border-[#0891b2] text-[#0891b2] rounded-md hover:bg-blue-50 flex items-center gap-2"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -812,7 +812,7 @@ const Prescriptions: React.FC = () => {
                         setShowDetailModal(false);
                         setShowCollectModal(true);
                       }}
-                      className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e]"
+                      className="px-4 py-2 bg-[#0891b2] text-white rounded-md hover:bg-[#0e7490]"
                     >
                       Collect
                     </button>
@@ -823,7 +823,7 @@ const Prescriptions: React.FC = () => {
                         setShowDetailModal(false);
                         setShowCompleteModal(true);
                       }}
-                      className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e]"
+                      className="px-4 py-2 bg-[#0891b2] text-white rounded-md hover:bg-[#0e7490]"
                     >
                       Complete
                     </button>
@@ -856,14 +856,14 @@ const Prescriptions: React.FC = () => {
                     setPrintFormat('electronic');
                     setShowPrintFormatDialog(false);
                   }}
-                  className="w-full p-4 border-2 border-[#005eb8] rounded-lg hover:bg-blue-50 text-left transition-colors"
+                  className="w-full p-4 border-2 border-[#0891b2] rounded-lg hover:bg-blue-50 text-left transition-colors"
                 >
                   <div className="flex items-start gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#005eb8] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#0891b2] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                     </svg>
                     <div>
-                      <div className="font-bold text-[#005eb8] mb-1">Electronic Prescription Token</div>
+                      <div className="font-bold text-[#0891b2] mb-1">Electronic Prescription Token</div>
                       <div className="text-sm text-gray-600">
                         Modern digital format with QR code. Can be used at any pharmacy in Nigeria.
                         Includes prescription ID and barcode for easy verification.
@@ -885,9 +885,9 @@ const Prescriptions: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     <div>
-                      <div className="font-bold text-green-700 mb-1">Paper Prescription (FP10-Style)</div>
+                      <div className="font-bold text-green-700 mb-1">Paper Prescription (Standard)</div>
                       <div className="text-sm text-gray-600">
-                        Traditional NHS-style paper prescription format.
+                        Traditional paper prescription format.
                         Ideal for pharmacies without electronic systems or as a backup.
                       </div>
                     </div>

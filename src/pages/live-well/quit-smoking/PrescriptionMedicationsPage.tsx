@@ -38,7 +38,7 @@ const quitMedications: Medication[] = [
 const PrescriptionMedicationsPage: React.FC = () => {
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <nav className="text-sm mb-4">
             <Link to="/live-well" className="hover:underline">Live well</Link>
@@ -74,7 +74,7 @@ const PrescriptionMedicationsPage: React.FC = () => {
             </Link>
             <a
               href="tel:0800-QUIT-NOW"
-              className="bg-[#005eb8] text-white px-4 py-2 rounded-md hover:bg-[#003f7e] transition-colors text-center font-bold"
+              className="bg-[#0891b2] text-white px-4 py-2 rounded-md hover:bg-[#0e7490] transition-colors text-center font-bold"
             >
               PHB Quit Smoking Helpline
             </a>
@@ -108,7 +108,7 @@ const PrescriptionMedicationsPage: React.FC = () => {
               className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-2xl font-bold text-[#005eb8]">{medication.title}</h3>
+                <h3 className="text-2xl font-bold text-[#0891b2]">{medication.title}</h3>
                 <span className="text-sm font-medium text-green-600 bg-green-50 px-3 py-1 rounded-full">
                   {medication.effectiveness}
                 </span>
@@ -177,7 +177,7 @@ const PrescriptionMedicationsPage: React.FC = () => {
         <div className="bg-[#f0f4f5] p-6 rounded-lg mb-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="text-center">
-              <div className="bg-[#005eb8] text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
+              <div className="bg-[#0891b2] text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
                 1
               </div>
               <h3 className="font-bold mb-2">Medical Assessment</h3>
@@ -187,7 +187,7 @@ const PrescriptionMedicationsPage: React.FC = () => {
             </div>
             
             <div className="text-center">
-              <div className="bg-[#005eb8] text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
+              <div className="bg-[#0891b2] text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
                 2
               </div>
               <h3 className="font-bold mb-2">Prescription & Planning</h3>
@@ -197,7 +197,7 @@ const PrescriptionMedicationsPage: React.FC = () => {
             </div>
             
             <div className="text-center">
-              <div className="bg-[#005eb8] text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
+              <div className="bg-[#0891b2] text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
                 3
               </div>
               <h3 className="font-bold mb-2">Monitoring & Support</h3>
@@ -207,7 +207,7 @@ const PrescriptionMedicationsPage: React.FC = () => {
             </div>
             
             <div className="text-center">
-              <div className="bg-[#005eb8] text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
+              <div className="bg-[#0891b2] text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold">
                 4
               </div>
               <h3 className="font-bold mb-2">Completion</h3>
@@ -278,7 +278,7 @@ const PrescriptionMedicationsPage: React.FC = () => {
         </div>
 
         {/* Next steps */}
-        <div className="bg-[#005eb8] text-white p-8 rounded-lg">
+        <div className="bg-[#0891b2] text-white p-8 rounded-lg">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-4">Ready to explore prescription options?</h2>
             <p className="mb-6">
@@ -287,7 +287,7 @@ const PrescriptionMedicationsPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/account/appointments/book"
-                className="bg-white text-[#005eb8] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
+                className="bg-white text-[#0891b2] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
               >
                 Book medical consultation
               </Link>

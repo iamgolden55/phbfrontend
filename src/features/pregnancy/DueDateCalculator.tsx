@@ -163,7 +163,7 @@ const DueDateCalculator: React.FC = () => {
               id="lmp-date"
               value={lmpDate}
               onChange={(e) => setLmpDate(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0891b2]"
             />
             <p className="text-sm text-gray-500 mt-1">
               This is the first day of your most recent period
@@ -182,7 +182,7 @@ const DueDateCalculator: React.FC = () => {
               id="conception-date"
               value={conceptionDate}
               onChange={(e) => setConceptionDate(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0891b2]"
             />
             <p className="text-sm text-gray-500 mt-1">
               This is the estimated date when you conceived
@@ -202,7 +202,7 @@ const DueDateCalculator: React.FC = () => {
                 id="ivf-date"
                 value={ivfTransferDate}
                 onChange={(e) => setIvfTransferDate(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0891b2]"
               />
             </div>
             <div className="mb-4">
@@ -213,7 +213,7 @@ const DueDateCalculator: React.FC = () => {
                 id="ivf-day"
                 value={ivfDayNumber}
                 onChange={(e) => setIvfDayNumber(parseInt(e.target.value, 10))}
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005eb8]"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0891b2]"
               >
                 <option value={3}>Day 3 Transfer</option>
                 <option value={5}>Day 5 Transfer (Blastocyst)</option>
@@ -249,7 +249,7 @@ const DueDateCalculator: React.FC = () => {
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="bg-[#005eb8] text-white p-4">
+      <div className="bg-[#0891b2] text-white p-4">
         <h2 className="text-xl font-bold">Due Date Calculator</h2>
       </div>
 
@@ -270,7 +270,7 @@ const DueDateCalculator: React.FC = () => {
                     name="calculation-method"
                     checked={calculationMethod === 'lmp'}
                     onChange={() => setCalculationMethod('lmp')}
-                    className="mr-2 text-[#005eb8] focus:ring-[#005eb8]"
+                    className="mr-2 text-[#0891b2] focus:ring-[#0891b2]"
                   />
                   <span>Last menstrual period (most common)</span>
                 </label>
@@ -280,7 +280,7 @@ const DueDateCalculator: React.FC = () => {
                     name="calculation-method"
                     checked={calculationMethod === 'conception'}
                     onChange={() => setCalculationMethod('conception')}
-                    className="mr-2 text-[#005eb8] focus:ring-[#005eb8]"
+                    className="mr-2 text-[#0891b2] focus:ring-[#0891b2]"
                   />
                   <span>Conception date</span>
                 </label>
@@ -290,7 +290,7 @@ const DueDateCalculator: React.FC = () => {
                     name="calculation-method"
                     checked={calculationMethod === 'ivf'}
                     onChange={() => setCalculationMethod('ivf')}
-                    className="mr-2 text-[#005eb8] focus:ring-[#005eb8]"
+                    className="mr-2 text-[#0891b2] focus:ring-[#0891b2]"
                   />
                   <span>IVF transfer date</span>
                 </label>
@@ -308,7 +308,7 @@ const DueDateCalculator: React.FC = () => {
 
             <button
               onClick={calculateDueDate}
-              className="w-full bg-[#005eb8] text-white py-2 px-4 rounded-md hover:bg-[#003f7e] transition-colors"
+              className="w-full bg-[#0891b2] text-white py-2 px-4 rounded-md hover:bg-[#0e7490] transition-colors"
             >
               Calculate Due Date
             </button>
@@ -321,7 +321,7 @@ const DueDateCalculator: React.FC = () => {
                 <h3 className="text-lg font-bold">Your Due Date</h3>
                 <button
                   onClick={() => setShowResults(false)}
-                  className="text-[#005eb8] text-sm hover:underline flex items-center"
+                  className="text-[#0891b2] text-sm hover:underline flex items-center"
                 >
                   <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -348,7 +348,7 @@ const DueDateCalculator: React.FC = () => {
                 </div>
                 <div className="h-3 bg-gray-200 rounded-full">
                   <div
-                    className="h-full bg-[#005eb8] rounded-full"
+                    className="h-full bg-[#0891b2] rounded-full"
                     style={{ width: `${dueDateInfo?.progress || 0}%` }}
                   ></div>
                 </div>

@@ -429,7 +429,7 @@ const WeightGainCalculator: React.FC = () => {
 
             <div className="mt-8">
               <button
-                className="w-full bg-[#005eb8] text-white py-2 px-4 rounded-md hover:bg-[#004c93] transition-colors"
+                className="w-full bg-[#0891b2] text-white py-2 px-4 rounded-md hover:bg-[#004c93] transition-colors"
                 onClick={handleCalculate}
                 disabled={!height || !prePregnancyWeight}
               >
@@ -458,7 +458,7 @@ const WeightGainCalculator: React.FC = () => {
                 For your {fetusCount === 1 ? 'singleton' : fetusCount === 2 ? 'twin' : 'triplet'} pregnancy, the recommended
                 total weight gain is:
               </p>
-              <p className="text-lg font-bold mb-4 text-[#005eb8]">
+              <p className="text-lg font-bold mb-4 text-[#0891b2]">
                 {recommendedGain ? `${recommendedGain.min}-${recommendedGain.max} ${weightUnit}` : '-'}
               </p>
 

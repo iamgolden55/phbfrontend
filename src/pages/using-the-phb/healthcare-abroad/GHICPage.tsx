@@ -5,7 +5,7 @@ import Breadcrumbs from '../../../components/Breadcrumbs';
 const GHICPage: React.FC = () => {
   return (
     <div className="bg-white min-h-screen">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <Breadcrumbs
             items={[
@@ -267,7 +267,7 @@ const GHICPage: React.FC = () => {
 
               <Link
                 to="/contact-us"
-                className="text-[#005eb8] hover:underline font-medium flex items-center"
+                className="text-[#0891b2] hover:underline font-medium flex items-center"
               >
                 Contact PHB for assistance
                 <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

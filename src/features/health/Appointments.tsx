@@ -27,7 +27,7 @@ const Appointments: React.FC = () => {
             <h3 className="text-xl font-bold">Upcoming Appointments</h3>
             <Link
               to="/account/appointments/view"
-              className="text-[#005eb8] hover:text-[#003f7e] font-medium text-sm"
+              className="text-[#0891b2] hover:text-[#0e7490] font-medium text-sm"
             >
               View all appointments →
             </Link>
@@ -61,7 +61,7 @@ const Appointments: React.FC = () => {
                       </span>
                       <Link
                         to={`/account/appointments/${appointment.id}`}
-                        className="text-sm text-[#005eb8] hover:text-[#003f7e] font-medium"
+                        className="text-sm text-[#0891b2] hover:text-[#0e7490] font-medium"
                       >
                         View details
                       </Link>
@@ -80,7 +80,7 @@ const Appointments: React.FC = () => {
             </p>
             <Link
               to="/account/appointments/book"
-              className="inline-block bg-[#005eb8] text-white px-4 py-2 rounded-md hover:bg-[#003f7e] transition-colors"
+              className="inline-block bg-[#0891b2] text-white px-4 py-2 rounded-md hover:bg-[#0e7490] transition-colors"
             >
               Book now
             </Link>
@@ -92,7 +92,7 @@ const Appointments: React.FC = () => {
             </p>
             <Link
               to="/account/appointments/view"
-              className="inline-block bg-[#005eb8] text-white px-4 py-2 rounded-md hover:bg-[#003f7e] transition-colors"
+              className="inline-block bg-[#0891b2] text-white px-4 py-2 rounded-md hover:bg-[#0e7490] transition-colors"
             >
               View appointments
             </Link>
@@ -105,21 +105,21 @@ const Appointments: React.FC = () => {
               to="/help/appointments/how-to-book"
               className="bg-white border border-gray-200 p-4 rounded-md hover:shadow-md transition-shadow"
             >
-              <h4 className="font-bold text-[#005eb8] mb-2">How to book</h4>
+              <h4 className="font-bold text-[#0891b2] mb-2">How to book</h4>
               <p className="text-sm text-gray-600">Learn how to book appointments online with your GP practice.</p>
             </Link>
             <Link
               to="/help/appointments/managing"
               className="bg-white border border-gray-200 p-4 rounded-md hover:shadow-md transition-shadow"
             >
-              <h4 className="font-bold text-[#005eb8] mb-2">Managing appointments</h4>
+              <h4 className="font-bold text-[#0891b2] mb-2">Managing appointments</h4>
               <p className="text-sm text-gray-600">Information about rescheduling or cancelling appointments.</p>
             </Link>
             <Link
               to="/help/appointments/types"
               className="bg-white border border-gray-200 p-4 rounded-md hover:shadow-md transition-shadow"
             >
-              <h4 className="font-bold text-[#005eb8] mb-2">Appointment types</h4>
+              <h4 className="font-bold text-[#0891b2] mb-2">Appointment types</h4>
               <p className="text-sm text-gray-600">Find out about different types of appointments available.</p>
             </Link>
           </div>

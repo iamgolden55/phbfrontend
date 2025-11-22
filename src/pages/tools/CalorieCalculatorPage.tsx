@@ -56,7 +56,7 @@ const CalorieCalculatorPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <nav className="text-sm mb-4">
             <Link to="/" className="hover:underline">Home</Link>
@@ -101,7 +101,7 @@ const CalorieCalculatorPage: React.FC = () => {
                     onClick={() => setGender('male')}
                     className={`px-4 py-2 rounded-md border transition-colors ${
                       gender === 'male'
-                        ? 'bg-[#005eb8] text-white border-[#005eb8]'
+                        ? 'bg-[#0891b2] text-white border-[#0891b2]'
                         : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                     }`}
                   >
@@ -111,7 +111,7 @@ const CalorieCalculatorPage: React.FC = () => {
                     onClick={() => setGender('female')}
                     className={`px-4 py-2 rounded-md border transition-colors ${
                       gender === 'female'
-                        ? 'bg-[#005eb8] text-white border-[#005eb8]'
+                        ? 'bg-[#0891b2] text-white border-[#0891b2]'
                         : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                     }`}
                   >
@@ -127,7 +127,7 @@ const CalorieCalculatorPage: React.FC = () => {
                   type="number"
                   value={age}
                   onChange={(e) => setAge(Number(e.target.value))}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#005eb8] focus:border-[#005eb8]"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#0891b2] focus:border-[#0891b2]"
                   min="15"
                   max="100"
                 />
@@ -140,7 +140,7 @@ const CalorieCalculatorPage: React.FC = () => {
                   type="number"
                   value={height}
                   onChange={(e) => setHeight(Number(e.target.value))}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#005eb8] focus:border-[#005eb8]"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#0891b2] focus:border-[#0891b2]"
                   min="100"
                   max="250"
                 />
@@ -153,7 +153,7 @@ const CalorieCalculatorPage: React.FC = () => {
                   type="number"
                   value={weight}
                   onChange={(e) => setWeight(Number(e.target.value))}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#005eb8] focus:border-[#005eb8]"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#0891b2] focus:border-[#0891b2]"
                   min="30"
                   max="300"
                 />
@@ -193,7 +193,7 @@ const CalorieCalculatorPage: React.FC = () => {
               <div className="space-y-4">
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="text-sm text-gray-600">Basal Metabolic Rate (BMR)</div>
-                  <div className="text-2xl font-bold text-[#005eb8]">{result.bmr.toLocaleString()} calories/day</div>
+                  <div className="text-2xl font-bold text-[#0891b2]">{result.bmr.toLocaleString()} calories/day</div>
                   <div className="text-sm text-gray-600 mt-1">Calories burned at complete rest</div>
                 </div>
 
@@ -245,7 +245,7 @@ const CalorieCalculatorPage: React.FC = () => {
         </div>
 
         {/* Next steps */}
-        <div className="bg-[#005eb8] text-white p-8 rounded-lg mt-8">
+        <div className="bg-[#0891b2] text-white p-8 rounded-lg mt-8">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-4">Ready to put this into action?</h2>
             <p className="mb-6">
@@ -255,7 +255,7 @@ const CalorieCalculatorPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/account/appointments/book"
-                className="bg-white text-[#005eb8] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
+                className="bg-white text-[#0891b2] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
               >
                 Book nutrition consultation
               </Link>

@@ -151,7 +151,7 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
           {paymentData && (
             <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
               <h3 className="font-bold text-gray-900 mb-4 flex items-center text-lg">
-                <CreditCard className="h-5 w-5 mr-2 text-[#005eb8]" />
+                <CreditCard className="h-5 w-5 mr-2 text-[#0891b2]" />
                 {paymentData.reference === 'waived-payment' || paymentData.amount === 0 ? 'Booking Details' : 'Payment Details'}
               </h3>
               <div className="space-y-3">
@@ -173,7 +173,7 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
                 )}
                 <div className="flex justify-between items-center py-2 border-b border-gray-200">
                   <span className="text-gray-600 font-medium">Amount:</span>
-                  <span className={`font-bold text-lg ${paymentData.amount === 0 ? 'text-green-600' : 'text-[#005eb8]'}`}>
+                  <span className={`font-bold text-lg ${paymentData.amount === 0 ? 'text-green-600' : 'text-[#0891b2]'}`}>
                     {paymentData.amount === 0 ? 'FREE' : formatCurrency(paymentData.amount)}
                   </span>
                 </div>
@@ -202,7 +202,7 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
           {/* Appointment Details */}
           {appointmentData && status === 'success' && (
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border-2 border-blue-200">
-              <h3 className="font-bold text-[#005eb8] mb-4 flex items-center text-lg">
+              <h3 className="font-bold text-[#0891b2] mb-4 flex items-center text-lg">
                 <Calendar className="h-5 w-5 mr-2" />
                 Appointment Confirmed
               </h3>
@@ -273,7 +273,7 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
                 {onGoToAppointments && (
                   <button
                     onClick={onGoToAppointments}
-                    className="w-full bg-gradient-to-r from-[#005eb8] to-[#0070d4] text-white py-4 px-6 rounded-xl font-bold text-lg hover:from-[#004a9f] hover:to-[#005bb3] flex items-center justify-center transition-all shadow-lg hover:shadow-xl"
+                    className="w-full bg-gradient-to-r from-[#0891b2] to-[#0070d4] text-white py-4 px-6 rounded-xl font-bold text-lg hover:from-[#004a9f] hover:to-[#005bb3] flex items-center justify-center transition-all shadow-lg hover:shadow-xl"
                   >
                     <Calendar className="h-6 w-6 mr-3" />
                     View My Appointments
@@ -293,7 +293,7 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
                 {onRetry && (
                   <button
                     onClick={onRetry}
-                    className="w-full bg-gradient-to-r from-[#005eb8] to-[#0070d4] text-white py-4 px-6 rounded-xl font-bold text-lg hover:from-[#004a9f] hover:to-[#005bb3] transition-all shadow-lg hover:shadow-xl"
+                    className="w-full bg-gradient-to-r from-[#0891b2] to-[#0070d4] text-white py-4 px-6 rounded-xl font-bold text-lg hover:from-[#004a9f] hover:to-[#005bb3] transition-all shadow-lg hover:shadow-xl"
                   >
                     Try Again
                   </button>
@@ -309,7 +309,7 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
 
             {status === 'processing' && (
               <div className="flex justify-center py-4">
-                <div className="animate-spin rounded-full h-10 w-10 border-t-3 border-b-3 border-[#005eb8]"></div>
+                <div className="animate-spin rounded-full h-10 w-10 border-t-3 border-b-3 border-[#0891b2]"></div>
               </div>
             )}
           </div>
@@ -318,11 +318,11 @@ const PaymentConfirmation: React.FC<PaymentConfirmationProps> = ({
           <div className="text-center pt-6 border-t border-gray-200">
             <p className="text-sm text-gray-600 leading-relaxed">
               Need help? Contact our support team at{' '}
-              <a href="mailto:support@phbhealthcare.com" className="text-[#005eb8] hover:underline font-semibold">
+              <a href="mailto:support@phbhealthcare.com" className="text-[#0891b2] hover:underline font-semibold">
                 support@phbhealthcare.com
               </a>
               {' '}or call{' '}
-              <a href="tel:+2341234567890" className="text-[#005eb8] hover:underline font-semibold">
+              <a href="tel:+2341234567890" className="text-[#0891b2] hover:underline font-semibold">
                 +234 123 456 7890
               </a>
             </p>

@@ -113,7 +113,7 @@ const AccountPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">My Account</h1>
           <p className="text-xl font-medium">
@@ -145,7 +145,7 @@ const AccountPage: React.FC = () => {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
               <div className="flex items-start mb-4">
-                <div className="bg-[#005eb8] text-white rounded-full h-16 w-16 flex items-center justify-center text-2xl font-bold">
+                <div className="bg-[#0891b2] text-white rounded-full h-16 w-16 flex items-center justify-center text-2xl font-bold">
                   {user?.full_name ? user.full_name.charAt(0) : '?'}
                 </div>
                 <div className="ml-4">
@@ -163,7 +163,7 @@ const AccountPage: React.FC = () => {
 
               <button
                 onClick={handleLogout}
-                className="w-full mt-4 border border-[#005eb8] text-[#005eb8] hover:bg-[#f0f4f5] py-2 rounded transition-colors"
+                className="w-full mt-4 border border-[#0891b2] text-[#0891b2] hover:bg-[#f0f4f5] py-2 rounded transition-colors"
               >
                 Sign out
               </button>
@@ -173,7 +173,7 @@ const AccountPage: React.FC = () => {
               <h3 className="font-bold mb-4">Account settings</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link to="/account/personal-details" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/account/personal-details" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
@@ -181,7 +181,7 @@ const AccountPage: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/account/contact-preferences" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/account/contact-preferences" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
@@ -189,7 +189,7 @@ const AccountPage: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/account/security" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/account/security" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
@@ -197,7 +197,7 @@ const AccountPage: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/account/password" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/account/password" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
@@ -391,7 +391,7 @@ const AccountPage: React.FC = () => {
                   <p className="text-sm text-gray-600 mb-3">
                     Track your health goals and progress
                   </p>
-                  <Link to="/account/health-goals" className="text-[#005eb8] hover:underline text-sm">
+                  <Link to="/account/health-goals" className="text-[#0891b2] hover:underline text-sm">
                     Set up health goals
                   </Link>
                 </div>
@@ -401,7 +401,7 @@ const AccountPage: React.FC = () => {
                   <p className="text-sm text-gray-600 mb-3">
                     Store and manage your health documents
                   </p>
-                  <Link to="/account/health-records" className="text-[#005eb8] hover:underline text-sm">
+                  <Link to="/account/health-records" className="text-[#0891b2] hover:underline text-sm">
                     Manage records
                   </Link>
                 </div>
@@ -414,7 +414,7 @@ const AccountPage: React.FC = () => {
                   <p className="text-sm text-gray-600 mb-3">
                     Access your complete medical history with secure verification
                   </p>
-                  <Link to="/account/medical-records" className="text-[#005eb8] hover:underline text-sm">
+                  <Link to="/account/medical-records" className="text-[#0891b2] hover:underline text-sm">
                     View medical records
                   </Link>
                 </div>
@@ -425,7 +425,7 @@ const AccountPage: React.FC = () => {
 
               <Link
                 to="/tools/health-assessments"
-                className="block bg-[#005eb8] hover:bg-[#003f7e] text-white p-4 rounded-md transition-colors text-center"
+                className="block bg-[#0891b2] hover:bg-[#0e7490] text-white p-4 rounded-md transition-colors text-center"
               >
                 Take a Health Assessment
               </Link>

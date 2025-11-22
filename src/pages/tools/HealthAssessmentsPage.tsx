@@ -141,7 +141,7 @@ const HealthAssessmentsPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Health Assessments</h1>
           <p className="text-xl font-medium">
@@ -235,7 +235,7 @@ const HealthAssessmentsPage: React.FC = () => {
                     <li key={assessment.id}>
                       <Link
                         to={`/tools/health-assessments/${assessment.id}`}
-                        className="text-[#005eb8] hover:underline block py-1"
+                        className="text-[#0891b2] hover:underline block py-1"
                       >
                         {assessment.title}
                       </Link>
@@ -292,7 +292,7 @@ const HealthAssessmentsPage: React.FC = () => {
                     setActiveCategory('all');
                     setSearchTerm('');
                   }}
-                  className="text-[#005eb8] hover:underline"
+                  className="text-[#0891b2] hover:underline"
                 >
                   Clear filters
                 </button>
@@ -329,7 +329,7 @@ const HealthAssessmentsPage: React.FC = () => {
 
                     <Link
                       to={`/tools/health-assessments/${assessment.id}`}
-                      className="block w-full bg-[#005eb8] hover:bg-[#003f7e] text-white text-center py-2 rounded-md transition-colors"
+                      className="block w-full bg-[#0891b2] hover:bg-[#0e7490] text-white text-center py-2 rounded-md transition-colors"
                     >
                       Start Assessment
                     </Link>

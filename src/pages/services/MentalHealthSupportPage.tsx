@@ -6,7 +6,7 @@ const MentalHealthSupportPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Header */}
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Mental Health Support</h1>
           <p className="text-xl font-medium">
@@ -35,7 +35,7 @@ const MentalHealthSupportPage: React.FC = () => {
           <div className="lg:col-span-2">
             {/* Overview */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">You Are Not Alone</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">You Are Not Alone</h2>
               <p className="mb-4">
                 Feeling sad, worried, stressed, or confused is normal. Everyone goes through hard times. But you don't have to face it alone.
               </p>
@@ -49,7 +49,7 @@ const MentalHealthSupportPage: React.FC = () => {
 
             {/* How to Get Help */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">How to Get Help</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">How to Get Help</h2>
               <p className="mb-4">
                 You can reach out to us in different ways. Choose what feels comfortable for you:
               </p>
@@ -95,7 +95,7 @@ const MentalHealthSupportPage: React.FC = () => {
 
             {/* Who Can Help */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Who Will Help You</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Who Will Help You</h2>
               <p className="mb-4">
                 Our team includes trained mental health professionals who understand Nigerian culture and speak your language.
               </p>
@@ -115,7 +115,7 @@ const MentalHealthSupportPage: React.FC = () => {
 
             {/* What to Expect */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">What to Expect</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">What to Expect</h2>
               <p className="mb-4">
                 When you reach out to us:
               </p>
@@ -133,7 +133,7 @@ const MentalHealthSupportPage: React.FC = () => {
 
             {/* Taking First Step */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Taking the First Step</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Taking the First Step</h2>
               <p className="mb-4">
                 We know it can be hard to ask for help. But reaching out is a sign of strength, not weakness.
               </p>
@@ -154,7 +154,7 @@ const MentalHealthSupportPage: React.FC = () => {
 
             {/* For Family and Friends */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Helping Someone Else</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Helping Someone Else</h2>
               <p className="mb-4">
                 Worried about a family member or friend? You can also reach out to us for advice on how to help them.
               </p>
@@ -202,14 +202,14 @@ const MentalHealthSupportPage: React.FC = () => {
               <div className="space-y-4">
                 <div>
                   <p className="font-semibold mb-2">Call 24/7</p>
-                  <a href="tel:0800-742-4357" className="text-[#005eb8] hover:underline text-lg font-medium">
+                  <a href="tel:0800-742-4357" className="text-[#0891b2] hover:underline text-lg font-medium">
                     0800-PHB-HELP
                   </a>
                   <p className="text-sm text-gray-600 mt-1">Free from any phone</p>
                 </div>
                 <div>
                   <p className="font-semibold mb-2">Email Us</p>
-                  <a href="mailto:support@phb.ng" className="text-[#005eb8] hover:underline">
+                  <a href="mailto:support@phb.ng" className="text-[#0891b2] hover:underline">
                     support@phb.ng
                   </a>
                   <p className="text-sm text-gray-600 mt-1">We reply within 24 hours</p>
@@ -217,7 +217,7 @@ const MentalHealthSupportPage: React.FC = () => {
                 <div>
                   <Link
                     to="/account/appointments/book"
-                    className="block bg-[#005eb8] text-white px-4 py-2 rounded-md hover:bg-[#003f7e] text-center font-medium"
+                    className="block bg-[#0891b2] text-white px-4 py-2 rounded-md hover:bg-[#0e7490] text-center font-medium"
                   >
                     Book Appointment
                   </Link>
@@ -230,7 +230,7 @@ const MentalHealthSupportPage: React.FC = () => {
               <h3 className="text-lg font-bold mb-4">Related topics</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link to="/mental-health/depression" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/mental-health/depression" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -238,7 +238,7 @@ const MentalHealthSupportPage: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/mental-health/anxiety" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/mental-health/anxiety" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -246,7 +246,7 @@ const MentalHealthSupportPage: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/services/talking-therapies" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/services/talking-therapies" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -254,7 +254,7 @@ const MentalHealthSupportPage: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/live-well/mental-wellbeing" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/live-well/mental-wellbeing" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -274,11 +274,11 @@ const MentalHealthSupportPage: React.FC = () => {
                 />
               </div>
               <div className="p-5">
-                <h3 className="text-lg font-bold text-[#005eb8] mb-3">Check Your Wellbeing</h3>
+                <h3 className="text-lg font-bold text-[#0891b2] mb-3">Check Your Wellbeing</h3>
                 <p className="text-gray-600 mb-4">
                   Take a few minutes to check in with yourself and get personalized guidance.
                 </p>
-                <Link to="/tools/mental-wellbeing-assessment" className="text-[#005eb8] font-medium hover:underline">
+                <Link to="/tools/mental-wellbeing-assessment" className="text-[#0891b2] font-medium hover:underline">
                   Take the check
                 </Link>
               </div>

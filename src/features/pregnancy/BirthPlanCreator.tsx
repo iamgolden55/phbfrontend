@@ -353,7 +353,7 @@ const BirthPlanCreator: React.FC = () => {
         <div className="flex justify-between mb-6">
           <div className="flex space-x-2">
             <button
-              className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#004c93]"
+              className="px-4 py-2 bg-[#0891b2] text-white rounded-md hover:bg-[#004c93]"
               onClick={handleTogglePreview}
             >
               {showPreview ? 'Edit Plan' : 'Preview Plan'}
@@ -448,7 +448,7 @@ const BirthPlanCreator: React.FC = () => {
                 <button
                   className={`pb-4 px-1 whitespace-nowrap ${
                     activeSection === 'basic'
-                      ? 'border-b-2 border-[#005eb8] text-[#005eb8] font-medium'
+                      ? 'border-b-2 border-[#0891b2] text-[#0891b2] font-medium'
                       : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                   onClick={() => setActiveSection('basic')}
@@ -461,7 +461,7 @@ const BirthPlanCreator: React.FC = () => {
                     key={section.id}
                     className={`pb-4 px-1 whitespace-nowrap ${
                       activeSection === section.id
-                        ? 'border-b-2 border-[#005eb8] text-[#005eb8] font-medium'
+                        ? 'border-b-2 border-[#0891b2] text-[#0891b2] font-medium'
                         : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }`}
                     onClick={() => setActiveSection(section.id)}
@@ -473,7 +473,7 @@ const BirthPlanCreator: React.FC = () => {
                 <button
                   className={`pb-4 px-1 whitespace-nowrap ${
                     activeSection === 'notes'
-                      ? 'border-b-2 border-[#005eb8] text-[#005eb8] font-medium'
+                      ? 'border-b-2 border-[#0891b2] text-[#0891b2] font-medium'
                       : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                   onClick={() => setActiveSection('notes')}
@@ -557,7 +557,7 @@ const BirthPlanCreator: React.FC = () => {
                         <input
                           type="checkbox"
                           id={option.id}
-                          className="h-5 w-5 text-[#005eb8] mr-3"
+                          className="h-5 w-5 text-[#0891b2] mr-3"
                           checked={option.selected}
                           onChange={() => handleOptionToggle(section.id, option.id)}
                         />
@@ -608,7 +608,7 @@ const BirthPlanCreator: React.FC = () => {
                           }}
                         />
                         <button
-                          className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#004c93]"
+                          className="px-4 py-2 bg-[#0891b2] text-white rounded-md hover:bg-[#004c93]"
                           onClick={() => handleAddCustomOption(section.id, section.customText || '')}
                           disabled={!section.customText}
                         >

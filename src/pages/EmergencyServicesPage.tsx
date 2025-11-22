@@ -55,10 +55,10 @@ const EmergencyServicesPage: React.FC = () => {
     },
     {
       id: 'ES004',
-      title: 'PHB 111 Health Advice',
+      title: 'PHB Health Helpline',
       type: 'medical',
       availability: '24/7',
-      phone: '111',
+      phone: '0800-PHB-CARE',
       description: 'Non-emergency health advice, when you need medical help but it\'s not a life-threatening emergency.',
       icon: 'phone_in_talk',
       urgent: false
@@ -247,7 +247,7 @@ const EmergencyServicesPage: React.FC = () => {
               </div>
               <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-4 border border-white border-opacity-20">
                 <span className="material-icons text-3xl mb-2 block">phone_in_talk</span>
-                <h3 className="text-xl font-bold mb-1">111</h3>
+                <h3 className="text-xl font-bold mb-1">0800-PHB-CARE</h3>
                 <p className="text-sm opacity-90">PHB Health Advice</p>
               </div>
             </div>
@@ -264,7 +264,7 @@ const EmergencyServicesPage: React.FC = () => {
             </div>
             <div className="ml-3">
               <p className="text-yellow-800">
-              <strong>When to call 999:</strong> Life-threatening emergencies only. For non-urgent health advice, call PHB 111.
+              <strong>When to call 999:</strong> Life-threatening emergencies only. For non-urgent health advice, call PHB Health Helpline.
               </p>
             </div>
           </div>

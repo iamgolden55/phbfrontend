@@ -51,7 +51,7 @@ const MedicineDetailPage: React.FC = () => {
   if (isDrugDatabaseId && loading) {
     return (
       <div className="bg-white">
-        <div className="bg-[#005eb8] text-white py-8">
+        <div className="bg-[#0891b2] text-white py-8">
           <div className="phb-container">
             <h1 className="text-3xl font-bold mb-4">Loading...</h1>
           </div>
@@ -71,7 +71,7 @@ const MedicineDetailPage: React.FC = () => {
   if ((isDrugDatabaseId && error) || (!medicine && !drugData)) {
     return (
       <div className="bg-white">
-        <div className="bg-[#005eb8] text-white py-8">
+        <div className="bg-[#0891b2] text-white py-8">
           <div className="phb-container">
             <h1 className="text-3xl font-bold mb-4">Medicine not found</h1>
           </div>
@@ -98,7 +98,7 @@ const MedicineDetailPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Header */}
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <div className="flex items-center gap-2 mb-4">
             <Link to="/medicines-a-z" className="text-white hover:underline">
@@ -136,7 +136,7 @@ const MedicineDetailPage: React.FC = () => {
           {/* Sidebar with "On this page" quick links */}
           <div className="md:w-1/4 order-2 md:order-1">
             <div className="sticky top-4 bg-gray-50 p-5 rounded-md border border-gray-200 shadow-sm">
-              <h2 className="text-xl font-bold mb-4 text-[#005eb8]">On this page</h2>
+              <h2 className="text-xl font-bold mb-4 text-[#0891b2]">On this page</h2>
               <ul className="space-y-3">
                 <li>
                   <a href="#about" className="flex items-center text-blue-700 hover:text-blue-900 hover:underline">
@@ -243,7 +243,7 @@ const MedicineDetailPage: React.FC = () => {
 
             {/* Uses */}
             <section id="uses" className="mb-8 scroll-mt-4">
-              <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">Uses of {medicine.name}</h2>
+              <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">Uses of {medicine.name}</h2>
               <p className="mb-4">{medicine.name} is used to treat or manage:</p>
               <ul className="list-disc pl-6 space-y-2">
                 {medicine.indications?.map((indication: string, index: number) => (
@@ -254,7 +254,7 @@ const MedicineDetailPage: React.FC = () => {
 
             {/* Dosage */}
             <section id="dosage" className="mb-8 scroll-mt-4">
-              <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">Dosage Information</h2>
+              <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">Dosage Information</h2>
               <div className="bg-blue-50 p-4 rounded-md mb-4">
                 <p className="font-medium text-blue-800">{removeTextCitations(medicine.dosage)}</p>
               </div>
@@ -265,7 +265,7 @@ const MedicineDetailPage: React.FC = () => {
 
             {/* Side Effects */}
             <section id="side-effects" className="mb-8 scroll-mt-4">
-              <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">Possible Side Effects</h2>
+              <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">Possible Side Effects</h2>
               <p className="mb-4">Common side effects of {medicine.name} may include:</p>
               <ul className="list-disc pl-6 space-y-2">
                 {medicine.sideEffects?.map((effect: string, index: number) => (
@@ -281,7 +281,7 @@ const MedicineDetailPage: React.FC = () => {
 
             {/* Warnings */}
             <section id="warnings" className="mb-8 scroll-mt-4">
-              <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">Warnings and Precautions</h2>
+              <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">Warnings and Precautions</h2>
               <ul className="list-disc pl-6 space-y-2">
                 {medicine.warnings?.map((warning: string, index: number) => (
                   <li key={index}>{removeTextCitations(warning)}</li>
@@ -292,7 +292,7 @@ const MedicineDetailPage: React.FC = () => {
             {/* Pregnancy */}
             {medicine.pregnancy && (
               <section id="pregnancy" className="mb-8 scroll-mt-4">
-                <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">Use During Pregnancy</h2>
+                <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">Use During Pregnancy</h2>
                 <p>{removeTextCitations(medicine.pregnancy)}</p>
               </section>
             )}
@@ -300,7 +300,7 @@ const MedicineDetailPage: React.FC = () => {
             {/* Breastfeeding */}
             {medicine.breastfeeding && (
               <section id="breastfeeding" className="mb-8 scroll-mt-4">
-                <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">Use While Breastfeeding</h2>
+                <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">Use While Breastfeeding</h2>
                 <p>{removeTextCitations(medicine.breastfeeding)}</p>
               </section>
             )}
@@ -310,7 +310,7 @@ const MedicineDetailPage: React.FC = () => {
             {/* References and Resources */}
             {medicine.wikipediaUrl && (
               <section id="references" className="mb-8 scroll-mt-4">
-                <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">External Resources</h2>
+                <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">External Resources</h2>
                 <div className="bg-gray-50 p-4 rounded-md">
                   <ul className="space-y-3">
                     {/* Wikipedia link */}
@@ -366,7 +366,7 @@ const DrugDatabaseDetailView: React.FC<{ drug: DrugDetail }> = ({ drug }) => {
   return (
     <div className="bg-white">
       {/* Header */}
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <div className="flex items-center gap-2 mb-4">
             <Link to="/professional/pharmacy-resources" className="text-white hover:underline">
@@ -404,7 +404,7 @@ const DrugDatabaseDetailView: React.FC<{ drug: DrugDetail }> = ({ drug }) => {
           {/* Sidebar with "On this page" quick links */}
           <div className="md:w-1/4 order-2 md:order-1">
             <div className="sticky top-4 bg-gray-50 p-5 rounded-md border border-gray-200 shadow-sm">
-              <h2 className="text-xl font-bold mb-4 text-[#005eb8]">On this page</h2>
+              <h2 className="text-xl font-bold mb-4 text-[#0891b2]">On this page</h2>
               <ul className="space-y-3">
                 <li>
                   <a href="#about" className="flex items-center text-blue-700 hover:text-blue-900 hover:underline">
@@ -510,7 +510,7 @@ const DrugDatabaseDetailView: React.FC<{ drug: DrugDetail }> = ({ drug }) => {
 
             {/* Classification */}
             <section id="classification" className="mb-8 scroll-mt-4">
-              <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">Drug Classification</h2>
+              <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">Drug Classification</h2>
               <div className="bg-blue-50 p-4 rounded-md mb-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {drug.therapeutic_class && (
@@ -547,7 +547,7 @@ const DrugDatabaseDetailView: React.FC<{ drug: DrugDetail }> = ({ drug }) => {
 
             {/* Prescribing Information */}
             <section id="prescribing" className="mb-8 scroll-mt-4">
-              <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">Prescribing Information</h2>
+              <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">Prescribing Information</h2>
               <ul className="list-disc pl-6 space-y-2">
                 <li>
                   <strong>Physician Prescription Required:</strong> {drug.requires_physician_only ? 'Yes' : 'No'}
@@ -574,7 +574,7 @@ const DrugDatabaseDetailView: React.FC<{ drug: DrugDetail }> = ({ drug }) => {
             {/* Safety Information */}
             {(drug.black_box_warning || majorContraindications.length > 0) && (
               <section id="safety" className="mb-8 scroll-mt-4">
-                <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">Safety Information</h2>
+                <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">Safety Information</h2>
 
                 {drug.black_box_warning && drug.black_box_warning_text && (
                   <div className="bg-red-50 border-l-4 border-red-600 p-4 mb-4">
@@ -607,7 +607,7 @@ const DrugDatabaseDetailView: React.FC<{ drug: DrugDetail }> = ({ drug }) => {
             {/* Drug Interactions */}
             {(majorDrugInteractions.length > 0 || foodInteractions.length > 0) && (
               <section id="interactions" className="mb-8 scroll-mt-4">
-                <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">Interactions</h2>
+                <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">Interactions</h2>
 
                 {majorDrugInteractions.length > 0 && (
                   <div className="mb-4">
@@ -637,7 +637,7 @@ const DrugDatabaseDetailView: React.FC<{ drug: DrugDetail }> = ({ drug }) => {
             {/* Special Populations */}
             {drug.pregnancy_category && (
               <section id="pregnancy" className="mb-8 scroll-mt-4">
-                <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">Special Populations</h2>
+                <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">Special Populations</h2>
 
                 <div className="mb-4">
                   <h3 className="font-semibold text-gray-900 mb-2">Pregnancy</h3>
@@ -663,7 +663,7 @@ const DrugDatabaseDetailView: React.FC<{ drug: DrugDetail }> = ({ drug }) => {
             {/* Alternatives */}
             {(saferAlternatives.length > 0 || cheaperAlternatives.length > 0) && (
               <section id="alternatives" className="mb-8 scroll-mt-4">
-                <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">Alternative Medications</h2>
+                <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">Alternative Medications</h2>
 
                 {saferAlternatives.length > 0 && (
                   <div className="mb-4">

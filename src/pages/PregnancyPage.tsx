@@ -280,7 +280,7 @@ const PregnancyPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Pregnancy</h1>
           <p className="text-xl font-medium">
@@ -296,7 +296,7 @@ const PregnancyPage: React.FC = () => {
           {/* Progress bar (desktop) */}
           <div className="hidden md:block absolute top-14 left-0 w-full h-2 bg-gray-200 rounded-full z-0">
             <div
-              className="absolute top-0 left-0 h-full bg-[#005eb8] rounded-full transform origin-left"
+              className="absolute top-0 left-0 h-full bg-[#0891b2] rounded-full transform origin-left"
               style={{ width: progressBarWidth }}
             ></div>
           </div>
@@ -320,7 +320,7 @@ const PregnancyPage: React.FC = () => {
                   {/* Circle and number for desktop */}
                   <div
                     className={`hidden md:flex h-8 w-8 rounded-full items-center justify-center font-bold text-lg z-10 cursor-pointer
-                      ${isSelected || isCurrent ? 'bg-[#005eb8] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                      ${isSelected || isCurrent ? 'bg-[#0891b2] text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                     onClick={() => handleStageClick(stage)}
                   >
                     {index + 1}
@@ -332,7 +332,7 @@ const PregnancyPage: React.FC = () => {
                       {stageData ? (
                         <Link
                           to={stageData.href}
-                          className={`hover:underline ${isSelected || isCurrent ? 'text-[#005eb8] font-bold' : 'text-gray-700'}`}
+                          className={`hover:underline ${isSelected || isCurrent ? 'text-[#0891b2] font-bold' : 'text-gray-700'}`}
                         >
                           {stageData.title}
                         </Link>
@@ -400,7 +400,7 @@ const PregnancyPage: React.FC = () => {
                   </Link>
                 )}
                 <div className="p-4 flex-grow flex flex-col">
-                  <h3 className="text-lg font-bold text-[#005eb8] mb-2">
+                  <h3 className="text-lg font-bold text-[#0891b2] mb-2">
                     <Link to={topic.href} className="hover:underline">
                       {topic.title}
                     </Link>
@@ -408,7 +408,7 @@ const PregnancyPage: React.FC = () => {
                   <p className="text-gray-600 text-sm mb-4 flex-grow">{topic.description}</p>
                   <Link
                     to={topic.href}
-                    className="text-[#005eb8] font-medium hover:underline flex items-center mt-auto text-sm"
+                    className="text-[#0891b2] font-medium hover:underline flex items-center mt-auto text-sm"
                   >
                     Read more
                     <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -440,7 +440,7 @@ const PregnancyPage: React.FC = () => {
               </p>
               <Link
                 to={tool.href}
-                className="text-[#005eb8] font-medium hover:underline flex items-center text-sm"
+                className="text-[#0891b2] font-medium hover:underline flex items-center text-sm"
               >
                 Try it now
                 <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -471,7 +471,7 @@ const PregnancyPage: React.FC = () => {
                 </Link>
               )}
               <div className="p-4 flex-grow flex flex-col">
-                <h3 className="text-lg font-bold text-[#005eb8] mb-2">
+                <h3 className="text-lg font-bold text-[#0891b2] mb-2">
                   <Link to={topic.href} className="hover:underline">
                     {topic.title}
                   </Link>
@@ -479,7 +479,7 @@ const PregnancyPage: React.FC = () => {
                 <p className="text-gray-600 text-sm mb-4 flex-grow">{topic.description}</p>
                 <Link
                   to={topic.href}
-                  className="text-[#005eb8] font-medium hover:underline flex items-center mt-auto text-sm"
+                  className="text-[#0891b2] font-medium hover:underline flex items-center mt-auto text-sm"
                 >
                   Read more
                   <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -520,7 +520,7 @@ const PregnancyPage: React.FC = () => {
                   <span>Reduced baby movements</span>
                 </li>
               </ul>
-              <Link to="/pregnancy/concerns" className="text-[#005eb8] text-sm hover:underline block mt-3">
+              <Link to="/pregnancy/concerns" className="text-[#0891b2] text-sm hover:underline block mt-3">
                 See all symptoms
               </Link>
             </div>
@@ -529,25 +529,25 @@ const PregnancyPage: React.FC = () => {
               <h3 className="font-bold mb-2">Common concerns</h3>
               <ul className="text-sm space-y-1">
                 <li className="flex items-start">
-                  <svg className="h-4 w-4 text-[#005eb8] mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-4 w-4 text-[#0891b2] mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                   <Link to="/pregnancy/concerns/morning-sickness" className="hover:underline">Morning sickness</Link>
                 </li>
                 <li className="flex items-start">
-                  <svg className="h-4 w-4 text-[#005eb8] mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-4 w-4 text-[#0891b2] mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                   <Link to="/pregnancy/concerns/tiredness" className="hover:underline">Extreme tiredness</Link>
                 </li>
                 <li className="flex items-start">
-                  <svg className="h-4 w-4 text-[#005eb8] mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-4 w-4 text-[#0891b2] mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                   <Link to="/pregnancy/concerns/back-pain" className="hover:underline">Back pain</Link>
                 </li>
               </ul>
-              <Link to="/pregnancy/common-concerns" className="text-[#005eb8] text-sm hover:underline block mt-3">
+              <Link to="/pregnancy/common-concerns" className="text-[#0891b2] text-sm hover:underline block mt-3">
                 See all common concerns
               </Link>
             </div>
@@ -586,14 +586,14 @@ const PregnancyPage: React.FC = () => {
               <div className="bg-gray-50 p-4 rounded-md">
                 <h3 className="font-bold mb-2">PHB antenatal classes</h3>
                 <p className="text-sm mb-3">Free classes offered by your local PHB trust, covering pregnancy, labor and birth.</p>
-                <Link to="/pregnancy/antenatal-classes" className="text-[#005eb8] text-sm hover:underline">
+                <Link to="/pregnancy/antenatal-classes" className="text-[#0891b2] text-sm hover:underline">
                   Find local classes
                 </Link>
               </div>
               <div className="bg-gray-50 p-4 rounded-md">
                 <h3 className="font-bold mb-2">Online resources</h3>
                 <p className="text-sm mb-3">Videos, online courses and digital tools to help you prepare for parenthood.</p>
-                <Link to="/pregnancy/online-resources" className="text-[#005eb8] text-sm hover:underline">
+                <Link to="/pregnancy/online-resources" className="text-[#0891b2] text-sm hover:underline">
                   Explore online resources
                 </Link>
               </div>
@@ -602,7 +602,7 @@ const PregnancyPage: React.FC = () => {
         </div>
 
         {/* Due date calculator */}
-        <div className="bg-[#005eb8] text-white p-8 rounded-lg">
+        <div className="bg-[#0891b2] text-white p-8 rounded-lg">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-4">When is my baby due?</h2>
             <p className="mb-6">
@@ -610,7 +610,7 @@ const PregnancyPage: React.FC = () => {
             </p>
             <Link
               to="/tools/due-date-calculator"
-              className="bg-white text-[#005eb8] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
+              className="bg-white text-[#0891b2] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
             >
               Calculate your due date
             </Link>

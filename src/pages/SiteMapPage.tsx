@@ -107,7 +107,7 @@ const SiteMapPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Site Map</h1>
           <p className="text-xl">
@@ -128,14 +128,14 @@ const SiteMapPage: React.FC = () => {
               {section.links.map((link, linkIndex) => (
                 <div key={linkIndex} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                   <h3 className="font-bold mb-2">
-                    <Link to={link.path} className="text-[#005eb8] hover:underline">
+                    <Link to={link.path} className="text-[#0891b2] hover:underline">
                       {link.title}
                     </Link>
                   </h3>
                   {link.description && (
                     <p className="text-sm text-gray-600 mb-2">{link.description}</p>
                   )}
-                  <Link to={link.path} className="text-sm text-[#005eb8] hover:underline flex items-center">
+                  <Link to={link.path} className="text-sm text-[#0891b2] hover:underline flex items-center">
                     Visit
                     <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -150,7 +150,7 @@ const SiteMapPage: React.FC = () => {
         <div className="mt-8 p-4 bg-gray-100 rounded-lg">
           <h2 className="text-lg font-bold mb-2">Can't find what you're looking for?</h2>
           <p className="mb-2">Try using the search feature at the top of the page or contact us for assistance.</p>
-          <Link to="/contact" className="text-[#005eb8] hover:underline">Contact PHB</Link>
+          <Link to="/contact" className="text-[#0891b2] hover:underline">Contact PHB</Link>
         </div>
       </div>
     </div>

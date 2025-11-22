@@ -5,7 +5,7 @@ import DueDateCalculator from '../features/pregnancy/DueDateCalculator';
 const DueDateCalculatorPage: React.FC = () => {
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Due Date Calculator</h1>
           <p className="text-xl font-medium">
@@ -53,7 +53,7 @@ const DueDateCalculatorPage: React.FC = () => {
 
               <div className="space-y-6">
                 <div>
-                  <h3 className="font-bold text-[#005eb8]">First Trimester (Weeks 1-13)</h3>
+                  <h3 className="font-bold text-[#0891b2]">First Trimester (Weeks 1-13)</h3>
                   <p className="text-sm text-gray-600 mt-1 mb-2">
                     Your baby's major organs and body systems develop during this period.
                   </p>
@@ -74,7 +74,7 @@ const DueDateCalculatorPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <h3 className="font-bold text-[#005eb8]">Second Trimester (Weeks 14-26)</h3>
+                  <h3 className="font-bold text-[#0891b2]">Second Trimester (Weeks 14-26)</h3>
                   <p className="text-sm text-gray-600 mt-1 mb-2">
                     Your baby grows rapidly and you'll likely feel movement.
                   </p>
@@ -95,7 +95,7 @@ const DueDateCalculatorPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <h3 className="font-bold text-[#005eb8]">Third Trimester (Weeks 27-40)</h3>
+                  <h3 className="font-bold text-[#0891b2]">Third Trimester (Weeks 27-40)</h3>
                   <p className="text-sm text-gray-600 mt-1 mb-2">
                     Your baby gains weight and prepares for birth.
                   </p>
@@ -117,7 +117,7 @@ const DueDateCalculatorPage: React.FC = () => {
               </div>
 
               <div className="mt-4">
-                <Link to="/pregnancy" className="text-[#005eb8] hover:underline flex items-center">
+                <Link to="/pregnancy" className="text-[#0891b2] hover:underline flex items-center">
                   View more pregnancy information
                   <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -130,14 +130,14 @@ const DueDateCalculatorPage: React.FC = () => {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-              <div className="bg-[#005eb8] text-white p-4">
+              <div className="bg-[#0891b2] text-white p-4">
                 <h2 className="text-xl font-bold">Pregnancy Resources</h2>
               </div>
               <div className="p-4">
                 <h3 className="font-bold mb-3">Tools & Calculators</h3>
                 <ul className="space-y-2">
                   <li>
-                    <Link to="/tools/weight-gain-calculator" className="text-[#005eb8] hover:underline flex items-center">
+                    <Link to="/tools/weight-gain-calculator" className="text-[#0891b2] hover:underline flex items-center">
                       <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                       </svg>
@@ -145,7 +145,7 @@ const DueDateCalculatorPage: React.FC = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/tools/pregnancy-calendar" className="text-[#005eb8] hover:underline flex items-center">
+                    <Link to="/tools/pregnancy-calendar" className="text-[#0891b2] hover:underline flex items-center">
                       <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
@@ -153,7 +153,7 @@ const DueDateCalculatorPage: React.FC = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/tools/kick-counter" className="text-[#005eb8] hover:underline flex items-center">
+                    <Link to="/tools/kick-counter" className="text-[#0891b2] hover:underline flex items-center">
                       <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                       </svg>
@@ -161,7 +161,7 @@ const DueDateCalculatorPage: React.FC = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/tools/contraction-timer" className="text-[#005eb8] hover:underline flex items-center">
+                    <Link to="/tools/contraction-timer" className="text-[#0891b2] hover:underline flex items-center">
                       <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
@@ -173,27 +173,27 @@ const DueDateCalculatorPage: React.FC = () => {
                 <h3 className="font-bold mt-6 mb-3">Popular Pregnancy Topics</h3>
                 <ul className="space-y-2">
                   <li>
-                    <Link to="/pregnancy/early/first-prenatal-visit" className="text-[#005eb8] hover:underline">
+                    <Link to="/pregnancy/early/first-prenatal-visit" className="text-[#0891b2] hover:underline">
                       Your first prenatal visit
                     </Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/early/pregnancy-symptoms" className="text-[#005eb8] hover:underline">
+                    <Link to="/pregnancy/early/pregnancy-symptoms" className="text-[#0891b2] hover:underline">
                       Early pregnancy symptoms
                     </Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/middle/prenatal-tests" className="text-[#005eb8] hover:underline">
+                    <Link to="/pregnancy/middle/prenatal-tests" className="text-[#0891b2] hover:underline">
                       Prenatal tests explained
                     </Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/health/nutrition" className="text-[#005eb8] hover:underline">
+                    <Link to="/pregnancy/health/nutrition" className="text-[#0891b2] hover:underline">
                       Nutrition during pregnancy
                     </Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/late/signs-of-labor" className="text-[#005eb8] hover:underline">
+                    <Link to="/pregnancy/late/signs-of-labor" className="text-[#0891b2] hover:underline">
                       Signs of labor
                     </Link>
                   </li>
@@ -204,7 +204,7 @@ const DueDateCalculatorPage: React.FC = () => {
                   <p className="text-sm text-blue-700 mb-3">
                     Have questions about your pregnancy? Speak with a midwife for personalized advice.
                   </p>
-                  <Link to="/services/talk-to-midwife" className="text-[#005eb8] text-sm font-medium hover:underline">
+                  <Link to="/services/talk-to-midwife" className="text-[#0891b2] text-sm font-medium hover:underline">
                     Book an appointment
                   </Link>
                 </div>

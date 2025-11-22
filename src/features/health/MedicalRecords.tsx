@@ -303,7 +303,7 @@ const MedicalRecords: React.FC = () => {
           <div className="bg-white p-6 rounded-lg shadow-sm">
             <h2 className="text-2xl font-bold mb-4">Medical Records</h2>
             <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#005eb8]"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0891b2]"></div>
             </div>
             <p className="text-center text-gray-600">
               Loading your medical records...
@@ -330,7 +330,7 @@ const MedicalRecords: React.FC = () => {
             
             <button
               onClick={checkAccess}
-              className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e]"
+              className="px-4 py-2 bg-[#0891b2] text-white rounded-md hover:bg-[#0e7490]"
             >
               Try Again
             </button>
@@ -403,7 +403,7 @@ const MedicalRecords: React.FC = () => {
                               <a 
                                 key={attachment.id || attachIndex}
                                 href={attachment.url}
-                                className="flex items-center text-[#005eb8] hover:underline"
+                                className="flex items-center text-[#0891b2] hover:underline"
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >

@@ -85,7 +85,7 @@ const OlderPeoplePage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <nav className="text-sm mb-4">
             <Link to="/" className="hover:underline">Home</Link>
@@ -127,7 +127,7 @@ const OlderPeoplePage: React.FC = () => {
                 onClick={() => setSelectedCategory(category.id)}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   selectedCategory === category.id
-                    ? 'bg-[#005eb8] text-white'
+                    ? 'bg-[#0891b2] text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -144,7 +144,7 @@ const OlderPeoplePage: React.FC = () => {
               key={index}
               className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
             >
-              <h3 className="text-xl font-bold text-[#005eb8] mb-3">{area.title}</h3>
+              <h3 className="text-xl font-bold text-[#0891b2] mb-3">{area.title}</h3>
               <p className="text-gray-600 mb-4">{area.description}</p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -153,7 +153,7 @@ const OlderPeoplePage: React.FC = () => {
                   <ul className="space-y-1">
                     {area.keyPoints.map((point, idx) => (
                       <li key={idx} className="flex items-start text-sm text-gray-600">
-                        <span className="w-2 h-2 bg-[#005eb8] rounded-full mr-2 mt-1.5 flex-shrink-0"></span>
+                        <span className="w-2 h-2 bg-[#0891b2] rounded-full mr-2 mt-1.5 flex-shrink-0"></span>
                         {point}
                       </li>
                     ))}
@@ -310,7 +310,7 @@ const OlderPeoplePage: React.FC = () => {
         </div>
 
         {/* Support and resources */}
-        <div className="bg-[#005eb8] text-white p-8 rounded-lg">
+        <div className="bg-[#0891b2] text-white p-8 rounded-lg">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-4">Need guidance or support?</h2>
             <p className="mb-6">
@@ -320,7 +320,7 @@ const OlderPeoplePage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/account/appointments/book"
-                className="bg-white text-[#005eb8] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
+                className="bg-white text-[#0891b2] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
               >
                 Schedule consultation
               </Link>
@@ -332,7 +332,7 @@ const OlderPeoplePage: React.FC = () => {
               </Link>
               <a
                 href="tel:0800-ELDER-CARE"
-                className="bg-transparent border-2 border-white text-white px-6 py-3 rounded-md hover:bg-white hover:text-[#005eb8] transition-colors inline-block font-bold"
+                className="bg-transparent border-2 border-white text-white px-6 py-3 rounded-md hover:bg-white hover:text-[#0891b2] transition-colors inline-block font-bold"
               >
                 24/7 Elder Care Line
               </a>

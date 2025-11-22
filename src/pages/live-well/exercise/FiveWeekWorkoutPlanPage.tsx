@@ -6,7 +6,7 @@ const FiveWeekWorkoutPlanPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <nav className="text-sm mb-4">
             <Link to="/live-well" className="hover:underline">Live well</Link>
@@ -45,7 +45,7 @@ const FiveWeekWorkoutPlanPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/live-well/exercise"
-              className="bg-[#005eb8] text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors inline-block font-bold"
+              className="bg-[#0891b2] text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors inline-block font-bold"
             >
               Explore other exercises
             </Link>

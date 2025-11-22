@@ -144,7 +144,7 @@ const AppointmentConfirmation: React.FC = () => {
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <button 
             onClick={addToCalendar}
-            className="flex items-center justify-center px-4 py-2 border border-[#005eb8] text-[#005eb8] rounded-md hover:bg-blue-50 transition-colors"
+            className="flex items-center justify-center px-4 py-2 border border-[#0891b2] text-[#0891b2] rounded-md hover:bg-blue-50 transition-colors"
           >
             <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -154,7 +154,7 @@ const AppointmentConfirmation: React.FC = () => {
           
           <Link
             to="/account/appointments"
-            className="flex items-center justify-center px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#004c93] transition-colors"
+            className="flex items-center justify-center px-4 py-2 bg-[#0891b2] text-white rounded-md hover:bg-[#004c93] transition-colors"
           >
             View All Appointments
           </Link>
@@ -179,13 +179,13 @@ const AppointmentConfirmation: React.FC = () => {
           <div className="flex flex-wrap gap-4">
             <Link
               to="/help/appointments/preparing"
-              className="text-[#005eb8] hover:underline"
+              className="text-[#0891b2] hover:underline"
             >
               How to prepare for your appointment
             </Link>
             <Link
               to="/help/appointments/cancel-change"
-              className="text-[#005eb8] hover:underline"
+              className="text-[#0891b2] hover:underline"
             >
               How to cancel or change your appointment
             </Link>

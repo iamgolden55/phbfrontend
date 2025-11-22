@@ -5,7 +5,7 @@ import PregnancyForums from '../features/pregnancy/PregnancyForums';
 const PregnancyForumsPage: React.FC = () => {
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <div className="flex items-center mb-2">
             <Link to="/pregnancy" className="text-white hover:underline mr-2">
@@ -49,23 +49,23 @@ const PregnancyForumsPage: React.FC = () => {
             <h2 className="text-xl font-bold mb-4">Forum Guidelines</h2>
             <ul className="space-y-3">
               <li className="flex items-start">
-                <span className="text-[#005eb8] mr-2">•</span>
+                <span className="text-[#0891b2] mr-2">•</span>
                 <span>Be respectful and supportive of all community members</span>
               </li>
               <li className="flex items-start">
-                <span className="text-[#005eb8] mr-2">•</span>
+                <span className="text-[#0891b2] mr-2">•</span>
                 <span>Avoid sharing personal medical information</span>
               </li>
               <li className="flex items-start">
-                <span className="text-[#005eb8] mr-2">•</span>
+                <span className="text-[#0891b2] mr-2">•</span>
                 <span>Remember that medical advice should come from healthcare professionals</span>
               </li>
               <li className="flex items-start">
-                <span className="text-[#005eb8] mr-2">•</span>
+                <span className="text-[#0891b2] mr-2">•</span>
                 <span>Keep discussions relevant to the topic of each forum category</span>
               </li>
               <li className="flex items-start">
-                <span className="text-[#005eb8] mr-2">•</span>
+                <span className="text-[#0891b2] mr-2">•</span>
                 <span>Report any inappropriate content to our moderators</span>
               </li>
             </ul>
@@ -105,21 +105,21 @@ const PregnancyForumsPage: React.FC = () => {
             <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               <h3 className="font-bold mb-2">Pregnancy Calendar</h3>
               <p className="text-sm text-gray-600 mb-3">Track your baby's development week by week throughout your pregnancy.</p>
-              <Link to="/pregnancy/calendar" className="text-[#005eb8] hover:underline text-sm">
+              <Link to="/pregnancy/calendar" className="text-[#0891b2] hover:underline text-sm">
                 View calendar →
               </Link>
             </div>
             <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               <h3 className="font-bold mb-2">Birth Plan Creator</h3>
               <p className="text-sm text-gray-600 mb-3">Create a personalized birth plan to share with your healthcare team.</p>
-              <Link to="/pregnancy/birth-plan-creator" className="text-[#005eb8] hover:underline text-sm">
+              <Link to="/pregnancy/birth-plan-creator" className="text-[#0891b2] hover:underline text-sm">
                 Create your plan →
               </Link>
             </div>
             <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               <h3 className="font-bold mb-2">Hospital Bag Checklist</h3>
               <p className="text-sm text-gray-600 mb-3">Make sure you're prepared for labor with our comprehensive hospital bag checklist.</p>
-              <Link to="/pregnancy/hospital-bag-checklist" className="text-[#005eb8] hover:underline text-sm">
+              <Link to="/pregnancy/hospital-bag-checklist" className="text-[#0891b2] hover:underline text-sm">
                 View checklist →
               </Link>
             </div>

@@ -6,7 +6,7 @@ const MealPlansPage: React.FC = () => {
   return (
     <div className="bg-white">
         {/* Header */}
-        <div className="bg-[#005eb8] text-white py-8">
+        <div className="bg-[#0891b2] text-white py-8">
           <div className="phb-container">
             <h1 className="text-3xl font-bold mb-4">Personalized Meal Plans</h1>
             <Breadcrumbs 

@@ -6,7 +6,7 @@ const AlcoholPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Header */}
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Alcohol Support</h1>
           <p className="text-xl font-medium">
@@ -35,7 +35,7 @@ const AlcoholPage: React.FC = () => {
           <div className="lg:col-span-2">
             {/* Overview */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">What You Should Know</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">What You Should Know</h2>
               <p className="mb-4">
                 Many Nigerians drink alcohol at parties, weddings, and social gatherings. This is normal. But it's good to know how much is too much.
               </p>
@@ -49,7 +49,7 @@ const AlcoholPage: React.FC = () => {
 
             {/* Recommended drinking limits */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">How Much Is Safe?</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">How Much Is Safe?</h2>
               <p className="mb-4">
                 To stay healthy:
               </p>
@@ -102,7 +102,7 @@ const AlcoholPage: React.FC = () => {
 
             {/* Health risks */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">What Can Go Wrong?</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">What Can Go Wrong?</h2>
               <p className="mb-4">
                 Drinking too much can damage your body and mind. The more you drink, the bigger the problem.
               </p>
@@ -136,7 +136,7 @@ const AlcoholPage: React.FC = () => {
 
             {/* Cutting down */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">How to Drink Less</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">How to Drink Less</h2>
               <p className="mb-4">
                 If you want to reduce how much you drink, try these:
               </p>
@@ -155,7 +155,7 @@ const AlcoholPage: React.FC = () => {
 
             {/* When to seek help */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">When to Get Help</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">When to Get Help</h2>
               <p className="mb-4">
                 Talk to a doctor if:
               </p>
@@ -178,7 +178,7 @@ const AlcoholPage: React.FC = () => {
                 <li>Help with depression or anxiety from drinking</li>
               </ul>
               <p>
-                <Link to="/account/appointments/book" className="text-[#005eb8] font-medium hover:underline">
+                <Link to="/account/appointments/book" className="text-[#0891b2] font-medium hover:underline">
                   Book appointment with doctor →
                 </Link>
               </p>
@@ -186,7 +186,7 @@ const AlcoholPage: React.FC = () => {
 
             {/* Alcohol and mental health */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Alcohol and Your Mind</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Alcohol and Your Mind</h2>
               <p className="mb-4">
                 Alcohol can affect how you feel:
               </p>
@@ -200,7 +200,7 @@ const AlcoholPage: React.FC = () => {
                 If alcohol is affecting your mind and how you feel, get help for both problems together. Don't suffer alone.
               </p>
               <p>
-                <Link to="/services/mental-health-support" className="text-[#005eb8] font-medium hover:underline">
+                <Link to="/services/mental-health-support" className="text-[#0891b2] font-medium hover:underline">
                   Talk to someone now →
                 </Link>
               </p>
@@ -232,7 +232,7 @@ const AlcoholPage: React.FC = () => {
               <h3 className="text-lg font-bold mb-4">Related topics</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link to="/live-well/quit-smoking" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/live-well/quit-smoking" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -240,7 +240,7 @@ const AlcoholPage: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/live-well/mental-wellbeing" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/live-well/mental-wellbeing" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -248,7 +248,7 @@ const AlcoholPage: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/live-well/healthy-eating" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/live-well/healthy-eating" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -256,7 +256,7 @@ const AlcoholPage: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/live-well/sleep" className="text-[#005eb8] hover:underline flex items-center">
+                  <Link to="/live-well/sleep" className="text-[#0891b2] hover:underline flex items-center">
                     <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -276,11 +276,11 @@ const AlcoholPage: React.FC = () => {
                 />
               </div>
               <div className="p-5">
-                <h3 className="text-lg font-bold text-[#005eb8] mb-3">Need someone to talk to?</h3>
+                <h3 className="text-lg font-bold text-[#0891b2] mb-3">Need someone to talk to?</h3>
                 <p className="text-gray-600 mb-4">
                   Our team is here to help if you're struggling. Talk to us anytime.
                 </p>
-                <Link to="/services/mental-health-support" className="text-[#005eb8] font-medium hover:underline">
+                <Link to="/services/mental-health-support" className="text-[#0891b2] font-medium hover:underline">
                   Talk to someone
                 </Link>
               </div>
@@ -292,14 +292,14 @@ const AlcoholPage: React.FC = () => {
               <div className="space-y-4">
                 <div>
                   <p className="font-semibold mb-1">PHB Alcohol Help</p>
-                  <a href="tel:0800-HELP-ALC" className="text-[#005eb8] hover:underline">
+                  <a href="tel:0800-HELP-ALC" className="text-[#0891b2] hover:underline">
                     0800-HELP-ALC
                   </a>
                   <p className="text-sm text-gray-600 mt-1">Free, private help anytime</p>
                 </div>
                 <div>
                   <p className="font-semibold mb-1">Talk to Someone</p>
-                  <Link to="/services/mental-health-support" className="text-[#005eb8] hover:underline">
+                  <Link to="/services/mental-health-support" className="text-[#0891b2] hover:underline">
                     Chat with counselor
                   </Link>
                 </div>
@@ -312,7 +312,7 @@ const AlcoholPage: React.FC = () => {
               <p className="mb-4">Check how you are feeling and get advice.</p>
               <Link
                 to="/tools/mental-wellbeing-assessment"
-                className="bg-[#005eb8] text-white px-4 py-2 rounded-md hover:bg-[#003f7e] inline-block w-full text-center"
+                className="bg-[#0891b2] text-white px-4 py-2 rounded-md hover:bg-[#0e7490] inline-block w-full text-center"
               >
                 Take the check
               </Link>

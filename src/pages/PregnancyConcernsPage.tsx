@@ -67,7 +67,7 @@ const pregnancySymptoms: SymptomType[] = [
     title: 'Difficulty breathing',
     description: 'If you\'re struggling to breathe or experiencing shortness of breath that gets worse when lying down, this could indicate a problem with your heart or lungs.',
     urgency: 'urgent',
-    action: 'Contact your midwife or GP, or call 111 for advice'
+    action: 'Contact your midwife or GP, or call us for advice'
   },
   {
     title: 'Regular contractions before 37 weeks',
@@ -86,7 +86,7 @@ const pregnancySymptoms: SymptomType[] = [
 const PregnancyConcernsPage: React.FC = () => {
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Symptoms not to ignore in pregnancy</h1>
           <p className="text-xl font-medium">
@@ -162,7 +162,7 @@ const PregnancyConcernsPage: React.FC = () => {
             </li>
             <li className="flex items-start">
               <span className="font-bold mr-2">•</span>
-              <span>PHB 111 service (for non-emergency advice)</span>
+              <span>PHB service (for non-emergency advice)</span>
             </li>
             <li className="flex items-start">
               <span className="font-bold mr-2">•</span>
@@ -170,7 +170,7 @@ const PregnancyConcernsPage: React.FC = () => {
             </li>
           </ul>
           <div className="mt-4">
-            <Link to="/pregnancy" className="text-[#005eb8] font-medium hover:underline flex items-center">
+            <Link to="/pregnancy" className="text-[#0891b2] font-medium hover:underline flex items-center">
               <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>

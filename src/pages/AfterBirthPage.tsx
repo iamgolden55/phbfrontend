@@ -456,7 +456,7 @@ const AfterBirthPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">After the Birth</h1>
           <p className="text-xl font-medium">
@@ -486,16 +486,16 @@ const AfterBirthPage: React.FC = () => {
                 <h3 className="font-bold mb-3">Related information</h3>
                 <ul className="space-y-2">
                   <li>
-                    <Link to="/pregnancy/labor-and-birth" className="text-[#005eb8] hover:underline text-sm">Labor and birth</Link>
+                    <Link to="/pregnancy/labor-and-birth" className="text-[#0891b2] hover:underline text-sm">Labor and birth</Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/nutrition-guide" className="text-[#005eb8] hover:underline text-sm">Nutrition guide</Link>
+                    <Link to="/pregnancy/nutrition-guide" className="text-[#0891b2] hover:underline text-sm">Nutrition guide</Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/breastfeeding" className="text-[#005eb8] hover:underline text-sm">Breastfeeding guide</Link>
+                    <Link to="/pregnancy/breastfeeding" className="text-[#0891b2] hover:underline text-sm">Breastfeeding guide</Link>
                   </li>
                   <li>
-                    <Link to="/mental-health" className="text-[#005eb8] hover:underline text-sm">Mental health</Link>
+                    <Link to="/mental-health" className="text-[#0891b2] hover:underline text-sm">Mental health</Link>
                   </li>
                 </ul>
               </div>
@@ -513,13 +513,13 @@ const AfterBirthPage: React.FC = () => {
 
             {sections.map((section) => (
               <section key={section.id} id={section.id} className="mb-12 scroll-mt-4">
-                <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">{section.title}</h2>
+                <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">{section.title}</h2>
                 <div className="prose max-w-none">{section.content}</div>
               </section>
             ))}
 
             <div className="mt-8">
-              <Link to="/pregnancy" className="text-[#005eb8] font-medium hover:underline flex items-center">
+              <Link to="/pregnancy" className="text-[#0891b2] font-medium hover:underline flex items-center">
                 <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>

@@ -194,7 +194,7 @@ const EarlyPregnancySymptomsPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Early Pregnancy Symptoms</h1>
           <p className="text-xl font-medium">
@@ -322,26 +322,26 @@ const EarlyPregnancySymptomsPage: React.FC = () => {
           <h2 className="text-xl font-bold mb-4">Related pregnancy information</h2>
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <li>
-              <Link to="/pregnancy/first-prenatal-visit" className="text-[#005eb8] hover:underline">Your first prenatal visit</Link>
+              <Link to="/pregnancy/first-prenatal-visit" className="text-[#0891b2] hover:underline">Your first prenatal visit</Link>
             </li>
             <li>
-              <Link to="/pregnancy/prenatal-tests" className="text-[#005eb8] hover:underline">Prenatal tests explained</Link>
+              <Link to="/pregnancy/prenatal-tests" className="text-[#0891b2] hover:underline">Prenatal tests explained</Link>
             </li>
             <li>
-              <Link to="/pregnancy/nutrition-guide" className="text-[#005eb8] hover:underline">Nutrition during pregnancy</Link>
+              <Link to="/pregnancy/nutrition-guide" className="text-[#0891b2] hover:underline">Nutrition during pregnancy</Link>
             </li>
             <li>
-              <Link to="/pregnancy/common-concerns" className="text-[#005eb8] hover:underline">Common pregnancy concerns</Link>
+              <Link to="/pregnancy/common-concerns" className="text-[#0891b2] hover:underline">Common pregnancy concerns</Link>
             </li>
             <li>
-              <Link to="/pregnancy/calendar" className="text-[#005eb8] hover:underline">Pregnancy calendar</Link>
+              <Link to="/pregnancy/calendar" className="text-[#0891b2] hover:underline">Pregnancy calendar</Link>
             </li>
             <li>
-              <Link to="/tools/due-date-calculator" className="text-[#005eb8] hover:underline">Due date calculator</Link>
+              <Link to="/tools/due-date-calculator" className="text-[#0891b2] hover:underline">Due date calculator</Link>
             </li>
           </ul>
           <div className="mt-4">
-            <Link to="/pregnancy" className="text-[#005eb8] font-medium hover:underline flex items-center">
+            <Link to="/pregnancy" className="text-[#0891b2] font-medium hover:underline flex items-center">
               <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>

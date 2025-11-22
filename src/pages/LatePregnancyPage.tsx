@@ -163,7 +163,7 @@ const LatePregnancyPage: React.FC = () => {
               <li>Never wait until the next day to seek advice about reduced movements</li>
             </ul>
             <p className="mt-2">
-              You can use our <Link to="/tools/kick-counter" className="text-[#005eb8] hover:underline">Kick Counter tool</Link> to help monitor your baby's movements.
+              You can use our <Link to="/tools/kick-counter" className="text-[#0891b2] hover:underline">Kick Counter tool</Link> to help monitor your baby's movements.
             </p>
           </div>
         </div>
@@ -274,7 +274,7 @@ const LatePregnancyPage: React.FC = () => {
               <li>Plans for feeding your baby</li>
             </ul>
             <p className="mt-3 text-sm">
-              Discuss your birth plan with your midwife or doctor, and be prepared to adapt if medical needs arise. Our <Link to="/pregnancy/birth-plan-creator" className="text-[#005eb8] hover:underline">Birth Plan Creator</Link> can help you develop a personalized plan.
+              Discuss your birth plan with your midwife or doctor, and be prepared to adapt if medical needs arise. Our <Link to="/pregnancy/birth-plan-creator" className="text-[#0891b2] hover:underline">Birth Plan Creator</Link> can help you develop a personalized plan.
             </p>
           </div>
 
@@ -338,7 +338,7 @@ const LatePregnancyPage: React.FC = () => {
             <li><strong>Early labor signs</strong> – regular contractions that increase in frequency and intensity, waters breaking</li>
           </ul>
           <p className="mb-6">
-            For detailed information about the signs and stages of labor, visit our <Link to="/pregnancy/signs-of-labor" className="text-[#005eb8] hover:underline">Signs of labor</Link> page.
+            For detailed information about the signs and stages of labor, visit our <Link to="/pregnancy/signs-of-labor" className="text-[#0891b2] hover:underline">Signs of labor</Link> page.
           </p>
 
           <h3 className="font-medium text-lg mb-3">When to go to the hospital or birth center</h3>
@@ -547,7 +547,7 @@ const LatePregnancyPage: React.FC = () => {
               Your next important milestone is labor and delivery. Understanding what to expect can help you feel more prepared and confident.
             </p>
             <p className="mb-3">
-              Learn more about the stages of labor, birth options, and what happens during delivery in our <Link to="/pregnancy/labor-and-birth" className="text-[#005eb8] font-medium hover:underline">Labor and Birth guide</Link>.
+              Learn more about the stages of labor, birth options, and what happens during delivery in our <Link to="/pregnancy/labor-and-birth" className="text-[#0891b2] font-medium hover:underline">Labor and Birth guide</Link>.
             </p>
           </div>
           <div className="bg-blue-50 p-4 rounded-md">
@@ -562,7 +562,7 @@ const LatePregnancyPage: React.FC = () => {
               <li>You may experience a range of emotions from joy to occasional overwhelm</li>
             </ul>
             <p className="mt-3">
-              Learn more in our <Link to="/pregnancy/after-birth" className="text-[#005eb8] font-medium hover:underline">After the birth guide</Link>.
+              Learn more in our <Link to="/pregnancy/after-birth" className="text-[#0891b2] font-medium hover:underline">After the birth guide</Link>.
             </p>
           </div>
         </div>
@@ -572,7 +572,7 @@ const LatePregnancyPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Late Pregnancy</h1>
           <p className="text-xl font-medium">
@@ -602,22 +602,22 @@ const LatePregnancyPage: React.FC = () => {
                 <h3 className="font-bold mb-3">Related information</h3>
                 <ul className="space-y-2">
                   <li>
-                    <Link to="/pregnancy/early" className="text-[#005eb8] hover:underline text-sm">Early pregnancy</Link>
+                    <Link to="/pregnancy/early" className="text-[#0891b2] hover:underline text-sm">Early pregnancy</Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/middle" className="text-[#005eb8] hover:underline text-sm">Middle pregnancy</Link>
+                    <Link to="/pregnancy/middle" className="text-[#0891b2] hover:underline text-sm">Middle pregnancy</Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/labor-and-birth" className="text-[#005eb8] hover:underline text-sm">Labor and birth</Link>
+                    <Link to="/pregnancy/labor-and-birth" className="text-[#0891b2] hover:underline text-sm">Labor and birth</Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/signs-of-labor" className="text-[#005eb8] hover:underline text-sm">Signs of labor</Link>
+                    <Link to="/pregnancy/signs-of-labor" className="text-[#0891b2] hover:underline text-sm">Signs of labor</Link>
                   </li>
                   <li>
-                    <Link to="/tools/contraction-timer" className="text-[#005eb8] hover:underline text-sm">Contraction timer</Link>
+                    <Link to="/tools/contraction-timer" className="text-[#0891b2] hover:underline text-sm">Contraction timer</Link>
                   </li>
                   <li>
-                    <Link to="/pregnancy/birth-plan-creator" className="text-[#005eb8] hover:underline text-sm">Birth plan creator</Link>
+                    <Link to="/pregnancy/birth-plan-creator" className="text-[#0891b2] hover:underline text-sm">Birth plan creator</Link>
                   </li>
                 </ul>
               </div>
@@ -635,13 +635,13 @@ const LatePregnancyPage: React.FC = () => {
 
             {sections.map((section) => (
               <section key={section.id} id={section.id} className="mb-12 scroll-mt-4">
-                <h2 className="text-2xl font-bold mb-4 text-[#005eb8]">{section.title}</h2>
+                <h2 className="text-2xl font-bold mb-4 text-[#0891b2]">{section.title}</h2>
                 <div className="prose max-w-none">{section.content}</div>
               </section>
             ))}
 
             <div className="mt-8">
-              <Link to="/pregnancy" className="text-[#005eb8] font-medium hover:underline flex items-center">
+              <Link to="/pregnancy" className="text-[#0891b2] font-medium hover:underline flex items-center">
                 <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>

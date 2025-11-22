@@ -230,7 +230,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                         <span className="inline-block text-xs font-medium px-2 py-1 bg-blue-100 text-blue-800 rounded mb-2">
                           {result.category}
                         </span>
-                        <h4 className="font-medium text-[#005eb8] mb-2 text-base md:text-sm">{result.title}</h4>
+                        <h4 className="font-medium text-[#0891b2] mb-2 text-base md:text-sm">{result.title}</h4>
                         <p className="text-sm text-gray-600 line-clamp-3 md:line-clamp-2">{description}</p>
 
                         {/* Display concepts/symptoms if available */}
@@ -278,7 +278,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         <div className="p-4 border-t border-gray-200 text-center sticky bottom-0 bg-white">
           <Link
             to={`/search?q=${encodeURIComponent(searchTerm)}`}
-            className="text-[#005eb8] hover:underline text-sm font-medium"
+            className="text-[#0891b2] hover:underline text-sm font-medium"
             onClick={(e) => onResultClick ? handleResultClick(`/search?q=${encodeURIComponent(searchTerm)}`, e) : onClose()}
           >
             View all results

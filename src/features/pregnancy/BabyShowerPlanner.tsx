@@ -257,7 +257,7 @@ const BabyShowerPlanner: React.FC = () => {
           <nav className="-mb-px flex space-x-8">
             <button
               className={`pb-4 px-1 ${activeTab === 'checklist'
-                ? 'border-b-2 border-[#005eb8] text-[#005eb8] font-medium'
+                ? 'border-b-2 border-[#0891b2] text-[#0891b2] font-medium'
                 : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
               onClick={() => setActiveTab('checklist')}
             >
@@ -265,7 +265,7 @@ const BabyShowerPlanner: React.FC = () => {
             </button>
             <button
               className={`pb-4 px-1 ${activeTab === 'invitations'
-                ? 'border-b-2 border-[#005eb8] text-[#005eb8] font-medium'
+                ? 'border-b-2 border-[#0891b2] text-[#0891b2] font-medium'
                 : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
               onClick={() => setActiveTab('invitations')}
             >
@@ -273,7 +273,7 @@ const BabyShowerPlanner: React.FC = () => {
             </button>
             <button
               className={`pb-4 px-1 ${activeTab === 'games'
-                ? 'border-b-2 border-[#005eb8] text-[#005eb8] font-medium'
+                ? 'border-b-2 border-[#0891b2] text-[#0891b2] font-medium'
                 : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
               onClick={() => setActiveTab('games')}
             >
@@ -281,7 +281,7 @@ const BabyShowerPlanner: React.FC = () => {
             </button>
             <button
               className={`pb-4 px-1 ${activeTab === 'tips'
-                ? 'border-b-2 border-[#005eb8] text-[#005eb8] font-medium'
+                ? 'border-b-2 border-[#0891b2] text-[#0891b2] font-medium'
                 : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
               onClick={() => setActiveTab('tips')}
             >
@@ -323,7 +323,7 @@ const BabyShowerPlanner: React.FC = () => {
                 ))}
               </select>
               <button
-                className="w-full sm:w-auto px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#004c93]"
+                className="w-full sm:w-auto px-4 py-2 bg-[#0891b2] text-white rounded-md hover:bg-[#004c93]"
                 onClick={handleAddItem}
               >
                 Add Item
@@ -344,7 +344,7 @@ const BabyShowerPlanner: React.FC = () => {
                         <li key={item.id} className="flex items-center">
                           <input
                             type="checkbox"
-                            className="mr-3 h-5 w-5 text-[#005eb8]"
+                            className="mr-3 h-5 w-5 text-[#0891b2]"
                             checked={item.completed}
                             onChange={() => toggleItemComplete(item.id)}
                           />
@@ -568,12 +568,12 @@ const BabyShowerPlanner: React.FC = () => {
 
               <div className="flex justify-end space-x-3">
                 <button
-                  className="px-4 py-2 border border-[#005eb8] text-[#005eb8] rounded-md hover:bg-blue-50"
+                  className="px-4 py-2 border border-[#0891b2] text-[#0891b2] rounded-md hover:bg-blue-50"
                   onClick={handleCloseTemplate}
                 >
                   Close
                 </button>
-                <button className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#004c93]">
+                <button className="px-4 py-2 bg-[#0891b2] text-white rounded-md hover:bg-[#004c93]">
                   Download Template
                 </button>
               </div>

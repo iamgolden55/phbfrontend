@@ -112,7 +112,7 @@ const laborSigns: SignType[] = [
 const SignsOfLaborPage: React.FC = () => {
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Signs of Labor</h1>
           <p className="text-xl font-medium">
@@ -164,7 +164,7 @@ const SignsOfLaborPage: React.FC = () => {
 
         {/* Early signs section */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6 text-[#005eb8]">Early signs that labor may be approaching</h2>
+          <h2 className="text-2xl font-bold mb-6 text-[#0891b2]">Early signs that labor may be approaching</h2>
           <p className="mb-6">These signs may occur days or even weeks before labor begins. They indicate that your body is preparing, but don't necessarily mean that labor is imminent.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -193,7 +193,7 @@ const SignsOfLaborPage: React.FC = () => {
 
         {/* Active labor signs section */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6 text-[#005eb8]">Signs that labor has begun</h2>
+          <h2 className="text-2xl font-bold mb-6 text-[#0891b2]">Signs that labor has begun</h2>
           <p className="mb-6">These are the definitive signs that labor is underway. When you experience these signs, you should contact your healthcare provider or go to your birthing location based on their instructions.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -222,7 +222,7 @@ const SignsOfLaborPage: React.FC = () => {
 
         {/* Imminent birth signs section */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6 text-[#005eb8]">Signs that birth is approaching soon</h2>
+          <h2 className="text-2xl font-bold mb-6 text-[#0891b2]">Signs that birth is approaching soon</h2>
           <p className="mb-6">These signs indicate that you're in the later stages of labor and birth may be imminent. By this point, you should already be at your birthing location with your healthcare team.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -298,7 +298,7 @@ const SignsOfLaborPage: React.FC = () => {
           <div className="flex items-center justify-center mb-2">
             <Link
               to="/tools/contraction-timer"
-              className="inline-block bg-[#005eb8] text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors text-center"
+              className="inline-block bg-[#0891b2] text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors text-center"
             >
               Use our contraction timer tool
             </Link>
@@ -309,26 +309,26 @@ const SignsOfLaborPage: React.FC = () => {
           <h2 className="text-xl font-bold mb-4">Related pregnancy information</h2>
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <li>
-              <Link to="/pregnancy/birth-plan-creator" className="text-[#005eb8] hover:underline">Create your birth plan</Link>
+              <Link to="/pregnancy/birth-plan-creator" className="text-[#0891b2] hover:underline">Create your birth plan</Link>
             </li>
             <li>
-              <Link to="/tools/contraction-timer" className="text-[#005eb8] hover:underline">Contraction timer tool</Link>
+              <Link to="/tools/contraction-timer" className="text-[#0891b2] hover:underline">Contraction timer tool</Link>
             </li>
             <li>
-              <Link to="/pregnancy/labor-pain-management" className="text-[#005eb8] hover:underline">Labor pain management options</Link>
+              <Link to="/pregnancy/labor-pain-management" className="text-[#0891b2] hover:underline">Labor pain management options</Link>
             </li>
             <li>
-              <Link to="/pregnancy/hospital-bag-checklist" className="text-[#005eb8] hover:underline">Hospital bag checklist</Link>
+              <Link to="/pregnancy/hospital-bag-checklist" className="text-[#0891b2] hover:underline">Hospital bag checklist</Link>
             </li>
             <li>
-              <Link to="/pregnancy/after-birth" className="text-[#005eb8] hover:underline">What to expect after giving birth</Link>
+              <Link to="/pregnancy/after-birth" className="text-[#0891b2] hover:underline">What to expect after giving birth</Link>
             </li>
             <li>
-              <Link to="/pregnancy/calendar" className="text-[#005eb8] hover:underline">Pregnancy calendar</Link>
+              <Link to="/pregnancy/calendar" className="text-[#0891b2] hover:underline">Pregnancy calendar</Link>
             </li>
           </ul>
           <div className="mt-4">
-            <Link to="/pregnancy" className="text-[#005eb8] font-medium hover:underline flex items-center">
+            <Link to="/pregnancy" className="text-[#0891b2] font-medium hover:underline flex items-center">
               <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const TalkingTherapiesPage: React.FC = () => {
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Talking therapies on the PHB</h1>
           <p className="text-xl font-medium">

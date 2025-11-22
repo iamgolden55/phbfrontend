@@ -608,7 +608,7 @@ const LinkPHBPage: React.FC = () => {
   if (hasPrimaryHospital && primaryHospital) {
     return (
       <div className="bg-white">
-        <div className="bg-[#005eb8] text-white py-8">
+        <div className="bg-[#0891b2] text-white py-8">
           <div className="phb-container">
             <h1 className="text-3xl font-bold mb-4">Hospital Registration</h1>
           </div>
@@ -635,7 +635,7 @@ const LinkPHBPage: React.FC = () => {
           <div className="flex justify-center mt-6">
             <Link
               to="/account"
-              className="px-6 py-3 bg-[#005eb8] text-white font-medium rounded-md hover:bg-[#004a93] transition-colors"
+              className="px-6 py-3 bg-[#0891b2] text-white font-medium rounded-md hover:bg-[#004a93] transition-colors"
             >
               Return to Account
             </Link>
@@ -647,7 +647,7 @@ const LinkPHBPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Link HPN Number to Hospital</h1>
           <p className="text-xl font-medium">
@@ -722,7 +722,7 @@ const LinkPHBPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={toggleLocationSearch}
-                  className="text-[#005eb8] hover:underline text-sm flex items-center"
+                  className="text-[#0891b2] hover:underline text-sm flex items-center"
                 >
                   {usingGeolocation ? 'Show all hospitals' : 'Find hospitals near me'}
                   <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -816,7 +816,7 @@ const LinkPHBPage: React.FC = () => {
                 
                 {isLoadingHospitals ? (
                   <div className="text-center py-8">
-                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#005eb8]"></div>
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#0891b2]"></div>
                     <p className="mt-2 text-gray-500">Loading hospitals...</p>
                   </div>
                 ) : noHospitalsFound ? (
@@ -911,7 +911,7 @@ const LinkPHBPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting || isLoadingHospitals || noHospitalsFound || !selectedHospital}
-                className={`px-6 py-3 bg-[#005eb8] text-white font-medium rounded-md hover:bg-[#004a93] transition-colors ${
+                className={`px-6 py-3 bg-[#0891b2] text-white font-medium rounded-md hover:bg-[#004a93] transition-colors ${
                   (isSubmitting || isLoadingHospitals || noHospitalsFound || !selectedHospital) ? 'opacity-70 cursor-not-allowed' : ''
                 }`}
               >
@@ -919,7 +919,7 @@ const LinkPHBPage: React.FC = () => {
               </button>
               <Link
                 to="/account"
-                className="text-[#005eb8] hover:underline"
+                className="text-[#0891b2] hover:underline"
               >
                 Cancel and return to account
               </Link>
@@ -934,12 +934,12 @@ const LinkPHBPage: React.FC = () => {
           </p>
           <ul className="list-disc pl-6 space-y-2">
             <li>
-              <Link to="/help/find-phb-number" className="text-[#005eb8] hover:underline">
+              <Link to="/help/find-phb-number" className="text-[#0891b2] hover:underline">
                 Find your HPN number
               </Link>
             </li>
             <li>
-              <Link to="/account/contact-support" className="text-[#005eb8] hover:underline">
+              <Link to="/account/contact-support" className="text-[#0891b2] hover:underline">
                 Contact PHB support
               </Link>
             </li>

@@ -361,7 +361,7 @@ const PersonalDetailsPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Personal Details</h1>
           <p className="text-xl font-medium">
@@ -388,7 +388,7 @@ const PersonalDetailsPage: React.FC = () => {
             <h2 className="text-2xl font-bold">Your Information</h2>
             <button
               onClick={() => setIsEditing(!isEditing)}
-              className="text-[#005eb8] hover:underline flex items-center"
+              className="text-[#0891b2] hover:underline flex items-center"
             >
               {isEditing ? 'Cancel' : 'Edit'}
             </button>
@@ -654,7 +654,7 @@ const PersonalDetailsPage: React.FC = () => {
                 <div className="pt-4">
                   <button
                     type="submit"
-                    className="bg-[#005eb8] hover:bg-[#003f7e] text-white py-2 px-6 rounded-md transition-colors"
+                    className="bg-[#0891b2] hover:bg-[#0e7490] text-white py-2 px-6 rounded-md transition-colors"
                   >
                     Save Changes
                   </button>

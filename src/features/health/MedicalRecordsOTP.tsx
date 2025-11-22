@@ -101,7 +101,7 @@ const MedicalRecordsOTP: React.FC<MedicalRecordsOTPProps> = ({
             <button
               onClick={handleRequestOTP}
               disabled={isLoading}
-              className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-[#0891b2] text-white rounded-md hover:bg-[#0e7490] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Sending...' : 'Request Verification Code'}
             </button>
@@ -149,7 +149,7 @@ const MedicalRecordsOTP: React.FC<MedicalRecordsOTPProps> = ({
               <button
                 type="submit"
                 disabled={isLoading || otp.length !== 6}
-                className="px-4 py-2 bg-[#005eb8] text-white rounded-md hover:bg-[#003f7e] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-[#0891b2] text-white rounded-md hover:bg-[#0e7490] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Verifying...' : 'Verify Code'}
               </button>

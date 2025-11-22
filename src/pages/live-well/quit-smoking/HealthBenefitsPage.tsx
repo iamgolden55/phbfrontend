@@ -266,7 +266,7 @@ const HealthBenefitsPage: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <nav className="text-sm mb-4">
             <Link to="/live-well" className="hover:underline">Live well</Link>
@@ -517,7 +517,7 @@ const HealthBenefitsPage: React.FC = () => {
         </div>
 
         {/* Support and next steps */}
-        <div className="bg-[#005eb8] text-white p-8 rounded-lg">
+        <div className="bg-[#0891b2] text-white p-8 rounded-lg">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-4">Ready to start your health journey?</h2>
             <p className="mb-6">
@@ -526,7 +526,7 @@ const HealthBenefitsPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/live-well/quit-smoking/coping-strategies"
-                className="bg-white text-[#005eb8] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
+                className="bg-white text-[#0891b2] px-6 py-3 rounded-md hover:bg-gray-100 transition-colors inline-block font-bold"
               >
                 Learn coping strategies
               </Link>
@@ -538,7 +538,7 @@ const HealthBenefitsPage: React.FC = () => {
               </Link>
               <a
                 href="tel:0800-QUIT-NOW"
-                className="bg-transparent border-2 border-white text-white px-6 py-3 rounded-md hover:bg-white hover:text-[#005eb8] transition-colors inline-block font-bold"
+                className="bg-transparent border-2 border-white text-white px-6 py-3 rounded-md hover:bg-white hover:text-[#0891b2] transition-colors inline-block font-bold"
               >
                 Call quit line: 0800-QUIT-NOW
               </a>

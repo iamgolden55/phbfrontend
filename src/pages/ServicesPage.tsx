@@ -51,7 +51,7 @@ const ServicesPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Header */}
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">PHB Services</h1>
           <p className="text-xl font-medium">
@@ -78,7 +78,7 @@ const ServicesPage: React.FC = () => {
                 </div>
               )}
               <div className="p-5 flex-grow flex flex-col">
-                <h2 className="text-xl font-bold text-[#005eb8] mb-2">
+                <h2 className="text-xl font-bold text-[#0891b2] mb-2">
                   <Link to={service.href} className="hover:underline">
                     {service.title}
                   </Link>
@@ -86,7 +86,7 @@ const ServicesPage: React.FC = () => {
                 <p className="text-gray-600 mb-4 flex-grow">{service.description}</p>
                 <Link
                   to={service.href}
-                  className="text-[#005eb8] font-medium hover:underline flex items-center mt-auto"
+                  className="text-[#0891b2] font-medium hover:underline flex items-center mt-auto"
                 >
                   Access service
                   <svg className="h-5 w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -143,37 +143,37 @@ const ServicesPage: React.FC = () => {
         <h2 className="text-2xl font-bold mb-6">Popular Services</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-[#e8edee] rounded-lg p-6 flex flex-col">
-            <h3 className="text-lg font-bold text-[#005eb8] mb-3">Book GP Appointment</h3>
+            <h3 className="text-lg font-bold text-[#0891b2] mb-3">Book GP Appointment</h3>
             <p className="text-gray-600 mb-4 flex-grow">
               See a doctor quickly for general health concerns, check-ups, and medical advice.
             </p>
             <Link
               to="/account/appointments/book"
-              className="text-[#005eb8] font-medium hover:underline"
+              className="text-[#0891b2] font-medium hover:underline"
             >
               Book now
             </Link>
           </div>
           <div className="bg-[#e8edee] rounded-lg p-6 flex flex-col">
-            <h3 className="text-lg font-bold text-[#005eb8] mb-3">Repeat Prescription</h3>
+            <h3 className="text-lg font-bold text-[#0891b2] mb-3">Repeat Prescription</h3>
             <p className="text-gray-600 mb-4 flex-grow">
               Order your regular medication online and collect from your nominated pharmacy.
             </p>
             <Link
               to="/account/prescriptions/request"
-              className="text-[#005eb8] font-medium hover:underline"
+              className="text-[#0891b2] font-medium hover:underline"
             >
               Request prescription
             </Link>
           </div>
           <div className="bg-[#e8edee] rounded-lg p-6 flex flex-col">
-            <h3 className="text-lg font-bold text-[#005eb8] mb-3">Wellbeing Check</h3>
+            <h3 className="text-lg font-bold text-[#0891b2] mb-3">Wellbeing Check</h3>
             <p className="text-gray-600 mb-4 flex-grow">
               Check your mental and physical wellbeing with our free health assessments.
             </p>
             <Link
               to="/tools/mental-wellbeing-assessment"
-              className="text-[#005eb8] font-medium hover:underline"
+              className="text-[#0891b2] font-medium hover:underline"
             >
               Take check
             </Link>
@@ -193,7 +193,7 @@ const ServicesPage: React.FC = () => {
               </p>
               <Link
                 to="/help/find-phb-number"
-                className="text-[#005eb8] font-medium hover:underline flex items-center"
+                className="text-[#0891b2] font-medium hover:underline flex items-center"
               >
                 Find your number
                 <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -208,7 +208,7 @@ const ServicesPage: React.FC = () => {
               </p>
               <Link
                 to="/account/contact-support"
-                className="text-[#005eb8] font-medium hover:underline flex items-center"
+                className="text-[#0891b2] font-medium hover:underline flex items-center"
               >
                 Contact us
                 <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -29,7 +29,7 @@ const MentorshipProgramPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Header */}
-      <div className="bg-[#005eb8] text-white py-8">
+      <div className="bg-[#0891b2] text-white py-8">
         <div className="phb-container">
           <h1 className="text-3xl font-bold mb-4">Mentorship Program</h1>
           <p className="text-xl font-medium">
@@ -57,7 +57,7 @@ const MentorshipProgramPage: React.FC = () => {
           {/* Main Content Area - 2/3 width on large screens */}
           <div className="lg:col-span-2">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">About the Mentorship Program</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">About the Mentorship Program</h2>
               <p className="mb-4">
                 The PHB Mentorship Program connects experienced public health professionals with emerging leaders,
                 practitioners, and researchers in the field. Our structured mentoring relationships provide guidance,
@@ -106,7 +106,7 @@ const MentorshipProgramPage: React.FC = () => {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Mentorship Categories</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Mentorship Categories</h2>
               <p className="mb-6">
                 Our mentorship program offers specialized guidance across various domains of public health practice:
               </p>
@@ -131,7 +131,7 @@ const MentorshipProgramPage: React.FC = () => {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">How the Program Works</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">How the Program Works</h2>
               <div className="space-y-6">
                 <div className="border-l-4 border-blue-500 pl-4">
                   <h3 className="text-xl font-semibold mb-2">Application and Matching</h3>
@@ -177,7 +177,7 @@ const MentorshipProgramPage: React.FC = () => {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#005eb8] mb-4">Eligibility</h2>
+              <h2 className="text-2xl font-bold text-[#0891b2] mb-4">Eligibility</h2>
 
               <div className="bg-white p-6 rounded-lg border border-gray-200 mb-6">
                 <h3 className="text-xl font-semibold mb-3">For Mentees:</h3>
@@ -201,16 +201,16 @@ const MentorshipProgramPage: React.FC = () => {
             </div>
 
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8">
-              <h2 className="text-xl font-bold text-[#005eb8] mb-2">Coming Soon</h2>
+              <h2 className="text-xl font-bold text-[#0891b2] mb-2">Coming Soon</h2>
               <p className="mb-4">
                 The PHB Mentorship Program is currently under development and will be launching soon.
                 Interested mentors and mentees can register below to receive updates when applications open.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4 mt-4">
-                <button className="bg-[#005eb8] text-white px-6 py-3 rounded-md hover:bg-[#003f7e] transition-colors font-medium">
+                <button className="bg-[#0891b2] text-white px-6 py-3 rounded-md hover:bg-[#0e7490] transition-colors font-medium">
                   Register as a Mentor
                 </button>
-                <button className="bg-[#005eb8] text-white px-6 py-3 rounded-md hover:bg-[#003f7e] transition-colors font-medium">
+                <button className="bg-[#0891b2] text-white px-6 py-3 rounded-md hover:bg-[#0e7490] transition-colors font-medium">
                   Register as a Mentee
                 </button>
               </div>
@@ -224,19 +224,19 @@ const MentorshipProgramPage: React.FC = () => {
               <h3 className="text-lg font-bold mb-4">Program Timeline</h3>
               <div className="space-y-4">
                 <div>
-                  <div className="text-[#005eb8] font-bold">Applications Open</div>
+                  <div className="text-[#0891b2] font-bold">Applications Open</div>
                   <div>Coming Soon</div>
                 </div>
                 <div>
-                  <div className="text-[#005eb8] font-bold">Matching Process</div>
+                  <div className="text-[#0891b2] font-bold">Matching Process</div>
                   <div>Coming Soon</div>
                 </div>
                 <div>
-                  <div className="text-[#005eb8] font-bold">Program Orientation</div>
+                  <div className="text-[#0891b2] font-bold">Program Orientation</div>
                   <div>Coming Soon</div>
                 </div>
                 <div>
-                  <div className="text-[#005eb8] font-bold">Program Duration</div>
+                  <div className="text-[#0891b2] font-bold">Program Duration</div>
                   <div>12 months</div>
                 </div>
               </div>
@@ -282,10 +282,10 @@ const MentorshipProgramPage: React.FC = () => {
             {/* Related Programs */}
             <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
               <div className="p-5">
-                <h3 className="text-lg font-bold text-[#005eb8] mb-3">Related Programs</h3>
+                <h3 className="text-lg font-bold text-[#0891b2] mb-3">Related Programs</h3>
                 <ul className="space-y-3">
                   <li>
-                    <Link to="/programs/student-recruitment" className="text-[#005eb8] hover:underline flex items-center">
+                    <Link to="/programs/student-recruitment" className="text-[#0891b2] hover:underline flex items-center">
                       <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
@@ -293,7 +293,7 @@ const MentorshipProgramPage: React.FC = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/programs/research" className="text-[#005eb8] hover:underline flex items-center">
+                    <Link to="/programs/research" className="text-[#0891b2] hover:underline flex items-center">
                       <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
@@ -301,7 +301,7 @@ const MentorshipProgramPage: React.FC = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/programs/partnerships" className="text-[#005eb8] hover:underline flex items-center">
+                    <Link to="/programs/partnerships" className="text-[#0891b2] hover:underline flex items-center">
                       <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
@@ -318,13 +318,13 @@ const MentorshipProgramPage: React.FC = () => {
               <p className="mb-4">For more information about the mentorship program:</p>
               <div className="space-y-2">
                 <div className="flex items-start">
-                  <svg className="h-5 w-5 mr-2 mt-0.5 text-[#005eb8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-5 w-5 mr-2 mt-0.5 text-[#0891b2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                   <span>mentorship@phb.gov.ng</span>
                 </div>
                 <div className="flex items-start">
-                  <svg className="h-5 w-5 mr-2 mt-0.5 text-[#005eb8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-5 w-5 mr-2 mt-0.5 text-[#0891b2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
                   <span>+234 (0) 123 456 7890</span>

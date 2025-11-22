@@ -92,7 +92,7 @@ const HeartDiseaseRiskAssessmentPage: React.FC = () => {
   return (
     <div className="bg-white min-h-screen py-10">
       <div className="phb-container max-w-xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6 text-[#005eb8]">Heart Disease Risk Assessment</h1>
+        <h1 className="text-3xl font-bold mb-6 text-[#0891b2]">Heart Disease Risk Assessment</h1>
         <p className="mb-6 text-gray-700">Answer the questions below to estimate your risk of heart disease. This tool is for informational purposes only and does not replace professional medical advice.</p>
         <form onSubmit={handleSubmit} className="space-y-4 bg-gray-50 p-6 rounded-lg shadow">
           <div>
@@ -197,7 +197,7 @@ const HeartDiseaseRiskAssessmentPage: React.FC = () => {
               </div>
             )}
           </div>
-          <button type="submit" className="w-full bg-[#005eb8] text-white py-2 rounded font-bold hover:bg-[#004b93] transition-colors">Calculate Risk</button>
+          <button type="submit" className="w-full bg-[#0891b2] text-white py-2 rounded font-bold hover:bg-[#004b93] transition-colors">Calculate Risk</button>
         </form>
         {result && (
           <div className="mt-6 p-4 rounded bg-blue-50 border border-blue-200 text-blue-800 text-center">
