@@ -195,9 +195,9 @@ const FluentHospitalDashboard: React.FC<FluentHospitalDashboardProps> = ({ userD
     },
     {
       icon: <Bed24Regular />,
-      label: 'Ward Management',
+      label: 'Departments',
       description: 'Manage departments and beds',
-      path: '/organization/wards',
+      path: '/organization/departments',
     },
     {
       icon: <Badge24Regular />,

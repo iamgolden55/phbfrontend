@@ -202,7 +202,7 @@ const SurgerySchedulePage: React.FC = () => {
           <Link to="/organization/admissions" className="bg-blue-50 hover:bg-blue-100 p-2 rounded-full" title="Patient Admissions">
             <span className="material-icons text-blue-700">person_add</span>
           </Link>
-          <Link to="/organization/wards" className="bg-blue-50 hover:bg-blue-100 p-2 rounded-full" title="Ward Management">
+          <Link to="/organization/departments" className="bg-blue-50 hover:bg-blue-100 p-2 rounded-full" title="Department Management">
             <span className="material-icons text-blue-700">bed</span>
           </Link>
           <Link to="/organization/staffing" className="bg-blue-50 hover:bg-blue-100 p-2 rounded-full" title="Staff Roster">

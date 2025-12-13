@@ -239,7 +239,7 @@ const FluentOrganizationLayoutInner: React.FC = () => {
           ...baseItems,
           { label: 'Patient Admissions', path: '/organization/admissions', icon: <PersonAdd24Regular /> },
           { label: 'Surgery Schedule', path: '/organization/surgery-schedule', icon: <CalendarLtr24Regular /> },
-          { label: 'Department Management', path: '/organization/wards', icon: <Bed24Regular /> },
+          { label: 'Department Management', path: '/organization/departments', icon: <Bed24Regular /> },
           { label: 'Staff Roster', path: '/organization/staffing', icon: <Badge24Regular /> },
           { label: 'Clinical Guidelines', path: '/organization/clinical-guidelines', icon: <ClipboardTextLtr24Regular /> },
           { label: 'Licenses', path: '/organization/licenses', icon: <DocumentText24Regular /> },

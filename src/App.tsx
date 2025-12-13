@@ -1,14 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
-// Debug utility
-import './utils/authDebug';
-
 // Layouts
 import MainLayout from './layouts/MainLayout';
 import ProfessionalLayout from './layouts/ProfessionalLayout';
 import OrganizationLayout from './layouts/OrganizationLayout';
 import FluentOrganizationLayout from './layouts/FluentOrganizationLayout';
+import ModernOrganizationLayout from './layouts/ModernOrganizationLayout';
+import ModernEmployeeLayout from './layouts/ModernEmployeeLayout';
 
 // Components
 import ScrollToTop from './components/ScrollToTop';
@@ -23,6 +22,24 @@ import AppointmentConfirmation from './features/health/AppointmentConfirmation';
 // Organization Pages
 import OrganizationDashboardPage from './pages/organization/OrganizationDashboardPage';
 import FluentDashboardPage from './pages/organization/FluentDashboardPage';
+import ModernOrganizationDashboard from './pages/organization/ModernOrganizationDashboard';
+import ModernEmployeeDashboard from './pages/employee/ModernEmployeeDashboard';
+import EmployeeProfilePage from './pages/employee/EmployeeProfilePage';
+import EmployeeAttendancePage from './pages/employee/EmployeeAttendancePage';
+import EmployeeLeavesPage from './pages/employee/EmployeeLeavesPage';
+import EmployeeProjectsPage from './pages/employee/EmployeeProjectsPage';
+import EmployeeTasksPage from './pages/employee/EmployeeTasksPage';
+import EmployeePayslipsPage from './pages/employee/EmployeePayslipsPage';
+import EmployeeSettingsPage from './pages/employee/EmployeeSettingsPage';
+import OrganizationPatientManagementPage from './pages/organization/PatientManagementPage';
+import PatientRegistrationPage from './pages/organization/PatientRegistrationPage';
+import ClinicalManagementPage from './pages/organization/ClinicalManagementPage';
+import PharmacyManagementPage from './pages/organization/PharmacyManagementPage';
+import BillingManagementPage from './pages/organization/BillingManagementPage';
+import ReportsPage from './pages/organization/ReportsPage';
+import StaffManagementPage from './pages/organization/StaffManagementPage';
+import LabTechnicianPage from './pages/organization/LabTechnicianPage';
+import RadiologyPage from './pages/organization/RadiologyPage';
 import OrganizationLoginPage from './pages/organization/OrganizationLoginPage';
 import OrganizationRegisterPage from './pages/organization/OrganizationRegisterPage';
 import PatientAdmissionsPage from './pages/organization/PatientAdmissionsPage';
@@ -31,7 +48,6 @@ import SurgerySchedulePage from './pages/organization/SurgerySchedulePage';
 import HospitalAdminForgotPasswordPage from './pages/organization/HospitalAdminForgotPasswordPage';
 import HospitalAdminPasswordResetVerifyPage from './pages/organization/HospitalAdminPasswordResetVerifyPage';
 import HospitalAdminPasswordResetCompletePage from './pages/organization/HospitalAdminPasswordResetCompletePage';
-import WardManagementPage from './pages/organization/WardManagementPage';
 import StaffRosterPage from './pages/organization/StaffRosterPage';
 import InventoryCheckPage from './pages/organization/InventoryCheckPage';
 import AnalyticsPage from './pages/organization/AnalyticsPage';
@@ -40,7 +56,18 @@ import UserRegistrationsPage from './pages/organization/UserRegistrationsPage';
 import AppointmentsPage from './pages/organization/AppointmentsPage';
 import ClinicalGuidelinesManagementPage from './pages/organization/ClinicalGuidelinesManagementPage';
 import HospitalLicensesPage from './pages/organization/HospitalLicensesPage';
+import DepartmentManagementPage from './pages/organization/DepartmentManagementPage';
 import { OrganizationAuthProvider } from './features/organization/organizationAuthContext';
+
+// Organization Settings Pages
+import OrganizationSettingsPage from './pages/organization/settings/OrganizationSettingsPage';
+import OrganizationProfilePage from './pages/organization/settings/OrganizationProfilePage';
+import UserManagementPage from './pages/organization/settings/UserManagementPage';
+import RoleManagementPage from './pages/organization/settings/RoleManagementPage';
+import TemplateLibraryPage from './pages/organization/settings/TemplateLibraryPage';
+import PriceListPage from './pages/organization/settings/PriceListPage';
+import HealthPackagesPage from './pages/organization/settings/HealthPackagesPage';
+
 import ForgotPasswordPage from './pages/ForgotPasswordPage'; // Add this import
 import ResetPasswordPage from './pages/ResetPasswordPage'; // Add this import
 
@@ -367,52 +394,13 @@ import ProfessionalRouteGuard from './features/professional/ProfessionalRouteGua
 import CaptchaTestPage from './features/auth/CaptchaTestPage';
 import CaptchaTestScript from './features/auth/CaptchaTestScript';
 
-// Organization route guard component
+// Organization route guard component - SECURE IMPLEMENTATION
+// Only relies on HTTP-only cookie authentication via context state
 const OrganizationRouteGuard = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading, isInitialized } = useOrganizationAuth();
-  const [directCheckDone, setDirectCheckDone] = React.useState(false);
-  const [directAuthCheck, setDirectAuthCheck] = React.useState(false);
-
-  // Try to directly check localStorage before relying on context state
-  React.useEffect(() => {
-    if (!isAuthenticated && !directCheckDone) {
-      try {
-        // Check localStorage directly as a last resort
-        const storedAuth = localStorage.getItem('organizationAuth');
-        if (storedAuth) {
-          const authData = JSON.parse(storedAuth);
-          if (authData.userData && authData.tokens) {
-            console.log('🛡️ Route Guard: Found valid auth in localStorage');
-            setDirectAuthCheck(true);
-          } else {
-            console.log('🛡️ Route Guard: Invalid auth data in localStorage');
-            setDirectAuthCheck(false);
-          }
-        } else {
-          // Check sessionStorage as backup
-          const backupState = sessionStorage.getItem('org_auth_state');
-          if (backupState) {
-            const parsedState = JSON.parse(backupState);
-            if (parsedState.isAuthenticated && parsedState.userData) {
-              console.log('🛡️ Route Guard: Found valid auth in sessionStorage backup');
-              setDirectAuthCheck(true);
-            } else {
-              setDirectAuthCheck(false);
-            }
-          } else {
-            setDirectAuthCheck(false);
-          }
-        }
-      } catch (err) {
-        console.error('🛡️ Route Guard: Error checking direct auth:', err);
-        setDirectAuthCheck(false);
-      } finally {
-        setDirectCheckDone(true);
-      }
-    }
-  }, [isAuthenticated, directCheckDone]);
 
   // Show loading spinner while authentication is being initialized
+  // The context will check cookies with the backend automatically
   if (isLoading || !isInitialized) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -426,9 +414,9 @@ const OrganizationRouteGuard = ({ children }: { children: React.ReactNode }) => 
     );
   }
 
-  // Either use the context's isAuthenticated or our direct check
-  if (!isAuthenticated && !directAuthCheck) {
-    console.log('🛡️ Route Guard: Redirecting to login page');
+  // Check authentication status from context (which validates with backend via cookies)
+  if (!isAuthenticated) {
+    console.log('🛡️ Organization Route Guard: Redirecting to login page');
     return <Navigate to="/organization/login" replace />;
   }
 
@@ -471,6 +459,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 function App() {
+  console.log('🚀 App.tsx is running! Using ModernOrganizationLayout?');
   return (
     <AuthProvider>
       <ProfessionalAuthProvider>
@@ -497,10 +486,65 @@ function App() {
               <Route path="pharmacy-verification" element={<PharmacyVerification />} />
 
               {/* Organization layout routes */}
-              <Route path="/organization" element={<FluentOrganizationLayout />}>
+              <Route path="/organization" element={<ModernOrganizationLayout />}>
                 <Route path="dashboard" element={
                   <OrganizationRouteGuard>
-                    <FluentDashboardPage />
+                    <ModernOrganizationDashboard />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="patients" element={
+                  <OrganizationRouteGuard>
+                    <OrganizationPatientManagementPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="patients/new" element={
+                  <OrganizationRouteGuard>
+                    <PatientRegistrationPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="clinical" element={
+                  <OrganizationRouteGuard>
+                    <ClinicalManagementPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="lab" element={
+                  <OrganizationRouteGuard>
+                    <LabTechnicianPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="radiology" element={
+                  <OrganizationRouteGuard>
+                    <RadiologyPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="pharmacy" element={
+                  <OrganizationRouteGuard>
+                    <PharmacyManagementPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="billing" element={
+                  <OrganizationRouteGuard>
+                    <BillingManagementPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="appointments" element={
+                  <OrganizationRouteGuard>
+                    <AppointmentsPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="surgery" element={
+                  <OrganizationRouteGuard>
+                    <SurgerySchedulePage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="reports" element={
+                  <OrganizationRouteGuard>
+                    <ReportsPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="staff" element={
+                  <OrganizationRouteGuard>
+                    <StaffManagementPage />
                   </OrganizationRouteGuard>
                 } />
                 <Route path="user-registrations" element={
@@ -523,9 +567,9 @@ function App() {
                     <SurgerySchedulePage />
                   </OrganizationRouteGuard>
                 } />
-                <Route path="wards" element={
+                <Route path="departments" element={
                   <OrganizationRouteGuard>
-                    <WardManagementPage />
+                    <DepartmentManagementPage />
                   </OrganizationRouteGuard>
                 } />
                 <Route path="staffing" element={
@@ -563,6 +607,88 @@ function App() {
                     <HospitalLicensesPage />
                   </OrganizationRouteGuard>
                 } />
+
+                {/* Organization Settings Routes */}
+                <Route path="settings" element={
+                  <OrganizationRouteGuard>
+                    <OrganizationSettingsPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="settings/profile" element={
+                  <OrganizationRouteGuard>
+                    <OrganizationProfilePage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="settings/users" element={
+                  <OrganizationRouteGuard>
+                    <UserManagementPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="settings/roles" element={
+                  <OrganizationRouteGuard>
+                    <RoleManagementPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="settings/templates" element={
+                  <OrganizationRouteGuard>
+                    <TemplateLibraryPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="settings/price-list" element={
+                  <OrganizationRouteGuard>
+                    <PriceListPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="settings/health-packages" element={
+                  <OrganizationRouteGuard>
+                    <HealthPackagesPage />
+                  </OrganizationRouteGuard>
+                } />
+              </Route>
+
+              {/* Employee layout routes */}
+              <Route path="/employee" element={<ModernEmployeeLayout />}>
+                <Route path="dashboard" element={
+                  <OrganizationRouteGuard>
+                    <ModernEmployeeDashboard />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="profile" element={
+                  <OrganizationRouteGuard>
+                    <EmployeeProfilePage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="attendance" element={
+                  <OrganizationRouteGuard>
+                    <EmployeeAttendancePage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="leaves" element={
+                  <OrganizationRouteGuard>
+                    <EmployeeLeavesPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="projects" element={
+                  <OrganizationRouteGuard>
+                    <EmployeeProjectsPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="tasks" element={
+                  <OrganizationRouteGuard>
+                    <EmployeeTasksPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="payslips" element={
+                  <OrganizationRouteGuard>
+                    <EmployeePayslipsPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="settings" element={
+                  <OrganizationRouteGuard>
+                    <EmployeeSettingsPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="*" element={<ModernEmployeeDashboard />} />
               </Route>
 
 
@@ -634,13 +760,13 @@ function App() {
                 <Route path="care-and-support/older-people" element={<OlderPeoplePage />} />
                 <Route path="care-and-support/dementia" element={<DementiaPage />} />
                 <Route path="care-and-support/carers-benefits" element={<CarersBenefitsPage />} />
-            <Route path="care-and-support/hospital-discharge" element={<HospitalDischargePage />} />
-            <Route path="care-and-support/carers" element={<CarersPage />} />
-            <Route path="care-and-support/end-of-life" element={<EndOfLifePage />} />
-            <Route path="care-and-support/disabilities" element={<DisabilitiesPage />} />
-            <Route path="care-and-support/assessment" element={<AssessmentPage />} />
-            <Route path="care-and-support/carers-assessment" element={<CarersAssessmentPage />} />
-            <Route path="care-and-support/financial-help" element={<FinancialHelpPage />} />
+                <Route path="care-and-support/hospital-discharge" element={<HospitalDischargePage />} />
+                <Route path="care-and-support/carers" element={<CarersPage />} />
+                <Route path="care-and-support/end-of-life" element={<EndOfLifePage />} />
+                <Route path="care-and-support/disabilities" element={<DisabilitiesPage />} />
+                <Route path="care-and-support/assessment" element={<AssessmentPage />} />
+                <Route path="care-and-support/carers-assessment" element={<CarersAssessmentPage />} />
+                <Route path="care-and-support/financial-help" element={<FinancialHelpPage />} />
 
                 {/* Find Support Routes */}
                 <Route path="find-support/fertility" element={<FertilitySupportPage />} />
@@ -986,7 +1112,7 @@ function App() {
                 <Route path="medical-ai-demo" element={<MedicalAIDemoPage />} />
                 <Route path="link-validator" element={<LinkValidatorPage />} />
                 <Route path="site-map" element={<SiteMapPage />} />
-                
+
                 {/* Test Pages */}
                 <Route path="captcha-test" element={<CaptchaTestPage />} />
                 <Route path="captcha-script" element={<CaptchaTestScript />} />

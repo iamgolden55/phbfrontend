@@ -207,7 +207,7 @@ const PatientAdmissionsPage: React.FC = () => {
           <h1 className="text-2xl font-bold text-blue-800">Patient Admissions</h1>
         </div>
         <div className="flex space-x-2">
-          <Link to="/organization/wards" className="bg-blue-50 hover:bg-blue-100 p-2 rounded-full" title="Ward Management">
+          <Link to="/organization/departments" className="bg-blue-50 hover:bg-blue-100 p-2 rounded-full" title="Department Management">
             <span className="material-icons text-blue-700">bed</span>
           </Link>
           <Link to="/organization/surgery-schedule" className="bg-blue-50 hover:bg-blue-100 p-2 rounded-full" title="Surgery Schedule">

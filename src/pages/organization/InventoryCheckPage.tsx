@@ -215,7 +215,7 @@ const InventoryCheckPage: React.FC = () => {
           <Link to="/organization/surgery-schedule" className="bg-blue-50 hover:bg-blue-100 p-2 rounded-full" title="Surgery Schedule">
             <span className="material-icons text-blue-700">event</span>
           </Link>
-          <Link to="/organization/wards" className="bg-blue-50 hover:bg-blue-100 p-2 rounded-full" title="Ward Management">
+          <Link to="/organization/departments" className="bg-blue-50 hover:bg-blue-100 p-2 rounded-full" title="Department Management">
             <span className="material-icons text-blue-700">bed</span>
           </Link>
         </div>

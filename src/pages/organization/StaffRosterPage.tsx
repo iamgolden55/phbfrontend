@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { StaffService, type StaffMember, type Department } from '../../services/staffService';
 import { StatusBadge } from '../../components/StatusBadge';
+import { useOrganizationAuth } from '../../features/organization/organizationAuthContext';
 // Using material-icons instead of heroicons
 import { PlusOne as PlusIcon, Close as XMarkIcon } from '@mui/icons-material';
 
@@ -371,8 +372,11 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
               
               <div>
                 <label htmlFor="department" className="block text-sm font-medium text-gray-700">
-                  Department *
+                  Clinical Department *
                 </label>
+                <p className="text-xs text-gray-500 mb-1">
+                  Select the clinical or support department (Emergency, Surgery, Laboratory, etc.)
+                </p>
                 {departmentsLoading ? (
                   <div className="mt-1 text-sm text-gray-500">Loading departments...</div>
                 ) : departmentsError ? (
@@ -561,6 +565,10 @@ const formatTimeString = (dateTimeString: string): string => {
 };
 
 const StaffRosterPage: React.FC = () => {
+  // Get organization authentication context
+  const { userData, isAuthenticated } = useOrganizationAuth();
+  const hospitalId = userData?.hospital?.id;
+
   // Current date for the roster
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   
@@ -656,18 +664,17 @@ const StaffRosterPage: React.FC = () => {
       try {
         setLoading(true);
         setDepartmentsLoading(true);
-        
-        // Get hospital ID from auth or context
-        const authData = JSON.parse(localStorage.getItem('organizationAuth') || '{}');
-        const hospitalId = authData.hospital?.id || authData.userData?.hospital?.id;
-        
+
+        // hospitalId is already available from useOrganizationAuth() hook
+
         if (!hospitalId) {
           throw new Error('Hospital ID not found');
         }
         
         // Fetch departments and staff members in parallel
+        // Only fetch clinical and support departments (not administrative ones like IT/HR)
         const [departmentsData, staffResponse] = await Promise.all([
-          StaffService.getHospitalDepartments(hospitalId),
+          StaffService.getHospitalDepartments(hospitalId, 'clinical_and_support'),
           StaffService.fetchStaffMembers()
         ]);
         
@@ -713,7 +720,7 @@ const StaffRosterPage: React.FC = () => {
           <Link to="/organization/surgery-schedule" className="bg-blue-50 hover:bg-blue-100 p-2 rounded-full" title="Surgery Schedule">
             <span className="material-icons text-blue-700">event</span>
           </Link>
-          <Link to="/organization/wards" className="bg-blue-50 hover:bg-blue-100 p-2 rounded-full" title="Ward Management">
+          <Link to="/organization/departments" className="bg-blue-50 hover:bg-blue-100 p-2 rounded-full" title="Department Management">
             <span className="material-icons text-blue-700">bed</span>
           </Link>
         </div>

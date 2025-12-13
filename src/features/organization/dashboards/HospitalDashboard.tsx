@@ -575,10 +575,10 @@ const HospitalQuickLinks: React.FC = () => {
       path: '/organization/appointments', 
       icon: 'event_available' 
     },
-    { 
-      label: 'Department Management', 
-      path: '/organization/wards', 
-      icon: 'bed' 
+    {
+      label: 'Department Management',
+      path: '/organization/departments',
+      icon: 'bed'
     },
     { 
       label: 'Staff Roster', 
@@ -689,7 +689,7 @@ const OccupancyChart: React.FC<{ data: typeof MOCK_OCCUPANCY }> = ({ data }) => 
         </React.Fragment>
       ))}
     </div>
-    <Link to="/organization/wards" className="text-blue-600 hover:underline text-sm mt-4 inline-block">
+    <Link to="/organization/departments" className="text-blue-600 hover:underline text-sm mt-4 inline-block">
       View Detailed Report
     </Link>
   </DashboardCard>
