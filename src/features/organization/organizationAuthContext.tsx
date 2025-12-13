@@ -72,14 +72,28 @@ export interface OrganizationRegistrationData {
 const OrganizationAuthContext = createContext<OrganizationAuthContextType | undefined>(undefined);
 
 /**
- * Organization Authentication Storage
+ * Organization Authentication Storage - SECURE IMPLEMENTATION
  *
- * MIGRATED TO HTTPONLY COOKIES:
- * - JWT tokens now stored in httpOnly cookies (XSS protected)
- * - Cookies: 'access_token' and 'refresh_token'
- * - Automatic token refresh every 25 minutes
- * - Cookies sent automatically with every API request (credentials: 'include')
- * - User data stored in React state (not localStorage)
+ * SECURITY MODEL (HTTP-ONLY COOKIES):
+ * ✅ JWT tokens stored in httpOnly cookies (XSS protected)
+ * ✅ Cookies: 'access_token' and 'refresh_token' set by backend
+ * ✅ Automatic token refresh every 25 minutes
+ * ✅ Cookies sent automatically with every API request (credentials: 'include')
+ * ✅ User data stored ONLY in React state (never in sessionStorage/localStorage)
+ * ✅ No sensitive data in client-side storage (prevents XSS theft)
+ *
+ * WHAT'S STORED IN sessionStorage (Non-Sensitive):
+ * - org_auth_email: Email for OTP verification flow only
+ * - org_auth_needs_verification: Boolean flag for OTP UI state
+ * - org_auth_timestamp: Timestamp for OTP flow tracking
+ * - org_logout_flag: Flag to distinguish intentional logout vs session expiry
+ *
+ * SECURITY BENEFITS:
+ * - httpOnly flag prevents JavaScript access (XSS protection)
+ * - No userData in sessionStorage (prevents session hijacking)
+ * - All user data fetched from backend (server is source of truth)
+ * - Secure flag ensures HTTPS-only transmission in production
+ * - SameSite=Lax prevents CSRF attacks
  */
 export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -91,9 +105,35 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const [lastAuthTime, setLastAuthTime] = useState<number>(Date.now());
   const refreshTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  // Track if refresh is in progress to prevent race conditions
+  const refreshInProgressRef = React.useRef<boolean>(false);
 
-  // Token refresh function
+  // Debug helper - expose auth state to window in development
+  React.useEffect(() => {
+    if (import.meta.env.DEV) {
+      (window as any).getOrgAuthState = () => ({
+        isAuthenticated,
+        isLoading,
+        isInitialized,
+        needsVerification,
+        hasUserData: !!userData,
+        userEmail: userData?.email,
+        organizationName: userData?.hospital?.name || userData?.ngo?.name || userData?.pharmacy?.name,
+        lastAuthTime: new Date(lastAuthTime).toISOString()
+      });
+    }
+  }, [isAuthenticated, isLoading, isInitialized, needsVerification, userData, lastAuthTime]);
+
+  // Token refresh function with proper error handling and race condition prevention
   const refreshAccessToken = React.useCallback(async (): Promise<boolean> => {
+    // Prevent duplicate refresh requests
+    if (refreshInProgressRef.current) {
+      console.log('⏭️ Organization: Token refresh already in progress, skipping');
+      return false;
+    }
+
+    refreshInProgressRef.current = true;
+
     try {
       console.log('🔄 Organization: Attempting to refresh access token...');
       const response = await fetch(createApiUrl('api/token/refresh/'), {
@@ -101,63 +141,120 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // Send cookies with request
+        credentials: 'include', // Send httpOnly cookies
       });
 
+      // Log response details for debugging
+      console.log(`📡 Organization: Token refresh response - Status: ${response.status} ${response.statusText}`);
+
       if (!response.ok) {
-        console.error('❌ Organization: Token refresh failed');
+        // Parse error details from response
+        let errorMessage = 'Token refresh failed';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorData.detail || errorMessage;
+        } catch {
+          // Response not JSON, use status text
+          errorMessage = response.statusText;
+        }
+
+        console.error(`❌ Organization: Token refresh failed - ${response.status}: ${errorMessage}`);
+
+        // Handle expired refresh tokens (401/403) by logging out
+        if (response.status === 401 || response.status === 403) {
+          console.log('🔒 Organization: Refresh token expired or invalid - logging out user');
+
+          // Clear auth state
+          setIsAuthenticated(false);
+          setUserData(null);
+          setNeedsVerification(false);
+          setCurrentEmail(null);
+
+          // Clear session storage (OTP-related only)
+          sessionStorage.removeItem('org_auth_email');
+          sessionStorage.removeItem('org_auth_needs_verification');
+          sessionStorage.removeItem('org_auth_timestamp');
+
+          // Clear localStorage tracking
+          localStorage.removeItem('org_last_token_refresh');
+
+          // Show user-friendly message
+          console.warn('⚠️ Your session has expired. Please log in again.');
+        }
+
+        refreshInProgressRef.current = false;
         return false;
       }
 
+      // Parse successful response
       const data = await response.json();
+
       if (data.status === 'success') {
         console.log('✅ Organization: Token refresh successful');
         const now = Date.now();
         setLastAuthTime(now);
-        // Update localStorage to track this refresh
+        // Only update localStorage once, not in setupTokenRefreshTimer
         localStorage.setItem('org_last_token_refresh', now.toString());
+        refreshInProgressRef.current = false;
         return true;
       }
 
+      console.error('❌ Organization: Token refresh returned non-success status:', data);
+      refreshInProgressRef.current = false;
       return false;
+
     } catch (err: any) {
-      console.error('❌ Organization: Token refresh error:', err);
-      if (err.status === 401 || err.status === 403) {
-        console.log('🔒 Organization: Refresh token expired - logging out user');
-        setIsAuthenticated(false);
-        setUserData(null);
-        setNeedsVerification(false);
-        setCurrentEmail(null);
-        sessionStorage.removeItem('org_auth_email');
-        sessionStorage.removeItem('org_auth_needs_verification');
-      }
+      console.error('❌ Organization: Token refresh network error:', err);
+
+      // Network errors don't necessarily mean expired token
+      // User might have lost internet connection
+      console.warn('⚠️ Network error during token refresh. Will retry on next trigger.');
+
+      refreshInProgressRef.current = false;
       return false;
     }
   }, []);
 
-  // Setup token refresh timer with persistent tracking
+  // Setup token refresh timer with retry logic
   const setupTokenRefreshTimer = React.useCallback(() => {
+    // Clear any existing timer
     if (refreshTimerRef.current) {
       clearTimeout(refreshTimerRef.current);
       refreshTimerRef.current = null;
+      console.log('🔄 Organization: Cleared existing refresh timer');
     }
 
-    const REFRESH_INTERVAL = 25 * 60 * 1000; // 25 minutes (5 min before 30-min expiry)
-    const now = Date.now();
+    const REFRESH_INTERVAL = 25 * 60 * 1000; // 25 minutes
 
-    // Store last refresh time in localStorage for persistence across navigations
-    localStorage.setItem('org_last_token_refresh', now.toString());
+    // Don't set localStorage here - only after actual refresh succeeds
+    // This prevents timestamp drift between timer setup and actual refresh
 
     console.log('⏰ Organization: Setting up token refresh timer (will refresh in 25 minutes)');
+    console.log(`⏰ Next refresh scheduled at: ${new Date(Date.now() + REFRESH_INTERVAL).toLocaleTimeString()}`);
 
     refreshTimerRef.current = setTimeout(async () => {
       console.log('⏰ Organization: Token refresh timer triggered');
       const success = await refreshAccessToken();
       if (success) {
-        setupTokenRefreshTimer(); // Set up next refresh
+        // Reschedule only if refresh succeeded
+        console.log('✅ Organization: Refresh succeeded, rescheduling timer');
+        setupTokenRefreshTimer();
+      } else {
+        // If refresh failed, check if user is still authenticated
+        // If yes, retry in 1 minute (might be temporary network issue)
+        // If no, user was logged out (expired refresh token)
+        if (isAuthenticated) {
+          console.warn('⚠️ Organization: Refresh failed but user still authenticated, retrying in 1 minute');
+          refreshTimerRef.current = setTimeout(async () => {
+            const retrySuccess = await refreshAccessToken();
+            if (retrySuccess) setupTokenRefreshTimer();
+          }, 60 * 1000); // Retry in 1 minute
+        } else {
+          console.log('🔒 Organization: User logged out, not rescheduling timer');
+        }
       }
     }, REFRESH_INTERVAL);
-  }, [refreshAccessToken]);
+  }, [refreshAccessToken, isAuthenticated]);
 
   // Cleanup refresh timer on unmount
   React.useEffect(() => {
@@ -168,27 +265,56 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
     };
   }, []);
 
-  // Handle page visibility changes - refresh token when user returns to tab
+  // Handle page visibility and focus changes - refresh token when user returns to tab
   React.useEffect(() => {
-    const handleVisibilityChange = async () => {
-      if (document.visibilityState === 'visible' && isAuthenticated) {
-        const lastRefresh = localStorage.getItem('org_last_token_refresh');
-        const REFRESH_THRESHOLD = 20 * 60 * 1000; // 20 minutes
+    const checkAndRefreshToken = async () => {
+      if (!isAuthenticated) return;
 
-        if (lastRefresh) {
-          const timeSinceRefresh = Date.now() - parseInt(lastRefresh);
-          if (timeSinceRefresh >= REFRESH_THRESHOLD) {
-            console.log('⏰ Organization: Tab became visible, refreshing token...');
-            await refreshAccessToken();
-            setupTokenRefreshTimer(); // Reset the timer
+      const lastRefresh = localStorage.getItem('org_last_token_refresh');
+      const REFRESH_THRESHOLD = 15 * 60 * 1000; // 15 minutes (more aggressive)
+
+      if (lastRefresh) {
+        const timeSinceRefresh = Date.now() - parseInt(lastRefresh);
+        if (timeSinceRefresh >= REFRESH_THRESHOLD) {
+          console.log(`⏰ Organization: Tab became active after ${Math.round(timeSinceRefresh / 60000)} minutes, refreshing token...`);
+
+          // refreshAccessToken has its own mutex to prevent race conditions
+          const success = await refreshAccessToken();
+
+          if (success) {
+            // Reset the timer after successful refresh
+            setupTokenRefreshTimer();
           }
+        } else {
+          console.log(`⏰ Organization: Tab became active, but token was refreshed ${Math.round(timeSinceRefresh / 60000)} minutes ago (threshold: 15 min)`);
+        }
+      } else {
+        // No last refresh timestamp - refresh immediately to be safe
+        console.log('⏰ Organization: Tab became active with no refresh timestamp, refreshing immediately...');
+        const success = await refreshAccessToken();
+        if (success) {
+          setupTokenRefreshTimer();
         }
       }
     };
 
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'visible') {
+        await checkAndRefreshToken();
+      }
+    };
+
+    const handleFocus = async () => {
+      await checkAndRefreshToken();
+    };
+
+    // Listen to both visibility change and focus events for better coverage
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
     };
   }, [isAuthenticated, refreshAccessToken, setupTokenRefreshTimer]);
 
@@ -198,14 +324,20 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
       if (!isAuthenticated) return;
 
       const lastRefresh = localStorage.getItem('org_last_token_refresh');
-      const ACTIVITY_REFRESH_THRESHOLD = 20 * 60 * 1000; // 20 minutes
+      const ACTIVITY_REFRESH_THRESHOLD = 15 * 60 * 1000; // 15 minutes (more aggressive)
 
       if (lastRefresh) {
         const timeSinceRefresh = Date.now() - parseInt(lastRefresh);
         if (timeSinceRefresh >= ACTIVITY_REFRESH_THRESHOLD) {
-          console.log('⏰ Organization: User activity detected, refreshing token...');
-          await refreshAccessToken();
-          setupTokenRefreshTimer(); // Reset the timer
+          console.log(`⏰ Organization: User activity detected after ${Math.round(timeSinceRefresh / 60000)} minutes, refreshing token...`);
+
+          // refreshAccessToken has its own mutex to prevent race conditions
+          const success = await refreshAccessToken();
+
+          if (success) {
+            // Reset the timer after successful refresh
+            setupTokenRefreshTimer();
+          }
         }
       }
     };
@@ -214,13 +346,13 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
     let activityTimeout: NodeJS.Timeout;
     const throttledActivity = () => {
       if (activityTimeout) clearTimeout(activityTimeout);
-      activityTimeout = setTimeout(handleUserActivity, 5000); // Check 5 seconds after activity
+      activityTimeout = setTimeout(handleUserActivity, 5000); // Check 5 seconds after activity stops
     };
 
     // Listen for user interactions
     const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
     events.forEach(event => {
-      document.addEventListener(event, throttledActivity);
+      document.addEventListener(event, throttledActivity, { passive: true }); // Add passive for performance
     });
 
     return () => {
@@ -259,7 +391,9 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
         // The backend will check the httpOnly cookies automatically
         // If the user is not an organization user, this will fail silently (404)
         try {
-          const response = await fetch(createApiUrl('api/organizations/profile/'), {
+          const profileUrl = createApiUrl('api/hospitals/admin/profile/');
+
+          const response = await fetch(profileUrl, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -269,8 +403,6 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
 
           if (response.ok) {
             const profileData = await response.json();
-            console.log('🔐 ✅ ORGANIZATION USER AUTHENTICATED VIA COOKIES');
-            console.log('🔐 Profile data:', profileData);
 
             // Map the profile data to UserData format
             const userData: UserData = {
@@ -295,7 +427,7 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
 
             // Check if token needs immediate refresh based on last refresh time
             const lastRefresh = localStorage.getItem('org_last_token_refresh');
-            const REFRESH_THRESHOLD = 20 * 60 * 1000; // 20 minutes - refresh if it's been this long
+            const REFRESH_THRESHOLD = 15 * 60 * 1000; // 15 minutes - refresh if it's been this long
 
             if (lastRefresh) {
               const timeSinceRefresh = Date.now() - parseInt(lastRefresh);
@@ -303,6 +435,11 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
                 console.log('⏰ Organization: Token is old, refreshing immediately...');
                 await refreshAccessToken();
               }
+            } else {
+              // No timestamp means we don't know when it was last refreshed
+              // Refresh proactively to ensure valid token
+              console.log('⏰ Organization: No refresh timestamp found, refreshing proactively...');
+              await refreshAccessToken();
             }
 
             // Setup automatic token refresh
@@ -310,8 +447,9 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
 
             console.log('🔐 ✅ ORGANIZATION USER RESTORED SUCCESSFULLY');
           } else {
-            // Expected for non-organization users (404/401/403)
-            // This is not an error - just means user is not an organization admin
+            // Profile endpoint failed - user might not be an organization user
+            // or cookies might be invalid/expired
+            console.log('🔐 Profile endpoint returned non-OK status:', response.status);
 
             // Check if we're in the middle of OTP verification
             const storedEmail = sessionStorage.getItem('org_auth_email');
@@ -324,7 +462,7 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
               setIsAuthenticated(false);
               setUserData(null);
             } else {
-              // No auth data and no verification in progress - this is normal for non-org users
+              // No auth data and no verification in progress
               setIsAuthenticated(false);
               setUserData(null);
               setNeedsVerification(false);
@@ -332,7 +470,8 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
             }
           }
         } catch (fetchError) {
-          // Expected error for non-organization users - suppress console log
+          // Profile endpoint network error or other failure
+          console.error('🔐 Profile endpoint fetch error:', fetchError);
 
           // Check if we're in the middle of OTP verification
           const storedEmail = sessionStorage.getItem('org_auth_email');
@@ -345,6 +484,7 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
             setIsAuthenticated(false);
             setUserData(null);
           } else {
+            // No auth data available
             setIsAuthenticated(false);
             setUserData(null);
             setNeedsVerification(false);
@@ -514,12 +654,10 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
       console.error('❌ Organization: Error during logout API call:', err);
     }
 
-    // Clear all auth-related session storage
+    // Clear all auth-related session storage (OTP-related only)
     sessionStorage.removeItem('org_auth_email');
     sessionStorage.removeItem('org_auth_needs_verification');
     sessionStorage.removeItem('org_auth_timestamp');
-    sessionStorage.removeItem('org_auth_initialized');
-    sessionStorage.removeItem('org_auth_state');
 
     // Clear token refresh tracking from localStorage
     localStorage.removeItem('org_last_token_refresh');
@@ -575,14 +713,6 @@ export const OrganizationAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
       if (!data.user_data) {
         throw new Error('Invalid response from server');
       }
-
-      console.log('🔐 User data received from backend:', {
-        hasUserData: !!data.user_data,
-        userRole: data.user_data?.role,
-        hospitalId: data.user_data?.hospital?.id
-      });
-
-      console.log('🔐 ✅ Cookies have been set by backend automatically');
 
       // Clear the verification state from sessionStorage
       sessionStorage.removeItem('org_auth_email');

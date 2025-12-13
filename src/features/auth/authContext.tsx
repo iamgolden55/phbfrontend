@@ -170,11 +170,6 @@ async function apiRequest<T>(
   // Ensure exactly one slash between base URL and endpoint
   const url = `${API_BASE_URL.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
 
-  // 🐛 DEBUG: Log the actual URL being called
-  console.log('🔗 API_BASE_URL:', API_BASE_URL);
-  console.log('🔗 Final URL:', url);
-  console.log('🔗 Method:', method);
-
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -193,18 +188,8 @@ async function apiRequest<T>(
     config.body = JSON.stringify(body);
   }
 
-  // 🐛 DEBUG: Log cookies being sent
-  console.log('🍪 Document.cookie:', document.cookie);
-  console.log('🍪 Sending request with credentials: include');
-
   try {
     const response = await fetch(url, config);
-
-    // 🐛 DEBUG: Log response headers
-    console.log('📥 Response headers:');
-    response.headers.forEach((value, key) => {
-      console.log(`  ${key}: ${value}`);
-    });
 
     // Handle cases where the response might be empty (e.g., 204 No Content)
     if (response.status === 204) {
@@ -402,9 +387,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const userData = await apiRequest<User>('/api/profile/', 'GET');
         
         // Log the user data and onboarding status
-        console.log("User profile data from API:", userData);
-        console.log("has_completed_onboarding value:", userData.has_completed_onboarding);
-        console.log("has_completed_onboarding type:", typeof userData.has_completed_onboarding);
+        // User profile data loaded successfully
         
         // Create a mutable copy of userData to add role if needed
         let userDataWithRole = {...userData};
@@ -428,13 +411,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               userDataWithRole.role = 'doctor'; // Set default role for users with HPN
             }
             
-            console.log("Updated user data with role:", userDataWithRole);
+            // Updated user data with role
           } catch (roleErr) {
             console.error('Error fetching user role:', roleErr);
             // Fallback if we can't fetch the role
             if (userData.hpn) {
               userDataWithRole.role = 'doctor';
-              console.log("Set fallback role for user with HPN:", userDataWithRole);
+              // Set fallback role for user with HPN
             }
           }
         }
@@ -457,8 +440,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             // Only update if values have changed to prevent re-renders
             const hasPrimaryChanged = hospitalData.has_primary !== hasPrimaryHospital;
             const hospitalChanged = JSON.stringify(hospitalData.primary_hospital) !== JSON.stringify(primaryHospital);
-            console.log("hasPrimaryChanged:", hasPrimaryChanged);
-            console.log("hospitalChanged:", hospitalData.primary_hospital);
+            // Primary hospital status updated
             if (hasPrimaryChanged || hospitalChanged) {
               setHasPrimaryHospital(hospitalData.has_primary);
               setPrimaryHospital(hospitalData.primary_hospital || null);
@@ -495,9 +477,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [checkAuthStatus]); // Run once on mount
 
   const handleAuthSuccess = (userData: User) => {
-      console.log("Auth success with user data:", userData);
-      console.log("has_completed_onboarding value:", userData.has_completed_onboarding);
-      console.log("User role received:", userData.role);
+      // Authentication successful
 
       // Make sure the role field is preserved in the user data
       const updatedUserData = {
@@ -519,8 +499,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       // Debug log after setting user
       setTimeout(() => {
-        console.log("User state after handleAuthSuccess:", user);
-        console.log("needsOnboarding calculated as:", !!user && !user.has_completed_onboarding);
+        // User state updated
       }, 100);
   };
 
@@ -858,9 +837,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return { success: false, message: "Cannot complete onboarding - user is null" };
     }
 
-    console.log("Starting completeOnboarding...");
-    console.log("Current user:", user);
-    console.log("Current has_completed_onboarding value:", user.has_completed_onboarding);
+    // Starting onboarding completion
 
     // Set a temporary flag to prevent redirect loops
     localStorage.setItem('phb_onboarding_completed', 'true');
@@ -868,22 +845,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsLoading(true);
     try {
       // Send the expected data in the POST body
-      const requestBody = { has_completed_onboarding: true }; 
-      console.log("Sending request to /api/onboarding/update/ with:", requestBody);
-      
+      const requestBody = { has_completed_onboarding: true };
+
       const response = await apiRequest<{success?: boolean; message?: string; user?: User}>(
         `/api/onboarding/update/`,
         'POST',
         requestBody
       );
-      
-      console.log("Response from /api/onboarding/update/:", response);
 
       // Update local state immediately regardless of response
       const updatedUser = { ...user, has_completed_onboarding: true };
       setUser(updatedUser);
-      
-      console.log("Onboarding completion successful");
       return { success: true, message: "Onboarding completed successfully" };
 
     } catch (err: any) {
@@ -1016,8 +988,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               if (!prevUser) return updatedUserData;
               return { ...prevUser, ...updatedUserData };
           });
-          
-          console.log("Profile updated successfully with fields:", Object.keys(updateData).join(', '));
       } catch (err: any) {
           console.error("Update profile failed:", err);
           const errorMessage = err.data?.detail || err.message || "Failed to update profile.";

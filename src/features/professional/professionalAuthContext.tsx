@@ -69,7 +69,6 @@ export const ProfessionalAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
   const fetchProfessionalInfo = async () => {
     try {
       const url = `${API_BASE_URL}/api/registry/my-info/`;
-      console.log('🔍 Fetching professional info from:', url);
 
       const response = await fetch(url, {
         method: 'GET',
@@ -79,24 +78,17 @@ export const ProfessionalAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
         },
       });
 
-      console.log('📡 Professional info response status:', response.status);
-
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ Professional info received:', data);
         return {
           professional_type: data.professional_type,
           licenseNumber: data.license_number,
           specialty: data.specialization,
           verified: data.verified,
         };
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        console.log('❌ Professional info error:', response.status, errorData);
       }
       return null;
     } catch (error) {
-      console.error('💥 Error fetching professional info:', error);
       return null;
     }
   };
@@ -104,67 +96,67 @@ export const ProfessionalAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
   // Check if the user is a professional (doctor, pharmacist, etc.)
   useEffect(() => {
     const loadProfessionalData = async () => {
-      // Prevent infinite loop - only run once
-      if (hasChecked.current) {
+      // Prevent infinite loop - only run once we have valid user data
+      // Allow re-run if user data changes (e.g., fresh login)
+      if (hasChecked.current && professionalUser) {
         return;
       }
 
-      // Only process when the main auth has completed loading
-      if (!authLoading) {
+      // Only process when the main auth has completed loading AND user data is available
+      if (!authLoading && mainUserAuthenticated && user) {
         hasChecked.current = true;
 
-        if (mainUserAuthenticated && user) {
-          // Try to fetch detailed professional info from registry
-          const registryInfo = await fetchProfessionalInfo();
+        // Try to fetch detailed professional info from registry
+        const registryInfo = await fetchProfessionalInfo();
 
-          if (registryInfo) {
-            // User has an active professional license in PHB Registry
-            const professionalUserData: ProfessionalUser = {
-              id: user.id,
-              name: user.full_name,
-              email: user.email,
-              role: registryInfo.professional_type as ProfessionalRole,
-              professional_type: registryInfo.professional_type,
-              licenseNumber: registryInfo.licenseNumber,
-              specialty: registryInfo.specialty,
-              verified: registryInfo.verified,
-            };
+        if (registryInfo) {
+          // User has an active professional license in PHB Registry
+          const professionalUserData: ProfessionalUser = {
+            id: user.id,
+            name: user.full_name,
+            email: user.email,
+            role: registryInfo.professional_type as ProfessionalRole,
+            professional_type: registryInfo.professional_type,
+            licenseNumber: registryInfo.licenseNumber,
+            specialty: registryInfo.specialty,
+            verified: registryInfo.verified,
+          };
 
-            setProfessionalUser(professionalUserData);
+          setProfessionalUser(professionalUserData);
 
-            // Update view preference if in professional view
-            if (window.location.pathname.includes('/professional')) {
-              localStorage.setItem(VIEW_PREFERENCE_KEY, 'doctor');
-              localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
-            }
-          } else if (isDoctor && user.hpn) {
-            // Fallback: User is detected as a doctor via old HPN system
-            const professionalUserData: ProfessionalUser = {
-              id: user.id,
-              name: user.full_name,
-              email: user.email,
-              role: 'doctor',
-              professional_type: 'doctor',
-              licenseNumber: user.hpn,
-              specialty: '',
-              verified: true,
-            };
+          // Update view preference if in professional view
+          if (window.location.pathname.includes('/professional')) {
+            localStorage.setItem(VIEW_PREFERENCE_KEY, 'doctor');
+            localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
+          }
+        } else if (isDoctor && user.hpn) {
+          // Fallback: User is detected as a doctor via old HPN system
+          const professionalUserData: ProfessionalUser = {
+            id: user.id,
+            name: user.full_name,
+            email: user.email,
+            role: 'doctor',
+            professional_type: 'doctor',
+            licenseNumber: user.hpn,
+            specialty: '',
+            verified: true,
+          };
 
-            setProfessionalUser(professionalUserData);
+          setProfessionalUser(professionalUserData);
 
-            if (window.location.pathname.includes('/professional')) {
-              localStorage.setItem(VIEW_PREFERENCE_KEY, 'doctor');
-              localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
-            }
-          } else {
-            // Not a professional user
-            setProfessionalUser(null);
+          if (window.location.pathname.includes('/professional')) {
+            localStorage.setItem(VIEW_PREFERENCE_KEY, 'doctor');
+            localStorage.setItem(PROFESSIONAL_AUTH_STATE_KEY, 'true');
           }
         } else {
-          // Not authenticated
+          // Not a professional user
           setProfessionalUser(null);
         }
 
+        setIsLoading(false);
+      } else if (!authLoading && !mainUserAuthenticated) {
+        // Auth completed but user is not authenticated
+        setProfessionalUser(null);
         setIsLoading(false);
       }
     };
@@ -200,7 +192,7 @@ export const ProfessionalAuthProvider: React.FC<{ children: ReactNode }> = ({ ch
     professionalInfo: professionalUser,
     logout,
   };
-  console.log("professionalUser:", professionalUser);
+
   return (
     <ProfessionalAuthContext.Provider value={contextValue}>
       {children}
