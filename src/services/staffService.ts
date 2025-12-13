@@ -131,7 +131,7 @@ export const StaffService = {
     }
   },
 
-  async getHospitalDepartments(hospitalId: number): Promise<Department[]> {
+  async getHospitalDepartments(hospitalId: number, category?: 'administrative' | 'clinical' | 'support' | 'clinical_and_support' | 'all'): Promise<Department[]> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/hospitals/departments/?hospital_id=${hospitalId}`, {
         method: 'GET',
@@ -146,7 +146,24 @@ export const StaffService = {
       }
 
       const data = await response.json();
-      return data.departments || [];
+      let departments = data.departments || [];
+
+      // Filter by category if specified
+      if (category && category !== 'all') {
+        const categoryMap = {
+          administrative: ['admin', 'records', 'it', 'human_resources', 'finance', 'operations'],
+          clinical: ['medical', 'surgical', 'emergency', 'critical_care', 'outpatient'],
+          support: ['laboratory', 'radiology', 'pharmacy', 'physiotherapy'],
+          clinical_and_support: ['medical', 'surgical', 'emergency', 'critical_care', 'outpatient', 'laboratory', 'radiology', 'pharmacy', 'physiotherapy'],
+        };
+
+        const allowedTypes = categoryMap[category] || [];
+        departments = departments.filter((dept: any) =>
+          allowedTypes.includes(dept.department_type)
+        );
+      }
+
+      return departments;
     } catch (error) {
       console.error('Error fetching departments:', error);
       throw error;

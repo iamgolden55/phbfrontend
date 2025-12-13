@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useOrganizationAuth } from '../../features/organization/organizationAuthContext';
 
 interface PatientDetailModalProps {
   isOpen: boolean;
@@ -28,12 +29,13 @@ interface PatientDetail {
   followup_instructions?: string;
 }
 
-const PatientDetailModal: React.FC<PatientDetailModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  patientId, 
-  onUpdate 
+const PatientDetailModal: React.FC<PatientDetailModalProps> = ({
+  isOpen,
+  onClose,
+  patientId,
+  onUpdate
 }) => {
+  const { isAuthenticated } = useOrganizationAuth(); // Verify authentication via context
   const [patient, setPatient] = useState<PatientDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -48,20 +50,6 @@ const PatientDetailModal: React.FC<PatientDetailModalProps> = ({
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
-  // Get auth token
-  const getAuthToken = () => {
-    const organizationAuth = localStorage.getItem('organizationAuth');
-    if (organizationAuth) {
-      try {
-        const authData = JSON.parse(organizationAuth);
-        return authData.tokens?.access;
-      } catch (e) {
-        console.error('Failed to parse organization auth data:', e);
-      }
-    }
-    return null;
-  };
-
   // Fetch patient details when modal opens
   useEffect(() => {
     if (isOpen && patientId) {
@@ -72,12 +60,11 @@ const PatientDetailModal: React.FC<PatientDetailModalProps> = ({
   const fetchPatientDetails = async () => {
     setLoading(true);
     try {
-      const token = getAuthToken();
       const response = await fetch(`${API_BASE_URL}/api/admissions/${patientId}/`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send HTTP-only cookies automatically
       });
 
       if (response.ok) {
@@ -112,13 +99,12 @@ const PatientDetailModal: React.FC<PatientDetailModalProps> = ({
   const handleSave = async () => {
     setLoading(true);
     try {
-      const token = getAuthToken();
       const response = await fetch(`${API_BASE_URL}/api/admissions/${patientId}/`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send HTTP-only cookies automatically
         body: JSON.stringify(editForm)
       });
 
@@ -154,12 +140,11 @@ const PatientDetailModal: React.FC<PatientDetailModalProps> = ({
   const updatePatientStatus = async (newStatus: string) => {
     setLoading(true);
     try {
-      const token = getAuthToken();
-      const endpoint = newStatus === 'admitted' 
+      const endpoint = newStatus === 'admitted'
         ? `${API_BASE_URL}/api/admissions/${patientId}/admit/`
         : `${API_BASE_URL}/api/admissions/${patientId}/discharge/`;
 
-      const body = newStatus === 'discharged' 
+      const body = newStatus === 'discharged'
         ? {
             discharge_summary: editForm.discharge_summary,
             followup_instructions: editForm.followup_instructions,
@@ -170,9 +155,9 @@ const PatientDetailModal: React.FC<PatientDetailModalProps> = ({
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send HTTP-only cookies automatically
         body: JSON.stringify(body)
       });
 

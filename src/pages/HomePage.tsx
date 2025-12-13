@@ -11,7 +11,7 @@ const HomePage: React.FC = () => {
   const healthLinks = [
     {
       href: '/account/gp-record',
-      text: 'View your GP health record',
+      text: 'View your health record',
     },
     {
       href: '/account/prescriptions',

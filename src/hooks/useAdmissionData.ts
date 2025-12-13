@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useOrganizationAuth } from '../features/organization/organizationAuthContext';
 
 interface AdmissionData {
   id: number;
@@ -47,6 +48,7 @@ interface AdmissionStats {
 }
 
 export const useAdmissionData = (): AdmissionStats => {
+  const { isInitialized, isLoading: authLoading } = useOrganizationAuth();
   const [stats, setStats] = useState<AdmissionStats>({
     admissions: [],
     totalCount: 0,
@@ -113,8 +115,8 @@ export const useAdmissionData = (): AdmissionStats => {
         };
 
         // Fix: Count emergency cases by priority OR admission_type, not registration status
-        const emergencyCount = admissions.filter(a => 
-          a.priority === 'emergency' || 
+        const emergencyCount = admissions.filter(a =>
+          a.priority === 'emergency' ||
           a.admission_type === 'emergency' ||
           a.priority === 'urgent' // Include urgent cases as emergency-level
         ).length;
@@ -136,8 +138,12 @@ export const useAdmissionData = (): AdmissionStats => {
       }
     };
 
-    loadAdmissions();
-  }, []);
+    // Only fetch admissions when auth is fully initialized
+    // This prevents race condition on page refresh
+    if (isInitialized && !authLoading) {
+      loadAdmissions();
+    }
+  }, [isInitialized, authLoading]);
 
   return stats;
 };

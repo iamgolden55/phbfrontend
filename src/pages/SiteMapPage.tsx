@@ -76,7 +76,7 @@ const SiteMapPage: React.FC = () => {
         { title: 'Login', path: '/login', description: 'Sign in to your PHB account' },
         { title: 'Register', path: '/register', description: 'Create a new PHB account' },
         { title: 'Account Overview', path: '/account', description: 'Manage your PHB account' },
-        { title: 'GP Health Record', path: '/account/gp-record', description: 'View your GP health record' },
+        { title: 'Health Record', path: '/account/gp-record', description: 'View your health record' },
         { title: 'Prescriptions', path: '/account/prescriptions', description: 'Manage your prescriptions' },
         { title: 'Appointments', path: '/account/appointments', description: 'Book and manage appointments' },
         { title: 'Test Results', path: '/account/test-results', description: 'View your test results' },

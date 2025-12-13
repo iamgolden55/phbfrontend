@@ -4,7 +4,7 @@ const ManageHealthSection: React.FC = () => {
   const healthLinks = [
     {
       href: '/view-gp-health-record',
-      text: 'View your GP health record',
+      text: 'View your health record',
     },
     {
       href: '/repeat-prescription',

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PatientHPNSearch from '../search/PatientHPNSearch';
 import { debounce } from 'lodash';
+import { useOrganizationAuth } from '../../features/organization/organizationAuthContext';
 
 interface Department {
   id: number;
@@ -35,11 +36,12 @@ interface NewAdmissionModalProps {
 }
 
 const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, onSubmit }) => {
+  const { userData, isAuthenticated } = useOrganizationAuth(); // Use secure cookie-based auth
   const [admissionType, setAdmissionType] = useState<'regular' | 'emergency'>('regular');
   const [departments, setDepartments] = useState<Department[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);  
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   // Form state
   const [formData, setFormData] = useState({
     // Emergency Patient Information
@@ -53,7 +55,7 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
     address: '',
     emergency_contact: '',
     emergency_contact_name: '',
-    
+
     // Admission Details
     department_id: '',
     attending_doctor_id: '',
@@ -66,12 +68,12 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
     admission_action: 'admit_immediately', // Default to immediate admission
     expected_discharge_date: '',
     additional_notes: '',
-    
+
     // Medical Information
     allergies: '',
     current_medications: '',
     brief_history: '',
-    
+
     // Insurance
     insurance_provider: '',
     insurance_id: ''
@@ -79,31 +81,15 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
-  // Get auth token and hospital ID
-  const getAuthData = () => {
-    const organizationAuth = localStorage.getItem('organizationAuth');
-    if (organizationAuth) {
-      try {
-        const authData = JSON.parse(organizationAuth);
-        return {
-          token: authData.tokens?.access,
-          hospitalId: authData.hospital?.id || authData.userData?.hospital?.id || authData.userData?.hospital_id
-        };
-      } catch (e) {
-        console.error('Failed to parse organization auth data:', e);
-      }
-    }
-    return { token: null, hospitalId: null };
-  };
+  // Get hospital ID from context
+  const hospitalId = userData?.hospital?.id;
   // Fetch departments and doctors when modal opens
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && isAuthenticated) {
       console.log('🚀 Modal opened, fetching data...');
-      const authData = getAuthData();
-      console.log('🔐 Auth data:', authData);
-      console.log('🏥 Hospital ID:', authData.hospitalId);
-      console.log('👤 User role:', authData.token ? 'Has token' : 'No token');
-      
+      console.log('🏥 Hospital ID:', hospitalId);
+      console.log('👤 User authenticated:', isAuthenticated);
+
       // Add small delay to ensure modal is fully rendered
       setTimeout(() => {
         console.log('🚀 Starting API calls...');
@@ -150,45 +136,41 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
   };
   const fetchDepartments = async () => {
     try {
-      const { token, hospitalId } = getAuthData();
-      
       if (!hospitalId) {
         console.error('No hospital ID found in auth data');
         return;
       }
-      
-      // For hospital admins, try the hospitals/departments endpoint first
-      const organizationAuth = localStorage.getItem('organizationAuth');
-      const authData = organizationAuth ? JSON.parse(organizationAuth) : null;
-      const isHospitalAdmin = authData?.userData?.role === 'hospital_admin';
-      
+
+      // Check user role from context
+      const isHospitalAdmin = userData?.role === 'hospital_admin';
+
       let url = `${API_BASE_URL}/api/departments/?hospital=${hospitalId}`;
-      
+
       // If we're a hospital admin, try the hospital-specific endpoint
       if (isHospitalAdmin) {
         // First try to get departments for the hospital admin's hospital
         url = `${API_BASE_URL}/api/hospitals/departments/${hospitalId}`;
       }
-      
+
       console.log('🏥 Fetching departments from:', url);
-      console.log('🔐 User role:', authData?.userData?.role);
+      console.log('🔐 User role:', userData?.role);
       console.log('🏥 Hospital ID being sent:', hospitalId);
-      
+
       const response = await fetch(url, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send HTTP-only cookies automatically
       });
-      
+
       // If hospital admin endpoint failed, try the regular endpoint
       if (!response.ok && isHospitalAdmin) {
         console.log('🔄 Hospital admin endpoint failed, trying regular departments endpoint...');
         const fallbackResponse = await fetch(`${API_BASE_URL}/api/departments/?hospital=${hospitalId}`, {
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
+          credentials: 'include', // Send HTTP-only cookies automatically
         });
         
         if (fallbackResponse.ok) {
@@ -248,25 +230,23 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
 
   const fetchDoctors = async (departmentId: string) => {
     try {
-      const { token, hospitalId } = getAuthData();
-      
       if (!hospitalId) {
         console.error('No hospital ID found in auth data');
         return;
       }
-      
+
       // Include both hospital ID and department ID to fetch filtered doctors
       const response = await fetch(`${API_BASE_URL}/api/doctors/department/${departmentId}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send HTTP-only cookies automatically
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         console.log('👨‍⚕️ Doctors fetched for hospital', hospitalId, ':', data);
-        
+
         // Handle both array and paginated responses
         let doctorList = [];
         if (Array.isArray(data)) {
@@ -276,17 +256,13 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
         } else if (data.data && Array.isArray(data.data)) {
           doctorList = data.data;
         }
-        
+
         console.log('📦 Parsed doctors:', doctorList);
         setDoctors(doctorList);
       } else {
         const errorData = await response.text();
         console.error('Failed to fetch doctors:', response.status, response.statusText, errorData);
-        
-        // For hospital admins, doctors might be empty if none are registered yet
-        const organizationAuth = localStorage.getItem('organizationAuth');
-        const authData = organizationAuth ? JSON.parse(organizationAuth) : null;
-        
+
         // Try parsing error response
         try {
           const errorJson = JSON.parse(errorData);
@@ -294,8 +270,8 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
         } catch {
           console.log('📢 Raw error:', errorData);
         }
-        
-        if (authData?.userData?.role === 'hospital_admin' && response.status === 404) {
+
+        if (userData?.role === 'hospital_admin' && response.status === 404) {
           console.log('📢 No doctors found for this hospital yet');
           setDoctors([]);
         }
@@ -351,8 +327,8 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
     setLoading(true);
 
     try {
-      const { token, hospitalId } = getAuthData();
-      
+      // hospitalId is already available from useOrganizationAuth() hook
+
       if (!hospitalId) {
         alert('Hospital ID not found. Please log in again.');
         return;
@@ -420,9 +396,9 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Send HTTP-only cookies automatically
         body: JSON.stringify(admissionData)
       });
 

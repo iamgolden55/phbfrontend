@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useOrganizationAuth } from '../features/organization/organizationAuthContext';
 
 interface RegistrationStats {
   pending: number;
@@ -9,6 +10,7 @@ interface RegistrationStats {
 }
 
 export const useRegistrationStats = (): RegistrationStats => {
+  const { isInitialized, isLoading: authLoading } = useOrganizationAuth();
   const [stats, setStats] = useState<RegistrationStats>({
     pending: 0,
     approved: 0,
@@ -78,8 +80,12 @@ export const useRegistrationStats = (): RegistrationStats => {
       }
     };
 
-    loadStats();
-  }, []);
+    // Only fetch stats when auth is fully initialized
+    // This prevents race condition on page refresh
+    if (isInitialized && !authLoading) {
+      loadStats();
+    }
+  }, [isInitialized, authLoading]);
 
   return stats;
 };

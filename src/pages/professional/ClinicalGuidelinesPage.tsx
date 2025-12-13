@@ -26,7 +26,7 @@ interface GuidelineFilter {
 }
 
 const ClinicalGuidelinesPage: React.FC = () => {
-  const { user, isAuthenticated } = useProfessionalAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useProfessionalAuth();
   const [guidelines, setGuidelines] = useState<ClinicalGuideline[]>([]);
   const [bookmarkedGuidelines, setBookmarkedGuidelines] = useState<ClinicalGuideline[]>([]);
   const [selectedGuideline, setSelectedGuideline] = useState<ClinicalGuideline | null>(null);
@@ -151,6 +151,19 @@ const ClinicalGuidelinesPage: React.FC = () => {
 
   const currentGuidelines = activeTab === 'all' ? guidelines : bookmarkedGuidelines;
 
+  // Show loading state while authentication is being checked
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Only show access denied after loading is complete
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
