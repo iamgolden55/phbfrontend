@@ -151,7 +151,7 @@ With OTP disabled, you can now:
 
 ## Related Files
 
-- **Credentials**: [TEST_DOCTOR_CREDENTIALS.md](../../TEST_DOCTOR_CREDENTIALS.md)
+- **Credentials**: [TEST_DOCTOR_CREDENTIALS.md](../../raw_doc/TEST_DOCTOR_CREDENTIALS.md)
 - **Registration Script**: `/Users/new/Newphb/basebackend/register_test_doctor.py`
 - **OTP Utility Script**: `/Users/new/Newphb/basebackend/disable_otp_for_user.py`
 

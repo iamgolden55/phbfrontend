@@ -349,7 +349,7 @@ src/
 
 ## Documentation Links
 
-- **User Guide**: [TEST_DOCTOR_CREDENTIALS.md](../../TEST_DOCTOR_CREDENTIALS.md)
+- **User Guide**: [TEST_DOCTOR_CREDENTIALS.md](../../raw_doc/TEST_DOCTOR_CREDENTIALS.md)
 - **OTP Disabled Summary**: [OTP_DISABLED_SUMMARY.md](OTP_DISABLED_SUMMARY.md)
 - **Account Page**: [src/pages/AccountPage.tsx](../../src/pages/AccountPage.tsx)
 - **Security Page**: [src/pages/account/SecuritySettingsPage.tsx](../../src/pages/account/SecuritySettingsPage.tsx)
