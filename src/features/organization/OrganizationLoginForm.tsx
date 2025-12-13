@@ -144,12 +144,7 @@ const OrganizationLoginForm: React.FC<OrganizationLoginFormProps> = ({ redirectP
       </div>
 
       <div className="mt-6 border-t border-gray-200 pt-4">
-        <h3 className="text-sm font-medium text-gray-500 mb-2">Demo Accounts:</h3>
-        <ul className="text-xs text-gray-500 space-y-1">
-          <li>Hospital: hospital@example.org / password123</li>
-          <li>NGO: ngo@example.org / password123</li>
-          <li>Pharmaceutical: pharma@example.org / password123</li>
-        </ul>
+        <p className="text-sm text-gray-600"> For more information on how to access your organization/hospitals dashboard, please contact support if you find any issues assessing your account.</p>
       </div>
     </div>
     </>

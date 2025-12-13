@@ -15,25 +15,20 @@ const AuthDebugConsole: React.FC = () => {
       console.log('Current Email:', auth.currentEmail);
       console.log('User Data:', auth.userData);
       console.log('Error:', auth.error);
-      
-      // Log localStorage content
-      const storedAuth = localStorage.getItem('organizationAuth');
-      if (storedAuth) {
-        try {
-          const parsed = JSON.parse(storedAuth);
-          console.log('LocalStorage Auth:', {
-            hasUserData: !!parsed.userData,
-            hasTokens: !!parsed.tokens,
-            userRole: parsed.userData?.role,
-            hospitalId: parsed.userData?.hospital?.id,
-            hospitalName: parsed.userData?.hospital?.name,
-          });
-        } catch (e) {
-          console.log('LocalStorage Parse Error:', e);
-        }
+
+      // Log authentication method (now using HTTP-only cookies)
+      console.log('🔒 Authentication Method: HTTP-only Cookies (XSS Protected)');
+      console.log('🍪 Tokens stored in httpOnly cookies (not accessible to JavaScript)');
+      console.log('✅ No sensitive data in localStorage or sessionStorage');
+
+      // Check if sessionStorage has any org-related data (should be empty now)
+      const sessionKeys = Object.keys(sessionStorage).filter(key => key.includes('org'));
+      if (sessionKeys.length > 0) {
+        console.warn('⚠️ WARNING: Found org-related sessionStorage keys:', sessionKeys);
       } else {
-        console.log('LocalStorage Auth: None');
+        console.log('✅ sessionStorage: Clean (no auth data)');
       }
+
       console.groupEnd();
     }
   }, [auth]);

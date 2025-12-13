@@ -9,7 +9,7 @@ interface OrganizationVerificationFormProps {
 const OrganizationVerificationForm: React.FC<OrganizationVerificationFormProps> = ({ redirectPath = '/organization/dashboard' }) => {
   const [verificationCode, setVerificationCode] = useState('');
   const [rememberDevice, setRememberDevice] = useState(false);
-  const { verify2FA, error, isLoading, clearError, currentEmail, getDashboardPath, needsVerification } = useOrganizationAuth();
+  const { verify2FA, error, isLoading, clearError, currentEmail, getDashboardPath, needsVerification, isAuthenticated } = useOrganizationAuth();
   const navigate = useNavigate();
 
   // Force navigation directly to dashboard 
@@ -27,22 +27,14 @@ const OrganizationVerificationForm: React.FC<OrganizationVerificationFormProps> 
       return; // Stay on verification page
     }
 
-    // Only redirect if we're actually authenticated
-    const authData = localStorage.getItem('organizationAuth');
-    if (authData && !needsVerification) {
-      try {
-        const parsed = JSON.parse(authData);
-        if (parsed.userData && parsed.tokens) {
-          console.log('🔐 Found valid auth data, redirecting to dashboard');
-          setTimeout(() => {
-            navigateToDashboard();
-          }, 100);
-        }
-      } catch (e) {
-        console.error('Error parsing auth data:', e);
-      }
+    // Only redirect if we're authenticated (via HTTP-only cookies)
+    if (isAuthenticated && !needsVerification) {
+      console.log('🔐 Authentication confirmed via cookies, redirecting to dashboard');
+      setTimeout(() => {
+        navigateToDashboard();
+      }, 100);
     }
-  }, [needsVerification, currentEmail, navigateToDashboard]);
+  }, [needsVerification, currentEmail, isAuthenticated, navigateToDashboard]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
