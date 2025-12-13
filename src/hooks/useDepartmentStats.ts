@@ -108,7 +108,7 @@ export interface UseDepartmentStatsReturn {
 }
 
 export const useDepartmentStats = (): UseDepartmentStatsReturn => {
-  const { userData, isLoading: authLoading } = useOrganizationAuth();
+  const { userData, isLoading: authLoading, isInitialized } = useOrganizationAuth();
   const [departments, setDepartments] = useState<DepartmentData[]>([]);
   const [stats, setStats] = useState<DepartmentStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -308,15 +308,19 @@ export const useDepartmentStats = (): UseDepartmentStatsReturn => {
   };
 
   useEffect(() => {
-    // Fetch department stats when userData with hospital ID is available
-    // Wait for auth to finish loading and userData to be populated
-    if (!authLoading && userData?.hospital?.id) {
-      console.log('🛏️ ✅ Conditions met, fetching department stats...');
+    // Fetch department stats when auth is fully initialized and userData with hospital ID is available
+    // CRITICAL: Must wait for isInitialized to ensure session restoration is complete
+    if (isInitialized && !authLoading && userData?.hospital?.id) {
+      console.log('🛏️ ✅ Auth initialized, fetching department stats...');
       fetchDepartmentStats();
     } else {
-      console.log('🛏️ ⏳ Waiting for auth... authLoading:', authLoading, 'hospitalId:', userData?.hospital?.id);
+      console.log('🛏️ ⏳ Waiting for auth...', {
+        isInitialized,
+        authLoading,
+        hospitalId: userData?.hospital?.id
+      });
     }
-  }, [authLoading, userData?.hospital?.id]);
+  }, [isInitialized, authLoading, userData?.hospital?.id]);
 
   const refetch = () => {
     fetchDepartmentStats();
