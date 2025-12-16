@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { MoreVertical, ChevronDown } from 'lucide-react';
+import { MoreVertical, ChevronDown, Bell } from 'lucide-react';
+import NotificationPopover from './NotificationPopover';
 
 export interface ActionTool {
     icon: React.ElementType;
@@ -33,6 +34,7 @@ const OrganizationActionBar: React.FC<OrganizationActionBarProps> = ({
     className = '',
 }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
     const positionClasses = position === 'top'
         ? 'sticky top-0 z-30 border-b'
@@ -71,6 +73,34 @@ const OrganizationActionBar: React.FC<OrganizationActionBarProps> = ({
 
                     {/* Left: Tools */}
                     <div className="flex items-center gap-3">
+                        {/* Built-in Notification Bell */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                                className={`
+                                    p-2.5 rounded-xl transition-all duration-300 relative overflow-hidden group border
+                                    ${isNotificationOpen
+                                        ? 'bg-blue-50 text-blue-600 border-blue-100 shadow-inner'
+                                        : 'text-gray-600 hover:text-blue-700 hover:bg-white/50 border-transparent hover:border-white/50 hover:shadow-sm'
+                                    }
+                                `}
+                                aria-label="Notifications"
+                            >
+                                <Bell size={20} className={`relative z-10 transition-transform duration-300 ${isNotificationOpen ? 'rotate-12' : 'group-hover:rotate-12'}`} />
+                                <span className="absolute top-2.5 right-2.5 flex h-2 w-2 z-20">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500 shadow-sm"></span>
+                                </span>
+                            </button>
+
+                            <NotificationPopover
+                                isOpen={isNotificationOpen}
+                                onClose={() => setIsNotificationOpen(false)}
+                                onMarkAllRead={() => console.log('Mark all read')}
+                            />
+                        </div>
+
+                        {/* Custom Tools */}
                         {tools.map((tool, index) => (
                             <div key={index} className="relative group">
                                 <button

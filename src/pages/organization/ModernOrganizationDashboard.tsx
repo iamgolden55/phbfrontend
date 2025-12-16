@@ -1,5 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
+import Joyride, { STATUS } from 'react-joyride';
+import { useDashboardTour } from '../../features/organization/hooks/useDashboardTour';
 import { useOrganizationAuth } from '../../features/organization/organizationAuthContext';
 import { useOrganizationDashboardStats } from '../../hooks/useOrganizationDashboardStats';
 import {
@@ -26,12 +28,14 @@ import {
     RefreshCw,
     Plus,
     AlertCircle,
-    Heart
+    Heart,
+    Building2
 } from 'lucide-react';
 
 const ModernOrganizationDashboard: React.FC = () => {
     const { userData } = useOrganizationAuth();
     const stats = useOrganizationDashboardStats();
+    const { run, steps, handleTourFinish } = useDashboardTour();
 
     // Mock Data for Lists
     const clockInList = [
@@ -97,47 +101,145 @@ const ModernOrganizationDashboard: React.FC = () => {
                 <title>{stats.organizationName} Dashboard | PHB</title>
             </Helmet>
 
-            {/* Critical Alerts Banner */}
+            <Joyride
+                steps={steps}
+                run={run}
+                continuous
+                showProgress
+                showSkipButton
+                scrollToFirstStep
+                scrollOffset={150}
+                disableScrollParentFix={true}
+                styles={{
+                    options: {
+                        primaryColor: '#2563eb',
+                        zIndex: 1000,
+                        arrowColor: '#fff',
+                        backgroundColor: '#fff',
+                        overlayColor: 'rgba(0, 0, 0, 0.5)',
+                        textColor: '#374151',
+                        width: 400,
+                    },
+                    tooltip: {
+                        fontSize: '14px',
+                        borderRadius: '16px',
+                        padding: '20px',
+                    },
+                    buttonNext: {
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        padding: '8px 16px',
+                    },
+                    buttonBack: {
+                        color: '#6b7280',
+                        fontSize: '13px',
+                        marginRight: '10px',
+                    }
+                }}
+                callback={(data) => {
+                    const { status } = data;
+                    if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status as any)) {
+                        handleTourFinish();
+                    }
+                }}
+            />
+
+            {/* Critical Alerts Banner (Premium Redesign) */}
             {stats.hospital && stats.hospital.criticalAlertCount > 0 && (
-                <div className="bg-red-50 border border-red-200 p-4 rounded-xl flex items-start gap-3">
-                    <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
-                    <div>
-                        <h3 className="font-semibold text-red-800">Critical Alerts</h3>
-                        <p className="text-sm text-red-700 mt-1">
-                            {stats.hospital.hasLowBedAvailability && `Low bed availability (${stats.hospital.availableBeds} beds). `}
-                            {stats.hospital.hasUnderstaffedDepartments && `${stats.hospital.understaffedDepartments} departments understaffed.`}
-                        </p>
+                <div data-tour="critical-alerts" className="relative overflow-hidden rounded-xl bg-gradient-to-r from-red-50 to-orange-50 border border-red-100 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
+                    <div className="absolute top-0 right-0 p-4 opacity-10">
+                        <AlertCircle className="w-32 h-32 text-red-500 -mr-10 -mt-10" />
+                    </div>
+                    <div className="relative z-10 p-5 flex items-start gap-4">
+                        <div className="flex-shrink-0">
+                            <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-red-100/80 text-red-600 ring-4 ring-white/50">
+                                <AlertCircle className="h-6 w-6 animate-pulse" />
+                            </span>
+                        </div>
+                        <div className="flex-1">
+                            <h3 className="text-lg font-bold text-gray-900 tracking-tight flex items-center gap-2">
+                                Critical Attention Required
+                                <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-xs font-bold uppercase tracking-wider border border-red-200">Urgent</span>
+                            </h3>
+                            <div className="mt-2 space-y-1">
+                                {stats.hospital.hasLowBedAvailability && (
+                                    <p className="text-sm font-medium text-red-800 flex items-center gap-2">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                        Low bed availability: Only <span className="font-bold underline">{stats.hospital.availableBeds} beds</span> remaining.
+                                    </p>
+                                )}
+                                {stats.hospital.hasUnderstaffedDepartments && (
+                                    <p className="text-sm font-medium text-red-800 flex items-center gap-2">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                        Staffing Alert: <span className="font-bold underline">{stats.hospital.understaffedDepartments} departments</span> are currently understaffed.
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                        <button className="hidden md:flex items-center gap-2 px-4 py-2 bg-white text-red-600 text-sm font-semibold rounded-lg border border-red-100 shadow-sm hover:bg-red-50 transition-colors">
+                            View Details <TrendingUp size={16} />
+                        </button>
                     </div>
                 </div>
             )}
 
-            {/* Welcome Section */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-800">Welcome Back, {stats.userFullName}!</h1>
-                    <p className="text-gray-500 mt-1">
+            {/* Welcome Section (Premium Redesign) */}
+            <div data-tour="welcome-actions" className="relative overflow-hidden bg-white/80 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-sm border border-white/60 ring-1 ring-black/5 flex flex-col md:flex-row justify-between items-center gap-6">
+
+                {/* Background Decor */}
+                <div className="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-gradient-to-bl from-blue-100/50 to-purple-100/50 rounded-full blur-3xl pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-80 h-80 bg-gradient-to-tr from-orange-100/50 to-pink-100/50 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div className="relative z-10 flex-1">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50/80 border border-blue-100 text-blue-600 text-xs font-semibold mb-3">
+                        <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                        </span>
+                        System Online
+                    </div>
+                    <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+                        Good Morning, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">{stats.userFullName}</span>
+                        <span className="ml-2 text-2xl">👋</span>
+                    </h1>
+                    <p className="text-gray-500 mt-2 text-lg max-w-xl">
                         {pendingCount > 0 ? (
-                            <>You have <span className="text-orange-500 font-medium">{pendingCount} Pending Approvals</span></>
+                            <>
+                                Action items pending: <span className="font-semibold text-gray-800">{pendingCount} Approvals</span>
+                                {leaveRequests > 0 && <span className="mx-2 text-gray-300">|</span>}
+                                {leaveRequests > 0 && <span className="font-semibold text-gray-800">{leaveRequests} Leave Requests</span>}
+                            </>
                         ) : (
-                            <>All caught up!</>
+                            "You're all caught up! Great job keeping the dashboard clean."
                         )}
-                        {leaveRequests > 0 && <> & <span className="text-orange-500 font-medium">{leaveRequests} Leave Requests</span></>}
                     </p>
-                    <p className="text-sm text-blue-600 mt-1">{stats.organizationName}</p>
+                    <p className="text-sm font-medium text-blue-600/80 mt-3 flex items-center gap-2">
+                        <Building2 size={14} />
+                        {stats.organizationName}
+                    </p>
                 </div>
-                <div className="mt-4 md:mt-0 flex gap-3">
-                    <button className="px-4 py-2 bg-blue-900 text-white rounded-lg text-sm font-medium hover:bg-blue-800 transition-colors">
+
+                <div className="relative z-10 flex flex-wrap gap-3 justify-center md:justify-end">
+                    <button className="group px-5 py-3 bg-gray-900 hover:bg-black text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-gray-200 hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
+                        <Clock size={16} className="text-gray-400 group-hover:text-white transition-colors" />
                         Add Schedule
                     </button>
-                    <button className="px-4 py-2 bg-orange-500 text-white rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors">
-                        Add Requests
+                    <button className="group px-5 py-3 bg-white text-gray-700 border border-gray-200 hover:border-orange-200 hover:bg-orange-50 rounded-xl text-sm font-semibold transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 flex items-center gap-2">
+                        <FileText size={16} className="text-gray-400 group-hover:text-orange-500 transition-colors" />
+                        Manage Requests
+                        {leaveRequests > 0 && (
+                            <span className="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-full ml-1 border border-orange-200">
+                                {leaveRequests}
+                            </span>
+                        )}
                     </button>
                 </div>
             </div>
 
             {/* Stats Grid Row 1 - Hospital Specific */}
             {stats.hospital && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div data-tour="key-metrics" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <StatCard
                         title="Patient Occupancy"
                         value={`${stats.hospital.activePatients}/${stats.hospital.totalBeds}`}
@@ -263,7 +365,7 @@ const ModernOrganizationDashboard: React.FC = () => {
 
             {/* Stats Grid Row 2 - Hospital Specific */}
             {stats.hospital && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div data-tour="department-stats" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <StatCard
                         title="ICU Beds Available"
                         value={`${stats.hospital.availableICUBeds}/${stats.hospital.totalICUBeds}`}
@@ -304,7 +406,7 @@ const ModernOrganizationDashboard: React.FC = () => {
             )}
 
             {/* Charts Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div data-tour="analytics-charts" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <ChartCard
                     title="Employee Status"
                     action={
@@ -340,7 +442,7 @@ const ModernOrganizationDashboard: React.FC = () => {
             </div>
 
             {/* Bottom Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div data-tour="daily-logs" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <ListCard
                     title="Clock-In/Out"
                     items={clockInList}

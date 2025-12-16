@@ -29,6 +29,8 @@ import EmployeeAttendancePage from './pages/employee/EmployeeAttendancePage';
 import EmployeeLeavesPage from './pages/employee/EmployeeLeavesPage';
 import EmployeeProjectsPage from './pages/employee/EmployeeProjectsPage';
 import EmployeeTasksPage from './pages/employee/EmployeeTasksPage';
+import EmployeeWorkflowsPage from './pages/employee/EmployeeWorkflowsPage';
+import EmployeeIntegrationsPage from './pages/employee/EmployeeIntegrationsPage';
 import EmployeePayslipsPage from './pages/employee/EmployeePayslipsPage';
 import EmployeeSettingsPage from './pages/employee/EmployeeSettingsPage';
 import OrganizationPatientManagementPage from './pages/organization/PatientManagementPage';
@@ -676,6 +678,16 @@ function App() {
                 <Route path="tasks" element={
                   <OrganizationRouteGuard>
                     <EmployeeTasksPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="workflows" element={
+                  <OrganizationRouteGuard>
+                    <EmployeeWorkflowsPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="integrations" element={
+                  <OrganizationRouteGuard>
+                    <EmployeeIntegrationsPage />
                   </OrganizationRouteGuard>
                 } />
                 <Route path="payslips" element={

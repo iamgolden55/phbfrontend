@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useOrganizationAuth } from '../features/organization/organizationAuthContext';
 import { EmployeeChatBot } from '../features/employee/components/EmployeeChatBot';
+import EmployeeSidebar from '../features/employee/components/EmployeeSidebar';
 import {
     LayoutDashboard,
     User,
@@ -39,76 +40,14 @@ const ModernEmployeeLayout: React.FC = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
     };
 
-    // Employee-specific navigation items
-    const navItems = [
-        { label: 'Dashboard', path: '/employee/dashboard', icon: LayoutDashboard },
-        { label: 'My Profile', path: '/employee/profile', icon: User },
-        { label: 'Attendance', path: '/employee/attendance', icon: Clock },
-        { label: 'Leaves', path: '/employee/leaves', icon: Calendar },
-        { label: 'Projects', path: '/employee/projects', icon: Briefcase },
-        { label: 'Tasks', path: '/employee/tasks', icon: CheckSquare },
-        { label: 'Payslips', path: '/employee/payslips', icon: FileText },
-        { label: 'Admin View', path: '/organization/dashboard', icon: Building2 },
-        { label: 'Settings', path: '/employee/settings', icon: Settings },
-    ];
-
-    const isActive = (path: string) => {
-        return location.pathname === path || location.pathname.startsWith(`${path}/`);
-    };
-
     return (
         <div className="min-h-screen bg-gray-50 flex font-sans text-gray-800">
             {/* Sidebar */}
-            <aside
-                className={`
-          fixed inset-y-0 left-0 z-50 bg-white shadow-xl transform transition-transform duration-300 ease-in-out
-          ${isSidebarOpen ? 'w-64' : 'w-20'}
-          ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
-        `}
-            >
-                {/* Logo Area */}
-                <div className="h-16 flex items-center justify-center border-b border-gray-100 px-4">
-                    <div className="flex items-center gap-2 text-blue-600 font-bold text-xl">
-                        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
-                            S
-                        </div>
-                        {isSidebarOpen && <span>SmartHR</span>}
-                    </div>
-                </div>
-
-                {/* Navigation */}
-                <div className="p-4 space-y-1 overflow-y-auto h-[calc(100vh-4rem)]">
-                    <div className="mb-4">
-                        {isSidebarOpen && <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">Employee Menu</p>}
-                        {navItems.map((item) => (
-                            <Link
-                                key={item.path}
-                                to={item.path}
-                                className={`
-                  flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors mb-1
-                  ${isActive(item.path)
-                                        ? 'bg-orange-50 text-orange-600'
-                                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}
-                `}
-                            >
-                                <item.icon size={20} className={isActive(item.path) ? 'text-orange-500' : 'text-gray-400'} />
-                                {isSidebarOpen && <span className="font-medium text-sm">{item.label}</span>}
-                            </Link>
-                        ))}
-                    </div>
-
-                    {/* Logout Button */}
-                    <button
-                        onClick={handleLogout}
-                        className={`
-              w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-red-600 hover:bg-red-50 mt-8
-            `}
-                    >
-                        <LogOut size={20} />
-                        {isSidebarOpen && <span className="font-medium text-sm">Logout</span>}
-                    </button>
-                </div>
-            </aside>
+            <EmployeeSidebar
+                isOpen={isSidebarOpen}
+                isMobileMenuOpen={isMobileMenuOpen}
+                onCloseMobile={() => setIsMobileMenuOpen(false)}
+            />
 
             {/* Main Content */}
             <div
