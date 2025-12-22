@@ -22,7 +22,7 @@ export interface ClinicalGuideline {
   expiry_date?: string;
   is_active: boolean;
   is_published: boolean;
-  approval_status: 'draft' | 'pending_review' | 'approved' | 'rejected' | 'archived';
+  approval_status: 'draft' | 'pending_review' | 'approved' | 'rejected' | 'archived' | 'published';
   approved_by?: number;
   approved_by_name?: string;
   approved_at?: string;
@@ -469,6 +469,91 @@ class GuidelinesService {
       console.error('Error fetching bookmarks:', error);
       throw error;
     }
+  }
+
+  // MOCK DATA FOR DEMO PURPOSES
+  // This simulates the AI-translated data structure
+  getDigitizedContent(guidelineId: string): any {
+    // Return Sepsis protocol demo data
+    return {
+      title: "Sepsis Emergency Protocol",
+      initialStepId: "step1",
+      steps: {
+        "step1": {
+          id: "step1",
+          type: "question",
+          question: "Does the patient have suspected infection?",
+          options: [
+            { label: "Yes", nextId: "step2", variant: "primary" },
+            { label: "No", nextId: "step_exit_non_sepsis" }
+          ]
+        },
+        "step_exit_non_sepsis": {
+          id: "step_exit_non_sepsis",
+          type: "result",
+          content: "Follow standard admission protocol. Sepsis pathway not indicated.",
+          isEmergency: false
+        },
+        "step2": {
+          id: "step2",
+          type: "question",
+          question: "Is Systolic BP < 90 mmHg OR Lactate > 4 mmol/L?",
+          isEmergency: true,
+          options: [
+            { label: "Yes", nextId: "step3_critical", variant: "danger" },
+            { label: "No", nextId: "step3_moderate", variant: "default" }
+          ]
+        },
+        "step3_critical": {
+          id: "step3_critical",
+          type: "action",
+          content: "INITIATE 'SEPSIS 6' IMMEDIATELY. \n1. Give High-Flow Oxygen.\n2. Take Blood Cultures.",
+          isEmergency: true,
+          options: [
+            { label: "Done, Next Step", nextId: "step4_fluid_challenge", variant: "primary" }
+          ]
+        },
+        "step3_moderate": {
+          id: "step3_moderate",
+          type: "action",
+          content: "Monitor Vitals q15min. Screen for organ dysfunction.",
+          options: [
+            { label: "Patient Deteriorating", nextId: "step3_critical", variant: "danger" },
+            { label: "Stable", nextId: "step_monitor" }
+          ]
+        },
+        "step4_fluid_challenge": {
+          id: "step4_fluid_challenge",
+          type: "action",
+          content: "Administer IV Fluid Challenge: 30ml/kg Crystalloid.",
+          isEmergency: true,
+          options: [
+            { label: "Completed", nextId: "step5_antibiotics", variant: "primary" }
+          ]
+        },
+        "step5_antibiotics": {
+          id: "step5_antibiotics",
+          type: "action",
+          content: "Administer IV Antibiotics (Broad Spectrum) within 60 mins.",
+          isEmergency: true,
+          options: [
+            { label: "Completed", nextId: "step_finish", variant: "primary" }
+          ]
+        },
+        "step_finish": {
+          id: "step_finish",
+          type: "result",
+          content: "Protocol Complete. Re-assess Lactate in 2 hours.",
+          isEmergency: false
+        },
+        "step_monitor": {
+          id: "step_monitor",
+          type: "result",
+          content: "Continue standard monitoring.",
+          isEmergency: false
+        }
+      }
+    };
   }
 }
 

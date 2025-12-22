@@ -25,6 +25,7 @@ interface StatCardProps {
     iconColor: string;
     bgColor: string;
     linkText?: string;
+    onClick?: () => void;
 }
 
 export const StatCard: React.FC<StatCardProps> = ({
@@ -35,7 +36,8 @@ export const StatCard: React.FC<StatCardProps> = ({
     icon: Icon,
     iconColor,
     bgColor,
-    linkText = "View Details"
+    linkText = "View Details",
+    onClick
 }) => {
     return (
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
@@ -52,7 +54,10 @@ export const StatCard: React.FC<StatCardProps> = ({
             </div>
             <h3 className="text-gray-500 text-sm font-medium mb-1">{title}</h3>
             <p className="text-2xl font-bold text-gray-800 mb-4">{value}</p>
-            <button className="text-blue-600 text-xs font-medium hover:underline">
+            <button
+                onClick={onClick}
+                className="text-blue-600 text-xs font-medium hover:underline focus:outline-none"
+            >
                 {linkText}
             </button>
         </div>
@@ -81,35 +86,34 @@ export const ChartCard: React.FC<ChartCardProps> = ({ title, action, children })
 };
 
 // --- Employee Status Chart ---
-export const EmployeeStatusChart: React.FC = () => {
-    const data = [
-        { name: 'Fulltime', value: 112, color: '#F59E0B' },
-        { name: 'Contract', value: 21, color: '#10B981' },
-        { name: 'Probation', value: 12, color: '#EF4444' },
-        { name: 'WFH', value: 4, color: '#EC4899' },
-    ];
+export const EmployeeStatusChart: React.FC<{ data?: any[] }> = ({ data }) => {
+    const chartData = data || [];
+
+    const total = chartData.reduce((sum, item) => sum + item.value, 0);
 
     return (
         <div className="flex flex-col h-full">
             <div className="flex items-center justify-between mb-4">
-                <span className="text-gray-500 text-sm">Total Employees</span>
-                <span className="text-2xl font-bold">154</span>
+                <span className="text-gray-500 text-sm">Total</span>
+                <span className="text-2xl font-bold">{total}</span>
             </div>
 
             {/* Custom Bar Visualization */}
-            <div className="flex h-4 rounded-full overflow-hidden mb-6">
-                {data.map((item, index) => (
+            <div className="flex h-4 rounded-full overflow-hidden mb-6 bg-gray-100">
+                {total > 0 ? chartData.map((item, index) => (
                     <div
                         key={index}
-                        style={{ width: `${(item.value / 149) * 100}%`, backgroundColor: item.color }}
+                        style={{ width: `${(item.value / total) * 100}%`, backgroundColor: item.color }}
                         className="h-full"
                     />
-                ))}
+                )) : (
+                    <div className="h-full w-full bg-gray-200" />
+                )}
             </div>
 
             {/* Legend Grid */}
             <div className="grid grid-cols-2 gap-4">
-                {data.map((item, index) => (
+                {chartData.map((item, index) => (
                     <div key={index} className="flex flex-col">
                         <div className="flex items-center mb-1">
                             <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: item.color }} />
@@ -124,20 +128,16 @@ export const EmployeeStatusChart: React.FC = () => {
 };
 
 // --- Attendance Chart ---
-export const AttendanceChart: React.FC = () => {
-    const data = [
-        { name: 'Early', value: 30, color: '#10B981' },
-        { name: 'On Time', value: 50, color: '#F59E0B' },
-        { name: 'Late', value: 10, color: '#EF4444' },
-        { name: 'Absent', value: 10, color: '#3B82F6' },
-    ];
+export const AttendanceChart: React.FC<{ data?: any[] }> = ({ data }) => {
+    const chartData = data || [];
+    const total = chartData.reduce((sum, item) => sum + item.value, 0);
 
     return (
         <div className="relative h-full flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                     <Pie
-                        data={data}
+                        data={chartData}
                         cx="50%"
                         cy="50%"
                         innerRadius={60}
@@ -147,36 +147,29 @@ export const AttendanceChart: React.FC = () => {
                         startAngle={180}
                         endAngle={0}
                     >
-                        {data.map((entry, index) => (
+                        {chartData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                     </Pie>
                 </PieChart>
             </ResponsiveContainer>
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/4 text-center">
-                <p className="text-xs text-gray-500">Total Attendance</p>
-                <p className="text-2xl font-bold">120</p>
+                <p className="text-xs text-gray-500">Total</p>
+                <p className="text-2xl font-bold">{total}</p>
             </div>
         </div>
     );
 };
 
 // --- Department Chart ---
-export const DepartmentChart: React.FC = () => {
-    const data = [
-        { name: 'UI/UX', value: 60 },
-        { name: 'Dev', value: 85 },
-        { name: 'Mgmt', value: 45 },
-        { name: 'HR', value: 20 },
-        { name: 'Test', value: 35 },
-        { name: 'Mktg', value: 55 },
-    ];
+export const DepartmentChart: React.FC<{ data?: any[] }> = ({ data }) => {
+    const chartData = data || [];
 
     return (
         <ResponsiveContainer width="100%" height="100%">
             <BarChart
                 layout="vertical"
-                data={data}
+                data={chartData}
                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
             >
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E7EB" />
@@ -200,7 +193,7 @@ export const DepartmentChart: React.FC = () => {
 };
 
 // --- List Card Component ---
-interface ListItem {
+export interface ListItem {
     id: string | number;
     title: string;
     subtitle?: string;

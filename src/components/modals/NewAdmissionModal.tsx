@@ -2,13 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PatientHPNSearch from '../search/PatientHPNSearch';
 import { debounce } from 'lodash';
 import { useOrganizationAuth } from '../../features/organization/organizationAuthContext';
-
-interface Department {
-  id: number;
-  name: string;
-  total_beds: number;
-  occupied_beds: number;
-}
+import { DepartmentData } from '../../hooks/useDepartmentStats'; // Import from hook
 
 interface Doctor {
   id: number;
@@ -33,12 +27,12 @@ interface NewAdmissionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (admissionData: any) => void;
+  departments: DepartmentData[]; // Receive departments as prop
 }
 
-const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, onSubmit }) => {
+const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, onSubmit, departments = [] }) => {
   const { userData, isAuthenticated } = useOrganizationAuth(); // Use secure cookie-based auth
   const [admissionType, setAdmissionType] = useState<'regular' | 'emergency'>('regular');
-  const [departments, setDepartments] = useState<Department[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
@@ -86,17 +80,9 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
   // Fetch departments and doctors when modal opens
   useEffect(() => {
     if (isOpen && isAuthenticated) {
-      console.log('🚀 Modal opened, fetching data...');
-      console.log('🏥 Hospital ID:', hospitalId);
-      console.log('👤 User authenticated:', isAuthenticated);
+      // Don't fetch departments anymore, we have them from props!
+      console.log('🚀 Modal opened with ', departments.length, ' departments');
 
-      // Add small delay to ensure modal is fully rendered
-      setTimeout(() => {
-        console.log('🚀 Starting API calls...');
-        fetchDepartments();
-        // Don't fetch doctors until a department is selected
-      }, 100);
-      
       // Reset form when modal opens
       resetForm();
     }
@@ -134,100 +120,6 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
       insurance_id: ''
     });
   };
-  const fetchDepartments = async () => {
-    try {
-      if (!hospitalId) {
-        console.error('No hospital ID found in auth data');
-        return;
-      }
-
-      // Check user role from context
-      const isHospitalAdmin = userData?.role === 'hospital_admin';
-
-      let url = `${API_BASE_URL}/api/departments/?hospital=${hospitalId}`;
-
-      // If we're a hospital admin, try the hospital-specific endpoint
-      if (isHospitalAdmin) {
-        // First try to get departments for the hospital admin's hospital
-        url = `${API_BASE_URL}/api/hospitals/departments/${hospitalId}`;
-      }
-
-      console.log('🏥 Fetching departments from:', url);
-      console.log('🔐 User role:', userData?.role);
-      console.log('🏥 Hospital ID being sent:', hospitalId);
-
-      const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Send HTTP-only cookies automatically
-      });
-
-      // If hospital admin endpoint failed, try the regular endpoint
-      if (!response.ok && isHospitalAdmin) {
-        console.log('🔄 Hospital admin endpoint failed, trying regular departments endpoint...');
-        const fallbackResponse = await fetch(`${API_BASE_URL}/api/departments/?hospital=${hospitalId}`, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include', // Send HTTP-only cookies automatically
-        });
-        
-        if (fallbackResponse.ok) {
-          const data = await fallbackResponse.json();
-          console.log('✅ Departments fetched from fallback:', data);
-          handleDepartmentsResponse(data);
-        } else {
-          const errorData = await fallbackResponse.text();
-          console.error('❌ Both endpoints failed:', fallbackResponse.status, errorData);
-        }
-      } else if (response.ok) {
-        const data = await response.json();
-        console.log('✅ Departments fetched successfully:', data);
-        handleDepartmentsResponse(data);
-      } else {
-        const errorData = await response.text();
-        console.error('❌ Failed to fetch departments:', response.status, response.statusText, errorData);
-      }
-    } catch (error) {
-      console.error('Error fetching departments:', error);
-    }
-  };
-  
-  const handleDepartmentsResponse = (data: any) => {
-    // Handle both array and paginated responses
-    let departmentList = [];
-    
-    console.log('🔍 Raw response structure:', {
-      hasDepartments: !!data.departments,
-      isArray: Array.isArray(data),
-      hasResults: !!data.results,
-      hasData: !!data.data,
-      keys: Object.keys(data)
-    });
-    
-    // Check if it's wrapped in a response object
-    if (data.departments && Array.isArray(data.departments)) {
-      departmentList = data.departments;
-      console.log('✅ Found departments in data.departments');
-    } else if (Array.isArray(data)) {
-      departmentList = data;
-      console.log('✅ Data is already an array');
-    } else if (data.results && Array.isArray(data.results)) {
-      departmentList = data.results;
-      console.log('✅ Found departments in data.results');
-    } else if (data.data && Array.isArray(data.data)) {
-      departmentList = data.data;
-      console.log('✅ Found departments in data.data');
-    } else {
-      console.error('❌ Could not parse departments from response:', data);
-    }
-    
-    console.log('📦 Parsed departments:', departmentList);
-    console.log('📦 Department count:', departmentList.length);
-    setDepartments(departmentList);
-  };
-
   const fetchDoctors = async (departmentId: string) => {
     try {
       if (!hospitalId) {
@@ -287,28 +179,28 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
       ...prev,
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
     }));
-    
+
     // Auto-calculate age when date of birth changes
     if (name === 'date_of_birth' && value) {
       const birthDate = new Date(value);
       const today = new Date();
       let age = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
-      
+
       // Adjust age if birthday hasn't occurred this year yet
       if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
         age--;
       }
-      
+
       // Update age field automatically
       setFormData(prev => ({
         ...prev,
         age: age.toString()
       }));
-      
+
       console.log(`🎂 Auto-calculated age: ${age} years from DOB: ${value}`);
     }
-    
+
     // If department is selected, fetch doctors for that department
     if (name === 'department_id' && value) {
       console.log('🏥 Department selected, fetching doctors for department:', value);
@@ -336,61 +228,61 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
 
       // Prepare data based on admission type
       const shouldAssignBed = formData.admission_action === 'admit_immediately';
-      
-      const admissionData = admissionType === 'emergency' 
-        ? {
-            // Emergency admission data - FIXED admission_type per backend AI
-            hospital_id: hospitalId,
-            department_id: parseInt(formData.department_id),
-            attending_doctor_id: parseInt(formData.attending_doctor_id) || null,
-            reason_for_admission: formData.reason_for_admission,
-            admission_type: 'inpatient',  // FIXED: Changed from 'emergency' to 'inpatient'
-            priority: 'emergency',        // CORRECT: This indicates emergency priority
-            assign_bed: shouldAssignBed,
-            temp_patient_details: {
-              first_name: formData.first_name,
-              last_name: formData.last_name,
-              age: parseInt(formData.age) || null,  // FIXED: Ensure age is sent as number, not undefined
-              date_of_birth: formData.date_of_birth || null,  // FIXED: Send as null instead of undefined
-              gender: formData.gender,
-              phone_number: formData.phone_number,
-              city: formData.city,
-              address: formData.address,
-              emergency_contact: formData.emergency_contact,
-              emergency_contact_name: formData.emergency_contact_name,
-              chief_complaint: formData.chief_complaint,
-              allergies: formData.allergies,
-              current_medications: formData.current_medications,
-              brief_history: formData.brief_history,
-              insurance_provider: formData.insurance_provider,
-              insurance_id: formData.insurance_id
-            }
-          }        : {
-            // Regular admission data - Fixed to match backend expectations
-            patient: selectedPatient?.id,
-            hospital: hospitalId,
-            department: parseInt(formData.department_id),
-            attending_doctor: parseInt(formData.attending_doctor_id) || null,
-            reason_for_admission: formData.reason_for_admission,
-            diagnosis: formData.diagnosis,
-            priority: formData.priority,
-            admission_type: formData.admission_type_detail,
-            assign_bed: shouldAssignBed  // Use user's choice
-          };
 
-      const endpoint = admissionType === 'emergency' 
+      const admissionData = admissionType === 'emergency'
+        ? {
+          // Emergency admission data - FIXED admission_type per backend AI
+          hospital_id: hospitalId,
+          department_id: parseInt(formData.department_id),
+          attending_doctor_id: parseInt(formData.attending_doctor_id) || null,
+          reason_for_admission: formData.reason_for_admission,
+          admission_type: 'inpatient',  // FIXED: Changed from 'emergency' to 'inpatient'
+          priority: 'emergency',        // CORRECT: This indicates emergency priority
+          assign_bed: shouldAssignBed,
+          temp_patient_details: {
+            first_name: formData.first_name,
+            last_name: formData.last_name,
+            age: parseInt(formData.age) || null,  // FIXED: Ensure age is sent as number, not undefined
+            date_of_birth: formData.date_of_birth || null,  // FIXED: Send as null instead of undefined
+            gender: formData.gender,
+            phone_number: formData.phone_number,
+            city: formData.city,
+            address: formData.address,
+            emergency_contact: formData.emergency_contact,
+            emergency_contact_name: formData.emergency_contact_name,
+            chief_complaint: formData.chief_complaint,
+            allergies: formData.allergies,
+            current_medications: formData.current_medications,
+            brief_history: formData.brief_history,
+            insurance_provider: formData.insurance_provider,
+            insurance_id: formData.insurance_id
+          }
+        } : {
+          // Regular admission data - Fixed to match backend expectations
+          patient: selectedPatient?.id,
+          hospital: hospitalId,
+          department: parseInt(formData.department_id),
+          attending_doctor: parseInt(formData.attending_doctor_id) || null,
+          reason_for_admission: formData.reason_for_admission,
+          diagnosis: formData.diagnosis,
+          priority: formData.priority,
+          admission_type: formData.admission_type_detail,
+          assign_bed: shouldAssignBed  // Use user's choice
+        };
+
+      const endpoint = admissionType === 'emergency'
         ? `${API_BASE_URL}/api/admissions/emergency_admission/`
         : `${API_BASE_URL}/api/admissions/`;
 
-      console.log('🚀 Submitting admission:', { 
-        endpoint, 
-        admissionType, 
-        shouldAssignBed, 
+      console.log('🚀 Submitting admission:', {
+        endpoint,
+        admissionType,
+        shouldAssignBed,
         hospitalId,
         departmentId: formData.department_id,
         patientAge: formData.age,
         patientDOB: formData.date_of_birth,
-        admissionData 
+        admissionData
       });
 
       const response = await fetch(endpoint, {
@@ -405,12 +297,12 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
       if (response.ok) {
         const newAdmission = await response.json();
         console.log('✅ Admission created:', newAdmission);
-        
+
         // Show success message based on what action was taken
-        const actionMessage = shouldAssignBed 
+        const actionMessage = shouldAssignBed
           ? `Patient admitted successfully! Bed assigned in ${newAdmission.admission?.department_name || 'department'}.`
           : `Admission created as pending. Patient can be admitted later when bed is available.`;
-        
+
         alert(actionMessage);
         onSubmit(newAdmission);
         onClose();
@@ -442,7 +334,7 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-blue-800">New Patient Admission</h2>
-            <button 
+            <button
               onClick={onClose}
               className="text-gray-500 hover:text-gray-700"
             >
@@ -455,11 +347,10 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
             <button
               type="button"
               onClick={() => setAdmissionType('regular')}
-              className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
-                admissionType === 'regular'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-700 hover:bg-gray-200'
-              }`}
+              className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${admissionType === 'regular'
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-700 hover:bg-gray-200'
+                }`}
             >
               <span className="material-icons text-sm mr-2">person</span>
               Registered Patient
@@ -467,11 +358,10 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
             <button
               type="button"
               onClick={() => setAdmissionType('emergency')}
-              className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
-                admissionType === 'emergency'
-                  ? 'bg-red-600 text-white'
-                  : 'text-gray-700 hover:bg-gray-200'
-              }`}
+              className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${admissionType === 'emergency'
+                ? 'bg-red-600 text-white'
+                : 'text-gray-700 hover:bg-gray-200'
+                }`}
             >
               <span className="material-icons text-sm mr-2">local_hospital</span>
               Emergency Admission
@@ -483,7 +373,7 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
               <h3 className="text-lg font-semibold text-gray-800 mb-4">
                 {admissionType === 'emergency' ? 'Patient Information' : 'Registered Patient'}
               </h3>
-              
+
               {admissionType === 'regular' ? (
                 <div className="grid grid-cols-1 gap-4">
                   <PatientHPNSearch
@@ -762,11 +652,20 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
                         Loading departments... (If this persists, check console)
                       </option>
                     ) : (
-                      departments.map(dept => (
-                        <option key={dept.id} value={dept.id}>
-                          {dept.name} ({dept.total_beds - dept.occupied_beds} beds available)
-                        </option>
-                      ))
+                      departments.map(dept => {
+                        // Safely calculate available beds to avoid NaN
+                        const total = dept.total_beds || dept.bed_capacity || 0;
+                        const occupied = dept.occupied_beds || 0;
+                        const available = dept.available_beds !== undefined
+                          ? dept.available_beds
+                          : Math.max(0, total - occupied);
+
+                        return (
+                          <option key={dept.id} value={dept.id}>
+                            {dept.name} ({available} beds available)
+                          </option>
+                        )
+                      })
                     )}
                   </select>
                 </div>
@@ -842,7 +741,7 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
                   </>
                 )}
               </div>
-              
+
               <div className="mt-4 space-y-3">
                 <label className="flex items-center">
                   <input
@@ -854,7 +753,7 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
                   />
                   <span className="ml-2 text-sm text-gray-700">Requires ICU Bed</span>
                 </label>
-                
+
                 {/* Admission Action Selection */}
                 <div className="bg-blue-50 p-3 rounded-lg">
                   <label className="block text-sm font-medium text-blue-800 mb-2">
@@ -945,13 +844,13 @@ const NewAdmissionModal: React.FC<NewAdmissionModalProps> = ({ isOpen, onClose, 
                 disabled={loading || (admissionType === 'regular' && !selectedPatient)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
               >                {loading && <span className="material-icons animate-spin text-sm mr-2">refresh</span>}
-                {admissionType === 'emergency' 
-                  ? (formData.admission_action === 'admit_immediately' 
-                     ? 'Create & Admit Emergency Patient' 
-                     : 'Create Pending Emergency Admission')
+                {admissionType === 'emergency'
+                  ? (formData.admission_action === 'admit_immediately'
+                    ? 'Create & Admit Emergency Patient'
+                    : 'Create Pending Emergency Admission')
                   : (formData.admission_action === 'admit_immediately'
-                     ? 'Create & Admit Patient'
-                     : 'Create Pending Admission')
+                    ? 'Create & Admit Patient'
+                    : 'Create Pending Admission')
                 }
               </button>
             </div>

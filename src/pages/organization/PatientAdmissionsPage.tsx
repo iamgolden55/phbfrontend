@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAdmissionData } from '../../hooks/useAdmissionData';
+import { useDepartmentStats, DepartmentData } from '../../hooks/useDepartmentStats';
 import NewAdmissionModal from '../../components/modals/NewAdmissionModal';
 import PatientDetailModal from '../../components/modals/PatientDetailModal';
 
@@ -17,8 +18,14 @@ interface Patient {
 
 const PatientAdmissionsPage: React.FC = () => {
   // Get real admission data from our hook! 🚀
-  const { admissions, statusCounts, emergencyCount, loading, error } = useAdmissionData();
-  
+  const { admissions, statusCounts, emergencyCount, loading: admissionsLoading, error: admissionsError } = useAdmissionData();
+
+  // Get real department stats! 🛏️
+  const { departments, loading: departmentsLoading, error: departmentsError } = useDepartmentStats();
+
+  const loading = admissionsLoading || departmentsLoading;
+  const error = admissionsError || departmentsError;
+
   // Modal state
   const [isNewAdmissionModalOpen, setIsNewAdmissionModalOpen] = useState(false);
   const [isPatientDetailModalOpen, setIsPatientDetailModalOpen] = useState(false);
@@ -26,27 +33,20 @@ const PatientAdmissionsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('today');
-  
+
   // Transform API data to match our Patient interface
   const transformToPatient = (admission: any): Patient => {
-    console.log('🔍 Transforming admission:', admission); // Debug log
-    
+    // console.log('🔍 Transforming admission:', admission); // Debug log
+
     // Backend sends patient_name directly from serializer! 🎉
     const patientName = admission.patient_name || 'Unknown Patient';
-    
+
     // Backend now sends patient_age directly! 🎯
     const age = admission.patient_age || 0;
-    
+
     // Backend sends admission_date correctly
     const admissionDate = admission.admission_date || admission.created_at;
-    
-    console.log('📊 Patient data:', { 
-      name: patientName,
-      age: age,
-      doctor: admission.attending_doctor_name,
-      reason: admission.reason_for_admission
-    });
-    
+
     return {
       id: admission.admission_id,
       name: patientName,
@@ -58,7 +58,7 @@ const PatientAdmissionsPage: React.FC = () => {
       doctor: admission.attending_doctor_name || 'Not assigned'
     };
   };
-  
+
   // Helper function to calculate age from date of birth
   const calculateAge = (dateOfBirth?: string): number => {
     if (!dateOfBirth) return 0;
@@ -71,7 +71,7 @@ const PatientAdmissionsPage: React.FC = () => {
     }
     return age;
   };
-  
+
   // Convert real API data to Patient format
   const patients = admissions.map(transformToPatient);
 
@@ -102,33 +102,33 @@ const PatientAdmissionsPage: React.FC = () => {
   // Filter patients based on search and filters
   const filteredPatients = patients.filter(patient => {
     // Search filter
-    const matchesSearch = searchTerm === '' || 
+    const matchesSearch = searchTerm === '' ||
       patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       patient.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       patient.reason.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     // Status filter
     const matchesStatus = statusFilter === '' || patient.status.toLowerCase() === statusFilter.toLowerCase();
-    
+
     // Date filter logic (simplified for now)
     const matchesDate = true; // For now, show all dates
-    
+
     return matchesSearch && matchesStatus && matchesDate;
   });
 
   // Format date for display - handle different date formats safely
   const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A';
-    
+
     try {
       const date = new Date(dateString);
-      
+
       // Check if date is valid
       if (isNaN(date.getTime())) {
         console.warn('Invalid date string:', dateString);
         return 'Invalid Date';
       }
-      
+
       return new Intl.DateTimeFormat('en-US', {
         month: 'short',
         day: 'numeric',
@@ -152,9 +152,9 @@ const PatientAdmissionsPage: React.FC = () => {
       Deceased: 'bg-red-100 text-red-800',
       Left_ama: 'bg-orange-100 text-orange-800'
     };
-    
+
     const displayStatus = status === 'Left_ama' ? 'Left AMA' : status;
-    
+
     return (
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${badgeClasses[status] || 'bg-gray-100 text-gray-800'}`}>
         {displayStatus}
@@ -168,7 +168,7 @@ const PatientAdmissionsPage: React.FC = () => {
       <div className="container mx-auto px-4 py-8 flex justify-center items-center min-h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading patient admissions... 🏥</p>
+          <p className="mt-4 text-gray-600">Loading admissions & bed data... 🏥</p>
         </div>
       </div>
     );
@@ -180,10 +180,10 @@ const PatientAdmissionsPage: React.FC = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
           <span className="material-icons text-red-500 text-4xl mb-2">error</span>
-          <h2 className="text-xl font-semibold text-red-800 mb-2">Error Loading Admissions</h2>
+          <h2 className="text-xl font-semibold text-red-800 mb-2">Error Loading Data</h2>
           <p className="text-red-600">{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="mt-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md"
           >
             Try Again
@@ -198,8 +198,8 @@ const PatientAdmissionsPage: React.FC = () => {
       {/* Navigation Bar */}
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center">
-          <Link 
-            to="/organization/dashboard" 
+          <Link
+            to="/organization/dashboard"
             className="mr-4 bg-blue-50 hover:bg-blue-100 p-2 rounded-full"
           >
             <span className="material-icons text-blue-700">arrow_back</span>
@@ -218,7 +218,7 @@ const PatientAdmissionsPage: React.FC = () => {
           </Link>
         </div>
       </div>
-      
+
       {/* Stats Summary */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white p-4 rounded-lg shadow-md text-center">
@@ -238,10 +238,82 @@ const PatientAdmissionsPage: React.FC = () => {
           <div className="text-sm text-gray-600">Discharged Today</div>
         </div>
       </div>
-      
+
+      {/* Department Bed Capacity - DYNAMIC 🚀 */}
+      <div className="mb-8">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+          <span className="material-icons text-blue-600 mr-2">meeting_room</span>
+          Department Bed Availability
+        </h2>
+        {departments && departments.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {departments
+              // Only show departments with beds or clinical relevance
+              .filter(dept => (dept.total_beds || 0) > 0 || dept.is_clinical)
+              // Sort by name
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((dept) => {
+                // Ensure numeric values
+                const totalBeds = dept.total_beds || dept.bed_capacity || 0;
+                const occupiedBeds = dept.occupied_beds || 0;
+                const availableBeds = dept.available_beds || (totalBeds - occupiedBeds);
+
+                return (
+                  <div key={dept.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="font-bold text-gray-900 line-clamp-1" title={dept.name}>{dept.name}</h3>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mt-1
+                                    ${dept.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                          {dept.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className="block text-2xl font-bold text-blue-600">{availableBeds}</span>
+                        <span className="text-xs text-gray-500 uppercase">Available</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex justify-between text-xs text-gray-600 mb-1">
+                          <span>Occupancy</span>
+                          <span className="font-medium">{occupiedBeds} / {totalBeds} Beds</span>
+                        </div>
+                        <div className="w-full bg-gray-100 rounded-full h-2">
+                          <div
+                            className="bg-blue-600 h-2 rounded-full transition-all duration-500"
+                            style={{ width: `${totalBeds > 0 ? (occupiedBeds / totalBeds) * 100 : 0}%` }}
+                          ></div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-50">
+                        <div className="flex items-center">
+                          <span className="material-icons text-[14px] mr-1">location_on</span>
+                          Floor {dept.floor_number || '—'}, {dept.wing || '—'} Wing
+                        </div>
+                        <div className="flex items-center" title={dept.extension_number}>
+                          <span className="material-icons text-[14px] mr-1">phone</span>
+                          {dept.extension_number || '—'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        ) : (
+          <div className="bg-gray-50 rounded-lg p-8 text-center border border-dashed border-gray-300">
+            <span className="material-icons text-gray-400 text-4xl mb-2">meeting_room</span>
+            <p className="text-gray-500">No department bed data available.</p>
+          </div>
+        )}
+      </div>
+
       {/* Action buttons */}
       <div className="flex justify-end mb-6">
-        <button 
+        <button
           onClick={() => setIsNewAdmissionModalOpen(true)}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
         >
@@ -249,7 +321,7 @@ const PatientAdmissionsPage: React.FC = () => {
           New Admission
         </button>
       </div>
-      
+
       {/* Filters/Search */}
       <div className="bg-white p-4 rounded-lg shadow-md mb-6">
         <div className="flex flex-wrap gap-4 items-end">
@@ -259,9 +331,9 @@ const PatientAdmissionsPage: React.FC = () => {
               <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <span className="material-icons text-gray-400 text-lg">search</span>
               </span>
-              <input 
-                type="text" 
-                placeholder="Search by ID or name..." 
+              <input
+                type="text"
+                placeholder="Search by ID or name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -274,7 +346,7 @@ const PatientAdmissionsPage: React.FC = () => {
               <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <span className="material-icons text-gray-400 text-lg">filter_list</span>
               </span>
-              <select 
+              <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="pl-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -293,7 +365,7 @@ const PatientAdmissionsPage: React.FC = () => {
               <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <span className="material-icons text-gray-400 text-lg">date_range</span>
               </span>
-              <select 
+              <select
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
                 className="pl-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -305,7 +377,7 @@ const PatientAdmissionsPage: React.FC = () => {
               </select>
             </div>
           </div>
-          <button 
+          <button
             onClick={() => {
               // Apply filters - already applied via filteredPatients
               console.log('Filters applied:', { searchTerm, statusFilter, dateFilter });
@@ -317,119 +389,120 @@ const PatientAdmissionsPage: React.FC = () => {
           </button>
         </div>
       </div>
-      
+
       {/* Patient Admissions Table */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          {filteredPatients.length === 0 ? (
-            <div className="text-center py-12">
-              <span className="material-icons text-6xl text-gray-300 mb-4">local_hospital</span>
-              <h3 className="text-lg font-medium text-gray-600 mb-2">
-                {searchTerm || statusFilter ? 'No Matching Patients Found' : 'No Patients Currently'}
-              </h3>
-              <p className="text-gray-500 mb-4">
-                {searchTerm || statusFilter 
-                  ? 'Try adjusting your search or filter criteria.' 
-                  : 'All patients have been discharged or there are no active admissions.'
-                }
-              </p>
-              <button 
-                onClick={() => setIsNewAdmissionModalOpen(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center mx-auto"
-              >
-                <span className="material-icons text-sm mr-1">add</span>
-                Add New Admission
-              </button>
+        {filteredPatients.length === 0 ? (
+          <div className="text-center py-12">
+            <span className="material-icons text-6xl text-gray-300 mb-4">local_hospital</span>
+            <h3 className="text-lg font-medium text-gray-600 mb-2">
+              {searchTerm || statusFilter ? 'No Matching Patients Found' : 'No Patients Currently'}
+            </h3>
+            <p className="text-gray-500 mb-4">
+              {searchTerm || statusFilter
+                ? 'Try adjusting your search or filter criteria.'
+                : 'All patients have been discharged or there are no active admissions.'
+              }
+            </p>
+            <button
+              onClick={() => setIsNewAdmissionModalOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center mx-auto"
+            >
+              <span className="material-icons text-sm mr-1">add</span>
+              Add New Admission
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient ID</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admission Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attending Doctor</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {filteredPatients.map((patient) => (
+                    <tr key={patient.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{patient.id}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">{patient.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">{patient.age}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">{formatDate(patient.admissionDate)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <StatusBadge status={patient.status} />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">{patient.reason}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">{patient.room || '—'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">{patient.doctor || '—'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
+                        <div className="flex items-center justify-end space-x-2">
+                          <button
+                            onClick={() => handleViewPatient(patient.id)}
+                            className="text-blue-600 hover:text-blue-800 flex items-center"
+                          >
+                            <span className="material-icons text-sm mr-1">visibility</span>
+                            View
+                          </button>
+                          <button
+                            onClick={() => handleEditPatient(patient.id)}
+                            className="text-blue-600 hover:text-blue-800 flex items-center"
+                          >
+                            <span className="material-icons text-sm mr-1">edit</span>
+                            Edit
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ) : (
-            <>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admission Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attending Doctor</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {filteredPatients.map((patient) => (
-                <tr key={patient.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{patient.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">{patient.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">{patient.age}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">{formatDate(patient.admissionDate)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <StatusBadge status={patient.status} />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">{patient.reason}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">{patient.room || '—'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">{patient.doctor || '—'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
-                    <div className="flex items-center justify-end space-x-2">
-                      <button 
-                        onClick={() => handleViewPatient(patient.id)}
-                        className="text-blue-600 hover:text-blue-800 flex items-center"
-                      >
-                        <span className="material-icons text-sm mr-1">visibility</span>
-                        View
-                      </button>
-                      <button 
-                        onClick={() => handleEditPatient(patient.id)}
-                        className="text-blue-600 hover:text-blue-800 flex items-center"
-                      >
-                        <span className="material-icons text-sm mr-1">edit</span>
-                        Edit
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        
-        {/* Pagination */}
-        <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
-          <div className="text-sm text-gray-700">
-            Showing <span className="font-medium">1</span> to <span className="font-medium">{filteredPatients.length}</span> of <span className="font-medium">{filteredPatients.length}</span> results
-          </div>
-          <div className="flex items-center space-x-2">
-            <button className="px-3 py-1 border border-gray-300 bg-white text-sm rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50 flex items-center" disabled>
-              <span className="material-icons text-sm mr-1">chevron_left</span>
-              Previous
-            </button>
-            <button className="px-3 py-1 border border-gray-300 bg-white text-sm rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50 flex items-center" disabled>
-              Next
-              <span className="material-icons text-sm ml-1">chevron_right</span>
-            </button>
-          </div>
-          </div>
-          </> 
-          )}
-          </div>
-          
-          {/* New Admission Modal */}
-          <NewAdmissionModal
-            isOpen={isNewAdmissionModalOpen}
-            onClose={() => setIsNewAdmissionModalOpen(false)}
-            onSubmit={handleNewAdmissionSubmit}
-          />
-          
-          {/* Patient Detail Modal */}
-          <PatientDetailModal
-            isOpen={isPatientDetailModalOpen}
-            onClose={() => setIsPatientDetailModalOpen(false)}
-            patientId={selectedPatientId}
-            onUpdate={handlePatientUpdate}
-          />
-          </div>
-          );
+
+            {/* Pagination */}
+            <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
+              <div className="text-sm text-gray-700">
+                Showing <span className="font-medium">1</span> to <span className="font-medium">{filteredPatients.length}</span> of <span className="font-medium">{filteredPatients.length}</span> results
+              </div>
+              <div className="flex items-center space-x-2">
+                <button className="px-3 py-1 border border-gray-300 bg-white text-sm rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50 flex items-center" disabled>
+                  <span className="material-icons text-sm mr-1">chevron_left</span>
+                  Previous
+                </button>
+                <button className="px-3 py-1 border border-gray-300 bg-white text-sm rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50 flex items-center" disabled>
+                  Next
+                  <span className="material-icons text-sm ml-1">chevron_right</span>
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* New Admission Modal */}
+      <NewAdmissionModal
+        isOpen={isNewAdmissionModalOpen}
+        onClose={() => setIsNewAdmissionModalOpen(false)}
+        onSubmit={handleNewAdmissionSubmit}
+        departments={departments || []}
+      />
+
+      {/* Patient Detail Modal */}
+      <PatientDetailModal
+        isOpen={isPatientDetailModalOpen}
+        onClose={() => setIsPatientDetailModalOpen(false)}
+        patientId={selectedPatientId}
+        onUpdate={handlePatientUpdate}
+      />
+    </div>
+  );
 };
 
 export default PatientAdmissionsPage; 

@@ -10,8 +10,10 @@ import {
     AttendanceChart,
     DepartmentChart,
     ListCard,
-    ChartCard
+    ChartCard,
+    ListItem
 } from '../../components/organization/DashboardWidgets';
+import { useNavigate } from 'react-router-dom';
 import {
     Users,
     Briefcase,
@@ -36,28 +38,18 @@ const ModernOrganizationDashboard: React.FC = () => {
     const { userData } = useOrganizationAuth();
     const stats = useOrganizationDashboardStats();
     const { run, steps, handleTourFinish } = useDashboardTour();
+    const navigate = useNavigate();
 
-    // Mock Data for Lists
-    const clockInList = [
-        {
-            id: 1,
-            title: 'Daniel Esbella',
-            subtitle: 'UI/UX Designer',
-            rightContent: <span className="px-2 py-1 bg-green-100 text-green-600 rounded text-xs font-medium">09:15 AM</span>
-        },
-        {
-            id: 2,
-            title: 'Doglas Martini',
-            subtitle: 'Project Manager',
-            rightContent: <span className="px-2 py-1 bg-green-100 text-green-600 rounded text-xs font-medium">09:30 AM</span>
-        },
-        {
-            id: 3,
-            title: 'Brian Villalobos',
-            subtitle: 'PHP Developer',
-            rightContent: <span className="px-2 py-1 bg-green-100 text-green-600 rounded text-xs font-medium">09:45 AM</span>
-        },
-    ];
+    // Recent Admissions List Adapter
+    const recentAdmissionsList: ListItem[] = stats.hospital?.recentAdmissionList?.map(adm => ({
+        id: adm.id,
+        title: adm.patient_name,
+        subtitle: `${adm.department_name} • ${adm.status}`,
+        rightContent: <span className="px-2 py-1 bg-green-100 text-green-600 rounded text-xs font-medium">
+            {new Date(adm.admission_date).toLocaleDateString()}
+        </span>,
+        // Optional: Add image/avatar logic if available
+    })) || [];
 
     // Loading state
     if (stats.loading) {
@@ -93,7 +85,7 @@ const ModernOrganizationDashboard: React.FC = () => {
 
     // Get pending counts based on organization type
     const pendingCount = stats.hospital?.pendingRegistrations || stats.hospital?.criticalAlertCount || 0;
-    const leaveRequests = 14; // TODO: Add leave requests API when available
+    const leaveRequests = 0; // Set to 0 as backend API is not yet available
 
     return (
         <div className="space-y-6">
@@ -177,7 +169,10 @@ const ModernOrganizationDashboard: React.FC = () => {
                                 )}
                             </div>
                         </div>
-                        <button className="hidden md:flex items-center gap-2 px-4 py-2 bg-white text-red-600 text-sm font-semibold rounded-lg border border-red-100 shadow-sm hover:bg-red-50 transition-colors">
+                        <button
+                            onClick={() => navigate('/organization/departments')}
+                            className="hidden md:flex items-center gap-2 px-4 py-2 bg-white text-red-600 text-sm font-semibold rounded-lg border border-red-100 shadow-sm hover:bg-red-50 transition-colors"
+                        >
                             View Details <TrendingUp size={16} />
                         </button>
                     </div>
@@ -221,11 +216,17 @@ const ModernOrganizationDashboard: React.FC = () => {
                 </div>
 
                 <div className="relative z-10 flex flex-wrap gap-3 justify-center md:justify-end">
-                    <button className="group px-5 py-3 bg-gray-900 hover:bg-black text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-gray-200 hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
+                    <button
+                        onClick={() => navigate('/organization/roster')}
+                        className="group px-5 py-3 bg-gray-900 hover:bg-black text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-gray-200 hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2"
+                    >
                         <Clock size={16} className="text-gray-400 group-hover:text-white transition-colors" />
                         Add Schedule
                     </button>
-                    <button className="group px-5 py-3 bg-white text-gray-700 border border-gray-200 hover:border-orange-200 hover:bg-orange-50 rounded-xl text-sm font-semibold transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 flex items-center gap-2">
+                    <button
+                        onClick={() => navigate('/organization/staff')}
+                        className="group px-5 py-3 bg-white text-gray-700 border border-gray-200 hover:border-orange-200 hover:bg-orange-50 rounded-xl text-sm font-semibold transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 flex items-center gap-2"
+                    >
                         <FileText size={16} className="text-gray-400 group-hover:text-orange-500 transition-colors" />
                         Manage Requests
                         {leaveRequests > 0 && (
@@ -238,195 +239,211 @@ const ModernOrganizationDashboard: React.FC = () => {
             </div>
 
             {/* Stats Grid Row 1 - Hospital Specific */}
-            {stats.hospital && (
-                <div data-tour="key-metrics" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <StatCard
-                        title="Patient Occupancy"
-                        value={`${stats.hospital.activePatients}/${stats.hospital.totalBeds}`}
-                        trend={stats.hospital.attendanceOverview.trend}
-                        trendDirection={stats.hospital.attendanceOverview.percentage > 70 ? "up" : "down"}
-                        icon={Users}
-                        iconColor="text-orange-500"
-                        bgColor="bg-orange-50"
-                    />
-                    <StatCard
-                        title="Available Beds"
-                        value={`${stats.hospital.availableBeds}`}
-                        trend={`${stats.hospital.bedUtilization.toFixed(1)}% utilized`}
-                        trendDirection={stats.hospital.bedUtilization > 80 ? "up" : "down"}
-                        icon={Briefcase}
-                        iconColor="text-blue-900"
-                        bgColor="bg-blue-50"
-                    />
-                    <StatCard
-                        title="Active Departments"
-                        value={`${stats.hospital.activeDepartments}/${stats.hospital.totalDepartments}`}
-                        trend={stats.hospital.understaffedDepartments > 0 ? `${stats.hospital.understaffedDepartments} understaffed` : "All staffed"}
-                        trendDirection={stats.hospital.understaffedDepartments > 0 ? "down" : "up"}
-                        icon={Users}
-                        iconColor="text-blue-500"
-                        bgColor="bg-blue-50"
-                    />
-                    <StatCard
-                        title="Staff On Duty"
-                        value={`${stats.hospital.staffOnDuty}`}
-                        trend={`${stats.hospital.staffUtilization.toFixed(1)}% capacity`}
-                        trendDirection="up"
-                        icon={CheckSquare}
-                        iconColor="text-pink-500"
-                        bgColor="bg-pink-50"
-                    />
-                </div>
-            )}
+            {
+                stats.hospital && (
+                    <div data-tour="key-metrics" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <StatCard
+                            title="Patient Occupancy"
+                            value={`${stats.hospital.activePatients}/${stats.hospital.totalBeds}`}
+                            trend={stats.hospital.attendanceOverview.trend}
+                            trendDirection={stats.hospital.attendanceOverview.percentage > 70 ? "up" : "down"}
+                            icon={Users}
+                            iconColor="text-orange-500"
+                            bgColor="bg-orange-50"
+                            onClick={() => navigate('/organization/admissions')}
+                        />
+                        <StatCard
+                            title="Available Beds"
+                            value={`${stats.hospital.availableBeds}`}
+                            trend={`${stats.hospital.bedUtilization.toFixed(1)}% utilized`}
+                            trendDirection={stats.hospital.bedUtilization > 80 ? "up" : "down"}
+                            icon={Briefcase}
+                            iconColor="text-blue-900"
+                            bgColor="bg-blue-50"
+                            onClick={() => navigate('/organization/departments')}
+                        />
+                        <StatCard
+                            title="Active Departments"
+                            value={`${stats.hospital.activeDepartments}/${stats.hospital.totalDepartments}`}
+                            trend={stats.hospital.understaffedDepartments > 0 ? `${stats.hospital.understaffedDepartments} understaffed` : "All staffed"}
+                            trendDirection={stats.hospital.understaffedDepartments > 0 ? "down" : "up"}
+                            icon={Users}
+                            iconColor="text-blue-500"
+                            bgColor="bg-blue-50"
+                            onClick={() => navigate('/organization/departments')}
+                        />
+                        <StatCard
+                            title="Staff On Duty"
+                            value={`${stats.hospital.staffOnDuty}`}
+                            trend={`${stats.hospital.staffUtilization.toFixed(1)}% capacity`}
+                            trendDirection="up"
+                            icon={CheckSquare}
+                            iconColor="text-pink-500"
+                            bgColor="bg-pink-50"
+                            onClick={() => navigate('/organization/staff')}
+                        />
+                    </div>
+                )
+            }
 
             {/* NGO Stats */}
-            {stats.ngo && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <StatCard
-                        title="Active Programs"
-                        value={stats.ngo.activePrograms.toString()}
-                        trend="+2.1%"
-                        trendDirection="up"
-                        icon={Briefcase}
-                        iconColor="text-orange-500"
-                        bgColor="bg-orange-50"
-                    />
-                    <StatCard
-                        title="Beneficiaries Reached"
-                        value={stats.ngo.beneficiariesReached.toLocaleString()}
-                        trend="+5.2%"
-                        trendDirection="up"
-                        icon={Users}
-                        iconColor="text-blue-900"
-                        bgColor="bg-blue-50"
-                    />
-                    <StatCard
-                        title="Active Volunteers"
-                        value={stats.ngo.activeVolunteers.toString()}
-                        trend="+8.1%"
-                        trendDirection="up"
-                        icon={UserPlus}
-                        iconColor="text-blue-500"
-                        bgColor="bg-blue-50"
-                    />
-                    <StatCard
-                        title="Funds Raised"
-                        value={`$${stats.ngo.fundsRaised.toLocaleString()}`}
-                        trend="+12.5%"
-                        trendDirection="up"
-                        icon={DollarSign}
-                        iconColor="text-pink-500"
-                        bgColor="bg-pink-50"
-                    />
-                </div>
-            )}
+            {
+                stats.ngo && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <StatCard
+                            title="Active Programs"
+                            value={stats.ngo.activePrograms.toString()}
+                            trend="+2.1%"
+                            trendDirection="up"
+                            icon={Briefcase}
+                            iconColor="text-orange-500"
+                            bgColor="bg-orange-50"
+                        />
+                        <StatCard
+                            title="Beneficiaries Reached"
+                            value={stats.ngo.beneficiariesReached.toLocaleString()}
+                            trend="+5.2%"
+                            trendDirection="up"
+                            icon={Users}
+                            iconColor="text-blue-900"
+                            bgColor="bg-blue-50"
+                        />
+                        <StatCard
+                            title="Active Volunteers"
+                            value={stats.ngo.activeVolunteers.toString()}
+                            trend="+8.1%"
+                            trendDirection="up"
+                            icon={UserPlus}
+                            iconColor="text-blue-500"
+                            bgColor="bg-blue-50"
+                        />
+                        <StatCard
+                            title="Funds Raised"
+                            value={`$${stats.ngo.fundsRaised.toLocaleString()}`}
+                            trend="+12.5%"
+                            trendDirection="up"
+                            icon={DollarSign}
+                            iconColor="text-pink-500"
+                            bgColor="bg-pink-50"
+                        />
+                    </div>
+                )
+            }
 
             {/* Pharmacy Stats */}
-            {stats.pharmacy && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <StatCard
-                        title="Clinical Trials"
-                        value={stats.pharmacy.activeClinicalTrials.toString()}
-                        trend="+3.2%"
-                        trendDirection="up"
-                        icon={FileText}
-                        iconColor="text-orange-500"
-                        bgColor="bg-orange-50"
-                    />
-                    <StatCard
-                        title="Products in Pipeline"
-                        value={stats.pharmacy.productsInPipeline.toString()}
-                        trend="+1.8%"
-                        trendDirection="up"
-                        icon={Briefcase}
-                        iconColor="text-blue-900"
-                        bgColor="bg-blue-50"
-                    />
-                    <StatCard
-                        title="Pending Submissions"
-                        value={stats.pharmacy.pendingSubmissions.toString()}
-                        trend="-0.5%"
-                        trendDirection="down"
-                        icon={CheckSquare}
-                        iconColor="text-blue-500"
-                        bgColor="bg-blue-50"
-                    />
-                    <StatCard
-                        title="Research Publications"
-                        value={stats.pharmacy.researchPublications.toString()}
-                        trend="+6.7%"
-                        trendDirection="up"
-                        icon={TrendingUp}
-                        iconColor="text-pink-500"
-                        bgColor="bg-pink-50"
-                    />
-                </div>
-            )}
+            {
+                stats.pharmacy && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <StatCard
+                            title="Clinical Trials"
+                            value={stats.pharmacy.activeClinicalTrials.toString()}
+                            trend="+3.2%"
+                            trendDirection="up"
+                            icon={FileText}
+                            iconColor="text-orange-500"
+                            bgColor="bg-orange-50"
+                        />
+                        <StatCard
+                            title="Products in Pipeline"
+                            value={stats.pharmacy.productsInPipeline.toString()}
+                            trend="+1.8%"
+                            trendDirection="up"
+                            icon={Briefcase}
+                            iconColor="text-blue-900"
+                            bgColor="bg-blue-50"
+                        />
+                        <StatCard
+                            title="Pending Submissions"
+                            value={stats.pharmacy.pendingSubmissions.toString()}
+                            trend="-0.5%"
+                            trendDirection="down"
+                            icon={CheckSquare}
+                            iconColor="text-blue-500"
+                            bgColor="bg-blue-50"
+                        />
+                        <StatCard
+                            title="Research Publications"
+                            value={stats.pharmacy.researchPublications.toString()}
+                            trend="+6.7%"
+                            trendDirection="up"
+                            icon={TrendingUp}
+                            iconColor="text-pink-500"
+                            bgColor="bg-pink-50"
+                        />
+                    </div>
+                )
+            }
 
             {/* Stats Grid Row 2 - Hospital Specific */}
-            {stats.hospital && (
-                <div data-tour="department-stats" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <StatCard
-                        title="ICU Beds Available"
-                        value={`${stats.hospital.availableICUBeds}/${stats.hospital.totalICUBeds}`}
-                        trend={`${stats.hospital.occupiedICUBeds} occupied`}
-                        trendDirection={stats.hospital.availableICUBeds < 5 ? "down" : "up"}
-                        icon={Heart}
-                        iconColor="text-purple-500"
-                        bgColor="bg-purple-50"
-                    />
-                    <StatCard
-                        title="Recent Admissions"
-                        value={stats.hospital.recentAdmissions.toString()}
-                        trend={`${stats.hospital.emergencyAdmissions} emergency cases`}
-                        trendDirection="up"
-                        icon={TrendingUp}
-                        iconColor="text-red-500"
-                        bgColor="bg-red-50"
-                    />
-                    <StatCard
-                        title="Pending Registrations"
-                        value={stats.hospital.pendingRegistrations.toString()}
-                        trend={`${stats.hospital.approvedRegistrations} approved`}
-                        trendDirection="up"
-                        icon={FileText}
-                        iconColor="text-green-500"
-                        bgColor="bg-green-50"
-                    />
-                    <StatCard
-                        title="Total Patients"
-                        value={stats.hospital.totalPatients.toString()}
-                        trend={`${stats.hospital.activePatients} currently admitted`}
-                        trendDirection="up"
-                        icon={UserPlus}
-                        iconColor="text-gray-800"
-                        bgColor="bg-gray-100"
-                    />
-                </div>
-            )}
+            {
+                stats.hospital && (
+                    <div data-tour="department-stats" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <StatCard
+                            title="ICU Beds Available"
+                            value={`${stats.hospital.availableICUBeds}/${stats.hospital.totalICUBeds}`}
+                            trend={`${stats.hospital.occupiedICUBeds} occupied`}
+                            trendDirection={stats.hospital.availableICUBeds < 5 ? "down" : "up"}
+                            icon={Heart}
+                            iconColor="text-purple-500"
+                            bgColor="bg-purple-50"
+                            onClick={() => navigate('/organization/departments')}
+                        />
+                        <StatCard
+                            title="Recent Admissions"
+                            value={stats.hospital.recentAdmissions.toString()}
+                            trend={`${stats.hospital.emergencyAdmissions} emergency cases`}
+                            trendDirection="up"
+                            icon={TrendingUp}
+                            iconColor="text-red-500"
+                            bgColor="bg-red-50"
+                            onClick={() => navigate('/organization/admissions')}
+                        />
+                        <StatCard
+                            title="Pending Registrations"
+                            value={stats.hospital.pendingRegistrations.toString()}
+                            trend={`${stats.hospital.approvedRegistrations} approved`}
+                            trendDirection="up"
+                            icon={FileText}
+                            iconColor="text-green-500"
+                            bgColor="bg-green-50"
+                            onClick={() => navigate('/organization/registration-approvals')}
+                        />
+                        <StatCard
+                            title="Total Patients"
+                            value={stats.hospital.totalPatients.toString()}
+                            trend={`${stats.hospital.activePatients} currently admitted`}
+                            trendDirection="up"
+                            icon={UserPlus}
+                            iconColor="text-gray-800"
+                            bgColor="bg-gray-100"
+                            onClick={() => navigate('/organization/patients')}
+                        />
+                    </div>
+                )
+            }
 
             {/* Charts Row */}
             <div data-tour="analytics-charts" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <ChartCard
-                    title="Employee Status"
+                    title="Staff Distribution"
                     action={
                         <button className="text-gray-400 hover:text-gray-600">
-                            <Calendar size={18} />
+                            <Users size={18} />
                         </button>
                     }
                 >
-                    <EmployeeStatusChart />
+                    <EmployeeStatusChart data={stats.hospital?.staffDistribution} />
                 </ChartCard>
 
                 <ChartCard
-                    title="Attendance Overview"
+                    title="Bed Occupancy"
                     action={
                         <button className="text-gray-400 hover:text-gray-600">
-                            <Calendar size={18} />
+                            <Briefcase size={18} />
                         </button>
                     }
                 >
-                    <AttendanceChart />
+                    <AttendanceChart data={stats.hospital?.bedOccupancy} />
                 </ChartCard>
 
                 <ChartCard
@@ -437,19 +454,18 @@ const ModernOrganizationDashboard: React.FC = () => {
                         </button>
                     }
                 >
-                    <DepartmentChart />
+                    <DepartmentChart data={stats.hospital?.departmentChartData} />
                 </ChartCard>
             </div>
 
             {/* Bottom Row */}
             <div data-tour="daily-logs" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <ListCard
-                    title="Clock-In/Out"
-                    items={clockInList}
+                    title="Recent Admissions"
+                    items={recentAdmissionsList}
                     action={
                         <div className="flex gap-2">
-                            <button className="text-xs border border-gray-200 rounded px-2 py-1 text-gray-500">All Departments</button>
-                            <button className="text-xs border border-gray-200 rounded px-2 py-1 text-gray-500">Today</button>
+                            <button onClick={() => navigate('/organization/admissions')} className="text-xs border border-gray-200 hover:bg-gray-50 rounded px-2 py-1 text-gray-500 transition-colors">View All</button>
                         </div>
                     }
                 />
@@ -461,7 +477,7 @@ const ModernOrganizationDashboard: React.FC = () => {
                     More Widgets Coming Soon
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

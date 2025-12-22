@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { X, Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { X, Upload, FileText, AlertCircle, CheckCircle, ChevronRight, Calendar, Tag, Shield, FileType } from 'lucide-react';
 import guidelinesService, { GuidelineCreateData } from '../../services/guidelinesService';
 
 interface GuidelineUploadModalProps {
@@ -42,12 +42,26 @@ const GuidelineUploadModal: React.FC<GuidelineUploadModalProps> = ({
     content_type: 'pdf',
     text_content: ''
   });
-  
+
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [animateIn, setAnimateIn] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setAnimateIn(true);
+      document.body.style.overflow = 'hidden';
+    } else {
+      setAnimateIn(false);
+      document.body.style.overflow = 'auto';
+    }
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isOpen]);
 
   const categories = [
     { value: 'emergency', label: 'Emergency Protocols' },
@@ -58,57 +72,46 @@ const GuidelineUploadModal: React.FC<GuidelineUploadModalProps> = ({
     { value: 'prevention', label: 'Preventive Care' },
     { value: 'infection_control', label: 'Infection Control' },
     { value: 'patient_safety', label: 'Patient Safety' },
-    { value: 'quality_assurance', label: 'Quality Assurance' },
-    { value: 'maternity', label: 'Maternity Care' },
-    { value: 'pediatric', label: 'Pediatric Care' },
-    { value: 'geriatric', label: 'Geriatric Care' },
-    { value: 'mental_health', label: 'Mental Health' },
-    { value: 'oncology', label: 'Oncology' },
-    { value: 'cardiology', label: 'Cardiology' },
-    { value: 'neurology', label: 'Neurology' },
-    { value: 'orthopedics', label: 'Orthopedics' },
-    { value: 'radiology', label: 'Radiology' },
-    { value: 'laboratory', label: 'Laboratory Procedures' },
     { value: 'nursing', label: 'Nursing Protocols' },
+    { value: 'cardiology', label: 'Cardiology' },
+    { value: 'pediatric', label: 'Pediatric Care' },
     { value: 'other', label: 'Other' }
   ];
 
   const roles = [
     'doctor', 'nurse', 'pharmacist', 'lab_technician', 'physician_assistant',
-    'medical_secretary', 'radiologist_tech', 'paramedic', 'emt', 'midwife'
+    'medical_secretary', 'radiologist_tech', 'paramedic', 'midwife'
   ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleRoleChange = (role: string, checked: boolean) => {
+  const handleRoleToggle = (role: string) => {
     setFormData(prev => ({
       ...prev,
-      target_roles: checked
-        ? [...prev.target_roles, role]
-        : prev.target_roles.filter(r => r !== role)
+      target_roles: prev.target_roles.includes(role)
+        ? prev.target_roles.filter(r => r !== role)
+        : [...prev.target_roles, role]
     }));
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
-      // Validate file type
-      const allowedTypes = ['application/pdf', 'application/msword', 
-                           'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                           'text/plain'];
-      
+      const allowedTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'text/plain'
+      ];
+
       if (!allowedTypes.includes(selectedFile.type)) {
         setError('Please select a PDF, Word document, or text file.');
         return;
       }
 
-      // Validate file size (10MB limit)
       if (selectedFile.size > 10 * 1024 * 1024) {
         setError('File size must be less than 10MB.');
         return;
@@ -121,31 +124,12 @@ const GuidelineUploadModal: React.FC<GuidelineUploadModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.title.trim()) {
-      setError('Title is required.');
-      return;
-    }
 
-    if (!formData.description.trim()) {
-      setError('Description is required.');
-      return;
-    }
-
-    if (!formData.category) {
-      setError('Category is required.');
-      return;
-    }
-
-    if (formData.content_type === 'pdf' && !file) {
-      setError('Please select a file to upload.');
-      return;
-    }
-
-    if (formData.content_type === 'text' && !formData.text_content.trim()) {
-      setError('Text content is required for text-based guidelines.');
-      return;
-    }
+    if (!formData.title.trim()) return setError('Title is required.');
+    if (!formData.description.trim()) return setError('Description is required.');
+    if (!formData.category) return setError('Category is required.');
+    if (formData.content_type === 'pdf' && !file) return setError('Please select a file to upload.');
+    if (formData.content_type === 'text' && !formData.text_content.trim()) return setError('Text content is required.');
 
     try {
       setUploading(true);
@@ -167,52 +151,33 @@ const GuidelineUploadModal: React.FC<GuidelineUploadModalProps> = ({
       };
 
       if (formData.content_type === 'pdf' && file) {
-        // Upload with file - create FormData
         const uploadFormData = new FormData();
-        
-        // Add file
         uploadFormData.append('file', file);
-        
-        // Add all guideline data
-        uploadFormData.append('title', guidelineData.title);
-        uploadFormData.append('description', guidelineData.description);
-        uploadFormData.append('version', guidelineData.version);
-        uploadFormData.append('category', guidelineData.category);
-        uploadFormData.append('effective_date', guidelineData.effective_date);
-        uploadFormData.append('priority', guidelineData.priority);
-        uploadFormData.append('content_type', guidelineData.content_type);
-        
-        if (guidelineData.specialty) {
-          uploadFormData.append('specialty', guidelineData.specialty);
-        }
-        if (guidelineData.expiry_date) {
-          uploadFormData.append('expiry_date', guidelineData.expiry_date);
-        }
-        if (guidelineData.keywords && guidelineData.keywords.length > 0) {
-          uploadFormData.append('keywords', guidelineData.keywords.join(','));
-        }
-        if (guidelineData.target_roles && guidelineData.target_roles.length > 0) {
-          uploadFormData.append('target_roles', guidelineData.target_roles.join(','));
-        }
-        
-        const result = await guidelinesService.uploadGuideline(uploadFormData);
-        setSuccess(result.message || 'Clinical guideline uploaded successfully.');
+        Object.entries(guidelineData).forEach(([key, value]) => {
+          if (value !== undefined) {
+            if (Array.isArray(value)) {
+              uploadFormData.append(key, value.join(','));
+            } else {
+              uploadFormData.append(key, String(value));
+            }
+          }
+        });
+
+        await guidelinesService.uploadGuideline(uploadFormData);
       } else {
-        // Create text-based guideline
         await guidelinesService.createGuideline(guidelineData);
-        setSuccess('Clinical guideline created successfully.');
       }
 
-      // Reset form and close modal after success
+      setSuccess('Guideline published successfully.');
       setTimeout(() => {
         resetForm();
         onSuccess();
         onClose();
-      }, 2000);
+      }, 1500);
 
     } catch (err: any) {
-      console.error('Error uploading guideline:', err);
-      setError(err.response?.data?.error || 'Failed to upload guideline. Please try again.');
+      console.error(err);
+      setError(err.response?.data?.error || 'Failed to publish guideline.');
     } finally {
       setUploading(false);
     }
@@ -220,380 +185,276 @@ const GuidelineUploadModal: React.FC<GuidelineUploadModalProps> = ({
 
   const resetForm = () => {
     setFormData({
-      title: '',
-      description: '',
-      version: '1.0',
-      category: '',
-      specialty: '',
-      keywords: '',
-      effective_date: new Date().toISOString().split('T')[0],
-      expiry_date: '',
-      target_roles: ['doctor', 'nurse'],
-      priority: 'medium',
-      content_type: 'pdf',
-      text_content: ''
+      title: '', description: '', version: '1.0', category: '', specialty: '', keywords: '',
+      effective_date: new Date().toISOString().split('T')[0], expiry_date: '',
+      target_roles: ['doctor', 'nurse'], priority: 'medium',
+      content_type: 'pdf', text_content: ''
     });
     setFile(null);
     setError(null);
     setSuccess(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
-  const handleClose = () => {
-    if (!uploading) {
-      resetForm();
-      onClose();
-    }
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-screen overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">Upload Clinical Guideline</h2>
+    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ${animateIn ? 'opacity-100' : 'opacity-0'}`}>
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+        onClick={onClose}
+      />
+
+      <div className={`bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] shadow-2xl overflow-hidden flex flex-col relative transform transition-all duration-500 ease-out ${animateIn ? 'translate-y-0 scale-100' : 'translate-y-10 scale-95'}`}>
+
+        {/* Header */}
+        <div className="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-white z-10">
+          <div>
+            <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">New Clinical Guideline</h2>
+            <p className="text-sm text-gray-500 mt-1">Share protocols with your organization</p>
+          </div>
           <button
-            onClick={handleClose}
-            disabled={uploading}
-            className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
+            onClick={onClose}
+            className="w-10 h-10 rounded-full bg-gray-50 hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-900 transition-colors"
           >
-            <X className="h-6 w-6" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Error and Success Messages */}
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4">
-              <div className="flex">
-                <AlertCircle className="h-5 w-5 text-red-400" />
-                <div className="ml-3">
-                  <p className="text-sm text-red-800">{error}</p>
-                </div>
+        {/* Scrollable Content */}
+        <div className="overflow-y-auto p-8 custom-scrollbar">
+          <form onSubmit={handleSubmit} className="space-y-10">
+
+            {/* Status Messages */}
+            {error && (
+              <div className="bg-red-50 border border-red-100 rounded-2xl p-4 flex items-center text-red-700 animate-in fade-in slide-in-from-top-2">
+                <AlertCircle className="w-5 h-5 mr-3 flex-shrink-0" />
+                <span className="text-sm font-medium">{error}</span>
               </div>
-            </div>
-          )}
+            )}
 
-          {success && (
-            <div className="bg-green-50 border border-green-200 rounded-md p-4">
-              <div className="flex">
-                <CheckCircle className="h-5 w-5 text-green-400" />
-                <div className="ml-3">
-                  <p className="text-sm text-green-800">{success}</p>
-                </div>
+            {success && (
+              <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 flex items-center text-emerald-700 animate-in fade-in slide-in-from-top-2">
+                <CheckCircle className="w-5 h-5 mr-3 flex-shrink-0" />
+                <span className="text-sm font-medium">{success}</span>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Basic Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Title *
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleInputChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter guideline title"
-                required
-                disabled={uploading}
-              />
-            </div>
+            {/* Section 1: Basic Info */}
+            <section>
+              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 flex items-center">
+                <FileText className="w-4 h-4 mr-2" /> Basic Information
+              </h3>
 
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description *
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                rows={3}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Describe the purpose and scope of this guideline"
-                required
-                disabled={uploading}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Version
-              </label>
-              <input
-                type="text"
-                name="version"
-                value={formData.version}
-                onChange={handleInputChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="1.0"
-                disabled={uploading}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Priority
-              </label>
-              <select
-                name="priority"
-                value={formData.priority}
-                onChange={handleInputChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                disabled={uploading}
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-                <option value="critical">Critical</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category *
-              </label>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleInputChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-                disabled={uploading}
-              >
-                <option value="">Select a category</option>
-                {categories.map((cat) => (
-                  <option key={cat.value} value={cat.value}>
-                    {cat.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Specialty
-              </label>
-              <input
-                type="text"
-                name="specialty"
-                value={formData.specialty}
-                onChange={handleInputChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., Cardiology, Pediatrics"
-                disabled={uploading}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Effective Date *
-              </label>
-              <input
-                type="date"
-                name="effective_date"
-                value={formData.effective_date}
-                onChange={handleInputChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-                disabled={uploading}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Expiry Date (Optional)
-              </label>
-              <input
-                type="date"
-                name="expiry_date"
-                value={formData.expiry_date}
-                onChange={handleInputChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                disabled={uploading}
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Keywords (comma-separated)
-              </label>
-              <input
-                type="text"
-                name="keywords"
-                value={formData.keywords}
-                onChange={handleInputChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., emergency, protocol, treatment"
-                disabled={uploading}
-              />
-            </div>
-          </div>
-
-          {/* Target Roles */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Target Roles *
-            </label>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {roles.map((role) => (
-                <label key={role} className="flex items-center">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Guideline Title</label>
                   <input
-                    type="checkbox"
-                    checked={formData.target_roles.includes(role)}
-                    onChange={(e) => handleRoleChange(role, e.target.checked)}
-                    className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500"
-                    disabled={uploading}
+                    type="text"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                    className="w-full px-5 py-3 rounded-xl bg-gray-50 border-gray-100 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none font-medium"
+                    placeholder="e.g. Sepsis Management Protocol 2024"
                   />
-                  <span className="text-sm text-gray-700 capitalize">
-                    {role.replace('_', ' ')}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
+                </div>
 
-          {/* Content Type */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Content Type
-            </label>
-            <div className="flex space-x-4">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="content_type"
-                  value="pdf"
-                  checked={formData.content_type === 'pdf'}
-                  onChange={handleInputChange}
-                  className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500"
-                  disabled={uploading}
-                />
-                <span className="text-sm text-gray-700">File Upload (PDF/DOC)</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="content_type"
-                  value="text"
-                  checked={formData.content_type === 'text'}
-                  onChange={handleInputChange}
-                  className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500"
-                  disabled={uploading}
-                />
-                <span className="text-sm text-gray-700">Text Content</span>
-              </label>
-            </div>
-          </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Description</label>
+                  <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    rows={3}
+                    className="w-full px-5 py-3 rounded-xl bg-gray-50 border-gray-100 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all outline-none text-sm resize-none"
+                    placeholder="Briefly describe the purpose..."
+                  />
+                </div>
 
-          {/* File Upload */}
-          {formData.content_type === 'pdf' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Upload File *
-              </label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".pdf,.doc,.docx,.txt"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                  disabled={uploading}
-                />
-                {file ? (
-                  <div className="flex items-center justify-center space-x-2">
-                    <FileText className="h-8 w-8 text-blue-600" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{file.name}</p>
-                      <p className="text-xs text-gray-500">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setFile(null)}
-                      className="text-red-600 hover:text-red-800"
-                      disabled={uploading}
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Category</label>
+                  <div className="relative">
+                    <select
+                      name="category"
+                      value={formData.category}
+                      onChange={handleInputChange}
+                      className="w-full appearance-none px-5 py-3 rounded-xl bg-gray-50 border-gray-100 focus:bg-white focus:ring-2 focus:ring-emerald-500 transition-all outline-none cursor-pointer"
                     >
-                      <X className="h-4 w-4" />
+                      <option value="">Select Category</option>
+                      {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                    </select>
+                    <ChevronRight className="absolute right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 rotate-90 pointer-events-none" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Priority</label>
+                  <div className="flex gap-2">
+                    {['low', 'medium', 'high', 'critical'].map((p) => (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, priority: p as any }))}
+                        className={`flex-1 py-3 px-2 rounded-xl text-xs font-bold capitalize transition-all border ${formData.priority === p
+                            ? p === 'critical' ? 'bg-red-50 text-red-600 border-red-200'
+                              : p === 'high' ? 'bg-orange-50 text-orange-600 border-orange-200'
+                                : 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                            : 'bg-gray-50 text-gray-400 border-transparent hover:bg-gray-100'
+                          }`}
+                      >
+                        {p}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Section 2: Details & Content */}
+            <section className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+              <div className="space-y-6">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center">
+                  <Tag className="w-4 h-4 mr-2" /> Targeting & Meta
+                </h3>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-3">Target Roles</label>
+                  <div className="flex flex-wrap gap-2">
+                    {roles.map(role => (
+                      <button
+                        key={role}
+                        type="button"
+                        onClick={() => handleRoleToggle(role)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${formData.target_roles.includes(role)
+                            ? 'bg-blue-50 text-blue-600 border-blue-200'
+                            : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
+                          }`}
+                      >
+                        {role.replace('_', ' ')}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 mb-1">Effective Date</label>
+                    <input
+                      type="date"
+                      name="effective_date"
+                      value={formData.effective_date}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 rounded-xl bg-gray-50 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 mb-1">Version</label>
+                    <input
+                      type="text"
+                      name="version"
+                      value={formData.version}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 rounded-xl bg-gray-50 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center">
+                  <FileType className="w-4 h-4 mr-2" /> Content Source
+                </h3>
+
+                <div className="flex bg-gray-100 p-1 rounded-xl">
+                  {[
+                    { id: 'pdf', label: 'Upload File' },
+                    { id: 'text', label: 'Write Content' }
+                  ].map(type => (
+                    <button
+                      key={type.id}
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, content_type: type.id as any }))}
+                      className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all ${formData.content_type === type.id
+                          ? 'bg-white shadow-sm text-gray-900'
+                          : 'text-gray-400 hover:text-gray-600'
+                        }`}
+                    >
+                      {type.label}
                     </button>
+                  ))}
+                </div>
+
+                {formData.content_type === 'pdf' ? (
+                  <div
+                    className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all ${file ? 'border-emerald-200 bg-emerald-50/30' : 'border-gray-200 hover:border-emerald-300 bg-gray-50 hover:bg-white'
+                      }`}
+                  >
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".pdf,.doc,.docx,.txt"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
+
+                    {file ? (
+                      <div className="flex flex-col items-center">
+                        <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-3">
+                          <CheckCircle className="w-6 h-6" />
+                        </div>
+                        <p className="font-bold text-gray-900 text-sm mb-1">{file.name}</p>
+                        <p className="text-xs text-gray-400 mb-4">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+                        <button
+                          type="button"
+                          onClick={() => setFile(null)}
+                          className="text-xs text-red-500 hover:text-red-700 font-bold"
+                        >
+                          Remove File
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                        <div className="w-12 h-12 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <Upload className="w-5 h-5" />
+                        </div>
+                        <p className="font-bold text-gray-700 text-sm mb-1">Click to upload</p>
+                        <p className="text-xs text-gray-400">PDF, Word, or Text (Max 10MB)</p>
+                      </div>
+                    )}
                   </div>
                 ) : (
-                  <div>
-                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                    <p className="mt-2 text-sm text-gray-600">
-                      Click to upload or drag and drop
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      PDF, DOC, DOCX, or TXT files up to 10MB
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="mt-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm"
-                      disabled={uploading}
-                    >
-                      Choose File
-                    </button>
-                  </div>
+                  <textarea
+                    name="text_content"
+                    value={formData.text_content}
+                    onChange={handleInputChange}
+                    className="w-full h-40 p-4 rounded-xl bg-gray-50 border-gray-100 focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none text-sm resize-none"
+                    placeholder="Enter the full guideline content..."
+                  ></textarea>
                 )}
               </div>
-            </div>
-          )}
+            </section>
 
-          {/* Text Content */}
-          {formData.content_type === 'text' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Text Content *
-              </label>
-              <textarea
-                name="text_content"
-                value={formData.text_content}
-                onChange={handleInputChange}
-                rows={10}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter the guideline content here..."
-                required={formData.content_type === 'text'}
-                disabled={uploading}
-              />
-            </div>
-          )}
+          </form>
+        </div>
 
-          {/* Buttons */}
-          <div className="flex space-x-4 pt-4 border-t border-gray-200">
-            <button
-              type="button"
-              onClick={handleClose}
-              disabled={uploading}
-              className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg disabled:opacity-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={uploading || !formData.title || !formData.description || !formData.category}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg disabled:opacity-50 flex items-center justify-center"
-            >
-              {uploading ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Uploading...
-                </>
-              ) : (
-                <>
-                  <Upload className="mr-2 h-4 w-4" />
-                  Upload Guideline
-                </>
-              )}
-            </button>
-          </div>
-        </form>
+        {/* Footer */}
+        <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-4">
+          <button
+            onClick={onClose}
+            className="px-6 py-3 rounded-full text-sm font-bold text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={uploading}
+            className={`px-8 py-3 rounded-full text-sm font-bold text-white shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 ${uploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-900 hover:bg-black hover:shadow-xl'
+              }`}
+          >
+            {uploading ? 'Publishing...' : 'Publish Guideline'}
+          </button>
+        </div>
+
       </div>
     </div>
   );

@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useOrganizationAuth } from '../features/organization/organizationAuthContext';
 
-interface AdmissionData {
+export interface AdmissionData {
   id: number;
   admission_id: string;
+  patient: number; // NEW: Trying to link to Patient ID
   patient_name: string; // This comes from backend serializer ✅
   patient_age: number | null; // NEW: Age from backend serializer ✅
+  patient_gender: string | null; // NEW: Gender from backend serializer
+  patient_phone: string | null; // NEW: Phone from backend serializer
   department_name: string; // This comes from backend serializer ✅
   attending_doctor_name: string; // This comes from backend serializer ✅
   status: 'pending' | 'admitted' | 'discharged' | 'transferred' | 'deceased' | 'left_ama';
@@ -13,6 +16,12 @@ interface AdmissionData {
   priority: string;
   reason_for_admission: string;
   admission_date: string;
+  expected_discharge_date?: string; // Expected discharge date from backend
+  actual_discharge_date?: string; // Actual discharge date when patient is discharged
+  discharge_destination?: string; // Where patient was discharged to
+  discharge_summary?: string; // Summary of stay and discharge instructions
+  followup_instructions?: string; // Post-discharge care instructions
+  length_of_stay_days?: number; // Calculated length of stay in days
   is_icu_bed: boolean;
   is_registered_patient: boolean;
   temp_patient_details?: {
@@ -87,11 +96,11 @@ export const useAdmissionData = (): AdmissionStats => {
 
       const data = await response.json();
       console.log('✅ Admission Data:', data);
-      
+
       // Handle both paginated and direct array responses
       const admissions = Array.isArray(data) ? data : (data.results || []);
       console.log('📊 Parsed Admissions Count:', admissions.length);
-      
+
       return admissions;
     } catch (err) {
       console.error('Error fetching admissions:', err);
@@ -108,10 +117,10 @@ export const useAdmissionData = (): AdmissionStats => {
 
         // Calculate statistics
         const statusCounts = {
-          pending: admissions.filter(a => a.status === 'pending').length,
-          admitted: admissions.filter(a => a.status === 'admitted').length,
-          discharged: admissions.filter(a => a.status === 'discharged').length,
-          transferred: admissions.filter(a => a.status === 'transferred').length,
+          pending: admissions.filter(a => a.status?.toLowerCase() === 'pending').length,
+          admitted: admissions.filter(a => a.status?.toLowerCase() === 'admitted').length,
+          discharged: admissions.filter(a => a.status?.toLowerCase() === 'discharged').length,
+          transferred: admissions.filter(a => a.status?.toLowerCase() === 'transferred').length,
         };
 
         // Fix: Count emergency cases by priority OR admission_type, not registration status

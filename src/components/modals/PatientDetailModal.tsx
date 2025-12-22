@@ -6,6 +6,7 @@ interface PatientDetailModalProps {
   onClose: () => void;
   patientId: string;
   onUpdate: (updatedData: any) => void;
+  initialIsEditing?: boolean; // NEW: Allow opening in edit mode
 }
 
 interface PatientDetail {
@@ -33,12 +34,13 @@ const PatientDetailModal: React.FC<PatientDetailModalProps> = ({
   isOpen,
   onClose,
   patientId,
-  onUpdate
+  onUpdate,
+  initialIsEditing = false
 }) => {
   const { isAuthenticated } = useOrganizationAuth(); // Verify authentication via context
   const [patient, setPatient] = useState<PatientDetail | null>(null);
   const [loading, setLoading] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(initialIsEditing);
   const [editForm, setEditForm] = useState({
     status: '',
     diagnosis: '',
@@ -52,10 +54,11 @@ const PatientDetailModal: React.FC<PatientDetailModalProps> = ({
 
   // Fetch patient details when modal opens
   useEffect(() => {
-    if (isOpen && patientId) {
-      fetchPatientDetails();
+    if (isOpen) {
+      if (patientId) fetchPatientDetails();
+      setIsEditing(initialIsEditing);
     }
-  }, [isOpen, patientId]);
+  }, [isOpen, patientId, initialIsEditing]);
 
   const fetchPatientDetails = async () => {
     setLoading(true);
@@ -146,10 +149,10 @@ const PatientDetailModal: React.FC<PatientDetailModalProps> = ({
 
       const body = newStatus === 'discharged'
         ? {
-            discharge_summary: editForm.discharge_summary,
-            followup_instructions: editForm.followup_instructions,
-            discharge_destination: 'Home' // Default
-          }
+          discharge_summary: editForm.discharge_summary,
+          followup_instructions: editForm.followup_instructions,
+          discharge_destination: 'Home' // Default
+        }
         : {};
 
       const response = await fetch(endpoint, {
@@ -167,12 +170,21 @@ const PatientDetailModal: React.FC<PatientDetailModalProps> = ({
         onUpdate(updatedData);
         alert(`Patient ${newStatus} successfully!`);
       } else {
-        console.error(`Failed to ${newStatus} patient`);
-        alert(`Failed to ${newStatus} patient`);
+        // Parse error response to show actual error message
+        const errorData = await response.json();
+        let errorMessage = errorData.error || errorData.message || `Failed to ${newStatus} patient`;
+
+        // Handle array errors (Django sometimes returns errors as arrays)
+        if (Array.isArray(errorMessage)) {
+          errorMessage = errorMessage.join('\n');
+        }
+
+        console.error(`Failed to ${newStatus} patient:`, errorData);
+        alert(`Unable to ${newStatus} patient:\n\n${errorMessage}`);
       }
     } catch (error) {
       console.error(`Error ${newStatus} patient:`, error);
-      alert(`An error occurred while updating patient status`);
+      alert(`An error occurred while updating patient status: ${error}`);
     } finally {
       setLoading(false);
     }
@@ -203,9 +215,9 @@ const PatientDetailModal: React.FC<PatientDetailModalProps> = ({
       deceased: 'bg-red-100 text-red-800',
       left_ama: 'bg-orange-100 text-orange-800'
     };
-    
+
     const displayStatus = status === 'left_ama' ? 'Left AMA' : status.charAt(0).toUpperCase() + status.slice(1);
-    
+
     return (
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${badgeClasses[status as keyof typeof badgeClasses] || 'bg-gray-100 text-gray-800'}`}>
         {displayStatus}
@@ -224,7 +236,7 @@ const PatientDetailModal: React.FC<PatientDetailModalProps> = ({
             <h2 className="text-2xl font-bold text-blue-800">
               {patient ? `Patient Details - ${patient.patient_name}` : 'Patient Details'}
             </h2>
-            <button 
+            <button
               onClick={onClose}
               className="text-gray-500 hover:text-gray-700"
             >
@@ -361,7 +373,7 @@ const PatientDetailModal: React.FC<PatientDetailModalProps> = ({
                       <label className="text-sm font-medium text-gray-600">Reason for Admission</label>
                       <p className="mt-1">{patient.reason_for_admission}</p>
                     </div>
-                    
+
                     <div>
                       <label className="text-sm font-medium text-gray-600">Diagnosis</label>
                       {isEditing ? (

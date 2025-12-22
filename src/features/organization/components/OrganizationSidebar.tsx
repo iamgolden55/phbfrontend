@@ -35,6 +35,67 @@ interface OrganizationSidebarProps {
     onCloseMobile: () => void;
 }
 
+const navSections = [
+    {
+        title: 'Overview',
+        items: [
+            { label: 'Dashboard', path: '/organization/dashboard', icon: LayoutDashboard },
+            { label: 'Analytics', path: '/organization/analytics', icon: TrendingUp },
+        ]
+    },
+    {
+        title: 'Patient Management',
+        items: [
+            { label: 'Patients', path: '/organization/patients', icon: Users },
+            { label: 'User Registrations', path: '/organization/user-registrations', icon: UserCheck },
+            { label: 'Patient Admissions', path: '/organization/admissions', icon: ClipboardList },
+            { label: 'Registration Approvals', path: '/organization/registration-approvals', icon: CheckSquare },
+        ]
+    },
+    {
+        title: 'Clinical & Care',
+        items: [
+            { label: 'Clinical', path: '/organization/clinical', icon: FileText },
+            { label: 'Clinical Guidelines', path: '/organization/clinical-guidelines', icon: BookOpen },
+            { label: 'Appointments', path: '/organization/appointments', icon: Calendar },
+            { label: 'Surgery', path: '/organization/surgery', icon: Activity },
+            { label: 'Emergency', path: '/organization/emergency', icon: AlertTriangle },
+        ]
+    },
+    {
+        title: 'Services',
+        items: [
+            { label: 'Pharmacy', path: '/organization/pharmacy', icon: Pill },
+            { label: 'Lab & Vitals', path: '/organization/lab', icon: Microscope },
+            { label: 'Radiology', path: '/organization/radiology', icon: Scan },
+        ]
+    },
+    {
+        title: 'Operations',
+        items: [
+            { label: 'Billing', path: '/organization/billing', icon: CreditCard },
+            { label: 'Inventory', path: '/organization/inventory', icon: Package },
+            { label: 'Reports', path: '/organization/reports', icon: BarChart3 },
+        ]
+    },
+    {
+        title: 'Staff & Admin',
+        items: [
+            { label: 'Departments', path: '/organization/departments', icon: Building2 },
+            { label: 'Staff Management', path: '/organization/staff', icon: Briefcase },
+            { label: 'Staff Roster', path: '/organization/staffing', icon: Clock },
+            { label: 'Hospital Licenses', path: '/organization/licenses', icon: Shield },
+        ]
+    },
+    {
+        title: 'System',
+        items: [
+            { label: 'Employee View', path: '/employee/dashboard', icon: Users },
+            { label: 'Settings', path: '/organization/settings', icon: Settings },
+        ]
+    }
+];
+
 const OrganizationSidebar: React.FC<OrganizationSidebarProps> = ({
     isOpen,
     isMobileMenuOpen,
@@ -44,8 +105,12 @@ const OrganizationSidebar: React.FC<OrganizationSidebarProps> = ({
     const location = useLocation();
     const navigate = useNavigate();
 
-    const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-        'Overview': true,
+    const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
+        const initialState: Record<string, boolean> = {};
+        navSections.forEach(section => {
+            initialState[section.title] = true;
+        });
+        return initialState;
     });
 
     const handleLogout = () => {
@@ -59,67 +124,6 @@ const OrganizationSidebar: React.FC<OrganizationSidebarProps> = ({
             [sectionTitle]: !prev[sectionTitle]
         }));
     };
-
-    const navSections = [
-        {
-            title: 'Overview',
-            items: [
-                { label: 'Dashboard', path: '/organization/dashboard', icon: LayoutDashboard },
-                { label: 'Analytics', path: '/organization/analytics', icon: TrendingUp },
-            ]
-        },
-        {
-            title: 'Patient Management',
-            items: [
-                { label: 'Patients', path: '/organization/patients', icon: Users },
-                { label: 'User Registrations', path: '/organization/user-registrations', icon: UserCheck },
-                { label: 'Patient Admissions', path: '/organization/admissions', icon: ClipboardList },
-                { label: 'Registration Approvals', path: '/organization/registration-approvals', icon: CheckSquare },
-            ]
-        },
-        {
-            title: 'Clinical & Care',
-            items: [
-                { label: 'Clinical', path: '/organization/clinical', icon: FileText },
-                { label: 'Clinical Guidelines', path: '/organization/clinical-guidelines', icon: BookOpen },
-                { label: 'Appointments', path: '/organization/appointments', icon: Calendar },
-                { label: 'Surgery', path: '/organization/surgery', icon: Activity },
-                { label: 'Emergency', path: '/organization/emergency', icon: AlertTriangle },
-            ]
-        },
-        {
-            title: 'Services',
-            items: [
-                { label: 'Pharmacy', path: '/organization/pharmacy', icon: Pill },
-                { label: 'Lab & Vitals', path: '/organization/lab', icon: Microscope },
-                { label: 'Radiology', path: '/organization/radiology', icon: Scan },
-            ]
-        },
-        {
-            title: 'Operations',
-            items: [
-                { label: 'Billing', path: '/organization/billing', icon: CreditCard },
-                { label: 'Inventory', path: '/organization/inventory', icon: Package },
-                { label: 'Reports', path: '/organization/reports', icon: BarChart3 },
-            ]
-        },
-        {
-            title: 'Staff & Admin',
-            items: [
-                { label: 'Departments', path: '/organization/departments', icon: Building2 },
-                { label: 'Staff Management', path: '/organization/staff', icon: Briefcase },
-                { label: 'Staff Roster', path: '/organization/staffing', icon: Clock },
-                { label: 'Hospital Licenses', path: '/organization/licenses', icon: Shield },
-            ]
-        },
-        {
-            title: 'System',
-            items: [
-                { label: 'Employee View', path: '/employee/dashboard', icon: Users },
-                { label: 'Settings', path: '/organization/settings', icon: Settings },
-            ]
-        }
-    ];
 
     const isActive = (path: string) => {
         return location.pathname === path || location.pathname.startsWith(`${path}/`);

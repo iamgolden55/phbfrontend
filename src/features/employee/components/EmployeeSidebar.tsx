@@ -23,6 +23,38 @@ interface EmployeeSidebarProps {
     onCloseMobile: () => void;
 }
 
+const navSections = [
+    {
+        title: 'Overview',
+        items: [
+            { label: 'Dashboard', path: '/employee/dashboard', icon: LayoutDashboard },
+            { label: 'My Profile', path: '/employee/profile', icon: User },
+        ]
+    },
+    {
+        title: 'Work Management',
+        items: [
+            { label: 'Attendance', path: '/employee/attendance', icon: Clock },
+            { label: 'Leaves', path: '/employee/leaves', icon: Calendar },
+            { label: 'Projects', path: '/employee/projects', icon: Briefcase },
+            { label: 'Tasks', path: '/employee/tasks', icon: CheckSquare },
+        ]
+    },
+    {
+        title: 'Finance',
+        items: [
+            { label: 'Payslips', path: '/employee/payslips', icon: DollarSign },
+        ]
+    },
+    {
+        title: 'System',
+        items: [
+            { label: 'Settings', path: '/employee/settings', icon: Settings },
+            { label: 'Admin View', path: '/organization/dashboard', icon: Building2 },
+        ]
+    }
+];
+
 const EmployeeSidebar: React.FC<EmployeeSidebarProps> = ({
     isOpen,
     isMobileMenuOpen,
@@ -32,9 +64,12 @@ const EmployeeSidebar: React.FC<EmployeeSidebarProps> = ({
     const location = useLocation();
     const navigate = useNavigate();
 
-    const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-        'Overview': true,
-        'Work Management': true,
+    const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
+        const initialState: Record<string, boolean> = {};
+        navSections.forEach(section => {
+            initialState[section.title] = true;
+        });
+        return initialState;
     });
 
     const handleLogout = () => {
@@ -48,38 +83,6 @@ const EmployeeSidebar: React.FC<EmployeeSidebarProps> = ({
             [sectionTitle]: !prev[sectionTitle]
         }));
     };
-
-    const navSections = [
-        {
-            title: 'Overview',
-            items: [
-                { label: 'Dashboard', path: '/employee/dashboard', icon: LayoutDashboard },
-                { label: 'My Profile', path: '/employee/profile', icon: User },
-            ]
-        },
-        {
-            title: 'Work Management',
-            items: [
-                { label: 'Attendance', path: '/employee/attendance', icon: Clock },
-                { label: 'Leaves', path: '/employee/leaves', icon: Calendar },
-                { label: 'Projects', path: '/employee/projects', icon: Briefcase },
-                { label: 'Tasks', path: '/employee/tasks', icon: CheckSquare },
-            ]
-        },
-        {
-            title: 'Finance',
-            items: [
-                { label: 'Payslips', path: '/employee/payslips', icon: DollarSign },
-            ]
-        },
-        {
-            title: 'System',
-            items: [
-                { label: 'Settings', path: '/employee/settings', icon: Settings },
-                { label: 'Admin View', path: '/organization/dashboard', icon: Building2 },
-            ]
-        }
-    ];
 
     const isActive = (path: string) => {
         return location.pathname === path || location.pathname.startsWith(`${path}/`);

@@ -249,11 +249,13 @@ export const useDepartmentStats = (): UseDepartmentStatsReturn => {
     const totalMinimumStaff = activeDepts.reduce((sum, dept) => sum + dept.minimum_staff_required, 0);
     const understaffedDepartments = activeDepts.filter(dept => dept.is_understaffed);
     
-    // 🏥 Patient statistics - Use occupied_beds instead of current_patient_count to avoid double-counting
-    // Note: current_patient_count might include outpatients or other non-bed patients
-    const totalPatients = occupiedBeds; // Use occupiedBeds instead of summing current_patient_count
+    // 🏥 Patient statistics - Use current_patient_count from each department
+    // This represents all currently active patients in the department
+    const totalPatients = activeDepts.reduce((sum, dept) => {
+      return sum + safeNumber(dept.current_patient_count);
+    }, 0);
     
-    console.log('🛏️ Total patients (using occupied beds):', totalPatients, 'Occupied beds:', occupiedBeds);
+    console.log('🛏️ Total patients (using current_patient_count):', totalPatients, 'Occupied beds:', occupiedBeds);
     
     // 📊 Department counts
     const clinicalDepartments = activeDepts.filter(dept => dept.is_clinical);

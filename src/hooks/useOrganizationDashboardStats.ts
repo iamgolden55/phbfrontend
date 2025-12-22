@@ -2,7 +2,8 @@ import { useMemo } from 'react';
 import { useOrganizationAuth } from '../features/organization/organizationAuthContext';
 import { useRegistrationStats } from './useRegistrationStats';
 import { useDepartmentStats } from './useDepartmentStats';
-import { useAdmissionData } from './useAdmissionData';
+import { useAdmissionData, AdmissionData } from './useAdmissionData';
+
 
 export interface DashboardStats {
   // Organization info
@@ -64,6 +65,10 @@ export interface DashboardStats {
     hasLowBedAvailability: boolean;
     hasUnderstaffedDepartments: boolean;
     criticalAlertCount: number;
+    recentAdmissionList: AdmissionData[];
+    departmentChartData: { name: string; value: number }[];
+    staffDistribution: { name: string; value: number; color: string }[];
+    bedOccupancy: { name: string; value: number; color: string }[];
   };
 
   // NGO-specific stats (placeholder for future implementation)
@@ -146,6 +151,38 @@ export const useOrganizationDashboardStats = (): DashboardStats => {
       (hasUnderstaffedDepartments ? 1 : 0) +
       (stats.criticalAlerts?.highUtilization?.length || 0);
 
+    const recentAdmissionList = [...admissionStats.admissions]
+      .sort((a, b) => new Date(b.admission_date).getTime() - new Date(a.admission_date).getTime())
+      .slice(0, 5);
+
+    // Compute department chart data (Employees by Department)
+    const departmentChartData = departmentStats.departments
+      .filter(d => d.is_active && d.current_staff_count > 0)
+      .map(d => ({ name: d.name.substring(0, 10), value: d.current_staff_count })) // Truncate name for chart
+      .sort((a, b) => b.value - a.value)
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 6);
+
+    // Compute Staff Distribution
+    const clinicalStaff = departmentStats.departments.filter(d => d.is_clinical).reduce((sum, d) => sum + d.current_staff_count, 0);
+    const adminStaff = departmentStats.departments.filter(d => d.is_administrative).reduce((sum, d) => sum + d.current_staff_count, 0);
+    const supportStaff = departmentStats.departments.filter(d => d.is_support).reduce((sum, d) => sum + d.current_staff_count, 0);
+    // Fallback for undefined types
+    const otherStaff = Math.max(0, stats.totalStaff - (clinicalStaff + adminStaff + supportStaff));
+
+    const staffDistribution = [
+      { name: 'Clinical', value: clinicalStaff, color: '#10B981' }, // Green
+      { name: 'Admin', value: adminStaff, color: '#3B82F6' }, // Blue
+      { name: 'Support', value: supportStaff, color: '#F59E0B' }, // Orange
+      { name: 'Other', value: otherStaff, color: '#6B7280' }, // Gray
+    ].filter(i => i.value > 0);
+
+    // Compute Bed Occupancy
+    const bedOccupancy = [
+      { name: 'Occupied', value: stats.occupiedBeds, color: '#EF4444' }, // Red
+      { name: 'Available', value: stats.availableBeds, color: '#10B981' }, // Green
+    ];
+
     return {
       // Overview
       attendanceOverview: {
@@ -194,6 +231,10 @@ export const useOrganizationDashboardStats = (): DashboardStats => {
       hasLowBedAvailability,
       hasUnderstaffedDepartments,
       criticalAlertCount,
+      recentAdmissionList,
+      departmentChartData,
+      staffDistribution,
+      bedOccupancy,
     };
   }, [organizationType, departmentStats.stats, admissionStats, registrationStats]);
 

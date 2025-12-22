@@ -103,9 +103,8 @@ const DepartmentCard: React.FC<DepartmentCardProps> = ({
 
   return (
     <div
-      className={`bg-white rounded-xl shadow-sm border transition-all ${
-        isSelected ? 'border-orange-500 shadow-md' : 'border-gray-100'
-      } ${!department.is_active ? 'opacity-70' : ''}`}
+      className={`bg-white rounded-xl shadow-sm border transition-all ${isSelected ? 'border-orange-500 shadow-md' : 'border-gray-100'
+        } ${!department.is_active ? 'opacity-70' : ''}`}
       data-tour={isFirst ? 'department-card' : undefined}
     >
       {/* Card Header */}
@@ -144,11 +143,10 @@ const DepartmentCard: React.FC<DepartmentCardProps> = ({
 
               {/* Status Badge */}
               <span
-                className={`px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap ${
-                  department.is_active
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-gray-100 text-gray-600'
-                }`}
+                className={`px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap ${department.is_active
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-gray-100 text-gray-600'
+                  }`}
               >
                 {department.is_active ? 'Active' : 'Inactive'}
               </span>
@@ -168,8 +166,8 @@ const DepartmentCard: React.FC<DepartmentCardProps> = ({
       {/* Key Metrics Row */}
       <div className="px-4 py-3 bg-gray-50 border-b border-gray-100">
         <div className="grid grid-cols-3 gap-3 text-xs">
-          {/* Beds (Clinical only) */}
-          {department.is_clinical && department.total_beds > 0 ? (
+          {/* Beds (Clinical only condition relaxed to check for bed count) */}
+          {department.total_beds > 0 ? (
             <div className="flex items-center gap-1">
               <Bed size={14} className="text-gray-400" />
               <span className="text-gray-600">
@@ -237,11 +235,10 @@ const DepartmentCard: React.FC<DepartmentCardProps> = ({
           {/* Deactivate/Reactivate Button */}
           <button
             onClick={onToggleStatus}
-            className={`p-2 rounded-lg transition-colors ${
-              department.is_active
-                ? 'text-gray-600 hover:text-red-600 hover:bg-red-50'
-                : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
-            }`}
+            className={`p-2 rounded-lg transition-colors ${department.is_active
+              ? 'text-gray-600 hover:text-red-600 hover:bg-red-50'
+              : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
+              }`}
             title={department.is_active ? 'Deactivate' : 'Reactivate'}
           >
             {department.is_active ? <ToggleLeft size={16} /> : <ToggleRight size={16} />}
@@ -281,8 +278,8 @@ const DepartmentCard: React.FC<DepartmentCardProps> = ({
             </div>
           </div>
 
-          {/* Bed Utilization (Clinical only) */}
-          {department.is_clinical && department.total_beds > 0 && (
+          {/* Bed Utilization (Any department with beds) */}
+          {department.total_beds > 0 && (
             <div>
               <h4 className="text-xs font-semibold text-gray-700 mb-2">Bed Utilization</h4>
               <div className="space-y-1">
@@ -294,13 +291,12 @@ const DepartmentCard: React.FC<DepartmentCardProps> = ({
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
-                    className={`h-2 rounded-full transition-all ${
-                      bedUtilization >= 85
+                    className={`h-2 rounded-full transition-all ${bedUtilization >= 85
                         ? 'bg-red-500'
                         : bedUtilization >= 70
-                        ? 'bg-orange-500'
-                        : 'bg-green-500'
-                    }`}
+                          ? 'bg-orange-500'
+                          : 'bg-green-500'
+                      }`}
                     style={{ width: `${bedUtilization}%` }}
                   />
                 </div>

@@ -293,10 +293,19 @@ export class DepartmentService {
         clinical_departments: departments.filter(d => d.is_clinical).length,
         support_departments: departments.filter(d => d.is_support).length,
         administrative_departments: departments.filter(d => d.is_administrative).length,
-        total_beds: departments.reduce((sum, d) => sum + (d.total_beds || 0), 0),
-        available_beds: departments.reduce((sum, d) => sum + (d.available_beds || 0), 0),
+        total_beds: departments.reduce((sum, d) => {
+          const val = typeof d.total_beds === 'number' ? d.total_beds : parseInt(String(d.total_beds || 0).replace(/[^0-9]/g, '') || '0', 10);
+          return sum + (isNaN(val) ? 0 : val);
+        }, 0),
+        available_beds: departments.reduce((sum, d) => {
+          const val = typeof d.available_beds === 'number' ? d.available_beds : parseInt(String(d.available_beds || 0).replace(/[^0-9]/g, '') || '0', 10);
+          return sum + (isNaN(val) ? 0 : val);
+        }, 0),
         bed_utilization_rate: this.calculateAverageBedUtilization(departments),
-        total_staff: departments.reduce((sum, d) => sum + (d.current_staff_count || 0), 0),
+        total_staff: departments.reduce((sum, d) => {
+          const val = typeof d.current_staff_count === 'number' ? d.current_staff_count : parseInt(String(d.current_staff_count || 0).replace(/[^0-9]/g, '') || '0', 10);
+          return sum + (isNaN(val) ? 0 : val);
+        }, 0),
         understaffed_departments: departments.filter(d => d.is_understaffed).length,
       };
     } catch (error) {
