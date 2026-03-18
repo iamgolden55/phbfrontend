@@ -25,6 +25,32 @@ export interface StaffMember {
   date_joined: string;
 }
 
+export interface VisitTask {
+  id: string;
+  description: string;
+  isCompleted: boolean;
+  isEssential: boolean;
+  type: 'task' | 'medication';
+  time?: string;
+  dosage?: string;
+}
+
+export interface Visit {
+  id: string;
+  staffId: number | null; // Null if unassigned
+  staffName?: string;
+  patientId: string;
+  patientName: string;
+  date: string; // ISO Date string YYYY-MM-DD
+  startTime: string; // HH:mm
+  endTime: string;   // HH:mm
+  status: 'scheduled' | 'completed' | 'missed' | 'in-progress' | 'not-started';
+  tasks: VisitTask[];
+  type: string; // e.g., "Morning Routine", "Lunch Call"
+  carePlanFor?: string; // e.g., "General Care"
+  clientPreferences?: string;
+}
+
 interface StaffResponse {
   status: string;
   total_staff: number;
@@ -168,5 +194,72 @@ export const StaffService = {
       console.error('Error fetching departments:', error);
       throw error;
     }
+  },
+
+  // Mock Visit Methods for Roster UI
+  async getVisits(startDate: string, endDate: string): Promise<Visit[]> {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Return mock data
+    return [
+      {
+        id: '1',
+        staffId: 1, // Assumes a staff with ID 1 exists
+        staffName: 'Aaron Aaronson',
+        patientId: 'p1',
+        patientName: 'Annie Smith',
+        date: new Date().toISOString().split('T')[0], // Today
+        startTime: '06:00',
+        endTime: '11:00',
+        status: 'not-started',
+        type: 'Morning Routine',
+        carePlanFor: 'General Daily Care',
+        clientPreferences: 'Prefer female carer',
+        tasks: [
+          { id: 't1', description: 'Assist to have a shower', isCompleted: false, isEssential: true, type: 'task' },
+          { id: 't2', description: 'Prompt to wash/bathe', isCompleted: false, isEssential: true, type: 'task' },
+          { id: 'm1', description: 'Enalapril 10mg tablets', isCompleted: false, isEssential: false, type: 'medication', dosage: '10mg' },
+          { id: 'm2', description: 'Lithium carbonate 250mg tablets', isCompleted: false, isEssential: false, type: 'medication', dosage: '250mg' },
+        ]
+      },
+      {
+        id: '2',
+        staffId: null, // Unassigned
+        patientId: 'p1',
+        patientName: 'Annie Smith',
+        date: new Date().toISOString().split('T')[0],
+        startTime: '12:00',
+        endTime: '13:00',
+        status: 'scheduled',
+        type: 'Lunch Visit',
+        tasks: [
+          { id: 't3', description: 'Prepare Lunch', isCompleted: false, isEssential: true, type: 'task' }
+        ]
+      },
+      {
+        id: '3',
+        staffId: 1,
+        staffName: 'Aaron Aaronson',
+        patientId: 'p2',
+        patientName: 'John Doe',
+        date: new Date().toISOString().split('T')[0],
+        startTime: '14:00',
+        endTime: '15:00',
+        status: 'completed',
+        type: 'Afternoon Check',
+        tasks: [
+          { id: 't4', description: 'Check blood pressure', isCompleted: true, isEssential: true, type: 'task' }
+        ]
+      }
+    ];
+  },
+
+  async createVisit(visit: Omit<Visit, 'id'>): Promise<Visit> {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return {
+      ...visit,
+      id: Math.random().toString(36).substr(2, 9),
+    };
   }
 };

@@ -167,12 +167,10 @@ export const UserManagementService = {
 
   async inviteUser(data: InviteUserRequest): Promise<OrganizationUser> {
     try {
-      const token = localStorage.getItem('phb_organization_token');
       const response = await fetch(`${API_BASE_URL}/api/organizations/users/invite/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
         },
         credentials: 'include',
         body: JSON.stringify(data),
@@ -191,12 +189,10 @@ export const UserManagementService = {
 
   async updateUser(userId: string, data: UpdateUserRequest): Promise<OrganizationUser> {
     try {
-      const token = localStorage.getItem('phb_organization_token');
       const response = await fetch(`${API_BASE_URL}/api/organizations/users/${userId}/`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
         },
         credentials: 'include',
         body: JSON.stringify(data),
@@ -215,12 +211,9 @@ export const UserManagementService = {
 
   async deleteUser(userId: string): Promise<void> {
     try {
-      const token = localStorage.getItem('phb_organization_token');
       const response = await fetch(`${API_BASE_URL}/api/organizations/users/${userId}/`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': token ? `Bearer ${token}` : '',
-        },
+        headers: {},
         credentials: 'include',
       });
 
@@ -235,12 +228,10 @@ export const UserManagementService = {
 
   async bulkAction(action: 'activate' | 'deactivate' | 'delete', userIds: string[]): Promise<void> {
     try {
-      const token = localStorage.getItem('phb_organization_token');
       const response = await fetch(`${API_BASE_URL}/api/organizations/users/bulk-action/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
         },
         credentials: 'include',
         body: JSON.stringify({ action, user_ids: userIds }),

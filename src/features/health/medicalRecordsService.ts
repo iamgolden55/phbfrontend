@@ -7,12 +7,9 @@ class MedicalRecordsService {
   // JWT tokens are now in httpOnly cookies - no need to store in class
   // Only store the special medical access token which is a short-lived secondary token
   private medAccessToken: string | null = null;
+  private medAccessExpiry: number | null = null;
 
   constructor() {
-    // Try to load medical access token from localStorage on initialization
-    // NOTE: JWT tokens are in httpOnly cookies and will be sent automatically
-    this.medAccessToken = localStorage.getItem('med_access_token');
-
     // Log config info
     console.log('MedicalRecordsService initialized');
     console.log('API_BASE_URL:', API_BASE_URL);
@@ -67,13 +64,11 @@ class MedicalRecordsService {
         };
       }
       
-      // If no OTP required, save token directly
+      // If no OTP required, server httpOnly cookies will be set automatically
       if (loginData.tokens && loginData.tokens.access) {
-        this.jwtToken = loginData.tokens.access;
-        localStorage.setItem('phb_auth_token', this.jwtToken);
         return {
           status: 'success',
-          token: this.jwtToken,
+          token: loginData.tokens.access,
           userData: loginData.user_data
         };
       }
@@ -115,13 +110,11 @@ class MedicalRecordsService {
       
       const data = await response.json();
       
-      // Save JWT token for future API calls
+      // Save JWT token for future API calls (now via httpOnly cookies only)
       if (data.tokens && data.tokens.access) {
-        this.jwtToken = data.tokens.access;
-        localStorage.setItem('phb_auth_token', this.jwtToken);
         return {
           status: 'success',
-          token: this.jwtToken,
+          token: data.tokens.access,
           userData: data.user_data
         };
       }
@@ -248,13 +241,15 @@ class MedicalRecordsService {
       // MOCK MODE: If using our mock code, return success immediately
       if (otp === '123456') {
         console.log('Development mode: Detected mock code, returning success');
-        // Store a fake token in localStorage so it can be used for subsequent requests
-        const mockToken = 'mock-med-access-token';
-        localStorage.setItem('med_access_token', mockToken);
+          const mockToken = 'mock-med-access-token';
+          this.medAccessToken = mockToken;
+          this.medAccessExpiry = Date.now() + 30 * 60 * 1000;
         
-        // Set expiry 30 minutes from now
-        const expiryTime = Date.now() + 30 * 60 * 1000;
-        localStorage.setItem('med_access_expiry', expiryTime.toString());
+          return {
+            status: 'success',
+            message: 'Development mode: Authentication successful',
+            token: mockToken
+          };
         
         return {
           status: 'success',
@@ -304,14 +299,15 @@ class MedicalRecordsService {
         console.log('OTP verification response data:', data);
         
         if (data.med_access_token) {
-          // Store the token in localStorage for subsequent requests
-          this.medAccessToken = data.med_access_token;
-          localStorage.setItem('med_access_token', this.medAccessToken);
+           this.medAccessToken = data.med_access_token;
+           const expiryMinutes = data.expires_in ? data.expires_in / 60 : 30;
+           this.medAccessExpiry = Date.now() + expiryMinutes * 60 * 1000;
           
-          // Store expiry time - default to 30 minutes if not specified
-          const expiryMinutes = data.expires_in ? data.expires_in / 60 : 30;
-          const expiryTime = Date.now() + expiryMinutes * 60 * 1000;
-          localStorage.setItem('med_access_expiry', expiryTime.toString());
+           return {
+            status: 'success',
+            message: 'Authentication successful',
+            token: this.medAccessToken
+           };
           
           return {
             status: 'success',
@@ -330,13 +326,15 @@ class MedicalRecordsService {
         // MOCK MODE: If API is down, return success for testing purposes
         if (otp === '123456') {
           console.log('Network error but using mock code, returning success for development');
-          // Store a fake token in localStorage
-          const mockToken = 'mock-med-access-token-network-fallback';
-          localStorage.setItem('med_access_token', mockToken);
-          
-          // Set expiry 30 minutes from now
-          const expiryTime = Date.now() + 30 * 60 * 1000;
-          localStorage.setItem('med_access_expiry', expiryTime.toString());
+            const mockToken = 'mock-med-access-token-network-fallback';
+            this.medAccessToken = mockToken;
+            this.medAccessExpiry = Date.now() + 30 * 60 * 1000;
+        
+            return {
+              status: 'success',
+              message: 'Development mode: Authentication successful',
+              token: mockToken
+            };
           
           return {
             status: 'success',
@@ -356,13 +354,15 @@ class MedicalRecordsService {
       // MOCK MODE: If something goes wrong but using mock code, return success
       if (otp === '123456') {
         console.log('General error but using mock code, returning success for development');
-        // Store a fake token in localStorage
-        const mockToken = 'mock-med-access-token-general-fallback';
-        localStorage.setItem('med_access_token', mockToken);
+          const mockToken = 'mock-med-access-token-general-fallback';
+          this.medAccessToken = mockToken;
+          this.medAccessExpiry = Date.now() + 30 * 60 * 1000;
         
-        // Set expiry 30 minutes from now
-        const expiryTime = Date.now() + 30 * 60 * 1000;
-        localStorage.setItem('med_access_expiry', expiryTime.toString());
+          return {
+            status: 'success',
+            message: 'Development mode: Authentication successful',
+            token: mockToken
+          };
         
         return {
           status: 'success',
@@ -386,43 +386,14 @@ class MedicalRecordsService {
       console.log('Starting getMedicalRecords request');
 
       // JWT tokens are now in httpOnly cookies - they'll be sent automatically
-      // Check if we have a stored med_access_token
-      if (!this.medAccessToken) {
-        // Try to get from localStorage
-        const storedToken = localStorage.getItem('med_access_token');
-        const expiresAt = localStorage.getItem('med_access_expires_at');
-        console.log('Med access token from localStorage:', storedToken ? 'Found' : 'Not found');
-        
-        if (storedToken && expiresAt) {
-          const now = new Date().getTime();
-          if (now < parseInt(expiresAt)) {
-            this.medAccessToken = storedToken;
-            console.log('Med access token is valid');
-            
-            // Verify token format (should be 32-character alphanumeric)
-            if (!/^[a-zA-Z0-9]{32}$/.test(this.medAccessToken)) {
-              console.warn('Med access token doesn\'t match expected format (32-char alphanumeric)');
-            }
-          } else {
-            // Token expired
-            console.log('Med access token is expired');
-            localStorage.removeItem('med_access_token');
-            localStorage.removeItem('med_access_expires_at');
-            
-            return {
-              status: 'error',
-              code: 'MED_ACCESS_EXPIRED',
-              message: 'Your medical records access has expired. Please verify again.'
-            };
-          }
-        } else {
-          console.log('No med access token available');
-          return {
-            status: 'error',
-            code: 'MED_ACCESS_REQUIRED',
-            message: 'Medical records require additional verification'
-          };
-        }
+      // Ensure we have an in-memory med access token and it is still valid
+      if (!this.medAccessToken || (this.medAccessExpiry && this.medAccessExpiry < Date.now())) {
+        console.log('No valid in-memory med access token available');
+        return {
+          status: 'error',
+          code: this.medAccessExpiry && this.medAccessExpiry < Date.now() ? 'MED_ACCESS_EXPIRED' : 'MED_ACCESS_REQUIRED',
+          message: 'Medical records require additional verification'
+        };
       }
       
       // Now fetch the medical records
@@ -466,8 +437,7 @@ class MedicalRecordsService {
             console.log('Unauthorized request (401) - requires medical records verification');
             // Clear any invalid tokens
             this.medAccessToken = null;
-            localStorage.removeItem('med_access_token');
-            localStorage.removeItem('med_access_expires_at');
+            this.medAccessExpiry = null;
             
             return {
               status: 'error',
@@ -485,8 +455,7 @@ class MedicalRecordsService {
               if (errorData.code === 'MED_ACCESS_EXPIRED') {
                 // Clear expired token
                 this.medAccessToken = null;
-                localStorage.removeItem('med_access_token');
-                localStorage.removeItem('med_access_expires_at');
+                this.medAccessExpiry = null;
                 
                 return {
                   status: 'error',
@@ -502,8 +471,7 @@ class MedicalRecordsService {
               } else if (errorData.code === 'INVALID_MED_ACCESS') {
                 // Clear invalid token
                 this.medAccessToken = null;
-                localStorage.removeItem('med_access_token');
-                localStorage.removeItem('med_access_expires_at');
+                this.medAccessExpiry = null;
                 
                 return {
                   status: 'error',
@@ -515,8 +483,7 @@ class MedicalRecordsService {
               console.log('Failed to parse error JSON, treating as generic authorization error');
               // Still clear tokens just in case
               this.medAccessToken = null;
-              localStorage.removeItem('med_access_token');
-              localStorage.removeItem('med_access_expires_at');
+              this.medAccessExpiry = null;
               
               return {
                 status: 'error',

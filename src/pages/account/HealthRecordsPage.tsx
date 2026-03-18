@@ -327,32 +327,9 @@ const HealthRecordsPage: React.FC = () => {
 
   // EFFECTS
   useEffect(() => {
-    const checkMedicalAccess = () => {
-      const medToken = localStorage.getItem('med_access_token');
-      const expiryTime = localStorage.getItem('med_access_expiry');
-      
-      console.log('🔐 Checking access:', { medToken: medToken ? 'Found' : 'Not found', expiryTime });
-      
-      if (medToken && expiryTime) {
-        const now = Date.now();
-        if (now < parseInt(expiryTime)) {
-          console.log('✅ Access granted - token valid');
-          setHasAccess(true);
-        } else {
-          console.log('❌ Token expired');
-          localStorage.removeItem('med_access_token');
-          localStorage.removeItem('med_access_expiry');
-          setHasAccess(false);
-        }
-      } else {
-        console.log('❌ No med_access_token found');
-        setHasAccess(false);
-      }
-      
-      setCheckingAccess(false);
-    };
-
-    checkMedicalAccess();
+    // Rely on server-side cookie auth; API responses will drive access state
+    setHasAccess(true);
+    setCheckingAccess(false);
   }, []);
 
   useEffect(() => {

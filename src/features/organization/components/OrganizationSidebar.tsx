@@ -26,7 +26,10 @@ import {
     TrendingUp,
     AlertTriangle,
     BookOpen,
-    Shield
+    Shield,
+    Heart,
+    Baby,
+    Stethoscope
 } from 'lucide-react';
 
 interface OrganizationSidebarProps {
@@ -60,6 +63,15 @@ const navSections = [
             { label: 'Appointments', path: '/organization/appointments', icon: Calendar },
             { label: 'Surgery', path: '/organization/surgery', icon: Activity },
             { label: 'Emergency', path: '/organization/emergency', icon: AlertTriangle },
+        ]
+    },
+    {
+        title: 'Key Care Flows',
+        items: [
+            { label: "Women's Health", path: '/organization/key-flows/womens-health', icon: Heart },
+            { label: 'Pregnancy', path: '/organization/key-flows/pregnancy', icon: Baby },
+            { label: 'Surgeries', path: '/organization/key-flows/surgeries', icon: Activity },
+            { label: 'Chronic Care', path: '/organization/key-flows/chronic-care', icon: Stethoscope },
         ]
     },
     {
@@ -133,8 +145,8 @@ const OrganizationSidebar: React.FC<OrganizationSidebarProps> = ({
     useEffect(() => {
         const currentPath = location.pathname;
         navSections.forEach(section => {
-            const hasActivePage = section.items.some(item => isActive(item.path));
-            if (hasActivePage && !expandedSections[section.title]) {
+            const hasActiveItem = section.items.some(item => isActive(item.path));
+            if (hasActiveItem && !expandedSections[section.title]) {
                 setExpandedSections(prev => ({
                     ...prev,
                     [section.title]: true

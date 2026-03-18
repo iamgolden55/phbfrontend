@@ -50,32 +50,12 @@ const MedicalAccessTab: React.FC<MedicalAccessTabProps> = ({
   const checkMedicalAccess = async () => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('phb_auth_token') || 
-                   localStorage.getItem('access_token') || 
-                   localStorage.getItem('authToken');
-
-      // Check if we have valid medical access token
-      const medAccessToken = localStorage.getItem('med_access_token');
-      const medAccessExpiry = localStorage.getItem('med_access_expiry');
-      
-      if (medAccessToken && medAccessExpiry) {
-        const expiryTime = parseInt(medAccessExpiry);
-        if (Date.now() < expiryTime) {
-          setHasAccess(true);
-          return;
-        } else {
-          // Clean up expired tokens
-          localStorage.removeItem('med_access_token');
-          localStorage.removeItem('med_access_expiry');
-        }
-      }
-
       // Check if doctor has access to patient records for this appointment
       const response = await fetch(
         createApiUrl(`api/professional/patient/${patientId}/medical-access/${appointmentId}/`), 
         {
+          credentials: 'include',
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
           }
         }
@@ -98,15 +78,11 @@ const MedicalAccessTab: React.FC<MedicalAccessTabProps> = ({
 
   const fetchAccessLogs = async () => {
     try {
-      const token = localStorage.getItem('phb_auth_token') || 
-                   localStorage.getItem('access_token') || 
-                   localStorage.getItem('authToken');
-
       const response = await fetch(
         createApiUrl(`api/professional/patient/${patientId}/access-logs/`), 
         {
+          credentials: 'include',
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
           }
         }
@@ -123,15 +99,11 @@ const MedicalAccessTab: React.FC<MedicalAccessTabProps> = ({
 
   const fetchPatientConsents = async () => {
     try {
-      const token = localStorage.getItem('phb_auth_token') || 
-                   localStorage.getItem('access_token') || 
-                   localStorage.getItem('authToken');
-
       const response = await fetch(
         createApiUrl(`api/professional/patient/${patientId}/consents/`), 
         {
+          credentials: 'include',
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
           }
         }
@@ -154,18 +126,16 @@ const MedicalAccessTab: React.FC<MedicalAccessTabProps> = ({
 
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('phb_auth_token') || 
-                   localStorage.getItem('access_token') || 
-                   localStorage.getItem('authToken');
 
       const response = await fetch(
         createApiUrl(`api/professional/patient/${patientId}/request-access/`), 
         {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
           },
+          credentials: 'include',
           body: JSON.stringify({
             appointment_id: appointmentId,
             access_reason: accessReason,
@@ -196,8 +166,6 @@ const MedicalAccessTab: React.FC<MedicalAccessTabProps> = ({
   };
 
   const revokeAccess = () => {
-    localStorage.removeItem('med_access_token');
-    localStorage.removeItem('med_access_expiry');
     setHasAccess(false);
   };
 

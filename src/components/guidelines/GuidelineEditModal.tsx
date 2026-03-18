@@ -382,7 +382,7 @@ const GuidelineEditModal: React.FC<GuidelineEditModalProps> = ({
               Cancel
             </button>
 
-            {guideline.approval_status !== 'published' && (
+            {!guideline.is_published && (
               <button
                 type="button"
                 onClick={handlePublish}

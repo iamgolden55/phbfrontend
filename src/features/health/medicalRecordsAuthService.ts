@@ -1,10 +1,9 @@
 // Import the API_BASE_URL from the utils config
 import { API_BASE_URL } from '../../utils/config';
 
-// Token storage keys
-const MED_ACCESS_TOKEN_KEY = 'med_access_token';
-const MED_ACCESS_EXPIRY_KEY = 'med_access_expiry';
-const AUTH_TOKEN_KEY = 'phb_auth_token';
+// In-memory token cache (no localStorage for security)
+let medAccessToken: string | null = null;
+let medAccessExpiry = 0;
 
 // Error codes
 export const ERROR_CODES = {
@@ -14,32 +13,23 @@ export const ERROR_CODES = {
 };
 
 // Token management
-export const getMedAccessToken = (): string | null => {
-  return localStorage.getItem(MED_ACCESS_TOKEN_KEY);
-};
+export const getMedAccessToken = (): string | null => medAccessToken;
 
-export const getMedAccessExpiry = (): number => {
-  const expiry = localStorage.getItem(MED_ACCESS_EXPIRY_KEY);
-  return expiry ? parseInt(expiry, 10) : 0;
-};
+export const getMedAccessExpiry = (): number => medAccessExpiry;
 
 export const setMedAccessToken = (token: string, expiryMinutes: number = 30): void => {
-  const expiryTime = Date.now() + expiryMinutes * 60 * 1000;
-  localStorage.setItem(MED_ACCESS_TOKEN_KEY, token);
-  localStorage.setItem(MED_ACCESS_EXPIRY_KEY, expiryTime.toString());
+  medAccessToken = token;
+  medAccessExpiry = Date.now() + expiryMinutes * 60 * 1000;
 };
 
 export const clearMedAccessToken = (): void => {
-  localStorage.removeItem(MED_ACCESS_TOKEN_KEY);
-  localStorage.removeItem(MED_ACCESS_EXPIRY_KEY);
+  medAccessToken = null;
+  medAccessExpiry = 0;
 };
 
 export const isMedAccessTokenValid = (): boolean => {
-  const token = getMedAccessToken();
-  if (!token) return false;
-  
-  const expiry = getMedAccessExpiry();
-  return expiry > Date.now();
+  if (!medAccessToken) return false;
+  return medAccessExpiry > Date.now();
 };
 
 // Helper function for making API calls
@@ -52,24 +42,15 @@ async function apiRequest<T>(
   // Ensure exactly one slash between base URL and endpoint
   const url = `${API_BASE_URL.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
   
-  // Get the authentication token
-  const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!authToken) {
-    throw new Error('Authentication required. Please log in again.');
-  }
-  
   console.log(`[DEBUG] API Request to: ${url} (${method})`);
-  console.log(`[DEBUG] Auth token available: ${!!authToken}`);
   
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-    'Authorization': `Bearer ${authToken}`,
     ...additionalHeaders
   };
   
-  const config: RequestInit = { method, headers };
+  const config: RequestInit = { method, headers, credentials: 'include' };
   
   if (body) {
     config.body = JSON.stringify(body);
@@ -209,26 +190,8 @@ export const fetchMedicalRecords = async () => {
       };
     }
     
-    // Get the authentication token
-    const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
-    
-    if (!authToken) {
-      console.log('[DEBUG] No auth token found');
-      return {
-        success: false,
-        errorCode: 'AUTH_REQUIRED',
-        message: 'Authentication required. Please log in again.'
-      };
-    }
-    
-    // Check if we have a known working endpoint from previous tests
-    let endpoint = localStorage.getItem('working_medical_record_endpoint');
-    
-    // If no working endpoint is saved, use the default as specified by the backend developer
-    if (!endpoint) {
-      // Standard endpoint with trailing slash as specified in the backend developer's message
-      endpoint = 'api/patient/medical-record/';
-    }
+    // Use the default backend endpoint (cookies provide auth)
+    const endpoint = 'api/patient/medical-record/';
     
     console.log(`[DEBUG] Using endpoint: ${endpoint}`);
     

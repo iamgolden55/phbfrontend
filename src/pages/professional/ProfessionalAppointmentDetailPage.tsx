@@ -23,6 +23,7 @@ import {
   fetchHospitals,
   fetchDepartments
 } from '../../features/professional/appointmentsService';
+import { createApiUrl } from '../../utils/config';
 
 interface AppointmentDetails {
   id: string;
@@ -204,13 +205,11 @@ const ProfessionalAppointmentDetailPage: React.FC = () => {
 
     try {
       setDrugSearchLoading(true);
-      const token = localStorage.getItem('phb_professional_token');
-
       const response = await fetch(
-        `http://127.0.0.1:8000/api/drugs/search/?q=${encodeURIComponent(query)}`,
+        createApiUrl(`api/drugs/search/?q=${encodeURIComponent(query)}`),
         {
+          credentials: 'include',
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         }

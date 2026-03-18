@@ -1,6 +1,7 @@
 import { API_BASE_URL } from '../../utils/config';
 
-const AUTH_TOKEN_KEY = 'phb_auth_token';
+let medicalRecordToken: string | null = null;
+let medicalRecordTokenExpiresAt: number | null = null;
 
 export interface MedicalRecord {
   id: string;
@@ -74,19 +75,13 @@ export interface Immunization {
  * @returns Promise that resolves to the OTP request status
  */
 export const requestMedicalRecordOTP = async (patientId: string) => {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   try {
     const response = await fetch(`${API_BASE_URL}/api/medical-records/request-access/`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({ 
         patient_id: patientId,
         reason: 'Medical consultation',
@@ -129,19 +124,13 @@ export const requestMedicalRecordOTP = async (patientId: string) => {
  * @returns Promise that resolves to the access token and expiry
  */
 export const verifyMedicalRecordOTP = async (patientId: string, otp: string) => {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
   try {
     const response = await fetch(`${API_BASE_URL}/api/medical-records/verify-access/`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({ 
         patient_id: patientId,
         otp: otp.trim() 
@@ -168,12 +157,9 @@ export const verifyMedicalRecordOTP = async (patientId: string, otp: string) => 
     
     // Store the medical record access token if provided
     if (data.access_token) {
-      localStorage.setItem('medical_record_token', data.access_token);
-      
-      // Also store the expiration time (default to 1 hour if not provided)
+      medicalRecordToken = data.access_token;
       const expiresIn = data.expires_in || 3600; // Default to 1 hour
-      const expiresAt = new Date(Date.now() + expiresIn * 1000).toISOString();
-      localStorage.setItem('medical_record_token_expires_at', expiresAt);
+      medicalRecordTokenExpiresAt = Date.now() + expiresIn * 1000;
     }
     
     return {
@@ -195,28 +181,22 @@ export const verifyMedicalRecordOTP = async (patientId: string, otp: string) => 
  * @returns Promise that resolves to the patient's medical records
  */
 export async function fetchMedicalRecords(patientId: string, accessToken?: string) {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
-  
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-  
+  const effectiveAccessToken = accessToken || medicalRecordToken;
+  const isAccessTokenValid = effectiveAccessToken && (!medicalRecordTokenExpiresAt || medicalRecordTokenExpiresAt > Date.now());
   try {
     const headers: HeadersInit = {
-      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     };
-    
-    // Add medical record access token to headers if provided
-    const medicalRecordToken = localStorage.getItem('medical_record_token');
-    if (medicalRecordToken) {
-      headers['X-Medical-Record-Token'] = medicalRecordToken;
+
+    if (isAccessTokenValid && effectiveAccessToken) {
+      headers['X-Medical-Record-Token'] = effectiveAccessToken;
     }
     
     // First, try to get the medical record ID for the patient
     const recordsResponse = await fetch(`${API_BASE_URL}/api/patient/medical-record/`, {
       method: 'GET',
       headers,
+      credentials: 'include',
     });
     
     if (!recordsResponse.ok) {
@@ -257,6 +237,7 @@ export async function fetchMedicalRecords(patientId: string, accessToken?: strin
     const response = await fetch(`${API_BASE_URL}/api/medical-records/${recordId}/`, {
       method: 'GET',
       headers,
+      credentials: 'include',
     });
     
     if (!response.ok) {

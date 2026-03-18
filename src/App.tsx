@@ -59,7 +59,15 @@ import AppointmentsPage from './pages/organization/AppointmentsPage';
 import ClinicalGuidelinesManagementPage from './pages/organization/ClinicalGuidelinesManagementPage';
 import HospitalLicensesPage from './pages/organization/HospitalLicensesPage';
 import DepartmentManagementPage from './pages/organization/DepartmentManagementPage';
+// Duplicate import removed
+
 import { OrganizationAuthProvider } from './features/organization/organizationAuthContext';
+
+// Key Care Flow Pages
+import WomensHealthFlowPage from './pages/organization/key-flows/WomensHealthFlowPage';
+import PregnancyFlowPage from './pages/organization/key-flows/PregnancyFlowPage';
+import SurgeriesFlowPage from './pages/organization/key-flows/SurgeriesFlowPage';
+import ChronicCareFlowPage from './pages/organization/key-flows/ChronicCareFlowPage';
 
 // Organization Settings Pages
 import OrganizationSettingsPage from './pages/organization/settings/OrganizationSettingsPage';
@@ -607,6 +615,28 @@ function App() {
                 <Route path="licenses" element={
                   <OrganizationRouteGuard>
                     <HospitalLicensesPage />
+                  </OrganizationRouteGuard>
+                } />
+
+                {/* Key Care Flow Routes */}
+                <Route path="key-flows/womens-health" element={
+                  <OrganizationRouteGuard>
+                    <WomensHealthFlowPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="key-flows/pregnancy" element={
+                  <OrganizationRouteGuard>
+                    <PregnancyFlowPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="key-flows/surgeries" element={
+                  <OrganizationRouteGuard>
+                    <SurgeriesFlowPage />
+                  </OrganizationRouteGuard>
+                } />
+                <Route path="key-flows/chronic-care" element={
+                  <OrganizationRouteGuard>
+                    <ChronicCareFlowPage />
                   </OrganizationRouteGuard>
                 } />
 

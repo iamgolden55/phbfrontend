@@ -137,6 +137,30 @@ const ClinicalGuidelinesManagementPage: React.FC = () => {
     { target: '.guidelines-list', content: 'Manage and launch your interactive protocols here.' },
   ];
 
+
+  // Watch for global tour trigger
+  useEffect(() => {
+    if (tourTrigger > 0) {
+      setRunTour(true);
+    }
+  }, [tourTrigger]);
+
+  // Check for first time view
+  useEffect(() => {
+    const hasSeenTour = localStorage.getItem('tour_seen_clinical_guidelines');
+    if (!hasSeenTour) {
+      setRunTour(true);
+    }
+  }, []);
+
+  const handleJoyrideCallback = (data: CallBackProps) => {
+    const { status } = data;
+    if (([STATUS.FINISHED, STATUS.SKIPPED] as string[]).includes(status)) {
+      setRunTour(false);
+      localStorage.setItem('tour_seen_clinical_guidelines', 'true');
+    }
+  };
+
   useEffect(() => {
     if (isAuthenticated) {
       loadData();
@@ -263,7 +287,19 @@ const ClinicalGuidelinesManagementPage: React.FC = () => {
           <title>Clinical Guidelines - Bella Design</title>
         </Helmet>
 
-        <Joyride steps={tourSteps} run={runTour} continuous showSkipButton styles={{ options: { primaryColor: '#10b981' } }} />
+        <Joyride
+          steps={tourSteps}
+          run={runTour}
+          continuous
+          showSkipButton
+          callback={handleJoyrideCallback}
+          styles={{
+            options: {
+              primaryColor: '#10b981',
+              zIndex: 10000
+            }
+          }}
+        />
 
         {/* Header */}
         <div className="flex justify-between items-center mb-10">
@@ -288,7 +324,7 @@ const ClinicalGuidelinesManagementPage: React.FC = () => {
               <Plus className="w-4 h-4 mr-2" />
               Add Guideline
             </button>
-            
+
           </div>
         </div>
 
@@ -496,7 +532,7 @@ const ClinicalGuidelinesManagementPage: React.FC = () => {
                       <Download className="w-4 h-4 mr-2" />
                       Download PDF
                     </button>
-                    {(selectedGuideline.approval_status === 'draft' || selectedGuideline.approval_status === 'pending_review') && (
+                    {!selectedGuideline.is_published && (selectedGuideline.approval_status === 'draft' || selectedGuideline.approval_status === 'pending_review') && (
                       <button
                         onClick={() => handlePublish(selectedGuideline)}
                         className="bg-emerald-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-emerald-200 flex items-center hover:bg-emerald-700 transition-transform hover:-translate-y-0.5"

@@ -203,8 +203,7 @@ const MedicalRecordsTab: React.FC<MedicalRecordsTabProps> = ({ patientId, patien
       const response = await verifyMedicalRecordOTP(patientId, otp);
       
       if (response.status === 'success' && response.access_token) {
-        // Store the token and reload records
-        localStorage.setItem('medical_record_token', response.access_token);
+        // Token is held in-memory by the service; just reload records
         setOtpDialogOpen(false);
         await loadMedicalRecords(response.access_token);
       } else {
@@ -217,17 +216,8 @@ const MedicalRecordsTab: React.FC<MedicalRecordsTabProps> = ({ patientId, patien
   };
 
   useEffect(() => {
-    // Check if we have a valid medical record token first
-    const medicalRecordToken = localStorage.getItem('medical_record_token');
-    const tokenExpiresAt = localStorage.getItem('medical_record_token_expires_at');
-    
-    if (medicalRecordToken && tokenExpiresAt && new Date(tokenExpiresAt) > new Date()) {
-      // Token is still valid, use it
-      loadMedicalRecords(medicalRecordToken);
-    } else {
-      // No valid token, load without it (will trigger OTP flow if needed)
-      loadMedicalRecords();
-    }
+    // Always attempt to load; service will request OTP if required
+    loadMedicalRecords();
   }, [patientId]);
 
   const renderConditions = () => (

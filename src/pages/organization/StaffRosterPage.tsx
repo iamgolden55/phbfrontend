@@ -4,7 +4,9 @@ import { StaffService, type StaffMember, type Department } from '../../services/
 import { StatusBadge } from '../../components/StatusBadge';
 import { useOrganizationAuth } from '../../features/organization/organizationAuthContext';
 // Using material-icons instead of heroicons
-import { PlusOne as PlusIcon, Close as XMarkIcon } from '@mui/icons-material';
+import { PlusOne as PlusIcon, Close as XMarkIcon, ViewList, CalendarMonth } from '@mui/icons-material';
+import StaffScheduleView from './components/StaffScheduleView';
+import AddVisitModal from './components/AddVisitModal';
 
 // Department state will be fetched from API
 
@@ -66,12 +68,12 @@ interface AddStaffFormProps {
   departmentsError: string | null;
 }
 
-const AddStaffForm: React.FC<AddStaffFormProps> = ({ 
-  onClose, 
+const AddStaffForm: React.FC<AddStaffFormProps> = ({
+  onClose,
   onStaffAdded,
   departments,
   departmentsLoading,
-  departmentsError 
+  departmentsError
 }) => {
   const [formData, setFormData] = useState<StaffFormData>({
     email: '',
@@ -98,7 +100,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    
+
     if (name === 'preferred_language') {
       setShowCustomLanguage(value === 'other');
       if (value !== 'other') {
@@ -106,7 +108,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
         return;
       }
     }
-    
+
     // Handle doctor profile fields
     if (name.startsWith('doctor_profile.')) {
       const fieldName = name.split('.')[1];
@@ -119,7 +121,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
       }));
       return;
     }
-    
+
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -137,15 +139,15 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
         ...(formData.preferred_language === 'other' && formData.custom_language
           ? { preferred_language: formData.custom_language }
           : formData.preferred_language
-          ? { preferred_language: formData.preferred_language }
-          : {})
+            ? { preferred_language: formData.preferred_language }
+            : {})
       };
-      
+
       // Convert empty string to null for optional fields
       if (staffData.phone === '') {
         staffData.phone = null;
       }
-      
+
       // Convert years_of_experience to number if it exists
       if (staffData.doctor_profile?.years_of_experience) {
         staffData.doctor_profile.years_of_experience = parseInt(staffData.doctor_profile.years_of_experience);
@@ -157,7 +159,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
           delete staffData[key];
         }
       });
-      
+
       // Clean up doctor_profile if all fields are empty
       if (staffData.doctor_profile) {
         const hasDoctorProfileData = Object.values(staffData.doctor_profile).some(val => val !== '');
@@ -165,7 +167,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
           delete staffData.doctor_profile;
         }
       }
-      
+
       console.log('Staff data:', staffData);
       const response = await StaffService.createStaffMember(staffData as any);
       onStaffAdded(response.staff_member);
@@ -191,7 +193,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
             <XMarkIcon className="h-6 w-6" />
           </button>
         </div>
-        
+
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 p-4 m-4">
             <div className="flex">
@@ -206,13 +208,13 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
             </div>
           </div>
         )}
-        
+
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Personal Information */}
             <div className="space-y-4">
               <h4 className="text-sm font-medium text-gray-700">Personal Information</h4>
-              
+
               <div>
                 <label htmlFor="first_name" className="block text-sm font-medium text-gray-700">
                   First Name *
@@ -227,7 +229,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              
+
               <div>
                 <label htmlFor="last_name" className="block text-sm font-medium text-gray-700">
                   Last Name *
@@ -242,7 +244,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              
+
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Email *
@@ -257,7 +259,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              
+
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Password *
@@ -275,11 +277,11 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
                 <p className="mt-1 text-xs text-gray-500">Minimum 8 characters</p>
               </div>
             </div>
-            
+
             {/* Professional Information */}
             <div className="space-y-4">
               <h4 className="text-sm font-medium text-gray-700">Professional Information</h4>
-              
+
               {formData.role === 'doctor' && (
                 <>
                   <div>
@@ -297,7 +299,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
                       placeholder="Enter medical license number"
                     />
                   </div>
-                  
+
                   <div>
                     <label htmlFor="doctor_profile.license_expiry_date" className="block text-sm font-medium text-gray-700">
                       License Expiry Date *
@@ -313,7 +315,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
-                  
+
                   <div>
                     <label htmlFor="doctor_profile.specialization" className="block text-sm font-medium text-gray-700">
                       Specialization *
@@ -329,7 +331,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
                       placeholder="Enter specialization"
                     />
                   </div>
-                  
+
                   <div>
                     <label htmlFor="doctor_profile.years_of_experience" className="block text-sm font-medium text-gray-700">
                       Years of Experience *
@@ -349,7 +351,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
                   </div>
                 </>
               )}
-              
+
               <div>
                 <label htmlFor="role" className="block text-sm font-medium text-gray-700">
                   Role *
@@ -369,7 +371,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
                   ))}
                 </select>
               </div>
-              
+
               <div>
                 <label htmlFor="department" className="block text-sm font-medium text-gray-700">
                   Clinical Department *
@@ -400,7 +402,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
                   </select>
                 )}
               </div>
-              
+
               <div>
                 <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
                   Phone Number *
@@ -415,7 +417,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              
+
               <div>
                 <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700">
                   Date of Birth
@@ -429,7 +431,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700">Gender</label>
                 <div className="mt-1 space-y-2">
@@ -448,7 +450,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
                   ))}
                 </div>
               </div>
-              
+
               <div>
                 <label htmlFor="preferred_language" className="block text-sm font-medium text-gray-700">
                   Preferred Language
@@ -466,7 +468,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
                     </option>
                   ))}
                 </select>
-                
+
                 {showCustomLanguage && (
                   <div className="mt-2">
                     <input
@@ -482,7 +484,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
               </div>
             </div>
           </div>
-          
+
           <div className="flex justify-end space-x-3 pt-4 border-t">
             <button
               type="button"
@@ -511,39 +513,21 @@ const isStaffActive = (staff: StaffMember) => {
   const now = new Date();
   const currentHour = now.getHours();
   const currentMinute = now.getMinutes();
-  
+
   if (!staff.availability_status.consultation_hours_start || !staff.availability_status.consultation_hours_end) {
     return true;
   }
 
   const [startHour, startMinute] = staff.availability_status.consultation_hours_start.split(':').map(Number);
   const [endHour, endMinute] = staff.availability_status.consultation_hours_end.split(':').map(Number);
-  
+
   const currentTime = currentHour * 60 + currentMinute;
   const startTime = startHour * 60 + startMinute;
   const endTime = endHour * 60 + endMinute;
-  
+
   return currentTime >= startTime && currentTime <= endTime;
 };
 
-interface StaffMember {
-  id: number;
-  email: string;
-  full_name: string;
-  role: string;
-  role_display: string;
-  department_name: string | null;
-  is_available: boolean;
-  availability_status: {
-    is_available: boolean;
-    consultation_hours_start: string | null;
-    consultation_hours_end: string | null;
-    next_available_slot: string | null;
-  };
-  phone: string | null;
-  last_login: string;
-  date_joined: string;
-}
 
 // Helper function to format time string to HH:MM:SS
 const formatTimeString = (dateTimeString: string): string => {
@@ -571,7 +555,7 @@ const StaffRosterPage: React.FC = () => {
 
   // Current date for the roster
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  
+
   // Staff data from API
   const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
   const [loading, setLoading] = useState(true);
@@ -590,7 +574,28 @@ const StaffRosterPage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Handle adding a new staff member
+  // View Mode State
+  const [viewMode, setViewMode] = useState<'list' | 'schedule'>('list');
+  const [showVisitModal, setShowVisitModal] = useState(false);
+  const [visitModalDate, setVisitModalDate] = useState<Date>(new Date());
+  const [visitModalStaffId, setVisitModalStaffId] = useState<number | null>(null);
+
+  const handleAddVisit = (date: Date, staffId?: number) => {
+    setVisitModalDate(date);
+    setVisitModalStaffId(staffId || null);
+    setShowVisitModal(true);
+  };
+
+  const handleSaveVisit = async (visit: any) => {
+    try {
+      await StaffService.createVisit(visit);
+      // Refresh timeline would happen here (or handled inside component)
+      setShowVisitModal(false);
+      setVisitModalStaffId(null);
+    } catch (e) {
+      console.error(e);
+    }
+  };
   const handleStaffAdded = (newStaff: StaffMember) => {
     setStaffMembers(prev => [newStaff, ...prev]);
   };
@@ -604,55 +609,55 @@ const StaffRosterPage: React.FC = () => {
       day: 'numeric'
     }).format(date);
   };
-  
+
   // Status badge component
   const StatusBadge: React.FC<{ isAvailable: boolean }> = ({ isAvailable }) => {
     const badgeClass = isAvailable ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
-    
+
     return (
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${badgeClass}`}>
         {isAvailable ? 'Available' : 'Not Available'}
       </span>
     );
   };
-  
+
   // Date navigation functions
   const goToNextDay = () => {
     const nextDay = new Date(currentDate);
     nextDay.setDate(nextDay.getDate() + 1);
     setCurrentDate(nextDay);
   };
-  
+
   const goToPreviousDay = () => {
     const prevDay = new Date(currentDate);
     prevDay.setDate(prevDay.getDate() - 1);
     setCurrentDate(prevDay);
   };
-  
+
   const goToToday = () => {
     setCurrentDate(new Date());
   };
-  
+
   // Filter staff members based on search query and filters
   const filteredStaff = staffMembers.filter(staff => {
     const searchLower = searchQuery.toLowerCase();
-    const matchesSearch = searchQuery === '' || 
+    const matchesSearch = searchQuery === '' ||
       staff.full_name.toLowerCase().includes(searchLower) ||
       staff.email.toLowerCase().includes(searchLower) ||
       (staff.phone ? staff.phone.toLowerCase().includes(searchLower) : false) ||
       (staff.role_display ? staff.role_display.toLowerCase().includes(searchLower) : false) ||
       (staff.department_name ? staff.department_name.toLowerCase().includes(searchLower) : false);
-      
+
     const matchesDepartment = !departmentFilter || staff.department_name === departmentFilter;
     const matchesRole = !roleFilter || staff.role_display === roleFilter;
-    const matchesStatus = !statusFilter || 
+    const matchesStatus = !statusFilter ||
       (statusFilter === 'true' ? staff.is_available : !staff.is_available);
-    const matchesActive = !activeFilter || 
+    const matchesActive = !activeFilter ||
       (activeFilter === 'true' ? isStaffActive(staff) : !isStaffActive(staff));
-    
+
     return matchesSearch && matchesDepartment && matchesRole && matchesStatus && matchesActive;
   });
-  
+
   // Get unique roles from staff members
   const roles = Array.from(
     new Set(staffMembers.map(staff => staff.role_display).filter((r): r is string => Boolean(r)))
@@ -670,22 +675,22 @@ const StaffRosterPage: React.FC = () => {
         if (!hospitalId) {
           throw new Error('Hospital ID not found');
         }
-        
+
         // Fetch departments and staff members in parallel
         // Only fetch clinical and support departments (not administrative ones like IT/HR)
         const [departmentsData, staffResponse] = await Promise.all([
           StaffService.getHospitalDepartments(hospitalId, 'clinical_and_support'),
           StaffService.fetchStaffMembers()
         ]);
-        
+
         setDepartments(departmentsData);
         setDepartmentsError(null);
-        
+
         // Update staff members from the response
         if (staffResponse && staffResponse.staff_members) {
           setStaffMembers(staffResponse.staff_members);
         }
-        
+
         setError(null);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -701,12 +706,12 @@ const StaffRosterPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className={`${viewMode === 'schedule' ? 'w-full px-4' : 'container mx-auto px-4'} py-8`}>
       {/* Navigation Bar */}
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center">
-          <Link 
-            to="/organization/dashboard" 
+          <Link
+            to="/organization/dashboard"
             className="mr-4 bg-blue-50 hover:bg-blue-100 p-2 rounded-full"
           >
             <span className="material-icons text-blue-700">arrow_back</span>
@@ -725,290 +730,372 @@ const StaffRosterPage: React.FC = () => {
           </Link>
         </div>
       </div>
-      
-     <div className='flex justify-end mb-6'>
-     <button 
-              onClick={() => setShowAddStaffForm(true)}
-              className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm flex items-center"
-            >
-              <PlusIcon className="h-4 w-4 mr-1" />
-              Add Staff
-            </button>
-     </div>
-      
-      {/* Date Navigation */}
-      <div className="bg-white p-4 rounded-lg shadow-md mb-6">
-        <div className="flex flex-wrap justify-between items-center">
-          <div className="flex space-x-2">
-            <button 
-              onClick={goToPreviousDay}
-              disabled={loading}
-              className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-md flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span className="material-icons text-sm">chevron_left</span>
-            </button>
-            <button 
-              onClick={goToToday}
-              disabled={loading}
-              className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded-md flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span className="material-icons text-sm mr-1">today</span>
-              Today
-            </button>
-            <button 
-              onClick={goToNextDay}
-              disabled={loading}
-              className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-md flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span className="material-icons text-sm">chevron_right</span>
-            </button>
-          </div>
-          
-          <h2 className="text-lg font-semibold text-center flex-grow flex items-center justify-center">
-            <span className="material-icons mr-2">calendar_month</span>
-            {formatDate(currentDate)}
-          </h2>
-          
-          <div className="flex space-x-2">
-          
-            <button className="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1 rounded-md text-sm flex items-center">
-              <span className="material-icons text-sm mr-1">print</span>
-              Print Roster
-            </button>
-            <button className="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1 rounded-md text-sm flex items-center">
-              <span className="material-icons text-sm mr-1">download</span>
-              Export
-            </button>
-          </div>
+
+      <div className='flex justify-between items-center mb-6'>
+        <div className="bg-gray-100 p-1 rounded-lg inline-flex">
+          <button
+            onClick={() => setViewMode('list')}
+            className={`px-4 py-2 rounded-md text-sm font-medium flex items-center transition-all ${viewMode === 'list'
+              ? 'bg-white text-blue-600 shadow-sm'
+              : 'text-gray-600 hover:text-gray-900'
+              }`}
+          >
+            <ViewList className="w-4 h-4 mr-2" />
+            Staff List
+          </button>
+          <button
+            onClick={() => setViewMode('schedule')}
+            className={`px-4 py-2 rounded-md text-sm font-medium flex items-center transition-all ${viewMode === 'schedule'
+              ? 'bg-white text-blue-600 shadow-sm'
+              : 'text-gray-600 hover:text-gray-900'
+              }`}
+          >
+            <CalendarMonth className="w-4 h-4 mr-2" />
+            Roster Schedule
+          </button>
         </div>
+
+        <button
+          onClick={() => setShowAddStaffForm(true)}
+          className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm flex items-center"
+        >
+          <PlusIcon className="h-4 w-4 mr-1" />
+          Add Staff
+        </button>
       </div>
-      
-      {/* Staff Summary */}
-      {loading ? (
-        <div className="flex justify-center items-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        </div>
-      ) : error ? (
-        <div className="bg-red-50 p-4 rounded-md text-red-700">
-          <span className="material-icons mr-2">error</span>
-          {error}
-        </div>
-      ) : (
-        <div className="bg-white p-4 rounded-lg shadow-md mb-6">
-          <h3 className="text-lg font-semibold text-blue-800 mb-3 flex items-center">
-            <span className="material-icons mr-2">summarize</span>
-            Today's Staff Summary
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="bg-blue-50 p-3 rounded-md text-center">
-              <p className="text-2xl font-bold text-blue-600">{staffMembers.length}</p>
-              <p className="text-sm text-gray-600">Total Staff</p>
-            </div>
-            <div className="bg-green-50 p-3 rounded-md text-center">
-              <p className="text-2xl font-bold text-green-600">
-                {staffMembers.filter(isStaffActive).length}
-              </p>
-              <p className="text-sm text-gray-600">Currently Active</p>
-            </div>
-            <div className="bg-green-50 p-3 rounded-md text-center">
-              <p className="text-2xl font-bold text-green-600">
-                {staffMembers.filter(staff => staff.is_available).length}
-              </p>
-              <p className="text-sm text-gray-600">Available</p>
-            </div>
-            <div className="bg-gray-50 p-3 rounded-md text-center">
-              <p className="text-2xl font-bold text-gray-600">
-                {staffMembers.filter(staff => !staff.is_available).length}
-              </p>
-              <p className="text-sm text-gray-600">Not Available</p>
+
+      {viewMode === 'list' ? (
+        <>
+          {/* Date Navigation */}
+          <div className="bg-white p-4 rounded-lg shadow-md mb-6">
+            <div className="flex flex-wrap justify-between items-center">
+              <div className="flex space-x-2">
+                <button
+                  onClick={goToPreviousDay}
+                  disabled={loading}
+                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-md flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span className="material-icons text-sm">chevron_left</span>
+                </button>
+                <button
+                  onClick={goToToday}
+                  disabled={loading}
+                  className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded-md flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span className="material-icons text-sm mr-1">today</span>
+                  Today
+                </button>
+                <button
+                  onClick={goToNextDay}
+                  disabled={loading}
+                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-md flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span className="material-icons text-sm">chevron_right</span>
+                </button>
+              </div>
+
+              <h2 className="text-lg font-semibold text-center flex-grow flex items-center justify-center">
+                <span className="material-icons mr-2">calendar_month</span>
+                {formatDate(currentDate)}
+              </h2>
             </div>
           </div>
+
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+              <h3 className="text-blue-800 font-medium mb-1 flex items-center">
+                <span className="material-icons text-sm mr-1">people</span>
+                Total Staff
+              </h3>
+              <p className="text-2xl font-bold text-blue-900">{staffMembers.length}</p>
+            </div>
+            <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+              <h3 className="text-green-800 font-medium mb-1 flex items-center">
+                <span className="material-icons text-sm mr-1">verified_user</span>
+                Currently Active
+              </h3>
+              <p className="text-2xl font-bold text-green-900">{staffMembers.filter(isStaffActive).length}</p>
+            </div>
+            <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+              <h3 className="text-green-800 font-medium mb-1 flex items-center">
+                <span className="material-icons text-sm mr-1">check_circle</span>
+                Available
+              </h3>
+              <p className="text-2xl font-bold text-green-900">{staffMembers.filter(s => s.is_available).length}</p>
+            </div>
+            <div className="bg-red-50 p-4 rounded-lg border border-red-100">
+              <h3 className="text-red-800 font-medium mb-1 flex items-center">
+                <span className="material-icons text-sm mr-1">cancel</span>
+                Not Available
+              </h3>
+              <p className="text-2xl font-bold text-red-900">{staffMembers.filter(s => !s.is_available).length}</p>
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="bg-white p-4 rounded-lg shadow-md mb-6">
+            <div className="flex items-center mb-4">
+              <span className="material-icons text-blue-700 mr-2">filter_list</span>
+              <h3 className="font-semibold text-gray-800">Filters</h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Department</label>
+                <div className="relative">
+                  <select
+                    value={departmentFilter}
+                    onChange={(e) => setDepartmentFilter(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm appearance-none"
+                    disabled={departmentsLoading}
+                  >
+                    <option value="">All Departments</option>
+                    {departments.map(dept => (
+                      <option key={dept.id} value={dept.name}>{dept.name}</option>
+                    ))}
+                  </select>
+                  <span className="material-icons absolute right-2 top-2 text-gray-400 pointer-events-none text-lg">expand_more</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Role</label>
+                <div className="relative">
+                  <select
+                    value={roleFilter}
+                    onChange={(e) => setRoleFilter(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm appearance-none"
+                  >
+                    <option value="">All Roles</option>
+                    {roles.map(role => (
+                      <option key={role} value={role}>{role}</option>
+                    ))}
+                  </select>
+                  <span className="material-icons absolute right-2 top-2 text-gray-400 pointer-events-none text-lg">expand_more</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Status</label>
+                <div className="relative">
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm appearance-none"
+                  >
+                    <option value="">All Statuses</option>
+                    <option value="true">Available</option>
+                    <option value="false">Not Available</option>
+                  </select>
+                  <span className="material-icons absolute right-2 top-2 text-gray-400 pointer-events-none text-lg">expand_more</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Active Status</label>
+                <div className="relative">
+                  <select
+                    value={activeFilter}
+                    onChange={(e) => setActiveFilter(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm appearance-none"
+                  >
+                    <option value="">All Active Statuses</option>
+                    <option value="true">Currently Active</option>
+                    <option value="false">Not Active</option>
+                  </select>
+                  <span className="material-icons absolute right-2 top-2 text-gray-400 pointer-events-none text-lg">expand_more</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="md:col-span-2">
+                <label className="block text-xs font-medium text-gray-500 mb-1">Search</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search staff..."
+                    className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  />
+                  <span className="material-icons absolute left-2 top-2 text-gray-400 text-lg">search</span>
+                </div>
+              </div>
+
+              <div className="flex items-end">
+                <button
+                  onClick={() => {
+                    setDepartmentFilter('');
+                    setRoleFilter('');
+                    setStatusFilter('');
+                    setActiveFilter('');
+                    setSearchQuery('');
+                  }}
+                  className="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2 rounded-md transition-colors text-sm flex items-center"
+                >
+                  <span className="material-icons text-sm mr-1">close</span>
+                  Clear Filters
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Staff Table */}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="overflow-x-auto">
+              {loading ? (
+                <div className="p-8 text-center text-gray-500">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-700 mb-2"></div>
+                  <p>Loading staff roster...</p>
+                </div>
+              ) : error ? (
+                <div className="p-8 text-center text-red-500">
+                  <span className="material-icons text-4xl mb-2">error_outline</span>
+                  <p>{error}</p>
+                </div>
+              ) : filteredStaff.length === 0 ? (
+                <div className="p-8 text-center text-gray-500">
+                  <span className="material-icons text-4xl mb-2">people_outline</span>
+                  <p>No staff members found matching your filters.</p>
+                </div>
+              ) : (
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shift</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Active Status</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                      <th scope="col" className="relative px-6 py-3">
+                        <span className="sr-only">Actions</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredStaff.map((staff) => (
+                      <tr key={staff.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600 font-medium">
+                          {staff.id}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">{staff.full_name}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {staff.role_display}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {staff.department_name || '-'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {staff.availability_status?.consultation_hours_start ? (
+                            `${staff.availability_status.consultation_hours_start} - ${staff.availability_status.consultation_hours_end}`
+                          ) : (
+                            <span className="text-gray-400 italic">Not specified</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {isStaffActive(staff) ? (
+                            <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                              Available
+                            </span>
+                          ) : (
+                            <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                              Not Available
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <StatusBadge isAvailable={staff.is_available} />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <div className="flex flex-col">
+                            {staff.phone ? (
+                              <div className="flex items-center mb-1">
+                                <span className="material-icons text-xs mr-1 text-gray-400">phone</span>
+                                {staff.phone}
+                              </div>
+                            ) : (
+                              <div className="flex items-center mb-1 text-gray-400 italic">
+                                <span className="material-icons text-xs mr-1">phone_disabled</span>
+                                Not specified
+                              </div>
+                            )}
+                            <div className="flex items-center">
+                              <span className="material-icons text-xs mr-1 text-gray-400">email</span>
+                              <span className="truncate max-w-[150px]" title={staff.email}>{staff.email}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <button className="text-blue-600 hover:text-blue-900 mr-3">
+                            <span className="material-icons text-lg">edit</span>
+                          </button>
+                          <button className="text-red-600 hover:text-red-900">
+                            <span className="material-icons text-lg">delete</span>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            {/* Pagination controls would go here */}
+            {filteredStaff.length > 0 && (
+              <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm text-gray-700">
+                      Showing <span className="font-medium">1</span> to <span className="font-medium">{filteredStaff.length}</span> of <span className="font-medium">{filteredStaff.length}</span> results
+                    </p>
+                  </div>
+                  <div>
+                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                      <a href="#" className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span className="sr-only">Previous</span>
+                        <span className="material-icons text-sm">chevron_left</span>
+                      </a>
+                      <a href="#" aria-current="page" className="z-10 bg-blue-50 border-blue-500 text-blue-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                        1
+                      </a>
+                      <a href="#" className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span className="sr-only">Next</span>
+                        <span className="material-icons text-sm">chevron_right</span>
+                      </a>
+                    </nav>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </>
+      ) : (
+        <div className="flex-1 w-full min-h-[calc(100vh-160px)] -mt-4">
+          <StaffScheduleView
+            staffMembers={staffMembers}
+            currentDate={currentDate}
+            onDateChange={setCurrentDate}
+            onAddVisit={handleAddVisit}
+            onDownload={() => alert('Download feature coming soon!')}
+          />
         </div>
       )}
-      
-      {/* Filters */}
-      <div className="mb-6 bg-white p-4 rounded-lg shadow-md">
-        <h3 className="text-lg font-semibold text-blue-800 mb-3 flex items-center">
-          <span className="material-icons mr-2">filter_alt</span>
-          Filters
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="w-full">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
-            <select
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              value={departmentFilter}
-              onChange={(e) => setDepartmentFilter(e.target.value)}
-            >
-              <option value="">All Departments</option>
-              {departmentsLoading ? (
-                <option>Loading departments...</option>
-              ) : departmentsError ? (
-                <option>Error loading departments</option>
-              ) : (
-                departments.map((dept) => (
-                  <option key={dept.id} value={dept.name}>
-                    {dept.name}
-                  </option>
-                ))
-              )}
-            </select>
-          </div>
-          <div className="w-full">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-            <select
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-            >
-              <option value="">All Roles</option>
-              {ROLE_OPTIONS.map((role) => (
-                <option key={role.value} value={role.value}>
-                  {role.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="w-full">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-            <select
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              <option value="">All Statuses</option>
-              <option value="true">Available</option>
-              <option value="false">Not Available</option>
-            </select>
-          </div>
-          <div className="w-full">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Active Status</label>
-            <select 
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              value={activeFilter}
-              onChange={(e) => setActiveFilter(e.target.value)}
-            >
-              <option value="">All Active Statuses</option>
-              <option value="true">Currently Active</option>
-              <option value="false">Currently Inactive</option>
-            </select>
-          </div>
-          <div className="w-full">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
-            <input
-              type="text"
-              placeholder="Search staff..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <div className="flex items-end">
-            <button 
-              className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md flex items-center h-10"
-              onClick={() => {
-                setDepartmentFilter('');
-                setRoleFilter('');
-                setStatusFilter('');
-                setActiveFilter('');
-                setSearchQuery('');
-              }}
-            >
-              <span className="material-icons text-sm mr-1">clear</span>
-              Clear Filters
-            </button>
-          </div>
-        </div>
-      </div>
-      
-      {/* Staff Roster Table */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shift</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Active Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {filteredStaff.map((staff) => (
-                <tr key={staff.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{staff.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    {staff.full_name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">{staff.role_display}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">{staff.department_name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {staff.availability_status.consultation_hours_start && staff.availability_status.consultation_hours_end ? (
-                      <div className="text-sm text-gray-600">
-                        {formatTimeString(staff.availability_status.consultation_hours_start)} - {formatTimeString(staff.availability_status.consultation_hours_end)}
-                      </div>
-                    ) : (
-                      <div className="text-sm text-gray-400">Not specified</div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <StatusBadge isAvailable={isStaffActive(staff)} />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <StatusBadge isAvailable={staff.is_available} />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <div className="flex items-center">
-                      <span className="material-icons text-xs mr-1 text-gray-400">phone</span>
-                      {staff.phone ? staff.phone : 'Not specified'}
-                    </div>
-                    <div className="text-xs text-gray-500 flex items-center mt-1">
-                      <span className="material-icons text-xs mr-1 text-gray-400">email</span>
-                      {staff.email}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
-                    <button className="text-blue-600 hover:text-blue-800 mr-3 flex items-center">
-                      <span className="material-icons text-sm mr-1">visibility</span>
-                      View
-                    </button>
-                    <button className="text-blue-600 hover:text-blue-800 flex items-center">
-                      <span className="material-icons text-sm mr-1">edit</span>
-                      Edit
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        
-        {/* Empty state */}
-        {filteredStaff.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            <span className="material-icons text-4xl mb-2 text-gray-400">person_search</span>
-            <p>No staff members match your filters.</p>
-            <button 
-              className="text-blue-600 hover:text-blue-800 mt-2 flex items-center justify-center mx-auto"
-              onClick={() => {
-                setDepartmentFilter('');
-                setRoleFilter('');
-                setStatusFilter('');
-                setSearchQuery('');
-              }}
-            >
-              <span className="material-icons text-sm mr-1">clear_all</span>
-              Clear all filters
-            </button>
-          </div>
-        )}
-      </div>
-      
+      {/* Add Visit Modal */}
+      <AddVisitModal
+        isOpen={showVisitModal}
+        onClose={() => setShowVisitModal(false)}
+        onSave={handleSaveVisit}
+        initialDate={visitModalDate}
+        staffMembers={staffMembers}
+      />
+
       {/* Add Staff Modal */}
       {showAddStaffForm && (
         <AddStaffForm

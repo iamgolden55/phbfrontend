@@ -66,12 +66,6 @@ const MedicalOTPAccess: React.FC<MedicalOTPProps> = ({ onAccessGranted }) => {
       const result = await response.json();
 
       if (response.ok) {
-        // Store the medical access token and expiry time
-        const expiryTime = Date.now() + (result.expires_in * 1000); // Convert seconds to milliseconds
-
-        localStorage.setItem('med_access_token', result.med_access_token);
-        localStorage.setItem('med_access_expiry', expiryTime.toString());
-
         setMessage('Access granted successfully!');
         setTimeout(() => {
           onAccessGranted();

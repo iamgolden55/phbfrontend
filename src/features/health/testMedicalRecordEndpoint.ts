@@ -8,14 +8,6 @@
  *    import('/src/features/health/testMedicalRecordEndpoint.ts').then(module => module.testAllEndpoints())
  */
 
-// Get tokens from localStorage
-const getTokens = () => {
-  const authToken = localStorage.getItem('phb_auth_token');
-  const medAccessToken = localStorage.getItem('med_access_token');
-  
-  return { authToken, medAccessToken };
-};
-
 // List of potential API endpoints to try
 const endpointsToTest = [
   'http://localhost:8000/api/patient/medical-record',
@@ -35,15 +27,8 @@ const endpointsToTest = [
 ];
 
 // Test a single endpoint
-const testEndpoint = async (url: string): Promise<{ success: boolean; status: number; data?: any }> => {
+const testEndpoint = async (url: string, medAccessToken?: string): Promise<{ success: boolean; status: number; data?: any }> => {
   try {
-    const { authToken, medAccessToken } = getTokens();
-    
-    if (!authToken || !medAccessToken) {
-      console.error('Missing tokens! Make sure you are logged in and completed OTP verification');
-      return { success: false, status: 0 };
-    }
-    
     console.log(`Testing endpoint: ${url}`);
     
     const response = await fetch(url, {
@@ -51,9 +36,9 @@ const testEndpoint = async (url: string): Promise<{ success: boolean; status: nu
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': `Bearer ${authToken}`,
-        'X-Med-Access-Token': medAccessToken
-      }
+        ...(medAccessToken ? { 'X-Med-Access-Token': medAccessToken } : {})
+      },
+      credentials: 'include'
     });
     
     const status = response.status;
@@ -78,18 +63,10 @@ const testEndpoint = async (url: string): Promise<{ success: boolean; status: nu
 };
 
 // Test all endpoints and find the one that works
-export const testAllEndpoints = async (): Promise<void> => {
+export const testAllEndpoints = async (medAccessToken?: string): Promise<void> => {
   console.log('Starting medical records endpoint test...');
   console.log('========================================');
-  
-  const { authToken, medAccessToken } = getTokens();
-  console.log(`Auth token available: ${!!authToken}`);
-  console.log(`Med Access token available: ${!!medAccessToken}`);
-  
-  if (!authToken || !medAccessToken) {
-    console.error('ERROR: Missing tokens! Make sure you are logged in and completed OTP verification');
-    return;
-  }
+  console.log(`Med Access token provided: ${!!medAccessToken}`);
   
   console.log('========================================');
   console.log('Testing all possible endpoints:');
@@ -97,14 +74,11 @@ export const testAllEndpoints = async (): Promise<void> => {
   let successfulEndpoint = null;
   
   for (const endpoint of endpointsToTest) {
-    const result = await testEndpoint(endpoint);
+    const result = await testEndpoint(endpoint, medAccessToken);
     
     if (result.success) {
       console.log(`✅ SUCCESS: ${endpoint} (Status: ${result.status})`);
       successfulEndpoint = endpoint;
-      
-      // Save the successful endpoint to localStorage for later use
-      localStorage.setItem('working_medical_record_endpoint', endpoint);
       
       // Break after finding the first working endpoint
       break;
